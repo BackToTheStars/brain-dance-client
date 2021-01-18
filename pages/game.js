@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
 import Head from 'next/head'; // в head засовываем всё что было в head index.html
+import { UI_Provider } from '../components/contexts/UI_Context';
 
 const Game = dynamic(() => import('../components/Game'), { ssr: false });
 // ssr = server side rendering
@@ -29,8 +30,9 @@ const GamePage = () => {
         ></script>
         <script src="/quill/quill.min.js"></script>
       </Head>
-
-      <Game />
+      <UI_Provider>
+        <Game />
+      </UI_Provider>
     </>
   );
 };

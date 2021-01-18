@@ -1,7 +1,12 @@
 import Game from '../src/game';
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
+import ButtonsPanel from './panels/ButtonsPanel';
+import ClassesPanel from './panels/ClassesPanel';
+import { UI_Context } from './contexts/UI_Context';
 
 const GameComponent = () => {
+  const { setClassesPanelIsHidden } = useContext(UI_Context);
+
   useEffect(() => {
     const game = new Game({
       stageEl: $('#gameBox'),
@@ -11,19 +16,13 @@ const GameComponent = () => {
 
   return (
     <div style={{ width: '100%', display: 'flex' }}>
-      <div className="p0 hidden" id="classMenu" />
+      <ClassesPanel />
       <div className="col p0">
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" />
         </div>
 
-        <div className="actions">
-          <button id="add-new-box-to-game-btn">Add Turn</button>
-          <button id="save-positions-btn">Save Field</button>
-          <button id="toggle-left-panel">Left Panel</button>
-          {/* <button id="show-minimap-btn">Minimap</button> */}
-          <button id="go-to-lobby">Lobby</button>
-        </div>
+        <ButtonsPanel setClassesPanelIsHidden={setClassesPanelIsHidden} />
 
         <div id="notificationPanel" />
 
