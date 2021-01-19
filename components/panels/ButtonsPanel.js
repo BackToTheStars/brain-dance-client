@@ -1,11 +1,10 @@
-import { UI_Context } from '../contexts/UI_Context';
-import { useContext } from 'react';
+import { useUiContext } from '../contexts/UI_Context';
 
 const ButtonsPanel = () => {
   const {
     state: { classesPanelIsHidden },
     dispatch,
-  } = useContext(UI_Context);
+  } = useUiContext();
 
   return (
     <div className="actions">

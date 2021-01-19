@@ -1,4 +1,4 @@
-import { useState, useReducer, createContext } from 'react';
+import { useState, useContext, useReducer, createContext } from 'react';
 
 export const UI_Context = createContext();
 const initialState = {
@@ -31,3 +31,5 @@ export const UI_Provider = ({ children }) => {
     </UI_Context.Provider>
   );
 };
+
+export const useUiContext = () => useContext(UI_Context);

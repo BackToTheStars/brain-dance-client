@@ -1,12 +1,9 @@
 import Game from '../src/game';
-import { useEffect, useContext } from 'react';
+import { useEffect } from 'react';
 import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
-import { UI_Context } from './contexts/UI_Context';
 
 const GameComponent = () => {
-  const { setClassesPanelIsHidden } = useContext(UI_Context);
-
   useEffect(() => {
     const game = new Game({
       stageEl: $('#gameBox'),
@@ -22,7 +19,7 @@ const GameComponent = () => {
           <div id="gameBox" className="ui-widget-content" />
         </div>
 
-        <ButtonsPanel setClassesPanelIsHidden={setClassesPanelIsHidden} />
+        <ButtonsPanel />
 
         <div id="notificationPanel" />
 

@@ -1,3 +1,5 @@
+import Link from 'next/link'; // линк для роутера next.js, асинхнонно грузит и кеширует разметку
+
 // https://via.placeholder.com/400x300
 
 // const PREV_FRONT_URL = 'http://localhost:3000'
@@ -18,9 +20,9 @@ const GameDetails = ({ game, mode, deleteGame, openEditGameForm }) => {
         {!!game.description && <p className="card-text">{game.description}</p>}
 
         <div className="card-game-buttons">
-          <a href={`/game?hash=${game.hash}`} className="btn btn-success">
-            Open
-          </a>
+          <Link href={`/game?hash=${game.hash}`}>
+            <a className="btn btn-success">Open</a>
+          </Link>
           {mode === 'admin' && (
             <>
               <button

@@ -5,12 +5,15 @@ import CreateGameForm from '../components/CreateGameForm';
 import EditGameForm from '../components/EditGameForm';
 
 import { API_URL } from '../src/config';
+import { getToken } from '../src/lib/token';
 
-const IndexPage = ({ mode = 'visitor' }) => {
+const IndexPage = () => {
   const [games, setGames] = useState([]);
   const [gameClicked, setGameClicked] = useState(null);
   const [toggleCreateForm, setToggleCreateForm] = useState(false);
   const [toggleEditForm, setToggleEditForm] = useState(false);
+
+  const mode = getToken() ? 'admin' : 'visitor';
 
   useEffect(() => {
     getGames();

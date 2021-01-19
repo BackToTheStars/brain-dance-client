@@ -1,10 +1,9 @@
-import { useContext } from 'react';
-import { UI_Context } from '../contexts/UI_Context';
+import { useUiContext } from '../contexts/UI_Context';
 
 const ClassesPanel = () => {
   const {
     state: { classesPanelIsHidden },
-  } = useContext(UI_Context);
+  } = useUiContext();
   return (
     <div
       className={['p0', classesPanelIsHidden ? 'hidden' : ''].join(' ')}
