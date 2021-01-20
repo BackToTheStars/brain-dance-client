@@ -16,7 +16,7 @@ const ButtonsPanel = () => {
         }
         id="toggle-left-panel"
       >
-        Left Panel
+        Classes
       </button>
       {/* <button id="show-minimap-btn">Minimap</button> */}
       <button id="go-to-lobby">Lobby</button>
