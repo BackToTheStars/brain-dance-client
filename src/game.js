@@ -26,9 +26,13 @@ import { MiniMap } from './minimap';
 // настраивает компоненты игры,
 // обеспечивает передачу данных между компонентами
 class Game {
-  constructor({ stageEl }) {
+  constructor({ stageEl, settings }) {
     this.stageEl = stageEl;
     this.triggers = {};
+
+    const { notificationAlert } = settings;
+    this.notificationAlert = notificationAlert;
+
     this.gameField = new GameField(
       {
         stageEl: this.stageEl,
@@ -83,6 +87,11 @@ class Game {
           const turns = await this.turnCollection.getTurns();
           const payload = this.gameField.saveTurnPositions(turns);
           await turnsUpdateCoordinates(payload);
+          // this.notificationAlert({
+          //   msgTitle: 'Info:',
+          //   msgText: 'Field has been saved',
+          //   timespan: 1500,
+          // });
           this.notificationPanel.alert({
             msgTitle: 'Info:',
             msgText: 'Field has been saved',

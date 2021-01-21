@@ -1,12 +1,21 @@
 import Game from '../src/game';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
+import NotificationPanel from './panels/NotificationPanel';
 
 const GameComponent = () => {
+  const [notes, setNotes] = useState([]);
+  const notificationAlert = (note) => {
+    setNotes((notes) => {
+      return [...notes, note];
+    });
+  };
+
   useEffect(() => {
     const game = new Game({
       stageEl: $('#gameBox'),
+      settings: { notificationAlert },
     });
     game.init();
   }, []);
@@ -20,8 +29,7 @@ const GameComponent = () => {
         </div>
 
         <ButtonsPanel />
-
-        <div id="notificationPanel" />
+        <NotificationPanel notes={notes} />
 
         <div className="quotes-panel" />
 
