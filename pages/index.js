@@ -13,6 +13,7 @@ const IndexPage = () => {
   const [toggleCreateForm, setToggleCreateForm] = useState(false);
   const [toggleEditForm, setToggleEditForm] = useState(false);
   const [mode, setMode] = useState('visitor');
+  const [code, setCode] = useState('');
 
   useEffect(() => {
     getGames();
@@ -129,6 +130,28 @@ const IndexPage = () => {
       });
   };
 
+  const addCode = (game) => {
+    fetch(`${API_URL}/codes?hash=${game.hash}`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json()) // вернёт Promise
+      .then((data) => {
+        const { item, message } = data;
+        if (item) {
+          setCode(item.hash);
+        } else {
+          console.log({ message });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="container-fluid col-10">
       <h4>User mode: {mode}</h4>
@@ -167,7 +190,7 @@ const IndexPage = () => {
         <div className="col-4">
           <GameDetails
             game={gameClicked}
-            {...{ mode, deleteGame, openEditGameForm }}
+            {...{ mode, deleteGame, openEditGameForm, addCode, code }}
           />
         </div>
       </div>

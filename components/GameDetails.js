@@ -3,7 +3,14 @@ import Link from 'next/link'; // линк для роутера next.js, аси�
 // https://via.placeholder.com/400x300
 
 // const PREV_FRONT_URL = 'http://localhost:3000'
-const GameDetails = ({ game, mode, deleteGame, openEditGameForm }) => {
+const GameDetails = ({
+  game,
+  mode,
+  deleteGame,
+  openEditGameForm,
+  addCode,
+  code,
+}) => {
   if (!game) {
     return null;
   }
@@ -39,6 +46,11 @@ const GameDetails = ({ game, mode, deleteGame, openEditGameForm }) => {
               >
                 Delete Game
               </button>
+              <hr />
+              <button onClick={() => addCode(game)} className="btn btn-success">
+                Get edit code
+              </button>
+              {!!code && <span>{code}</span>}
             </>
           )}
         </div>
