@@ -12,18 +12,23 @@ const IndexPage = () => {
   const [gameClicked, setGameClicked] = useState(null);
   const [toggleCreateForm, setToggleCreateForm] = useState(false);
   const [toggleEditForm, setToggleEditForm] = useState(false);
-
-  const mode = getToken() ? 'admin' : 'visitor';
+  const [mode, setMode] = useState('visitor');
 
   useEffect(() => {
     getGames();
-  }, []);
+  }, []); // component did mount
 
   useEffect(() => {
     if (!games.length) return;
     if (gameClicked) return;
     setGameClicked(games[0]);
-  }, [games]);
+  }, [games]); // когда state или props изменился
+
+  useEffect(() => {
+    if (getToken()) {
+      setMode('admin');
+    }
+  }, []);
 
   const onItemClick = (hash) => {
     setGameClicked(games.find((game) => game.hash === hash));
@@ -70,11 +75,12 @@ const IndexPage = () => {
   };
 
   const editGame = ({ name, gameIsPublic, description, hash }) => {
-    // description, players - добавить
+    // description, players - добавить;
     fetch(`${API_URL}/game?hash=${hash}`, {
       method: 'PUT',
       headers: {
         'content-type': 'application/json',
+        authorization: `Bearer ${getToken()}`,
       },
       body: JSON.stringify({
         name,
@@ -85,6 +91,11 @@ const IndexPage = () => {
       .then((res) => res.json()) // вернёт Promise
       .then((data) => {
         const { item } = data;
+        if (!item) {
+          // @todo: check statusCode
+          alert('Error!');
+          return;
+        }
         const newGames = [...games];
         const mutatedIndex = newGames.findIndex((game) => game.hash === hash);
         newGames[mutatedIndex] = item;

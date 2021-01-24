@@ -20,9 +20,11 @@ const GameDetails = ({ game, mode, deleteGame, openEditGameForm }) => {
         {!!game.description && <p className="card-text">{game.description}</p>}
 
         <div className="card-game-buttons">
-          <Link href={`/game?hash=${game.hash}`}>
-            <a className="btn btn-success">Open</a>
-          </Link>
+          {/* <Link href={`/game?hash=${game.hash}`}> */}
+          <a href={`/game?hash=${game.hash}`} className="btn btn-success">
+            Open
+          </a>
+          {/* </Link> */}
           {mode === 'admin' && (
             <>
               <button
