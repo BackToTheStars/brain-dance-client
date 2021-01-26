@@ -10,7 +10,7 @@ const CodeEnterForm = () => {
   return (
     <form className="form-inline" onSubmit={handleSubmit}>
       <div className="form-group mx-sm-3 mb-2">
-        <label for="code" className="sr-only">
+        <label htmlFor="code" className="sr-only">
           Enter Code
         </label>
         <input
