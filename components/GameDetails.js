@@ -1,5 +1,5 @@
 import Link from 'next/link'; // линк для роутера next.js, асинхнонно грузит и кеширует разметку
-
+import { roles } from './settings';
 // https://via.placeholder.com/400x300
 
 // const PREV_FRONT_URL = 'http://localhost:3000'
@@ -14,6 +14,8 @@ const GameDetails = ({
   if (!game) {
     return null;
   }
+
+  const { codes = [] } = game;
 
   return (
     <div className="card">
@@ -47,6 +49,26 @@ const GameDetails = ({
                 Delete Game
               </button>
               <hr />
+              {!!codes.length && (
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <td>Role</td>
+                      <td>Code</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {codes.map((code) => {
+                      return (
+                        <tr key={code.hash}>
+                          <td>{roles[code.role].name}</td>
+                          <td>{code.hash}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
               <button onClick={() => addCode(game)} className="btn btn-success">
                 Get edit code
               </button>

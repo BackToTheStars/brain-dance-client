@@ -3,6 +3,7 @@ import GameTable from '../components/GameTable';
 import GameDetails from '../components/GameDetails';
 import CreateGameForm from '../components/CreateGameForm';
 import EditGameForm from '../components/EditGameForm';
+import CodeEnterForm from '../components/forms/CodeEnterForm';
 
 import { API_URL } from '../src/config';
 import { getToken } from '../src/lib/token';
@@ -42,7 +43,11 @@ const IndexPage = () => {
   };
 
   const getGames = () => {
-    fetch(`${API_URL}/games`)
+    fetch(`${API_URL}/games`, {
+      headers: {
+        authorization: `Bearer ${getToken()}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const { items } = data;
@@ -155,6 +160,7 @@ const IndexPage = () => {
   return (
     <div className="container-fluid col-10">
       <h4>User mode: {mode}</h4>
+      <CodeEnterForm />
       <div className="row">
         <div className="col-8">
           <GameTable games={games} onItemClick={onItemClick} />
