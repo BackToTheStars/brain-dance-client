@@ -56,7 +56,7 @@ class Game {
     this.gameClassPanel = new GameClassPanel('classMenu');
     // this.minimap = new MiniMap('minimap');
 
-    window[Symbol.for('MyGame')] = this;
+    window[Symbol.for('MyGame')] = this; // для minimap (screenshooter.js)
   }
   async init() {
     const result = await getTurns();
