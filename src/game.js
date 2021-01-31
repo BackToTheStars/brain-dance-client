@@ -8,6 +8,7 @@ import {
   updateRedLogicLines,
   createRedLogicLine,
   deleteLines,
+  getUser,
 } from './service';
 import {
   TurnCollection,
@@ -29,6 +30,9 @@ class Game {
   constructor({ stageEl, settings }) {
     this.stageEl = stageEl;
     this.triggers = {};
+    this.user = getUser();
+    this.userInfo = this.user.info; // info (hash, nickname, role)
+    this.userToken = this.user.token;
 
     const { notificationAlert } = settings;
     this.notificationAlert = notificationAlert;
@@ -65,7 +69,8 @@ class Game {
         turnsData: result.items,
         stageEl: this.stageEl,
       },
-      this.triggers
+      this.triggers,
+      this.userInfo
     );
 
     const {
@@ -239,6 +244,11 @@ class Game {
     };
 
     this.gameField.handleLoadImages();
+    this.notificationPanel.alert({
+      msgTitle: 'Info:',
+      msgText: `User ${this.userInfo.nickname} logged in`,
+      timespan: 1500,
+    });
   }
   addEventListeners() {}
 }

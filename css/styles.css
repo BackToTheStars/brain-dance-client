@@ -2,19 +2,23 @@
   width: 400px;
 }
 
-.card-game-buttons .btn{
+.card-game-buttons .btn {
   margin-right: 10px;
 }
 
 /** bootstrap overwrite */
-.btn-success, .btn-primary, .btn-danger {
+.btn-success,
+.btn-primary,
+.btn-danger {
   color: #fff;
   background-color: #6c757d;
   border-color: #6c757d;
-  opacity: .65;
+  opacity: 0.65;
 }
 
-.btn-success:hover, .btn-primary:hover, .btn-danger:hover {
+.btn-success:hover,
+.btn-primary:hover,
+.btn-danger:hover {
   opacity: 0.9;
 }
 

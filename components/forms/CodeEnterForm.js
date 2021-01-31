@@ -5,7 +5,9 @@ const CodeEnterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push(`/code?hash=${e.target.code.value}`);
+    router.push(
+      `/code?hash=${e.target.code.value}&nickname=${e.target.nickname.value}`
+    );
   };
   return (
     <form className="form-inline" onSubmit={handleSubmit}>
@@ -18,6 +20,12 @@ const CodeEnterForm = () => {
           type="text"
           className="form-control"
           placeholder="Code"
+        />
+        <input
+          name="nickname"
+          type="text"
+          className="form-control"
+          placeholder="Nickname"
         />
       </div>
       <button type="submit" className="btn btn-primary mb-2">

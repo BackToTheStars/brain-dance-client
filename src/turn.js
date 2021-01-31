@@ -23,10 +23,11 @@ const getParagraphText = (arrText) => {
 // предоставляет свои настройки другим компонентам
 
 class Turn {
-  constructor({ data, stageEl }, triggers) {
+  constructor({ data, stageEl }, triggers, userInfo) {
     this._id = data._id;
     this.data = data;
     this.triggers = triggers;
+    this.userInfo = userInfo;
 
     this.needToRender = true;
     this.el = this.createDomEl();
@@ -167,11 +168,16 @@ class Turn {
       videoUrl = youtubeFormatter(videoUrl);
     } // лежит там же
 
+    // @todo: get role const
     this.el.innerHTML = `<h5 class="headerText">
             <div class="headerTextTitle">${header}</div>
             <div class="headerTextActions">
-                <a class="edit-btn"><i class="fas fa-pen-square"></i></a>
-                <a class="delete-btn"><i class="fas fa-trash-alt"></i></a>
+                ${
+                  this.userInfo.role === 2
+                    ? `<a class="edit-btn"><i class="fas fa-pen-square"></i></a>
+                  <a class="delete-btn"><i class="fas fa-trash-alt"></i></a>`
+                    : ''
+                }
             </div>
         </h5>
         ${
@@ -269,11 +275,15 @@ class Turn {
       this.paragraphEl.scrollTop = this.data.scrollPosition;
     });
 
-    this.deleteBtn.addEventListener(
-      'click',
-      this.deleteButtonHandler.bind(this)
-    );
-    this.editBtn.addEventListener('click', this.editButtonHandler.bind(this));
+    // @todo: get role const
+    if (this.userInfo.role === 2) {
+      this.deleteBtn.addEventListener(
+        'click',
+        this.deleteButtonHandler.bind(this)
+      );
+      this.editBtn.addEventListener('click', this.editButtonHandler.bind(this));
+    }
+
     this.paragraphEl.addEventListener(
       'scroll',
       this.scrollParagrahpHandler.bind(this)
