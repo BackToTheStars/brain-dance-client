@@ -6,6 +6,7 @@ import NotificationPanel from './panels/NotificationPanel';
 
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
+
   const notificationAlert = (note) => {
     setNotes((notes) => {
       return [...notes, note];
