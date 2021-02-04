@@ -134,6 +134,9 @@ const updateRedLogicLines = async (redLogicLines) =>
       }),
       dataType: 'json',
       contentType: 'application/json',
+      headers: {
+        'game-token': user.token,
+      },
       success: resolve,
       error: reject,
     });
@@ -147,6 +150,9 @@ const createRedLogicLine = async (line) =>
       data: JSON.stringify(line),
       dataType: 'json',
       contentType: 'application/json',
+      headers: {
+        'game-token': user.token,
+      },
       success: resolve,
       error: reject,
     });
@@ -162,11 +168,79 @@ const deleteLines = async (redLogicLines) => {
       }),
       dataType: 'json',
       contentType: 'application/json',
+      headers: {
+        'game-token': user.token,
+      },
       success: resolve,
       error: reject,
     });
   });
 };
+
+// classes
+// получение классов
+const request = async (
+  url,
+  { body = null, tokenFlag = false, method = 'GET' } = {},
+  { errorMessage } = {}
+) => {
+  let defaultMessage =
+    errorMessage || `Произошла ошибка service.js:187, метод ${method}`;
+  const params = {
+    method,
+    headers: {
+      'content-type': 'application/json',
+    },
+  };
+  if (tokenFlag) {
+    params.headers['game-token'] = user.token;
+  }
+  if (body) {
+    params.body = JSON.stringify(body);
+  }
+
+  return new Promise((resolve, reject) => {
+    fetch(url, params)
+      .then((data) => {
+        return data.json();
+      })
+      .then((res) => {
+        const { message = defaultMessage, item, items } = res;
+        // @todo: более гибкая обработка
+        if (item || items) {
+          resolve(res);
+        } else {
+          alert(message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        reject('Request error');
+      });
+  });
+};
+
+const getClasses = async () => request(`${API_URL}/game-classes?hash=${HASH}`);
+
+const createClass = async (body) =>
+  request(`${API_URL}/game-classes?hash=${HASH}`, {
+    method: 'POST',
+    body,
+    tokenFlag: true,
+  });
+
+const updateClass = async (id, body) =>
+  request(`${API_URL}/game-classes/${id}?hash=${HASH}`, {
+    method: 'PUT',
+    tokenFlag: true,
+    body,
+  });
+
+const deleteClass = async (id) =>
+  request(`${API_URL}/game-classes/${id}?hash=${HASH}`, {
+    method: 'DELETE',
+    tokenFlag: true,
+  });
 
 export {
   getTurns,
@@ -179,4 +253,8 @@ export {
   createRedLogicLine,
   deleteLines,
   getUser,
+  getClasses,
+  createClass,
+  updateClass,
+  deleteClass,
 };

@@ -1,3 +1,5 @@
+import { getClasses, createClass, updateClass, deleteClass } from './service';
+
 import { API_URL } from './config';
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -16,36 +18,37 @@ class GameClass {
       const body = {
         gameClass: name,
       };
-      const bodyJSON = JSON.stringify(body);
-      fetch(`${API_URL}/game-classes?hash=${HASH}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': bodyJSON.length,
-        },
-        body: bodyJSON,
-      }).then(
-        (res) => {
-          res.json().then(
-            (json) => {
-              const { _id } = json;
-              console.log(_id);
-              this.dbId = _id;
-              this.prerender().then(() => {
-                this.render();
-              });
-            },
-            (err) => {
-              console.log(
-                `ERROR: GameClass: construtor: fetch: not JSON: ${err}`
-              );
-            }
-          );
+      // добавление класса
+      // const bodyJSON = JSON.stringify(body);
+      // fetch(`${API_URL}/game-classes?hash=${HASH}`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Content-Length': bodyJSON.length,
+      //   },
+      //   body: bodyJSON,
+      // })
+      // .then(
+      // (res) => {
+      // res.json()
+      createClass(body).then(
+        (json) => {
+          const { _id } = json.item;
+          console.log(_id);
+          this.dbId = _id; // эта строчка, похоже, ни на что не влияет
+          this.prerender().then(() => {
+            this.render();
+          });
         },
         (err) => {
-          console.log(`ERROR: ${bodyJSON}: sending failed`);
+          console.log(`ERROR: GameClass: construtor: fetch: not JSON: ${err}`);
         }
       );
+      // },
+      // (err) => {
+      //   console.log(`ERROR: ${bodyJSON}: sending failed`);
+      // }
+      // );
     } else {
       this.prerender().then(() => {
         this.render().then(() => {
@@ -86,32 +89,35 @@ class GameClass {
           };
           this.titleName.innerHTML = '';
           this.titleName.innerText = this.name;
-          const bodyJSON = JSON.stringify(bodyObj);
-          fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': bodyJSON.length,
-            },
-            body: bodyJSON,
-          }).then(
-            (res) => {
-              if (res.status == 200) {
+          // редактирование названия класса
+          // const bodyJSON = JSON.stringify(bodyObj);
+          updateClass(this.dbId, bodyObj)
+            // fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
+            //   method: 'PUT',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //     'Content-Length': bodyJSON.length,
+            //   },
+            //   body: bodyJSON,
+            // })
+            .then(
+              (res) => {
+                // if (res.status == 200) {
                 this.name = bodyObj.gameClass;
                 this.titleName.innerHTML = '';
                 this.titleName.innerText = this.name;
-              } else {
-                console.log(
-                  `ERROR: res.status = ${res.status} | res = ${JSON.stringify(
-                    res
-                  )}`
-                );
+                // } else {
+                //   console.log(
+                //     `ERROR: res.status = ${res.status} | res = ${JSON.stringify(
+                //       res
+                //     )}`
+                //   );
+                // }
               }
-            },
-            (err) => {
-              console.log(err);
-            }
-          );
+              // (err) => {
+              //   console.log(err);
+              // }
+            );
         }
       }
     });
@@ -207,22 +213,25 @@ class GameClass {
     //console.log(`${this.name}: id = ${this.dbId}`);
   }
 
+  // удаление класса
   async delete() {
-    fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((res) => {
-      if (res.status == 200) {
+    deleteClass(this.dbId)
+      // fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // })
+      .then((res) => {
+        // if (res.status == 200) {
         this.self.remove();
         this.panel.deleteClass(this);
-      } else {
-        console.log(
-          `ERROR: res.status = ${res.status} | ${JSON.stringify(res)}`
-        );
-      }
-    });
+        // } else {
+        //   console.log(
+        //     `ERROR: res.status = ${res.status} | ${JSON.stringify(res)}`
+        //   );
+        // }
+      });
   }
 
   async titleEdit() {
@@ -239,23 +248,26 @@ class GameClass {
         id: this.dbId,
         addNewSubclass: this.input.value.replace(/\s+/, ' '),
       };
-      const bodyJSON = JSON.stringify(bodyObj);
-      fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': bodyJSON.length,
-        },
-        body: bodyJSON,
-      }).then(
-        () => {
-          this.renderSubclass({ subClassName: bodyObj.addNewSubclass });
-          this.subClassNames.push(bodyObj.addNewSubclass);
-        },
-        (err) => {
-          console.log(JSON.stringify(err));
-        }
-      );
+      // добавление элемента класса
+      // const bodyJSON = JSON.stringify(bodyObj);
+      updateClass(this.dbId, bodyObj)
+        // fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
+        //   method: 'PUT',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Content-Length': bodyJSON.length,
+        //   },
+        //   body: bodyJSON,
+        // })
+        .then(
+          () => {
+            this.renderSubclass({ subClassName: bodyObj.addNewSubclass });
+            this.subClassNames.push(bodyObj.addNewSubclass);
+          }
+          // (err) => {
+          //   console.log(JSON.stringify(err));
+          // }
+        );
       this.input.value = '';
       this.input.style.display = 'none';
       this.buttonAddSubclass.style.display = 'none';
@@ -292,26 +304,29 @@ class GameClass {
               to: val,
             },
           };
-          const bodyJSON = JSON.stringify(bodyObj);
-          fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': bodyJSON.length,
-            },
-            body: bodyJSON,
-          }).then(
-            (res) => {
-              if (res.status == 200) {
-                liName.innerText = val;
-              } else {
-                console.log(`res.status == ${res.status}`);
+          // переименование элемента класса
+          // const bodyJSON = JSON.stringify(bodyObj);
+          updateClass(this.dbId, bodyObj)
+            // fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
+            //   method: 'PUT',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //     'Content-Length': bodyJSON.length,
+            //   },
+            //   body: bodyJSON,
+            // })
+            .then(
+              (res) => {
+                if (res.status == 200) {
+                  liName.innerText = val;
+                } else {
+                  console.log(`res.status == ${res.status}`);
+                }
               }
-            },
-            (err) => {
-              console.log(err);
-            }
-          );
+              // (err) => {
+              //   console.log(err);
+              // }
+            );
         }
       });
     };
@@ -322,18 +337,21 @@ class GameClass {
         id: this.dbId,
         subClassToDelete: liName.innerText,
       };
-      const bodyJSON = JSON.stringify(bodyObj);
-      fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': bodyJSON.length,
-        },
-        body: bodyJSON,
-      }).then(
-        (res) => {
-          //console.log(`just for logging: ${res.status}`);
-          if (res.status === 200) {
+      // удаление элемента класса
+      // const bodyJSON = JSON.stringify(bodyObj);
+      updateClass(this.dbId, bodyObj)
+        // fetch(`${API_URL}/game-classes/${this.dbId}?hash=${HASH}`, {
+        //   method: 'PUT',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Content-Length': bodyJSON.length,
+        //   },
+        //   body: bodyJSON,
+        // })
+        .then(
+          (res) => {
+            //console.log(`just for logging: ${res.status}`);
+            // if (res.status === 200) {
             li.remove();
             const ind = this.subClassNames.indexOf(bodyObj.subClassToDelete);
             if (ind === -1) {
@@ -344,14 +362,14 @@ class GameClass {
             } else {
               this.subClassNames.splice(ind, 1);
             }
-          } else {
-            console.log(`ERROR: /gameClass res.status =  ${res.status}`);
+            // } else {
+            //   console.log(`ERROR: /gameClass res.status =  ${res.status}`);
+            // }
+          },
+          (err) => {
+            console.log(err);
           }
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
+        );
     };
 
     li.onmouseover = () => {
@@ -380,11 +398,9 @@ class GameClassPanel {
   }
 
   async load() {
-    const res = await fetch(`${API_URL}/game-classes?hash=${HASH}`, {
-      method: 'GET',
-    });
-    const data = await res.json();
-    this.gameClassDescs = data.items;
+    // получение классов
+    const res = await getClasses();
+    this.gameClassDescs = res.items;
   }
 
   async prerender() {
