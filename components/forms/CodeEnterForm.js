@@ -1,13 +1,13 @@
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
+import useEditCodeWarningPopup from '../hooks/edit-code-warning-popup';
 
 const CodeEnterForm = () => {
-  const router = useRouter();
+  // const router = useRouter();
+  const { enterGame } = useEditCodeWarningPopup();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push(
-      `/code?hash=${e.target.code.value}&nickname=${e.target.nickname.value}`
-    );
+    enterGame(e.target.code.value, e.target.nickname.value);
   };
   return (
     <form className="form-inline" onSubmit={handleSubmit}>

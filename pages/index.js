@@ -6,6 +6,8 @@ import EditGameForm from '../components/EditGameForm';
 import CodeEnterForm from '../components/forms/CodeEnterForm';
 import useGameControl from '../components/hooks/game-control';
 import useGamePlayerCode from '../components/hooks/edit-game-code';
+import useEditCodeWarningPopup from '../components/hooks/edit-code-warning-popup';
+import NewGameWarningPopup from '../components/popups/NewGameWarningPopup';
 
 import { API_URL } from '../src/config';
 import { getToken } from '../src/lib/token';
@@ -24,8 +26,7 @@ const IndexPage = () => {
   } = useGameControl();
 
   const { code, addCode } = useGamePlayerCode();
-
-  // const { hash, setHash, enterGame } = useNewGamePopup();
+  const { code: popupCode, createGame, enterGame } = useEditCodeWarningPopup();
 
   const [mode, setMode] = useState('visitor');
 
@@ -34,32 +35,6 @@ const IndexPage = () => {
       setMode('admin');
     }
   }, []);
-
-  const createGame = ({ name, gameIsPublic }) => {
-    // добавить description, players
-    fetch(`${API_URL}/games`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        public: gameIsPublic,
-      }),
-    })
-      .then((res) => res.json()) // вернёт Promise
-      .then((data) => {
-        const { item, hash } = data;
-        console.log(item);
-        window.location.replace(`/game?hash=${hash}`);
-        // setHash(hash);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    // console.log({name, gameIsPublic})
-  };
 
   const editGame = ({ name, gameIsPublic, description, hash }) => {
     // description, players - добавить;
@@ -118,6 +93,9 @@ const IndexPage = () => {
 
   return (
     <div className="container-fluid col-10">
+      {!!popupCode && (
+        <NewGameWarningPopup code={popupCode} enterGame={enterGame} />
+      )}
       <h4>User mode: {mode}</h4>
       <CodeEnterForm />
       <div className="row">
