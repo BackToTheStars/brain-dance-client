@@ -256,7 +256,7 @@ const createPopup = (inputDiv, triggers) => {
 
   el.addEventListener('click', (e) => {
     if (e.target.getAttribute('id') == 'modalBackground') {
-      closeModal();
+      // closeModal(); - чтобы нажатие вне модального окна его не закрывало
     }
   });
 

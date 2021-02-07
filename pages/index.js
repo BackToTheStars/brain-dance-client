@@ -4,56 +4,36 @@ import GameDetails from '../components/GameDetails';
 import CreateGameForm from '../components/CreateGameForm';
 import EditGameForm from '../components/EditGameForm';
 import CodeEnterForm from '../components/forms/CodeEnterForm';
+import useGameControl from '../components/hooks/game-control';
+import useGamePlayerCode from '../components/hooks/edit-game-code';
 
 import { API_URL } from '../src/config';
 import { getToken } from '../src/lib/token';
 
 const IndexPage = () => {
-  const [games, setGames] = useState([]);
-  const [gameClicked, setGameClicked] = useState(null);
-  const [toggleCreateForm, setToggleCreateForm] = useState(false);
-  const [toggleEditForm, setToggleEditForm] = useState(false);
+  const {
+    games,
+    openEditGameForm,
+    onItemClick,
+    gameClicked,
+    setGameClicked,
+    toggleCreateForm,
+    setToggleCreateForm,
+    toggleEditForm,
+    setToggleEditForm,
+  } = useGameControl();
+
+  const { code, addCode } = useGamePlayerCode();
+
+  // const { hash, setHash, enterGame } = useNewGamePopup();
+
   const [mode, setMode] = useState('visitor');
-  const [code, setCode] = useState('');
-
-  useEffect(() => {
-    getGames();
-  }, []); // component did mount
-
-  useEffect(() => {
-    if (!games.length) return;
-    if (gameClicked) return;
-    setGameClicked(games[0]);
-  }, [games]); // когда state или props изменился
 
   useEffect(() => {
     if (getToken()) {
       setMode('admin');
     }
   }, []);
-
-  const onItemClick = (hash) => {
-    setGameClicked(games.find((game) => game.hash === hash));
-    setToggleCreateForm(false);
-    setToggleEditForm(false);
-  };
-
-  const openEditGameForm = (game) => {
-    setToggleEditForm(true);
-  };
-
-  const getGames = () => {
-    fetch(`${API_URL}/games`, {
-      headers: {
-        authorization: `Bearer ${getToken()}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const { items } = data;
-        setGames(items);
-      });
-  };
 
   const createGame = ({ name, gameIsPublic }) => {
     // добавить description, players
@@ -72,6 +52,7 @@ const IndexPage = () => {
         const { item, hash } = data;
         console.log(item);
         window.location.replace(`/game?hash=${hash}`);
+        // setHash(hash);
       })
       .catch((err) => {
         console.log(err);
@@ -126,28 +107,6 @@ const IndexPage = () => {
         const { item, message } = data;
         if (item) {
           console.log({ item });
-        } else {
-          console.log({ message });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const addCode = (game) => {
-    fetch(`${API_URL}/codes?hash=${game.hash}`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${getToken()}`,
-      },
-    })
-      .then((res) => res.json()) // вернёт Promise
-      .then((data) => {
-        const { item, message } = data;
-        if (item) {
-          setCode(item.hash);
         } else {
           console.log({ message });
         }
