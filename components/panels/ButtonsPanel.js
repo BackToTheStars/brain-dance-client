@@ -16,6 +16,7 @@ const ButtonsPanel = () => {
         <>
           <button id="add-new-box-to-game-btn">Add Turn</button>
           <button id="save-positions-btn">Save Field</button>
+          <button id="invite-people-btn">Invite</button>
         </>
       )}
       <button
