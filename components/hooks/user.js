@@ -1,4 +1,5 @@
 import { getGameInfo } from '../../src/lib/gameToken';
+import { checkRuleByRole } from '../config';
 
 const guestUser = {
   info: {
@@ -13,8 +14,13 @@ const useUser = (hash) => {
   guestUser.hash = hash;
   const { info, token } = getGameInfo(hash) || guestUser;
 
+  const can = function (rule) {
+    return checkRuleByRole(rule, info.role);
+  };
+
   return {
     info,
+    can,
   };
 };
 

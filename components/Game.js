@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
 import NotificationPanel from './panels/NotificationPanel';
+import { useUiContext } from './contexts/UI_Context';
 
 const GameComponent = () => {
+  const { gameInfoPanelIsHidden } = useUiContext();
   const [notes, setNotes] = useState([]);
 
   const notificationAlert = (note) => {
@@ -33,6 +35,8 @@ const GameComponent = () => {
         <NotificationPanel notes={notes} />
 
         <div className="quotes-panel" />
+
+        {!gameInfoPanelIsHidden && <div>Game Info</div>}
 
         {/* <div id="minimap"></div> */}
       </div>

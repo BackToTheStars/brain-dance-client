@@ -22,7 +22,7 @@ const ROLES = {
 
 const checkRuleByRole = (ruleId, roleId = ROLE_GAME_VISITOR) => {
   let role = ROLES[roleId];
-  return role.indexOf(ruleId) !== -1;
+  return role.rules.indexOf(ruleId) !== -1;
 };
 
 export {

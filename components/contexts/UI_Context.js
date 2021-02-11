@@ -17,12 +17,17 @@ const reducer = (state, action) => {
 export const UI_Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
+  const [gameInfoPanelIsHidden, setGameInfoPanelIsHidden] = useState(true);
 
   return (
     <UI_Context.Provider
       value={{
         // classesPanelIsHidden,
         // setClassesPanelIsHidden,
+
+        gameInfoPanelIsHidden,
+        setGameInfoPanelIsHidden,
+
         state,
         dispatch,
       }}

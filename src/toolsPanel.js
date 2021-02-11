@@ -11,10 +11,10 @@
 </div>
 */
 class ToolsPanel {
-  constructor(params, triggers, userInfo) {
+  constructor(params, triggers, user) {
     this.el = $('.actions');
     this.triggers = triggers;
-    this.userInfo = userInfo;
+    this.user = user;
 
     this.addTurnBtn = this.el.find('#add-new-box-to-game-btn');
     // this.toggleLeftPanelBtn = this.el.find('#toggle-left-panel');

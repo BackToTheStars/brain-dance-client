@@ -44,7 +44,7 @@ class Game {
       this.triggers
     );
 
-    this.toolsPanel = new ToolsPanel({}, this.triggers, this.userInfo);
+    this.toolsPanel = new ToolsPanel({}, this.triggers, this.user);
     this.classPanel = new ClassPanel({}, this.triggers);
 
     this.popup = getPopup(document.body, this.triggers);
@@ -70,7 +70,7 @@ class Game {
         stageEl: this.stageEl,
       },
       this.triggers,
-      this.userInfo
+      this.user
     );
 
     const {

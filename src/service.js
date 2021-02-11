@@ -1,6 +1,8 @@
 import { API_URL } from './config';
 import { getGameInfo } from './lib/gameToken';
+import { checkRuleByRole, RULE_TURNS_CRUD } from '../components/config';
 
+/** USER INFO */
 const urlParams = new URLSearchParams(window.location.search);
 const HASH = urlParams.get('hash');
 
@@ -20,9 +22,15 @@ try {
   console.log({ e });
 }
 
+user.can = function (rule) {
+  return checkRuleByRole(rule, this.info.role);
+};
+
 const getUser = () => {
   return user;
 };
+
+/** USER INFO */
 
 const getTurns = async () =>
   new Promise((resolve, reject) => {

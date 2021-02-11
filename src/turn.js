@@ -1,6 +1,7 @@
 import { dateFormatter } from './formatters/dateFormatter';
 import { youtubeFormatter } from './formatters/youtubeFormatter';
 import { getShortLink } from './formatters/urlFormatter';
+import { RULE_TURNS_CRUD } from '../components/config';
 
 const getParagraphText = (arrText) => {
   // @todo: remove
@@ -23,11 +24,11 @@ const getParagraphText = (arrText) => {
 // предоставляет свои настройки другим компонентам
 
 class Turn {
-  constructor({ data, stageEl }, triggers, userInfo) {
+  constructor({ data, stageEl }, triggers, user) {
     this._id = data._id;
     this.data = data;
     this.triggers = triggers;
-    this.userInfo = userInfo;
+    this.user = user;
 
     this.needToRender = true;
     this.el = this.createDomEl();
@@ -173,7 +174,7 @@ class Turn {
             <div class="headerTextTitle">${header}</div>
             <div class="headerTextActions">
                 ${
-                  this.userInfo.role === 2
+                  this.user.can(RULE_TURNS_CRUD)
                     ? `<a class="edit-btn"><i class="fas fa-pen-square"></i></a>
                   <a class="delete-btn"><i class="fas fa-trash-alt"></i></a>`
                     : ''
@@ -276,7 +277,7 @@ class Turn {
     });
 
     // @todo: get role const
-    if (this.userInfo.role === 2) {
+    if (this.user.can(RULE_TURNS_CRUD)) {
       this.deleteBtn.addEventListener(
         'click',
         this.deleteButtonHandler.bind(this)
