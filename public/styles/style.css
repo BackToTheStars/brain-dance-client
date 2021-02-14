@@ -163,6 +163,20 @@ button {
     width: 0; */
 }
 
+#gameInfoPanel {
+  transition: 0.3s;
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, 0);
+  left: 50%;
+  z-index: 2;
+  background: #fff;
+}
+
+#gameInfoPanel.hidden {
+  transform: translate(-50%, -100%);
+}
+
 .p0 {
   padding: 0;
 }

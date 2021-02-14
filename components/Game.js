@@ -2,11 +2,10 @@ import Game from '../src/game';
 import { useState, useEffect } from 'react';
 import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
+import GameInfoPanel from './panels/GameInfoPanel';
 import NotificationPanel from './panels/NotificationPanel';
-import { useUiContext } from './contexts/UI_Context';
 
 const GameComponent = () => {
-  const { gameInfoPanelIsHidden } = useUiContext();
   const [notes, setNotes] = useState([]);
 
   const notificationAlert = (note) => {
@@ -26,6 +25,7 @@ const GameComponent = () => {
   return (
     <div style={{ width: '100%', display: 'flex' }}>
       <ClassesPanel />
+      <GameInfoPanel />
       <div className="col p0">
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" />
@@ -35,8 +35,6 @@ const GameComponent = () => {
         <NotificationPanel notes={notes} />
 
         <div className="quotes-panel" />
-
-        {!gameInfoPanelIsHidden && <div>Game Info</div>}
 
         {/* <div id="minimap"></div> */}
       </div>
