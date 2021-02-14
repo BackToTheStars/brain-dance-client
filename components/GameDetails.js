@@ -1,5 +1,5 @@
 import Link from 'next/link'; // линк для роутера next.js, асинхнонно грузит и кеширует разметку
-import { roles } from './settings';
+import { ROLES } from './config';
 // https://via.placeholder.com/400x300
 
 // const PREV_FRONT_URL = 'http://localhost:3000'
@@ -61,7 +61,7 @@ const GameDetails = ({
                     {codes.map((code) => {
                       return (
                         <tr key={code.hash}>
-                          <td>{roles[code.role].name}</td>
+                          <td>{ROLES[code.role].name}</td>
                           <td>{code.hash}</td>
                         </tr>
                       );

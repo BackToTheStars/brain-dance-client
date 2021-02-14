@@ -1,10 +1,14 @@
 import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
 import Head from 'next/head'; // в head засовываем всё что было в head index.html
 import { UI_Provider } from '../components/contexts/UI_Context';
+import { UserProvider } from '../components/contexts/UserContext';
+import { useRouter } from 'next/router';
 
 const Game = dynamic(() => import('../components/Game'), { ssr: false });
 // ssr = server side rendering
 const GamePage = () => {
+  const router = useRouter();
+
   return (
     <>
       <Head>
@@ -30,9 +34,11 @@ const GamePage = () => {
         ></script>
         <script src="/quill/quill.min.js"></script>
       </Head>
-      <UI_Provider>
-        <Game />
-      </UI_Provider>
+      <UserProvider hash={router.query.hash}>
+        <UI_Provider>
+          <Game />
+        </UI_Provider>
+      </UserProvider>
     </>
   );
 };

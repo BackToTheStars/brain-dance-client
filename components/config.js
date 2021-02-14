@@ -11,12 +11,15 @@ const RULE_GAME_EDIT = 5; // добавление скриншота, переи
 const ROLES = {
   [ROLE_GAME_VISITOR]: {
     rules: [RULE_VIEW],
+    name: 'Visitor',
   },
   [ROLE_GAME_PLAYER]: {
     rules: [RULE_VIEW, RULE_TURNS_CRUD],
+    name: 'Player',
   },
   [ROLE_GAME_OWNER]: {
     rules: [RULE_VIEW, RULE_TURNS_CRUD, RULE_GAME_EDIT],
+    name: 'Owner',
   },
 };
 

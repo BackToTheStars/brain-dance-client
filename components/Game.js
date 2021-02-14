@@ -4,9 +4,13 @@ import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
 import GameInfoPanel from './panels/GameInfoPanel';
 import NotificationPanel from './panels/NotificationPanel';
+import { useUserContext } from './contexts/UserContext';
+import { API_URL } from '../src/config';
 
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
+  const [game, setGame] = useState(null);
+  const { token, info, can } = useUserContext();
 
   const notificationAlert = (note) => {
     setNotes((notes) => {
@@ -15,9 +19,22 @@ const GameComponent = () => {
   };
 
   useEffect(() => {
+    fetch(`${API_URL}/game?hash=${info.hash}`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        'game-token': token,
+      },
+    })
+      .then((data) => data.json())
+      .then(({ item }) => setGame(item));
+  }, []);
+
+  useEffect(() => {
     const game = new Game({
       stageEl: $('#gameBox'),
       settings: { notificationAlert },
+      user: { info, token, can },
     });
     game.init();
   }, []);
@@ -25,7 +42,8 @@ const GameComponent = () => {
   return (
     <div style={{ width: '100%', display: 'flex' }}>
       <ClassesPanel />
-      <GameInfoPanel />
+
+      <GameInfoPanel game={game} />
       <div className="col p0">
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" />

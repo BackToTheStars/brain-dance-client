@@ -1,7 +1,9 @@
 import { useRouter } from 'next/router';
 import { useUiContext } from '../contexts/UI_Context'; // export const useUiContext
 import useUser from '../hooks/user'; // export default useUser
-import { RULE_TURNS_CRUD, RULE_GAME_EDIT } from '../config';
+import { useUserContext } from '../contexts/UserContext';
+
+import { RULE_VIEW, RULE_TURNS_CRUD, RULE_GAME_EDIT } from '../config';
 
 const ButtonsPanel = () => {
   const {
@@ -11,7 +13,7 @@ const ButtonsPanel = () => {
     dispatch,
   } = useUiContext();
   const router = useRouter();
-  const { info, can } = useUser(router.query.hash);
+  const { info, can } = useUserContext();
 
   return (
     <div className="actions">
@@ -31,7 +33,7 @@ const ButtonsPanel = () => {
       </button>
       {/* <button id="show-minimap-btn">Minimap</button> */}
       <button id="go-to-lobby">Lobby</button>
-      {can(RULE_GAME_EDIT) && (
+      {can(RULE_VIEW) && (
         <button
           id="game-info-panel-btn"
           onClick={() => setGameInfoPanelIsHidden((prevVal) => !prevVal)}

@@ -8,7 +8,7 @@ import {
   updateRedLogicLines,
   createRedLogicLine,
   deleteLines,
-  getUser,
+  // getUser,
 } from './service';
 import {
   TurnCollection,
@@ -27,10 +27,10 @@ import { MiniMap } from './minimap';
 // настраивает компоненты игры,
 // обеспечивает передачу данных между компонентами
 class Game {
-  constructor({ stageEl, settings }) {
+  constructor({ stageEl, settings, user }) {
     this.stageEl = stageEl;
     this.triggers = {};
-    this.user = getUser();
+    this.user = user;
     this.userInfo = this.user.info; // info (hash, nickname, role)
     this.userToken = this.user.token;
 

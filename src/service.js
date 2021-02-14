@@ -260,7 +260,7 @@ export {
   updateRedLogicLines,
   createRedLogicLine,
   deleteLines,
-  getUser,
+  // getUser,
   getClasses,
   createClass,
   updateClass,
