@@ -15,6 +15,7 @@ import { getToken } from '../src/lib/token';
 const IndexPage = () => {
   const {
     games,
+    setGames,
     openEditGameForm,
     onItemClick,
     gameClicked,

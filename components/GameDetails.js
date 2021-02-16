@@ -1,5 +1,5 @@
 import Link from 'next/link'; // линк для роутера next.js, асинхнонно грузит и кеширует разметку
-import { ROLES } from './config';
+import AccessCodesTable from './widgets/AccessCodeTable';
 // https://via.placeholder.com/400x300
 
 // const PREV_FRONT_URL = 'http://localhost:3000'
@@ -49,26 +49,7 @@ const GameDetails = ({
                 Delete Game
               </button>
               <hr />
-              {!!codes.length && (
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <td>Role</td>
-                      <td>Code</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {codes.map((code) => {
-                      return (
-                        <tr key={code.hash}>
-                          <td>{ROLES[code.role].name}</td>
-                          <td>{code.hash}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+              {!!codes.length && <AccessCodesTable codes={codes} />}
               <button onClick={() => addCode(game)} className="btn btn-success">
                 Get edit code
               </button>

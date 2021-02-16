@@ -47,6 +47,7 @@ const useGameControl = () => {
 
   return {
     games,
+    setGames,
     openEditGameForm,
     onItemClick,
     gameClicked,
