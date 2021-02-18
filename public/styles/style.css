@@ -171,6 +171,9 @@ button {
   left: 50%;
   z-index: 4;
   background: #fff;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  padding: 15px;
 }
 
 #gameInfoPanel.hidden {
@@ -400,4 +403,12 @@ button {
 #minimap video {
   height: 80%;
   width: 100%;
+}
+
+.game-info-table tbody tr:first-child td:first-child {
+  width: 25%;
+}
+
+.ml-12px {
+  margin-left: 12px;
 }

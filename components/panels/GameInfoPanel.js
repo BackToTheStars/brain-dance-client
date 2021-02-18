@@ -1,7 +1,7 @@
 // может быть, потом переделаем на Redux или Redux Saga
-import { ROLES } from '../config';
+import { ROLES, RULE_GAME_EDIT } from '../config';
 import { useUiContext } from '../contexts/UI_Context';
-import { useUserContext } from '../contexts/UserContext';
+import { UserContext, useUserContext } from '../contexts/UserContext';
 import AccessCodesTable from '../widgets/AccessCodeTable';
 import useGamePlayerCode from '../hooks/edit-game-code';
 
@@ -12,7 +12,7 @@ const getUrl = ({ hash }) => {
 };
 
 const GameInfoPanel = ({ game }) => {
-  const { gameInfoPanelIsHidden } = useUiContext();
+  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden } = useUiContext();
   const { info, can, token } = useUserContext();
   const { code, addCode } = useGamePlayerCode(token);
 
@@ -28,28 +28,74 @@ const GameInfoPanel = ({ game }) => {
       className={['p0', gameInfoPanelIsHidden ? 'hidden' : ''].join(' ')}
       id="gameInfoPanel"
     >
-      <div>Игра: {name} (@todo карандаш)</div>
-      <div>
-        Ссылка для зрителей: <a href={getUrl(info)}>{getUrl(info)}</a>
-      </div>
-      <div>
-        <p>Описание игры: {description}</p>
-        <img src={image} />
-        <p>{publicStatus ? 'This game is public' : 'This game is private'}</p>
-      </div>
-      <div>
-        Инвайты на админа и игроков
-        <AccessCodesTable codes={codes} />
-        <button onClick={() => addCode(game)} className="btn btn-success">
-          Get edit code
-        </button>
-        {!!code && <span>{code}</span>}
-      </div>
-
-      <div>
-        <p>Your nickname: {nickname}</p>
-        <p>Your role: {ROLES[role].name}</p>
-      </div>
+      <table class="table game-info-table">
+        <tbody>
+          <tr>
+            <td>Game name:</td>
+            <td>
+              <h4>{name}</h4>
+            </td>{' '}
+            {/* @todo карандаш */}
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              {publicStatus ? 'This game is public' : 'This game is private'}
+            </td>
+          </tr>
+          <tr>
+            <td>Visitor link:</td>
+            <td>
+              <a href={getUrl(info)}>{getUrl(info)}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Game description:</td>
+            <td>{description}</td>
+          </tr>
+          {/* <tr>
+            <td></td>
+            <td>
+              <img src={image} />
+            </td>
+          </tr> */}
+          {can(RULE_GAME_EDIT) && (
+            <tr>
+              <td>
+                <p>Invite admin / player</p>
+                <a
+                  href="#"
+                  onClick={() => addCode(game)}
+                  className="btn btn-success"
+                >
+                  Get player code
+                </a>
+              </td>
+              <td>
+                {!!code && <span>{code}</span>}
+                <AccessCodesTable codes={codes} />
+              </td>
+            </tr>
+          )}
+          <tr>
+            <td>Your nickname:</td>
+            <td>{nickname}</td>
+          </tr>
+          <tr>
+            <td>Your role:</td>
+            <td>
+              <h4>{ROLES[role].name}</h4>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <a
+        href="#"
+        onClick={() => setGameInfoPanelIsHidden(true)}
+        class="btn btn-secondary ml-12px"
+      >
+        Close
+      </a>
     </div>
   );
 };
