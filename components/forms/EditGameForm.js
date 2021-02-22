@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
   const [name, setName] = useState(game.name);
+  const [image, setImage] = useState(game.image);
   const [gameIsPublic, setGameIsPublic] = useState(game.public);
   const [description, setDescription] = useState(game.description);
 
@@ -12,6 +13,7 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
       gameIsPublic,
       hash: game.hash,
       description,
+      image,
     });
   };
 
@@ -50,6 +52,16 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <div className="form-group">
+        <label>Screenshot</label>
+        <input
+          className="form-control"
+          name="image"
+          type="text"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
         />
       </div>
       <div className="form-group">

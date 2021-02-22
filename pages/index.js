@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import GameTable from '../components/GameTable';
 import GameDetails from '../components/GameDetails';
-import CreateGameForm from '../components/CreateGameForm';
-import EditGameForm from '../components/EditGameForm';
+import CreateGameForm from '../components/forms/CreateGameForm';
+import EditGameForm from '../components/forms/EditGameForm';
 import CodeEnterForm from '../components/forms/CodeEnterForm';
 import useGameControl from '../components/hooks/game-control';
 import useGamePlayerCode from '../components/hooks/edit-game-code';
@@ -37,7 +37,7 @@ const IndexPage = () => {
     }
   }, []);
 
-  const editGame = ({ name, gameIsPublic, description, hash }) => {
+  const editGame = ({ name, gameIsPublic, description, hash, image }) => {
     // description, players - добавить;
     fetch(`${API_URL}/game?hash=${hash}`, {
       method: 'PUT',
@@ -49,6 +49,7 @@ const IndexPage = () => {
         name,
         public: gameIsPublic,
         description,
+        image,
       }),
     })
       .then((res) => res.json()) // вернёт Promise

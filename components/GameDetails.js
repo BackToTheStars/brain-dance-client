@@ -19,11 +19,15 @@ const GameDetails = ({
 
   return (
     <div className="card">
-      <img
-        className="card-img-top"
-        src="img/game_screenshot.png"
-        alt="Card image cap"
-      />
+      {!!game.image ? (
+        <img className="card-img-top" src={game.image} alt="Card image cap" />
+      ) : (
+        <img
+          className="card-img-top"
+          src="/img/game_screenshot.png"
+          alt="Card image cap"
+        />
+      )}
       <div className="card-body">
         <h5 className="card-title">{game.name}</h5>
         {!!game.description && <p className="card-text">{game.description}</p>}
