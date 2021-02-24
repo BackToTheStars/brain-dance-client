@@ -4,6 +4,7 @@ import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
 import GameInfoPanel from './panels/GameInfoPanel';
 import NotificationPanel from './panels/NotificationPanel';
+import MinimapPanel from './panels/MinimapPanel';
 import { useUserContext } from './contexts/UserContext';
 import { API_URL } from '../src/config';
 
@@ -51,6 +52,7 @@ const GameComponent = () => {
 
         <ButtonsPanel />
         <NotificationPanel notes={notes} />
+        <MinimapPanel />
 
         <div className="quotes-panel" />
 

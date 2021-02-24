@@ -430,3 +430,12 @@ button {
 .game-info-table a.edit-btn:hover {
   color: rgb(58, 58, 58);
 }
+
+.minimap-panel {
+  position: fixed;
+  width: 17vw;
+  height: 25vh;
+  background: rgba(0,255,0,1);
+  right: 0;
+  bottom: 0;
+}
