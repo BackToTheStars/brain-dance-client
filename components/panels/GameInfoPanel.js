@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // может быть, потом переделаем на Redux или Redux Saga
 import { ROLES, RULE_GAME_EDIT } from '../config';
 import { useUiContext } from '../contexts/UI_Context';
@@ -6,6 +6,7 @@ import { UserContext, useUserContext } from '../contexts/UserContext';
 import AccessCodesTable from '../widgets/AccessCodeTable';
 import useGamePlayerCode from '../hooks/edit-game-code';
 import EditGameForm from '../forms/EditGameForm';
+import useEditGame from '../hooks/edit-game';
 
 const getUrl = ({ hash }) => {
   return typeof window === 'undefined' // SSR
@@ -13,16 +14,24 @@ const getUrl = ({ hash }) => {
     : window.location.href;
 };
 
-const GameInfoPanel = ({ game }) => {
+const GameInfoPanel = ({ game, setGame }) => {
   const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden } = useUiContext();
   const { info, can, token } = useUserContext();
   const { code, addCode } = useGamePlayerCode(token);
+  const { game: editedGame, editGame } = useEditGame(token);
+
   const [viewMode, setViewMode] = useState(true);
 
   const { role, nickname } = info;
 
+  useEffect(() => {
+    if (editedGame) {
+      setGame(editedGame);
+      setViewMode(true);
+    }
+  }, [editedGame]);
+
   if (!game) return 'Loading...';
-  console.log({ game });
 
   const { name, description, image, public: publicStatus, codes = [] } = game;
 
@@ -35,7 +44,7 @@ const GameInfoPanel = ({ game }) => {
         <EditGameForm
           setToggleEditForm={() => setViewMode(true)}
           game={game}
-          editGame={() => {}}
+          editGame={editGame}
         />
       )}
       <table className="table game-info-table">

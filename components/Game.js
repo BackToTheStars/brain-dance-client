@@ -44,7 +44,7 @@ const GameComponent = () => {
     <div style={{ width: '100%', display: 'flex' }}>
       <ClassesPanel />
 
-      <GameInfoPanel game={game} />
+      <GameInfoPanel game={game} setGame={setGame} />
       <div className="col p0">
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" />

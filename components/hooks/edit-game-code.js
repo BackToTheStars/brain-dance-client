@@ -8,9 +8,9 @@ const useGamePlayerCode = (gameToken) => {
     'content-type': 'application/json',
   };
   if (gameToken) {
-    headers['game-token'] = gameToken;
+    headers['game-token'] = gameToken; // owner или player
   } else {
-    headers['authorization'] = `Bearer ${getToken()}`;
+    headers['authorization'] = `Bearer ${getToken()}`; // superadmin
   }
 
   const addCode = (game) => {
