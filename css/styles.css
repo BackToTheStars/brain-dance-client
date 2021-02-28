@@ -44,3 +44,7 @@ body {
   width: 430px;
   padding: 20px;
 }
+
+.games-list__item {
+  cursor: pointer;
+}

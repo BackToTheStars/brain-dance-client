@@ -18,7 +18,7 @@ const CodeEnterForm = () => {
         <input
           name="code"
           type="text"
-          className="form-control"
+          className="form-control mr-3"
           placeholder="Code"
         />
         <input

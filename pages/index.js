@@ -75,12 +75,14 @@ const IndexPage = () => {
   };
 
   return (
-    <div className="container-fluid col-10">
+    <div className="container-fluid col-10 mt-4">
       {!!popupCode && (
         <NewGameWarningPopup code={popupCode} enterGame={enterGame} />
       )}
-      <h4>User mode: {mode}</h4>
-      <CodeEnterForm />
+      {mode === 'admin' && <h4>User mode: {mode}</h4>}
+      <div className="row">
+        <CodeEnterForm />
+      </div>
       <div className="row">
         <div className="col-8">
           <GameTable games={games} onItemClick={onItemClick} />
