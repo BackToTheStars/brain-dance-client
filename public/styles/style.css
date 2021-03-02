@@ -434,8 +434,7 @@ button {
 .minimap-panel {
   position: fixed;
   width: 17vw;
-  height: 25vh;
-  background: rgba(0,255,0,1);
+  /* height: 25vh; */
   right: 0;
   bottom: 0;
 }

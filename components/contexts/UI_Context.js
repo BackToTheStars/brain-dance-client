@@ -15,7 +15,7 @@ const reducer = (state, action) => {
 };
 
 const minimapInitialState = {
-  isHidden: true,
+  isHidden: false, // true
   left: 0,
   top: 0,
   bottom: 0,
@@ -25,7 +25,12 @@ const minimapInitialState = {
 const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_MOVED': {
-      return { left: action.payload.left, top: action.payload.top, bottom: action.payload.bottom, right: action.payload.right };
+      return {
+        left: action.payload.left,
+        top: action.payload.top,
+        bottom: action.payload.bottom,
+        right: action.payload.right,
+      };
     }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);
@@ -33,14 +38,15 @@ const minimapReducer = (state, action) => {
   }
 };
 
-
 export const UI_Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
   const [gameInfoPanelIsHidden, setGameInfoPanelIsHidden] = useState(true);
 
-  const [minimapState, minimapDispatch] = useReducer(minimapReducer, minimapInitialState);
-
+  const [minimapState, minimapDispatch] = useReducer(
+    minimapReducer,
+    minimapInitialState
+  );
 
   return (
     <UI_Context.Provider
