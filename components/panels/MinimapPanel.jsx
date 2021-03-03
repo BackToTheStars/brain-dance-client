@@ -4,7 +4,7 @@ import { useRef } from 'react';
 
 const styles = {
   panel: {
-    zIndex: '1',
+    zIndex: '5',
     height: 'auto',
     border: '2px solid #eee',
   },
@@ -45,7 +45,7 @@ function MinimapPanel(props) {
               // console.log(e.clientY);
             }}
             ref={imgRef}
-            src={`${API_URL}/out_0_0.png`}
+            src={`${API_URL}/output.png`}
             style={styles.img}
           />
         </div>

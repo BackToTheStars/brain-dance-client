@@ -26,10 +26,29 @@ const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_MOVED': {
       return {
+        ...state,
         left: action.payload.left,
         top: action.payload.top,
         bottom: action.payload.bottom,
         right: action.payload.right,
+      };
+    }
+    case 'HIDE_MINIMAP': {
+      return {
+        ...state,
+        isHidden: true
+      };
+    }
+    case 'SHOW_MINIMAP': {
+      return {
+        ...state,
+        isHidden: false
+      };
+    }
+    case 'TOGGLE_MINIMAP': {
+      return {
+        ...state,
+        isHidden: !state.isHidden
       };
     }
     default: {
