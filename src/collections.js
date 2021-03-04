@@ -35,6 +35,38 @@ class TurnCollection {
     );
     this.turnObjects.slice(index, 1);
   }
+  getScreenRect() {
+    let left = Infinity,
+      right = -Infinity,
+      top = Infinity,
+      bottom = -Infinity;
+    for (let turnObject of this.turnObjects) {
+      const { x, y, height, width } = turnObject.getPositionInfo();
+
+      if (left > x) {
+        left = x;
+      }
+
+      if (top > y) {
+        top = y;
+      }
+
+      if (right < x + width) {
+        right = x + width;
+      }
+
+      if (bottom < y + height) {
+        bottom = y + height;
+      }
+    }
+
+    return {
+      left,
+      right,
+      top,
+      bottom,
+    };
+  }
 }
 
 class LinesCollection {

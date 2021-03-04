@@ -25,18 +25,36 @@ function MinimapPanel(props) {
         <div className="minimap-panel" style={styles.panel}>
           <img
             onClick={(e) => {
-              const k = (2 * window.innerWidth) / 100;
-              const imgWidth = Math.floor((window.innerWidth * 17) / 100);
+              const rect = e.target.getBoundingClientRect();
+
               const xPerc = Math.floor(
-                ((window.innerWidth - e.clientX) * 100) / imgWidth
-              );
-              const imgHeight = Math.floor((window.innerHeight * 17) / 100);
-              const yPerc = Math.floor(
-                ((window.innerHeight - e.clientY) * 100) / imgHeight
+                ((e.clientX - rect.left) * 100) / rect.width
               );
 
-              console.log(100 - xPerc);
-              console.log(100 - yPerc);
+              const yPerc = Math.floor(
+                ((e.clientY - rect.top) * 100) / rect.height
+              );
+
+              console.log({ xPerc, yPerc });
+
+              const gameBox = document
+                .querySelector('#gameBox')
+                .getBoundingClientRect();
+
+              console.log(gameBox.height, gameBox.width);
+
+              // const k = (2 * window.innerWidth) / 100;
+              // const imgWidth = Math.floor((window.innerWidth * 17) / 100);
+              // const xPerc = Math.floor(
+              //   ((window.innerWidth - e.clientX) * 100) / imgWidth
+              // );
+              // const imgHeight = Math.floor((window.innerHeight * 17) / 100);
+              // const yPerc = Math.floor(
+              //   ((window.innerHeight - e.clientY) * 100) / imgHeight
+              // );
+
+              // console.log(100 - xPerc);
+              // console.log(100 - yPerc);
 
               // console.log(e);
               // console.log(e.target.offsetLeft);
