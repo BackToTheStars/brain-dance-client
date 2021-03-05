@@ -63,7 +63,7 @@ function MinimapPanel(props) {
               // console.log(e.clientY);
             }}
             ref={imgRef}
-            src={`${API_URL}/out_0_0.png`}
+            src={`${API_URL}/output.png`}
             style={styles.img}
           />
         </div>
