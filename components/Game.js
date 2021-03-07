@@ -6,12 +6,14 @@ import GameInfoPanel from './panels/GameInfoPanel';
 import NotificationPanel from './panels/NotificationPanel';
 import MinimapPanel from './panels/MinimapPanel';
 import { useUserContext } from './contexts/UserContext';
+import { useUiContext } from './contexts/UI_Context';
 import { API_URL } from '../src/config';
 
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
   const { token, info, can } = useUserContext();
+  const { minimapDispatch } = useUiContext();
 
   const notificationAlert = (note) => {
     setNotes((notes) => {
@@ -36,6 +38,9 @@ const GameComponent = () => {
       stageEl: $('#gameBox'),
       settings: { notificationAlert },
       user: { info, token, can },
+      dispatchers: {
+        minimapDispatch,
+      },
     });
     game.init();
   }, []);
