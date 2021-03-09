@@ -16,6 +16,9 @@ const reducer = (state, action) => {
 
 const minimapInitialState = {
   isHidden: false, // true
+
+  initLeft: 0,
+  initTop: 0,
   left: 0,
   top: 0,
   bottom: 0,
@@ -24,12 +27,23 @@ const minimapInitialState = {
 
 const minimapReducer = (state, action) => {
   switch (action.type) {
-    case 'MAP_MOVED': {
+    case 'MAP_INIT': {
+      const { left, top } = action.payload;
       return {
-        left: action.payload.left,
-        top: action.payload.top,
-        bottom: action.payload.bottom,
-        right: action.payload.right,
+        ...state,
+        initLeft: left,
+        initTop: top,
+        ...action.payload,
+      };
+    }
+    case 'VIEWPORT_MOVED_ON_FIELD': {
+      return {
+        ...state,
+        ...action.payload,
+        // left: action.payload.left,
+        // top: action.payload.top,
+        // bottom: action.payload.bottom,
+        // right: action.payload.right,
       };
     }
     default: {

@@ -27,12 +27,13 @@ import { MiniMap } from './minimap';
 // настраивает компоненты игры,
 // обеспечивает передачу данных между компонентами
 class Game {
-  constructor({ stageEl, settings, user }) {
+  constructor({ stageEl, settings, user, dispatchers }) {
     this.stageEl = stageEl;
     this.triggers = {};
     this.user = user;
     this.userInfo = this.user.info; // info (hash, nickname, role)
     this.userToken = this.user.token;
+    this.dispatchers = dispatchers;
 
     const { notificationAlert } = settings;
     this.notificationAlert = notificationAlert;
@@ -73,6 +74,13 @@ class Game {
       this.user
     );
 
+    this.dispatchers.minimapDispatch({
+      type: 'MAP_INIT',
+      payload: {
+        ...this.turnCollection.getScreenRect(),
+      },
+    });
+
     const {
       item: { redLogicLines },
     } = await getRedLogicLines();
@@ -109,6 +117,12 @@ class Game {
           // двигает все ходы при отпускании draggable() поля
           const turns = await this.turnCollection.getTurns();
           this.gameField.recalculate(turns);
+          this.dispatchers.minimapDispatch({
+            type: 'VIEWPORT_MOVED_ON_FIELD',
+            payload: {
+              ...this.turnCollection.getScreenRect(),
+            },
+          });
           break;
         }
         case 'DRAW_LINES': {
