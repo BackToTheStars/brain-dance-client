@@ -64,6 +64,7 @@ function MinimapPanel(props) {
           }}
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
+            console.log(`rect: ${JSON.stringify(rect)}`);
             // const k = Math.floor(width / mapWidth);
             const xPerc = Math.floor(
               ((e.clientX - rect.left) * 100) / rect.width
@@ -71,14 +72,15 @@ function MinimapPanel(props) {
             const yPerc = Math.floor(
               ((e.clientY - rect.top) * 100) / rect.height
             );
-
+            console.log(`Percentage: ${JSON.stringify({ xPerc, yPerc })}`);
             const { prevX, prevY } = prevData;
             const deltaX =
               Math.floor((width * xPerc) / 100) - window.innerWidth - prevX;
             const deltaY =
               Math.floor((height * yPerc) / 100) - window.innerHeight - prevY;
-
+            console.log(`delta: ${JSON.stringify({ deltaX, deltaY })}`);
             setPrevData({ prevX: deltaX + prevX, prevY: deltaY + prevY });
+            console.log(`minimapState: ${JSON.stringify(minimapState)}`);
 
             const gameBox = document
               .querySelector('#gameBox')
@@ -118,7 +120,7 @@ function MinimapPanel(props) {
           }}
         >
           <img
-            src={`${API_URL}/output.png`}
+            src={`${API_URL}/ebb/output.png`}
             style={{
               ...styles.img,
               width: `${imgWidth}%`,
