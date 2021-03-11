@@ -11,6 +11,7 @@ const ButtonsPanel = () => {
 
     state: { classesPanelIsHidden },
     dispatch,
+    minimapDispatch,
   } = useUiContext();
   const router = useRouter();
   const { info, can } = useUserContext();
@@ -41,6 +42,9 @@ const ButtonsPanel = () => {
           Info
         </button>
       )}
+      <button onClick={() => minimapDispatch({ type: 'MINIMAP_SHOW_HIDE' })}>
+        Minimap
+      </button>
     </div>
   );
 };

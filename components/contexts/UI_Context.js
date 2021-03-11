@@ -46,6 +46,12 @@ const minimapReducer = (state, action) => {
         // right: action.payload.right,
       };
     }
+    case 'MINIMAP_SHOW_HIDE': {
+      return {
+        ...state,
+        isHidden: !state.isHidden,
+      };
+    }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);
     }

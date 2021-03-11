@@ -1,6 +1,7 @@
 import { useUiContext } from '../contexts/UI_Context';
+import { useUserContext } from '../contexts/UserContext';
 import { API_URL } from '../../src/config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const styles = {
   panel: {
@@ -23,9 +24,12 @@ const styles = {
 function MinimapPanel(props) {
   const [prevData, setPrevData] = useState({ prevX: 0, prevY: 0 });
   const { minimapState, minimapDispatch } = useUiContext();
+  const { info: { hash } = {} } = useUserContext();
 
   const { initLeft, initTop, left, top, bottom, right } = minimapState;
   const mapWidth = 500; // ширина миникарты на экране
+
+  console.log({ initLeft, initTop, left, top, bottom, right });
 
   const deltaLeft = initLeft - left; // насколько мы сместились
   const deltaTop = initTop - top;
@@ -49,6 +53,30 @@ function MinimapPanel(props) {
   );
   const imgViewportWidth = Math.floor((screenWidth * 100) / width);
   const imgViewportHeight = Math.floor((screenHeight * 100) / height);
+
+  console.log({
+    width,
+    height,
+
+    mapWidth,
+    mapHeight,
+
+    imgViewportWidth,
+    imgViewportHeight,
+  });
+
+  // useEffect(() => {
+  //   if (!!initLeft || !!initTop) {
+  //     console.log({ initLeft });
+  //     minimapDispatch({
+  //       type: 'VIEWPORT_MOVED_ON_FIELD',
+  //       payload: {
+  //         // left: initLeft,
+  //         // top: initTop,
+  //       },
+  //     });
+  //   }
+  // }, [initLeft, initTop]);
 
   return (
     <>
@@ -120,7 +148,8 @@ function MinimapPanel(props) {
           }}
         >
           <img
-            src={`${API_URL}/ebb/output.png`}
+            src={`${API_URL}/games/screenshot?hash=${hash}`}
+            // src={`${API_URL}/${hash}/output.png`}
             style={{
               ...styles.img,
               width: `${imgWidth}%`,
