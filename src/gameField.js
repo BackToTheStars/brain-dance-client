@@ -51,9 +51,8 @@ class GameField {
     Object.defineProperty(onlooker, 'counter', {
       set: (v) => {
         //if (v == 0) window[MyIsLoaded] = true;
-        console.log(
-          `client src/gameField.js :54 handleLoadImages: v = ${v} | ${window[MyIsLoaded]}`
-        );
+        // console.log(   `client src/gameField.js :54 handleLoadImages: v = ${v} | ${window[MyIsLoaded]}`
+        //);
         window[MyIsLoaded] = v;
         return (_counter = v);
       },
