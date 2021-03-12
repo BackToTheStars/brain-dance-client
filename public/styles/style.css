@@ -438,3 +438,32 @@ button {
   right: 0;
   bottom: 0;
 }
+
+.rec-label {
+  position: fixed;
+  background: rgba(255, 0, 0, 0.8);
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  top: 26px;
+  right: 93px;
+  z-index: 5;
+}
+
+.rec-text {
+  position: fixed;
+  color: rgba(255, 0, 0, 0.8);
+  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  top: 20px;
+  right: 55px;
+  z-index: 5;
+  font-size: 1.4rem;
+
+  /* content: 'REC'; */
+  /* color: rgba(255, 0, 0, 0.8);
+  z-index: 5;
+  margin-left: 30px;
+  margin-top: -20px; */
+}

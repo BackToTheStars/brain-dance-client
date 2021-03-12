@@ -29,7 +29,7 @@ function MinimapPanel(props) {
   const { initLeft, initTop, left, top, bottom, right } = minimapState;
   const mapWidth = 500; // ширина миникарты на экране
 
-  console.log({ initLeft, initTop, left, top, bottom, right });
+  //console.log({ initLeft, initTop, left, top, bottom, right });
 
   const deltaLeft = initLeft - left; // насколько мы сместились
   const deltaTop = initTop - top;
@@ -54,16 +54,16 @@ function MinimapPanel(props) {
   const imgViewportWidth = Math.floor((screenWidth * 100) / width);
   const imgViewportHeight = Math.floor((screenHeight * 100) / height);
 
-  console.log({
-    width,
-    height,
+  // console.log({
+  //   width,
+  //   height,
 
-    mapWidth,
-    mapHeight,
+  //   mapWidth,
+  //   mapHeight,
 
-    imgViewportWidth,
-    imgViewportHeight,
-  });
+  //   imgViewportWidth,
+  //   imgViewportHeight,
+  // });
 
   // useEffect(() => {
   //   if (!!initLeft || !!initTop) {

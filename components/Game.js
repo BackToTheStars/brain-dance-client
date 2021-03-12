@@ -8,12 +8,13 @@ import MinimapPanel from './panels/MinimapPanel';
 import { useUserContext } from './contexts/UserContext';
 import { useUiContext } from './contexts/UI_Context';
 import { API_URL } from '../src/config';
+import RecPanel from './panels/RecPanel';
 
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
   const { token, info, can } = useUserContext();
-  const { minimapDispatch } = useUiContext();
+  const { minimapDispatch, recPanelDispatch } = useUiContext();
 
   const notificationAlert = (note) => {
     setNotes((notes) => {
@@ -40,6 +41,7 @@ const GameComponent = () => {
       user: { info, token, can },
       dispatchers: {
         minimapDispatch,
+        recPanelDispatch,
       },
     });
     game.init();
@@ -58,6 +60,7 @@ const GameComponent = () => {
         <ButtonsPanel />
         <NotificationPanel notes={notes} />
         <MinimapPanel />
+        <RecPanel />
 
         <div className="quotes-panel" />
 
