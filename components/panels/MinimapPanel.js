@@ -23,6 +23,7 @@ const styles = {
 
 function MinimapPanel(props) {
   const [prevData, setPrevData] = useState({ prevX: 0, prevY: 0 });
+  const [timeCode, setTimeCode] = useState(new Date().getTime());
   const { minimapState, minimapDispatch } = useUiContext();
   const { info: { hash } = {} } = useUserContext();
 
@@ -53,6 +54,10 @@ function MinimapPanel(props) {
   );
   const imgViewportWidth = Math.floor((screenWidth * 100) / width);
   const imgViewportHeight = Math.floor((screenHeight * 100) / height);
+
+  const refreshButtonClicked = () => {
+    setTimeCode(new Date().getTime());
+  };
 
   // console.log({
   //   width,
@@ -92,6 +97,10 @@ function MinimapPanel(props) {
           }}
           onClick={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
+
+            if (e.target.classList.contains('minimap-panel__refresh-btn')) {
+              return;
+            }
             console.log(`rect: ${JSON.stringify(rect)}`);
             // const k = Math.floor(width / mapWidth);
             const xPerc = Math.floor(
@@ -147,8 +156,14 @@ function MinimapPanel(props) {
             // console.log(e.clientY);
           }}
         >
+          <button
+            className="minimap-panel__refresh-btn"
+            onClick={refreshButtonClicked}
+          >
+            Refresh
+          </button>
           <img
-            src={`${API_URL}/games/screenshot?hash=${hash}`}
+            src={`${API_URL}/games/screenshot?hash=${hash}&timecode=${timeCode}`}
             // src={`${API_URL}/${hash}/output.png`}
             style={{
               ...styles.img,

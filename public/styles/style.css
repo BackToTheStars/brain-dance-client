@@ -439,6 +439,11 @@ button {
   bottom: 0;
 }
 
+.minimap-panel__refresh-btn {
+  transform: translateY(-120%);
+  transform: translateX(-10%);
+}
+
 .rec-label {
   position: fixed;
   background: rgba(255, 0, 0, 0.8);
