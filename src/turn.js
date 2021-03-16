@@ -2,6 +2,7 @@ import { dateFormatter } from './formatters/dateFormatter';
 import { youtubeFormatter } from './formatters/youtubeFormatter';
 import { getShortLink } from './formatters/urlFormatter';
 import { RULE_TURNS_CRUD } from '../components/config';
+import { markerColors } from '../src/popup';
 
 const getParagraphText = (arrText) => {
   // @todo: remove
@@ -149,7 +150,8 @@ class Turn {
       .find('span')
       .toArray()
       .filter((spanEl) => {
-        return $(spanEl).css('background-color') === 'rgb(255, 255, 0)';
+        return markerColors.indexOf($(spanEl).css('background-color')) !== -1;
+        // return $(spanEl).css('background-color') === 'rgb(255, 255, 0)';
       });
   }
 

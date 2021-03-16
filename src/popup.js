@@ -4,6 +4,14 @@
 import { getQuill } from './quillHandler';
 import { createTurn, updateTurn } from './service';
 import { getTurn } from './turn';
+export const markerColors = [
+  'rgb(255, 255, 0)',
+  'rgb(138, 255, 36)',
+  'rgb(253, 201, 255)',
+  'rgb(156, 245, 255)',
+  'rgb(210, 211, 212)',
+  'rgb(255, 213, 150)',
+];
 
 let popup = null;
 const createPopup = (inputDiv, triggers) => {
@@ -54,7 +62,12 @@ const createPopup = (inputDiv, triggers) => {
                 <span class="ql-formats">
                     <select class="ql-background">
                         <option selected></option>
-                        <option value="yellow"></option>
+                        <option value="rgb(255, 255, 0)"></option>
+                        <option value="rgb(138, 255, 36)"></option>
+                        <option value="rgb(253, 201, 255)"></option>
+                        <option value="rgb(156, 245, 255)"></option>
+                        <option value="rgb(210, 211, 212)"></option>
+                        <option value="rgb(255, 213, 150)"></option>
                     </select>
                 </span>
             </div>
@@ -226,11 +239,12 @@ const createPopup = (inputDiv, triggers) => {
     setTurnType(turn.contentType);
 
     if (turn.date) {
-      const date = new Date(turn.date);
-      dateInput.value = `${date.getFullYear()}-${(
-        '0' +
-        (date.getMonth() + 1)
-      ).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+      // const date = new Date(turn.date);
+      // dateInput.value = `${date.getFullYear()}-${(
+      //   '0' +
+      //   (date.getMonth() + 1)
+      // ).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+      dateInput.value = turn.date.slice(0, 10);
     }
 
     if (turn.sourceUrl) {
