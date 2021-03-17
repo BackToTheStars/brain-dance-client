@@ -166,10 +166,15 @@ class Turn {
     let { date, videoUrl } = this.data;
     if (date) {
       date = dateFormatter(date);
-    } // лежит в папке "refactoring/formatters"
+    }
     if (videoUrl) {
-      videoUrl = youtubeFormatter(videoUrl);
-    } // лежит там же
+      if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+        videoUrl = youtubeFormatter(videoUrl);
+      } else {
+        console.log(`Unknown video source: "${videoUrl}"`);
+        //TODO
+      }
+    }
 
     // @todo: get role const
     this.el.innerHTML = `<h5 class="headerText">
