@@ -34,7 +34,7 @@ const GamePage = () => {
         ></script>
         <script src="/quill/quill.min.js"></script>
       </Head>
-      <UserProvider hash={router.query.hash}>
+      <UserProvider hash={router.query.hash} timecode={router.query.timecode}>
         <UI_Provider>
           <Game />
         </UI_Provider>

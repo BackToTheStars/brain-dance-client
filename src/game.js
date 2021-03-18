@@ -27,12 +27,13 @@ import { MiniMap } from './minimap';
 // настраивает компоненты игры,
 // обеспечивает передачу данных между компонентами
 class Game {
-  constructor({ stageEl, settings, user, dispatchers }) {
+  constructor({ stageEl, settings, user, timecode, dispatchers }) {
     this.stageEl = stageEl;
     this.triggers = {};
     this.user = user;
     this.userInfo = this.user.info; // info (hash, nickname, role)
     this.userToken = this.user.token;
+    this.timecode = timecode;
     this.dispatchers = dispatchers;
 
     const { notificationAlert } = settings;
@@ -69,6 +70,7 @@ class Game {
       {
         turnsData: result.items,
         stageEl: this.stageEl,
+        timecode: this.timecode,
       },
       this.triggers,
       this.user

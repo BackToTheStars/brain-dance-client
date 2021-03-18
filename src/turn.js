@@ -25,11 +25,12 @@ const getParagraphText = (arrText) => {
 // предоставляет свои настройки другим компонентам
 
 class Turn {
-  constructor({ data, stageEl }, triggers, user) {
+  constructor({ data, stageEl, timecode }, triggers, user) {
     this._id = data._id;
     this.data = data;
     this.triggers = triggers;
     this.user = user;
+    this.timecode = timecode;
 
     this.needToRender = true;
     this.el = this.createDomEl();
@@ -176,6 +177,8 @@ class Turn {
       }
     }
 
+    console.log(this.timecode);
+
     // @todo: get role const
     this.el.innerHTML = `<h5 class="headerText">
             <div class="headerTextTitle">${header}</div>
@@ -205,13 +208,17 @@ class Turn {
               videoUrl && videoUrl.trim()
                 ? `<div class="video">
                 <div class="iframe-overlay"></div>
-                <iframe
+                ${
+                  this.timecode
+                    ? `<img style="width: 100%; height: 100%;" src="http://img.youtube.com/vi/${videoUrl}/2.jpg" />`
+                    : `<iframe
                     src="https://www.youtube.com/embed/${videoUrl}"
                     allow="accelerometer; fullscreen; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen="allowFullScreen"
                     frameBorder="0"
                     style="width: 100%; height: 100%;">
-                </iframe>
+                </iframe>`
+                }
                 </div>`
                 : ''
             }

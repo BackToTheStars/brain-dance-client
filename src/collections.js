@@ -6,12 +6,13 @@ import Quote from './quote';
 import Line from './line';
 
 class TurnCollection {
-  constructor({ turnsData, stageEl }, triggers, user) {
+  constructor({ turnsData, stageEl, timecode }, triggers, user) {
     this.stageEl = stageEl;
     this.triggers = triggers;
+    this.timecode = timecode;
     this.user = user;
     this.turnObjects = turnsData.map(
-      (data) => new Turn({ data, stageEl }, triggers, user)
+      (data) => new Turn({ data, stageEl, timecode }, triggers, user)
     );
   }
   getTurns() {
@@ -22,7 +23,11 @@ class TurnCollection {
   }
   addTurn(data) {
     this.turnObjects.push(
-      new Turn({ data, stageEl: this.stageEl }, this.triggers, this.user)
+      new Turn(
+        { data, stageEl: this.stageEl, timecode: this.timecode },
+        this.triggers,
+        this.user
+      )
     );
   }
   updateTurn(data) {
