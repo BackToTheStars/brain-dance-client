@@ -211,13 +211,17 @@ class Turn {
                 ${
                   this.timecode
                     ? `<img style="width: 100%; height: 100%;" src="http://img.youtube.com/vi/${videoUrl}/2.jpg" />`
-                    : `<iframe
+                    : (() => {
+                        const str = `<iframe
                     src="https://www.youtube.com/embed/${videoUrl}"
                     allow="accelerometer; fullscreen; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen="allowFullScreen"
                     frameBorder="0"
                     style="width: 100%; height: 100%;">
-                </iframe>`
+                </iframe>`;
+                        console.log('iframe: ', str);
+                        return str;
+                      })()
                 }
                 </div>`
                 : ''
