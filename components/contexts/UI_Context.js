@@ -19,6 +19,8 @@ const minimapInitialState = {
 
   initLeft: 0,
   initTop: 0,
+  initRight: 0,
+  initBottom: 0,
   left: 0,
   top: 0,
   bottom: 0,
@@ -28,11 +30,13 @@ const minimapInitialState = {
 const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_INIT': {
-      const { left, top } = action.payload;
+      const { left, top, right, bottom } = action.payload;
       return {
         ...state,
         initLeft: left,
         initTop: top,
+        initRight: right,
+        initBottom: bottom,
         ...action.payload,
       };
     }

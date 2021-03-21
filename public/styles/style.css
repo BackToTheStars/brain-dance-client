@@ -209,6 +209,10 @@ button {
   max-width: 100%;
 }
 
+.zero-point-type {
+  display: none;
+}
+
 .textBox.comment-type .paragraphText {
   height: 100%;
   overflow-y: hidden;
@@ -442,6 +446,8 @@ button {
 .minimap-panel__refresh-btn {
   transform: translateY(-120%);
   transform: translateX(-10%);
+  display: none;
+  /* Николай - пока скрыл кнопку Refresh */
 }
 
 .rec-label {

@@ -21,16 +21,51 @@ const styles = {
   },
 };
 
+const getField = (left, top, bottom, right) => {
+  return [
+    right - left, // field width
+    bottom - top, // field height
+    -left, // viewport x
+    -top, // viewport y
+  ];
+};
+
 function MinimapPanel(props) {
   const [prevData, setPrevData] = useState({ prevX: 0, prevY: 0 });
   const [timeCode, setTimeCode] = useState(new Date().getTime());
   const { minimapState, minimapDispatch } = useUiContext();
   const { info: { hash } = {} } = useUserContext();
 
-  const { initLeft, initTop, left, top, bottom, right } = minimapState;
+  const {
+    initLeft,
+    initTop,
+    initBottom,
+    initRight,
+    left,
+    top,
+    bottom,
+    right,
+  } = minimapState;
+
+  // console.log({
+  //   top: top - initTop,
+  //   left: left - initLeft,
+  //   bottom: bottom - initBottom,
+  //   right: right - initRight,
+  // });
+
   const mapWidth = 500; // ширина миникарты на экране
 
-  //console.log({ initLeft, initTop, left, top, bottom, right });
+  console.log({
+    initLeft,
+    initTop,
+    initBottom,
+    initRight,
+    left,
+    top,
+    bottom,
+    right,
+  });
 
   const deltaLeft = initLeft - left; // насколько мы сместились
   const deltaTop = initTop - top;
@@ -38,8 +73,15 @@ function MinimapPanel(props) {
   const screenWidth = typeof window === 'undefined' ? 1920 : window.innerWidth;
   const screenHeight = typeof window === 'undefined' ? 800 : window.innerHeight;
 
-  const width = screenWidth + right - left;
-  const height = screenHeight + bottom - top;
+  const [fieldWidth, fieldHeight, viewportX, viewportY] = getField(
+    left,
+    top,
+    bottom,
+    right
+  );
+
+  const width = screenWidth + fieldWidth;
+  const height = screenHeight + fieldHeight;
 
   const mapHeight = Math.floor((mapWidth * height) / width);
 
@@ -47,10 +89,10 @@ function MinimapPanel(props) {
   const imgHeight = Math.floor(((bottom - top) * 100) / height);
 
   const imgViewportLeft = Math.floor(
-    ((deltaLeft + screenWidth / 2) * 100) / width
+    ((-initLeft + deltaLeft + screenWidth / 2) * 100) / width
   ); // отображаем прямоугольник на миникарте
   const imgViewportTop = Math.floor(
-    ((deltaTop + screenHeight / 2) * 100) / height
+    ((-initTop + deltaTop + screenHeight / 2) * 100) / height
   );
   const imgViewportWidth = Math.floor((screenWidth * 100) / width);
   const imgViewportHeight = Math.floor((screenHeight * 100) / height);
@@ -112,9 +154,15 @@ function MinimapPanel(props) {
             console.log(`Percentage: ${JSON.stringify({ xPerc, yPerc })}`);
             const { prevX, prevY } = prevData;
             const deltaX =
-              Math.floor((width * xPerc) / 100) - window.innerWidth - prevX;
+              Math.floor((width * xPerc) / 100) -
+              window.innerWidth -
+              prevX +
+              initLeft;
             const deltaY =
-              Math.floor((height * yPerc) / 100) - window.innerHeight - prevY;
+              Math.floor((height * yPerc) / 100) -
+              window.innerHeight -
+              prevY +
+              initTop;
             console.log(`delta: ${JSON.stringify({ deltaX, deltaY })}`);
             setPrevData({ prevX: deltaX + prevX, prevY: deltaY + prevY });
             console.log(`minimapState: ${JSON.stringify(minimapState)}`);
@@ -162,6 +210,15 @@ function MinimapPanel(props) {
           >
             Refresh
           </button>
+          <div
+            style={{
+              border: '2px solid white',
+              ...styles.img,
+              width: `${imgWidth}%`,
+              height: `${imgHeight}%`,
+              zIndex: 1,
+            }}
+          ></div>
           <img
             src={`${API_URL}/games/screenshot?hash=${hash}&timecode=${timeCode}`}
             // src={`${API_URL}/${hash}/output.png`}
