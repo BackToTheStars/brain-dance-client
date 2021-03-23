@@ -45,6 +45,10 @@ function MinimapPanel(props) {
     top,
     bottom,
     right,
+    zeroX,
+    zeroY,
+    initZeroX,
+    initZeroY,
   } = minimapState;
 
   // console.log({
@@ -57,14 +61,18 @@ function MinimapPanel(props) {
   const mapWidth = 500; // ширина миникарты на экране
 
   console.log({
-    initLeft,
-    initTop,
-    initBottom,
-    initRight,
-    left,
-    top,
-    bottom,
-    right,
+    // initLeft,
+    // initTop,
+    // initBottom,
+    // initRight,
+    // left,
+    // top,
+    // bottom,
+    // right,
+    zeroX,
+    zeroY,
+    initZeroX,
+    initZeroY,
   });
 
   const deltaLeft = initLeft - left; // насколько мы сместились
@@ -100,6 +108,24 @@ function MinimapPanel(props) {
   const refreshButtonClicked = () => {
     setTimeCode(new Date().getTime());
   };
+
+  console.log(`Сдвиг влево: ${zeroX - initZeroX}`);
+  console.log(
+    `Изменение ширины поля: ${right - left - (initRight - initLeft)}`
+  );
+  console.log(`Изменение левой стороны поля: ${left - initLeft}`);
+  console.log(
+    `Дополнительные px слева: ${left - initLeft - (zeroX - initZeroX)}`
+  );
+  console.log(`Изменение правой стороны поля: ${right - initRight}`);
+  console.log(
+    `Дополнительные px справа: ${right - initRight - (zeroX - initZeroX)}`
+  );
+
+  const extraPercLeft =
+    ((zeroX - initZeroX - (left - initLeft)) * 100) / fieldWidth;
+  const extraPercRight =
+    ((zeroX - initZeroX - (right - initRight)) * 100) / fieldWidth;
 
   // console.log({
   //   width,
@@ -216,18 +242,23 @@ function MinimapPanel(props) {
               ...styles.img,
               width: `${imgWidth}%`,
               height: `${imgHeight}%`,
+              paddingLeft: `${extraPercLeft}%`, // можно сделать увеличение в px
+              paddingRight: `${extraPercRight}%`,
               zIndex: 1,
             }}
-          ></div>
-          <img
-            src={`${API_URL}/games/screenshot?hash=${hash}&timecode=${timeCode}`}
-            // src={`${API_URL}/${hash}/output.png`}
-            style={{
-              ...styles.img,
-              width: `${imgWidth}%`,
-              height: `${imgHeight}%`,
-            }}
-          />
+          >
+            <img
+              src={`${API_URL}/games/screenshot?hash=${hash}&timecode=${timeCode}`}
+              // src={`${API_URL}/${hash}/output.png`}
+              style={{
+                // ...styles.img,
+                width: '100%',
+                // width: `${imgWidth}%`,
+                // height: `${imgHeight}%`,
+              }}
+            />
+          </div>
+
           <img
             style={{
               ...styles.viewportArea,
@@ -235,6 +266,7 @@ function MinimapPanel(props) {
               top: `${imgViewportTop}%`,
               width: `${imgViewportWidth}%`,
               height: `${imgViewportHeight}%`,
+              zIndex: 1,
             }}
             src="/img/viewport.png"
           />

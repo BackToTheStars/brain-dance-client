@@ -18,6 +18,11 @@ class TurnCollection {
   getTurns() {
     return this.turnObjects;
   }
+  // getZeroPointTurn() {
+  //   return this.turnObjects.find(
+  //     (turnObject) => turnObject.type === 'zero-point'
+  //   );
+  // }
   getTurn({ _id }) {
     return this.turnObjects.find((turnObject) => turnObject._id === _id);
   }
@@ -44,24 +49,30 @@ class TurnCollection {
     let left = Infinity,
       right = -Infinity,
       top = Infinity,
-      bottom = -Infinity;
+      bottom = -Infinity,
+      zeroX = 0,
+      zeroY = 0;
     for (let turnObject of this.turnObjects) {
       const { x, y, height, width } = turnObject.getPositionInfo();
+      if (turnObject.data.contentType === 'zero-point') {
+        zeroX = x;
+        zeroY = y;
+      } else {
+        if (left > x) {
+          left = x;
+        }
 
-      if (left > x) {
-        left = x;
-      }
+        if (top > y) {
+          top = y;
+        }
 
-      if (top > y) {
-        top = y;
-      }
+        if (right < x + width) {
+          right = x + width;
+        }
 
-      if (right < x + width) {
-        right = x + width;
-      }
-
-      if (bottom < y + height) {
-        bottom = y + height;
+        if (bottom < y + height) {
+          bottom = y + height;
+        }
       }
     }
 
@@ -70,6 +81,8 @@ class TurnCollection {
       right,
       top,
       bottom,
+      zeroX,
+      zeroY,
     };
   }
 }
