@@ -60,20 +60,20 @@ function MinimapPanel(props) {
 
   const mapWidth = 500; // ширина миникарты на экране
 
-  console.log({
-    // initLeft,
-    // initTop,
-    // initBottom,
-    // initRight,
-    // left,
-    // top,
-    // bottom,
-    // right,
-    zeroX,
-    zeroY,
-    initZeroX,
-    initZeroY,
-  });
+  // console.log({
+  // initLeft,
+  // initTop,
+  // initBottom,
+  // initRight,
+  // left,
+  // top,
+  // bottom,
+  // right,
+  //   zeroX,
+  //   zeroY,
+  //   initZeroX,
+  //   initZeroY,
+  // });
 
   const deltaLeft = initLeft - left; // насколько мы сместились
   const deltaTop = initTop - top;
@@ -87,6 +87,7 @@ function MinimapPanel(props) {
     bottom,
     right
   );
+  // console.log({ viewportX, viewportY });
 
   const width = screenWidth + fieldWidth;
   const height = screenHeight + fieldHeight;
@@ -95,6 +96,7 @@ function MinimapPanel(props) {
 
   const imgWidth = Math.floor(((right - left) * 100) / width);
   const imgHeight = Math.floor(((bottom - top) * 100) / height);
+  // console.log({ width, height });
 
   const imgViewportLeft = Math.floor(
     ((-initLeft + deltaLeft + screenWidth / 2) * 100) / width
@@ -109,47 +111,42 @@ function MinimapPanel(props) {
     setTimeCode(new Date().getTime());
   };
 
-  console.log(`Сдвиг влево: ${zeroX - initZeroX}`);
-  console.log(
-    `Изменение ширины поля: ${right - left - (initRight - initLeft)}`
-  );
-  console.log(`Изменение левой стороны поля: ${left - initLeft}`);
-  console.log(
-    `Дополнительные px слева: ${left - initLeft - (zeroX - initZeroX)}`
-  );
-  console.log(`Изменение правой стороны поля: ${right - initRight}`);
-  console.log(
-    `Дополнительные px справа: ${right - initRight - (zeroX - initZeroX)}`
-  );
+  // console.log(`Сдвиг влево: ${zeroX - initZeroX}`);
+  // console.log(
+  //   `Изменение ширины поля: ${right - left - (initRight - initLeft)}`
+  // );
+  // console.log(`Изменение левой стороны поля: ${left - initLeft}`);
+  // console.log(
+  //   `Дополнительные px слева: ${left - initLeft - (zeroX - initZeroX)}`
+  // );
+  // console.log(`Изменение правой стороны поля: ${right - initRight}`);
+  // console.log(
+  //   `Дополнительные px справа: ${right - initRight - (zeroX - initZeroX)}`
+  // );
 
   const extraPercLeft =
     ((zeroX - initZeroX - (left - initLeft)) * 100) / fieldWidth;
   const extraPercRight =
     ((zeroX - initZeroX - (right - initRight)) * 100) / fieldWidth;
+  const extraPercTop =
+    ((zeroY - initZeroY - (top - initTop)) * 100) / fieldHeight;
+  const extraPercBottom =
+    ((zeroY - initZeroY - (bottom - initBottom)) * 100) / fieldHeight;
 
   // console.log({
-  //   width,
-  //   height,
-
-  //   mapWidth,
-  //   mapHeight,
-
-  //   imgViewportWidth,
-  //   imgViewportHeight,
+  // extraLeft: zeroX - initZeroX - (left - initLeft),
+  // extraRight: zeroX - initZeroX - (right - initRight),
+  // fieldWidth,
+  //   extraPercTop,
+  //   extraPercBottom,
+  //   fieldHeight,
   // });
 
-  // useEffect(() => {
-  //   if (!!initLeft || !!initTop) {
-  //     console.log({ initLeft });
-  //     minimapDispatch({
-  //       type: 'VIEWPORT_MOVED_ON_FIELD',
-  //       payload: {
-  //         // left: initLeft,
-  //         // top: initTop,
-  //       },
-  //     });
-  //   }
-  // }, [initLeft, initTop]);
+  // если extraRight < 0, то справа нужно добавить свободную область
+
+  // если extraRight > 0, то поле уменьшилось, скриншот нужно расширить
+  const percImgWidth = 100 - extraPercLeft + extraPercRight;
+  const percImgHieght = 100 - extraPercTop + extraPercBottom;
 
   return (
     <>
@@ -179,14 +176,19 @@ function MinimapPanel(props) {
             );
             console.log(`Percentage: ${JSON.stringify({ xPerc, yPerc })}`);
             const { prevX, prevY } = prevData;
+            console.log(`zeroX initZeroX;`, zeroX, initZeroX);
             const deltaX =
               Math.floor((width * xPerc) / 100) -
               window.innerWidth -
+              // zeroX +
+              // initZeroX;
               prevX +
               initLeft;
             const deltaY =
               Math.floor((height * yPerc) / 100) -
               window.innerHeight -
+              // zeroY +
+              // initZeroY;
               prevY +
               initTop;
             console.log(`delta: ${JSON.stringify({ deltaX, deltaY })}`);
@@ -242,8 +244,9 @@ function MinimapPanel(props) {
               ...styles.img,
               width: `${imgWidth}%`,
               height: `${imgHeight}%`,
-              paddingLeft: `${extraPercLeft}%`, // можно сделать увеличение в px
-              paddingRight: `${extraPercRight}%`,
+              // paddingLeft: `${extraPercLeft}%`, // можно сделать увеличение в px
+              // paddingRight: `${extraPercRight}%`,
+              //              paddingTop: `${viewportY > 0 ? '0' : viewportY / 10}px`,
               zIndex: 1,
             }}
           >
@@ -251,8 +254,11 @@ function MinimapPanel(props) {
               src={`${API_URL}/games/screenshot?hash=${hash}&timecode=${timeCode}`}
               // src={`${API_URL}/${hash}/output.png`}
               style={{
+                position: 'absolute',
                 // ...styles.img,
-                width: '100%',
+                left: `${extraPercLeft}%`,
+                top: `${extraPercTop}%`,
+                width: `${percImgWidth}%`,
                 // width: `${imgWidth}%`,
                 // height: `${imgHeight}%`,
               }}
