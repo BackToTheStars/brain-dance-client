@@ -166,7 +166,7 @@ function MinimapPanel(props) {
             if (e.target.classList.contains('minimap-panel__refresh-btn')) {
               return;
             }
-            console.log(`rect: ${JSON.stringify(rect)}`);
+            // console.log(`rect: ${JSON.stringify(rect)}`);
             // const k = Math.floor(width / mapWidth);
             const xPerc = Math.floor(
               ((e.clientX - rect.left) * 100) / rect.width
@@ -174,7 +174,63 @@ function MinimapPanel(props) {
             const yPerc = Math.floor(
               ((e.clientY - rect.top) * 100) / rect.height
             );
+
             console.log(`Percentage: ${JSON.stringify({ xPerc, yPerc })}`);
+
+            console.log(`Shift: ${initZeroX - zeroX} ${initZeroY - zeroY}`);
+
+            // текущее расположение центра внутри MiniMap в процентах
+            const leftScreenshotPosition = Math.floor(window.innerWidth / 2); // первоначально
+            const topScreenshotPosition = Math.floor(window.innerHeight / 2);
+            console.log(`Coords Zero Point in Minimap (px): `, {
+              x: leftScreenshotPosition + initZeroX,
+              // initZeroX,
+              y: topScreenshotPosition + initZeroY,
+              // initZeroY,
+            });
+
+            const pxRealToPxMinimap = Math.floor(window.innerWidth / 2) / 100; // при изменении скриншота нужно учесть extraPercLeft
+            // const pxRealToPxMimimapY =
+            console.log(
+              `Zero x initialy placed in Minimap on X(px): `,
+              (leftScreenshotPosition + initZeroX) / pxRealToPxMinimap
+            );
+            const zeroXInitPerc =
+              (((leftScreenshotPosition + initZeroX) / pxRealToPxMinimap) *
+                100) /
+              500;
+            const zeroYInitPerc =
+              (((topScreenshotPosition + initZeroY) / pxRealToPxMinimap) *
+                100) /
+              500;
+            console.log(
+              `Zero x initialy placed in Minimap on X(%): `,
+              zeroXInitPerc
+            );
+
+            console.log(
+              `Zero x now placed in Minimap on X(px): `,
+              (leftScreenshotPosition + zeroX) / pxRealToPxMinimap
+            );
+
+            console.log(
+              'Need to shift X (%) from zero position',
+              xPerc - zeroXInitPerc
+            );
+
+            console.log(
+              `Need to place the field X (px)`,
+              initZeroX + (xPerc - zeroXInitPerc) * 5 * pxRealToPxMinimap
+            );
+            const newFieldLeft = Math.floor(
+              initZeroX + (xPerc - zeroXInitPerc) * 5 * pxRealToPxMinimap
+            );
+            const newFieldTop = Math.floor(
+              initZeroX + (yPerc - zeroYInitPerc) * 5 * pxRealToPxMinimap
+            );
+            console.log({ newFieldLeft });
+
+            // return;
             const { prevX, prevY } = prevData;
             console.log(`zeroX initZeroX;`, zeroX, initZeroX);
             const deltaX =
@@ -201,8 +257,25 @@ function MinimapPanel(props) {
 
             // @fixme
             const gf = window[Symbol.for('MyGame')].gameField;
-            gf.stageEl.css('left', `${-deltaX}px`);
-            gf.stageEl.css('top', `${-deltaY}px`);
+            // gf.stageEl.css('left', `${-deltaX}px`);
+            gf.stageEl.css(
+              'left',
+              `${
+                -newFieldLeft +
+                (initZeroX - zeroX) +
+                Math.floor(window.innerWidth / 2)
+              }px`
+            );
+            // gf.stageEl.css('top', `${-deltaY}px`);
+            gf.stageEl.css(
+              'top',
+              `${
+                -newFieldTop +
+                (initZeroY - zeroY) +
+                Math.floor(window.innerHeight / 2)
+              }px`
+            );
+
             gf.saveFieldSettings({
               left,
               top,
