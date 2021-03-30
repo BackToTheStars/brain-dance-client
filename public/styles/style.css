@@ -397,7 +397,7 @@ button {
   font-size: 1.2rem;
 }
 
-#minimap {
+/* #minimap {
   position: fixed;
   top: 5px;
   right: 5px;
@@ -409,7 +409,7 @@ button {
 #minimap video {
   height: 80%;
   width: 100%;
-}
+} */
 
 .game-info-table tbody tr:first-child td:first-child {
   width: 25%;
@@ -435,20 +435,20 @@ button {
   color: rgb(58, 58, 58);
 }
 
-.minimap-panel {
+/* .minimap-panel {
   position: fixed;
-  width: 17vw;
-  /* height: 25vh; */
-  right: 0;
+  width: 17vw; */
+/* height: 25vh; */
+/* right: 0;
   bottom: 0;
-}
+} */
 
-.minimap-panel__refresh-btn {
+/* .minimap-panel__refresh-btn {
   transform: translateY(-120%);
   transform: translateX(-10%);
-  display: none;
-  /* Николай - пока скрыл кнопку Refresh */
-}
+  display: none; */
+/* Николай - пока скрыл кнопку Refresh */
+/* } */
 
 .rec-label {
   position: fixed;

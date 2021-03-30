@@ -52,8 +52,10 @@ class TurnCollection {
       bottom = -Infinity,
       zeroX = 0,
       zeroY = 0;
+    const turns = [];
     for (let turnObject of this.turnObjects) {
-      const { x, y, height, width } = turnObject.getPositionInfo();
+      const { x, y, height, width } = turnObject.getPositionInfo(); // собирает все ходы с экрана
+      turns.push({ x, y, height, width });
       if (turnObject.data.contentType === 'zero-point') {
         zeroX = x;
         zeroY = y;
@@ -83,6 +85,7 @@ class TurnCollection {
       bottom,
       zeroX,
       zeroY,
+      turns,
     };
   }
 }

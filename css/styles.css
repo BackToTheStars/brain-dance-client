@@ -48,3 +48,12 @@ body {
 .games-list__item {
   cursor: pointer;
 }
+
+.flex-minimap {
+  position: fixed;
+  width: 300px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  background-color: #fff;
+}
