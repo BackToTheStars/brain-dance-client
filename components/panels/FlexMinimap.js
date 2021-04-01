@@ -20,7 +20,26 @@ const FlexMinimap = () => {
 
   const width = right - left;
   const height = bottom - top;
-  const value = { width, height, turns };
+  const fieldLeftZero = left - zeroX;
+  const fieldTopZero = top - zeroY;
+
+  const value = {
+    initLeft,
+    initTop,
+    width,
+    height,
+    left,
+    top,
+    turns,
+    zeroX,
+    zeroY,
+    initZeroX,
+    initZeroY,
+    fieldLeftZero,
+    fieldTopZero,
+    viewPortWidth: window ? window.innerWidth : 1600,
+    viewPortHeight: window ? window.innerHeight : 1200,
+  };
 
   return (
     <div className="flex-minimap">
@@ -29,8 +48,32 @@ const FlexMinimap = () => {
   );
 };
 
-const SVGMiniMap = ({ width, height, turns }) => {
-  console.log({ width, height, turns });
+const SVGMiniMap = ({
+  initLeft,
+  initTop,
+  width,
+  height,
+  left,
+  top,
+  turns,
+  zeroX,
+  zeroY,
+  initZeroX,
+  initZeroY,
+  fieldLeftZero,
+  fieldTopZero,
+  viewPortHeight,
+  viewPortWidth,
+}) => {
+  console.log({
+    // width,
+    // height,
+    // turns,
+    // zeroX,
+    // zeroY,
+    fieldLeftZero,
+    fieldTopZero,
+  });
 
   return (
     <svg
@@ -38,17 +81,36 @@ const SVGMiniMap = ({ width, height, turns }) => {
       xmlns="http://www.w3.org/2000/svg"
       style={{ width: '100%' }}
     >
-      {turns.map((turn) => {
+      {turns.map((turn, i) => {
         return (
           <rect
-            x={turn.x}
-            y={turn.y}
+            key={i}
+            x={turn.x - zeroX - fieldLeftZero}
+            // zeroX - fieldLeftZero}
+            y={turn.y - zeroY - fieldTopZero}
+            // zeroY - fieldTopZero}
             width={turn.width}
             fill="blue"
             height={turn.height}
-          ></rect>
+          />
         );
       })}
+      <circle cx={zeroX - zeroX} cy={zeroY - zeroY} r={50} fill="red" />
+      <circle
+        cx={initZeroX - zeroX - initLeft}
+        cy={initZeroY - zeroY - initTop}
+        // cx={fieldLeftZero - zeroX}
+        // cy={fieldTopZero - zeroX}
+        r={50}
+        fill="green"
+      />
+      <rect
+        x={initZeroX - zeroX - initLeft}
+        y={initZeroY - zeroY - initTop}
+        width={viewPortWidth}
+        height={viewPortHeight}
+        fill="rgba(0, 255, 0, 0.7)"
+      />
     </svg>
   );
 };
