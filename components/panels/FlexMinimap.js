@@ -2,45 +2,26 @@ import { useUiContext } from '../contexts/UI_Context';
 
 const FlexMinimap = () => {
   const { minimapState, minimapDispatch } = useUiContext();
-  const {
-    initLeft,
-    initTop,
-    initBottom,
-    initRight,
-    left,
-    top,
-    bottom,
-    right,
-    zeroX,
-    zeroY,
-    initZeroX,
-    initZeroY,
-    turns = [],
-  } = minimapState;
-
-  const width = right - left;
-  const height = bottom - top;
-  const fieldLeftZero = left - zeroX;
-  const fieldTopZero = top - zeroY;
+  const { left, right, top, bottom, turns = [] } = minimapState;
 
   const value = {
-    initLeft,
-    initTop,
-    width,
-    height,
-    left,
-    top,
-    turns,
-    zeroX,
-    zeroY,
-    initZeroX,
-    initZeroY,
-    fieldLeftZero,
-    fieldTopZero,
-    viewPortWidth: window ? window.innerWidth : 1600,
-    viewPortHeight: window ? window.innerHeight : 1200,
+    width: right - left, // ширина field
+    height: bottom - top, // высота field
+    viewport: {
+      // смещение viewport - это координата левого верхнего шага
+      x: -left,
+      y: -top,
+      width: window ? window.innerWidth : 1200,
+      height: window ? window.innerHeight : 800,
+    },
+    turns: turns.map((turn) => ({
+      ...turn,
+      // для получения координаты шага на карте достаточно
+      // сместить его координаты на координаты viewport
+      x: turn.x - left,
+      y: turn.y - top,
+    })),
   };
-
   return (
     <div className="flex-minimap">
       <SVGMiniMap {...value} />
@@ -48,33 +29,7 @@ const FlexMinimap = () => {
   );
 };
 
-const SVGMiniMap = ({
-  initLeft,
-  initTop,
-  width,
-  height,
-  left,
-  top,
-  turns,
-  zeroX,
-  zeroY,
-  initZeroX,
-  initZeroY,
-  fieldLeftZero,
-  fieldTopZero,
-  viewPortHeight,
-  viewPortWidth,
-}) => {
-  console.log({
-    // width,
-    // height,
-    // turns,
-    // zeroX,
-    // zeroY,
-    fieldLeftZero,
-    fieldTopZero,
-  });
-
+const SVGMiniMap = ({ width, height, viewport, turns }) => {
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -85,34 +40,22 @@ const SVGMiniMap = ({
         return (
           <rect
             key={i}
-            x={turn.x - zeroX - fieldLeftZero}
-            // zeroX - fieldLeftZero}
-            y={turn.y - zeroY - fieldTopZero}
-            // zeroY - fieldTopZero}
+            x={turn.x}
+            y={turn.y}
             width={turn.width}
-            fill="blue"
+            fill="rgba(212, 213, 214, 1)"
             height={turn.height}
           />
         );
       })}
-      <circle cx={zeroX - zeroX} cy={zeroY - zeroY} r={50} fill="red" />
-      <circle
-        cx={initZeroX - zeroX - initLeft}
-        cy={initZeroY - zeroY - initTop}
-        // cx={fieldLeftZero - zeroX}
-        // cy={fieldTopZero - zeroX}
-        r={50}
-        fill="green"
-      />
       <rect
-        x={initZeroX - zeroX - initLeft}
-        y={initZeroY - zeroY - initTop}
-        width={viewPortWidth}
-        height={viewPortHeight}
-        fill="rgba(0, 255, 0, 0.7)"
+        x={viewport.x}
+        y={viewport.y}
+        width={viewport.width}
+        height={viewport.height}
+        fill="rgba(0, 247, 255, 0.5)"
       />
     </svg>
   );
 };
-
 export default FlexMinimap;
