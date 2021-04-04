@@ -51,7 +51,7 @@ body {
 
 .flex-minimap {
   position: fixed;
-  width: 500px;
+  /* width: 300px; */
   right: 0px;
   bottom: 0px;
   z-index: 3;
