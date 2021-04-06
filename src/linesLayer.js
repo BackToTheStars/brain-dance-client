@@ -23,9 +23,9 @@ class LinesLayer {
       ((func) => {
         return () => {
           func();
-          window[Symbol.for('MyGame')].dispatchers.recPanelDispatch({
-            type: 'TOGGLE_RECPANEL',
-          });
+          // window[Symbol.for('MyGame')].dispatchers.recPanelDispatch({
+          //   type: 'TOGGLE_RECPANEL',
+          // });
         };
       })(this.toggleLinesZIndex.bind(this))
     ); // потому что JQuery элемент
@@ -112,6 +112,15 @@ class LinesLayer {
 
   toggleLinesZIndex() {
     this.el.toggleClass('front-elements');
+    if (this.el.hasClass('front-elements')) {
+      window[Symbol.for('MyGame')].dispatchers.recPanelDispatch({
+        type: 'HIDE_RECPANEL',
+      });
+    } else {
+      window[Symbol.for('MyGame')].dispatchers.recPanelDispatch({
+        type: 'SHOW_RECPANEL',
+      });
+    }
   }
 }
 

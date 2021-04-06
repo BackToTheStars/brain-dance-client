@@ -42,7 +42,7 @@ class Line {
 
     // ГЛОБАЛЬНЫЕ НАСТРОЙКИ ВНЕШНЕГО ВИДА ЛИНИЙ
     const k = 0.3; // - константа внешнего вида кривых
-    const thickness = 2;
+    const thickness = 3;
 
     return `<path 
           d="M${line.x1} ${line.y1} C ${line.x1 + k * (line.x2 - line.x1)} ${

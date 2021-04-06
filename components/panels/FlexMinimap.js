@@ -6,7 +6,7 @@ const FlexMinimap = () => {
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 900;
+  const maxMinimapSizeWidthPlusHeight = 1000;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
