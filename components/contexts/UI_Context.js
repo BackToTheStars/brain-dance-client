@@ -19,21 +19,31 @@ const minimapInitialState = {
 
   initLeft: 0,
   initTop: 0,
+  initRight: 0,
+  initBottom: 0,
   left: 0,
   top: 0,
   bottom: 0,
   right: 0,
+  initZeroX: 0,
+  initZeroY: 0,
+  zeroX: 0,
+  zeroY: 0,
 };
 
 const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_INIT': {
-      const { left, top } = action.payload;
+      const { left, top, right, bottom } = action.payload;
       return {
         ...state,
         initLeft: left,
         initTop: top,
+        initRight: right,
+        initBottom: bottom,
         ...action.payload,
+        initZeroX: action.payload.zeroX,
+        initZeroY: action.payload.zeroY,
       };
     }
     case 'VIEWPORT_MOVED_ON_FIELD': {

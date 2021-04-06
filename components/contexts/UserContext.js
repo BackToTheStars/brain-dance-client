@@ -11,7 +11,7 @@ const guestUser = {
 
 export const UserContext = createContext();
 
-export const UserProvider = ({ children, hash }) => {
+export const UserProvider = ({ children, hash, timecode }) => {
   // info (hash, nickname, role)
   // token
   guestUser.info.hash = hash;
@@ -24,6 +24,7 @@ export const UserProvider = ({ children, hash }) => {
     info,
     token,
     can,
+    timecode,
   };
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

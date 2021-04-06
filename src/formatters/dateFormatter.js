@@ -17,26 +17,35 @@ https://medium.com/swlh/use-tolocaledatestring-to-format-javascript-dates-295910
 
 */
 
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
 function dateFormatter(dateString) {
+  const options = {
+    // weekday: 'long',
+    year: 'numeric', // '2-digit'
+    month: 'long', // 'short'
+    day: 'numeric',
+    // timeZoneName: 'short'
+  };
+  //   const date = new Date(dateString).toLocaleDateString('en-GB', options);
+  const year = dateString.slice(0, 4);
+  const month = dateString.slice(5, 7);
+  const day = dateString.slice(8, 10);
 
-    const options = {
-        // weekday: 'long',
-        year: 'numeric',         // '2-digit'
-        month: 'long',           // 'short'
-        day: 'numeric',
-        // timeZoneName: 'short'
-    };
-
-    const date = new Date(dateString).toLocaleDateString('en-GB', options);
-
-    return date;
+  return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
 }
 
-
 export { dateFormatter };
-
-
-
-
-
-

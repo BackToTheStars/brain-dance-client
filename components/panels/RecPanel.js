@@ -10,7 +10,7 @@ function RecPanel(props) {
         <div>
           <div className="rec-label"></div>
           <div className="rec-text">
-            <h2>REC</h2>
+            <h2>EDIT</h2>
           </div>
         </div>
       )}

@@ -38,8 +38,10 @@ body {
 
 .gameFieldWrapper {
   height: 100vh;
-  overflow-x: auto;
-  overflow-y: auto;
+  /* overflow-x: auto;
+  overflow-y: auto; */
+  overflow: hidden;
+  background: #595959;
   /* border: 1px solid blue; */
 }
 
@@ -207,6 +209,10 @@ button {
   object-fit: contain;
   max-height: 100%;
   max-width: 100%;
+}
+
+.zero-point-type {
+  display: none;
 }
 
 .textBox.comment-type .paragraphText {
@@ -393,7 +399,7 @@ button {
   font-size: 1.2rem;
 }
 
-#minimap {
+/* #minimap {
   position: fixed;
   top: 5px;
   right: 5px;
@@ -405,7 +411,7 @@ button {
 #minimap video {
   height: 80%;
   width: 100%;
-}
+} */
 
 .game-info-table tbody tr:first-child td:first-child {
   width: 25%;
@@ -431,13 +437,20 @@ button {
   color: rgb(58, 58, 58);
 }
 
-.minimap-panel {
+/* .minimap-panel {
   position: fixed;
-  width: 17vw;
-  /* height: 25vh; */
-  right: 0;
+  width: 17vw; */
+/* height: 25vh; */
+/* right: 0;
   bottom: 0;
-}
+} */
+
+/* .minimap-panel__refresh-btn {
+  transform: translateY(-120%);
+  transform: translateX(-10%);
+  display: none; */
+/* Николай - пока скрыл кнопку Refresh */
+/* } */
 
 .rec-label {
   position: fixed;
@@ -446,7 +459,7 @@ button {
   width: 30px;
   height: 30px;
   top: 26px;
-  right: 93px;
+  right: 103px;
   z-index: 5;
 }
 
@@ -457,7 +470,7 @@ button {
   width: 30px;
   height: 30px;
   top: 20px;
-  right: 55px;
+  right: 65px;
   z-index: 5;
   font-size: 1.4rem;
 

@@ -6,23 +6,33 @@ import Quote from './quote';
 import Line from './line';
 
 class TurnCollection {
-  constructor({ turnsData, stageEl }, triggers, user) {
+  constructor({ turnsData, stageEl, timecode }, triggers, user) {
     this.stageEl = stageEl;
     this.triggers = triggers;
+    this.timecode = timecode;
     this.user = user;
     this.turnObjects = turnsData.map(
-      (data) => new Turn({ data, stageEl }, triggers, user)
+      (data) => new Turn({ data, stageEl, timecode }, triggers, user)
     );
   }
   getTurns() {
     return this.turnObjects;
   }
+  // getZeroPointTurn() {
+  //   return this.turnObjects.find(
+  //     (turnObject) => turnObject.type === 'zero-point'
+  //   );
+  // }
   getTurn({ _id }) {
     return this.turnObjects.find((turnObject) => turnObject._id === _id);
   }
   addTurn(data) {
     this.turnObjects.push(
-      new Turn({ data, stageEl: this.stageEl }, this.triggers, this.user)
+      new Turn(
+        { data, stageEl: this.stageEl, timecode: this.timecode },
+        this.triggers,
+        this.user
+      )
     );
   }
   updateTurn(data) {
@@ -39,24 +49,32 @@ class TurnCollection {
     let left = Infinity,
       right = -Infinity,
       top = Infinity,
-      bottom = -Infinity;
+      bottom = -Infinity,
+      zeroX = 0,
+      zeroY = 0;
+    const turns = [];
     for (let turnObject of this.turnObjects) {
-      const { x, y, height, width } = turnObject.getPositionInfo();
+      const { x, y, height, width } = turnObject.getPositionInfo(); // собирает все ходы с экрана
+      turns.push({ x, y, height, width });
+      if (turnObject.data.contentType === 'zero-point') {
+        zeroX = x;
+        zeroY = y;
+      } else {
+        if (left > x) {
+          left = x;
+        }
 
-      if (left > x) {
-        left = x;
-      }
+        if (top > y) {
+          top = y;
+        }
 
-      if (top > y) {
-        top = y;
-      }
+        if (right < x + width) {
+          right = x + width;
+        }
 
-      if (right < x + width) {
-        right = x + width;
-      }
-
-      if (bottom < y + height) {
-        bottom = y + height;
+        if (bottom < y + height) {
+          bottom = y + height;
+        }
       }
     }
 
@@ -65,6 +83,9 @@ class TurnCollection {
       right,
       top,
       bottom,
+      zeroX,
+      zeroY,
+      turns,
     };
   }
 }
