@@ -18,11 +18,11 @@ class TurnCollection {
   getTurns() {
     return this.turnObjects;
   }
-  // getZeroPointTurn() {
-  //   return this.turnObjects.find(
-  //     (turnObject) => turnObject.type === 'zero-point'
-  //   );
-  // }
+  getZeroPointTurn() {
+    return this.turnObjects.find(
+      (turnObject) => turnObject.data.contentType === 'zero-point'
+    );
+  }
   getTurn({ _id }) {
     return this.turnObjects.find((turnObject) => turnObject._id === _id);
   }

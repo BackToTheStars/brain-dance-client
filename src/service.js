@@ -16,7 +16,7 @@ const guestUser = {
 let user = guestUser;
 try {
   user = getGameInfo(HASH) || guestUser;
-  console.log(`service.js line 17:  user loaded: ${user}`);
+  // console.log(`service.js line 17:  user loaded: ${user}`);
 } catch (e) {
   console.log('No user info');
   console.log({ e });

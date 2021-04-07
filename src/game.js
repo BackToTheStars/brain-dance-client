@@ -99,8 +99,26 @@ class Game {
       // добавить логгер действий пользователя - потом её можно использовать в тестах и телеметрии
       switch (type) {
         case 'SAVE_FIELD_POSITION': {
-          const turns = await this.turnCollection.getTurns();
-          const payload = this.gameField.saveTurnPositions(turns);
+          const zeroPoint = this.turnCollection.getZeroPointTurn();
+          const {
+            data: { x: dataX, y: dataY },
+          } = zeroPoint;
+          const { x: viewX, y: viewY } = zeroPoint.getPositionInfo();
+          const deltaX = viewX - dataX;
+          const deltaY = viewY - dataY;
+
+          const turns = await this.turnCollection
+            .getTurns()
+            .filter((turn) => turn.wasChanged === true);
+          for (let turn of turns) {
+            turn.wasChanged = false;
+          }
+          console.log({ turns });
+          const payload = this.gameField
+            .saveTurnPositions(turns)
+            .map((turn) => {
+              return { ...turn, x: turn.x + deltaX, y: turn.y + deltaY };
+            });
           await turnsUpdateCoordinates(payload);
           // this.notificationAlert({
           //   msgTitle: 'Info:',
@@ -259,6 +277,20 @@ class Game {
       }
     };
 
+    const zeroPoint = this.turnCollection.getZeroPointTurn();
+    console.log({ zeroPoint });
+    const gf = window[Symbol.for('MyGame')].gameField;
+    $(gf.stageEl).animate(
+      {
+        left: `${-zeroPoint.data.x}px`,
+        top: `${-zeroPoint.data.y}px`,
+      },
+      300,
+      () => {
+        gf.triggers.dispatch('RECALCULATE_FIELD');
+        gf.triggers.dispatch('DRAW_LINES');
+      }
+    );
     this.gameField.handleLoadImages();
     this.notificationPanel.alert({
       msgTitle: 'Info:',

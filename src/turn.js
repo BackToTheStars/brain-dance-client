@@ -47,12 +47,14 @@ class Turn {
       // drawLinesByEls(lineInfoEls, true); // @todo check frontLinesFlag);
       start: (event, ui) => triggers.dispatch('MAKE_FIELD_TRANSLUCENT', true),
       stop: (event, ui) => {
+        this.wasChanged = true;
         triggers.dispatch('DRAW_LINES');
         triggers.dispatch('MAKE_FIELD_TRANSLUCENT', false);
       },
       drag: (event, ui) => triggers.dispatch('DRAW_LINES'),
     });
     this.handleResize();
+    this.wasChanged = false;
   }
   createDomEl() {
     const { _id, contentType } = this.data;
@@ -89,6 +91,7 @@ class Turn {
     this.el.style.top = `${parseInt(this.el.style.top) + dTop}px`;
   }
   handleResize() {
+    this.wasChanged = true;
     let minMediaHeight = 15; // @todo
 
     let maxMediaHeight = this.paragraphEl.scrollHeight + 15; // 15 это снизу появляется нестыковка
@@ -219,7 +222,7 @@ class Turn {
                     frameBorder="0"
                     style="width: 100%; height: 100%;">
                 </iframe>`;
-                        console.log('iframe: ', str);
+                        //console.log('iframe: ', str);
                         return str;
                       })()
                 }

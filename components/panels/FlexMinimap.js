@@ -10,11 +10,11 @@ const FlexMinimap = () => {
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
-  console.log({
-    maxMinimapSizeWidthPlusHeight,
-    widthPx,
-    heightPx,
-  });
+  // console.log({
+  //   maxMinimapSizeWidthPlusHeight,
+  //   widthPx,
+  //   heightPx,
+  // });
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200;
