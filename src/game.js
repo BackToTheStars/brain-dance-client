@@ -64,6 +64,14 @@ class Game {
 
     window[Symbol.for('MyGame')] = this; // для minimap (screenshooter.js)
   }
+  setGameData(gameData) {
+    // console.log({ gameData });
+    const { viewportPointX, viewportPointY } = gameData; // координаты viewport для этого hash игрока
+    this.viewportPoint = {
+      x: viewportPointX,
+      y: viewportPointY,
+    };
+  }
   async init() {
     const result = await getTurns();
     this.turnCollection = new TurnCollection(
@@ -103,23 +111,34 @@ class Game {
           const {
             data: { x: dataX, y: dataY },
           } = zeroPoint;
-          const { x: viewX, y: viewY } = zeroPoint.getPositionInfo();
-          const deltaX = viewX - dataX;
-          const deltaY = viewY - dataY;
 
-          const turns = await this.turnCollection
-            .getTurns()
-            .filter((turn) => turn.wasChanged === true);
-          for (let turn of turns) {
-            turn.wasChanged = false;
-          }
+          this.viewportPoint = {
+            x: dataX,
+            y: dataY,
+          };
+
+          // @todo: нужно отправить на бэкенд сохранение viewport для хэша
+
+          // const viewportPoint = this.turnCollection.getZeroPointTurn();
+          // @todo: uncomment
+          // const { x: viewX, y: viewY } = zeroPoint.getPositionInfo();
+          // const deltaX = viewX - dataX;
+          // const deltaY = viewY - dataY;
+
+          // const turns = await this.turnCollection
+          //   .getTurns()
+          //   .filter((turn) => turn.wasChanged === true);
+          // for (let turn of turns) {
+          //   turn.wasChanged = false;
+          // }
           console.log({ turns });
-          const payload = this.gameField
-            .saveTurnPositions(turns)
-            .map((turn) => {
-              return { ...turn, x: turn.x + deltaX, y: turn.y + deltaY };
-            });
-          await turnsUpdateCoordinates(payload);
+          // const payload = this.gameField
+          //   .saveTurnPositions(turns)
+          //   .map((turn) => {
+          //     return { ...turn, x: turn.x + deltaX, y: turn.y + deltaY };
+          //   });
+          // await turnsUpdateCoordinates(payload);
+
           // this.notificationAlert({
           //   msgTitle: 'Info:',
           //   msgText: 'Field has been saved',
@@ -277,13 +296,16 @@ class Game {
       }
     };
 
-    const zeroPoint = this.turnCollection.getZeroPointTurn();
-    console.log({ zeroPoint });
+    // const zeroPoint = this.turnCollection.getZeroPointTurn();
+    // console.log({ zeroPoint });
+    const { x, y } = this.viewportPoint;
     const gf = window[Symbol.for('MyGame')].gameField;
     $(gf.stageEl).animate(
       {
-        left: `${-zeroPoint.data.x}px`,
-        top: `${-zeroPoint.data.y}px`,
+        // left: `${-zeroPoint.data.x}px`,
+        // top: `${-zeroPoint.data.y}px`,
+        left: `${-x}px`,
+        top: `${-y}px`,
       },
       300,
       () => {

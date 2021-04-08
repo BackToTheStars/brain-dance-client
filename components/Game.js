@@ -12,6 +12,8 @@ import { useUiContext } from './contexts/UI_Context';
 import { API_URL } from '../src/config';
 import RecPanel from './panels/RecPanel';
 
+let globalGame;
+
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
@@ -33,11 +35,15 @@ const GameComponent = () => {
       },
     })
       .then((data) => data.json())
-      .then(({ item }) => setGame(item));
+      .then(({ item }) => {
+        setGame(item);
+        globalGame.setGameData(item);
+        globalGame.init();
+      });
   }, []);
 
   useEffect(() => {
-    const game = new Game({
+    globalGame = new Game({
       stageEl: $('#gameBox'),
       settings: { notificationAlert },
       user: { info, token, can },
@@ -47,7 +53,6 @@ const GameComponent = () => {
         recPanelDispatch,
       },
     });
-    game.init();
   }, []);
 
   return (
