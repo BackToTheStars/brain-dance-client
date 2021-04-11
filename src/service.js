@@ -104,6 +104,35 @@ const deleteTurn = async (turnObj) => {
   });
 };
 
+const updateViewport = async (viewportPoint) => {
+  return new Promise(async (resolve, reject) => {
+    fetch(`${API_URL}/games/viewport?hash=${HASH}`, {
+      // @todo: лучше везде делать fetch()
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        'game-token': user.token,
+      },
+      body: JSON.stringify(viewportPoint),
+    })
+      .then((data) => {
+        return data.json();
+      })
+      .then((res) => {
+        const { message = 'Произошла ошибка', success } = res;
+        if (success) {
+          resolve(res);
+        } else {
+          alert(message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        reject('Request error');
+      });
+  });
+};
+
 const turnsUpdateCoordinates = async (turns) =>
   new Promise((resolve, reject) => {
     $.ajax({
@@ -255,6 +284,7 @@ export {
   createTurn,
   updateTurn,
   deleteTurn,
+  updateViewport,
   turnsUpdateCoordinates,
   getRedLogicLines,
   updateRedLogicLines,

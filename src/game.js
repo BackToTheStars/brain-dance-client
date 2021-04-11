@@ -3,6 +3,7 @@ import {
   createTurn,
   updateTurn,
   deleteTurn,
+  updateViewport,
   turnsUpdateCoordinates,
   getRedLogicLines,
   updateRedLogicLines,
@@ -108,14 +109,15 @@ class Game {
       switch (type) {
         case 'SAVE_FIELD_POSITION': {
           const zeroPoint = this.turnCollection.getZeroPointTurn();
-          const {
-            data: { x: dataX, y: dataY },
-          } = zeroPoint;
+          const { x: dataX, y: dataY } = zeroPoint.getPositionInfo();
 
           this.viewportPoint = {
-            x: dataX,
-            y: dataY,
+            x: -dataX,
+            y: -dataY,
           };
+
+          // console.log({ viewportPoint: this.viewportPoint });
+          await updateViewport(this.viewportPoint);
 
           // @todo: нужно отправить на бэкенд сохранение viewport для хэша
 
@@ -131,7 +133,7 @@ class Game {
           // for (let turn of turns) {
           //   turn.wasChanged = false;
           // }
-          console.log({ turns });
+          // console.log({ turns });
           // const payload = this.gameField
           //   .saveTurnPositions(turns)
           //   .map((turn) => {

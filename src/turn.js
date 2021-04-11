@@ -30,7 +30,7 @@ class Turn {
     this.data = data;
     this.triggers = triggers;
     this.user = user;
-    this.timecode = timecode;
+    this.timecode = timecode; // @todo удалить, больше не нужен?
 
     this.needToRender = true;
     this.el = this.createDomEl();
@@ -179,8 +179,6 @@ class Turn {
         //TODO
       }
     }
-
-    console.log(this.timecode);
 
     // @todo: get role const
     this.el.innerHTML = `<h5 class="headerText">
