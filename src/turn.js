@@ -195,7 +195,7 @@ class Turn {
         ${
           sourceUrl
             ? `<div class="left-bottom-label">
-            <a href="${sourceUrl}">
+            <a target="_blank" href="${sourceUrl}">
                 ${getShortLink(sourceUrl)}
             </a>
         </div>`

@@ -116,30 +116,33 @@ class Game {
             y: -dataY,
           };
 
-          // console.log({ viewportPoint: this.viewportPoint });
+          console.log({ zeroPoint });
+          console.log({ viewportPoint: this.viewportPoint });
+
           await updateViewport(this.viewportPoint);
 
-          // @todo: нужно отправить на бэкенд сохранение viewport для хэша
+          const turns = await this.turnCollection
+            .getTurns()
+            .filter((turn) => turn.wasChanged === true); // ход был изменён, сохранить только его
 
-          // const viewportPoint = this.turnCollection.getZeroPointTurn();
-          // @todo: uncomment
-          // const { x: viewX, y: viewY } = zeroPoint.getPositionInfo();
-          // const deltaX = viewX - dataX;
-          // const deltaY = viewY - dataY;
+          const reggaeTurn = await this.turnCollection
+            .getTurns()
+            .find((turn) => turn.data.header === 'Reggae');
 
-          // const turns = await this.turnCollection
-          //   .getTurns()
-          //   .filter((turn) => turn.wasChanged === true);
-          // for (let turn of turns) {
-          //   turn.wasChanged = false;
-          // }
+          console.log({ reggaeTurn });
+
+          for (let turn of turns) {
+            turn.wasChanged = false;
+            console.log('turn.x turn.y', turn.x, turn.y);
+          }
           // console.log({ turns });
-          // const payload = this.gameField
-          //   .saveTurnPositions(turns)
-          //   .map((turn) => {
-          //     return { ...turn, x: turn.x + deltaX, y: turn.y + deltaY };
-          //   });
-          // await turnsUpdateCoordinates(payload);
+          const payload = this.gameField
+            .saveTurnPositions(turns)
+            .map((turn) => {
+              return { ...turn, x: turn.x - dataX, y: turn.y - dataY };
+            });
+          console.log({ payload });
+          await turnsUpdateCoordinates(payload);
 
           // this.notificationAlert({
           //   msgTitle: 'Info:',
