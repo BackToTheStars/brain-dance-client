@@ -54,7 +54,7 @@ class Game {
     this.linesLayer = new LinesLayer(
       {
         stageEl,
-        quotesPanel: new QuotesPanel({}, this.triggers), // создали панель управления линиями
+        quotesPanel: new QuotesPanel({}, this.triggers, this.user), // создали панель управления линиями
       },
       this.triggers
     );
