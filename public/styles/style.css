@@ -212,7 +212,7 @@ button {
 }
 
 .zero-point-type {
-  /* display: none; */
+  display: none;
 }
 
 .textBox.comment-type .paragraphText {

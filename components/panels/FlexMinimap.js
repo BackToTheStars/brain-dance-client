@@ -74,6 +74,15 @@ const FlexMinimap = () => {
   );
 };
 
+const areRectanglesIntersect = (rect1, rect2) => {
+  return (
+    rect1.x + rect1.width >= rect2.x &&
+    rect1.x <= rect2.x + rect2.width &&
+    rect1.y + rect1.height >= rect2.y &&
+    rect1.y <= rect2.y + rect2.height
+  );
+};
+
 const SVGMiniMap = ({
   minimapWidth,
   width,
@@ -90,17 +99,30 @@ const SVGMiniMap = ({
       onClick={(e) => onMapClick(e)}
     >
       {turns.map((turn, i) => {
+        // viewport x y width height
+        // turn x y width height
+
+        const isTurnInsideViewport = areRectanglesIntersect(turn, {
+          x: viewport.x - viewport.width,
+          width: 3 * viewport.width,
+          y: viewport.y - viewport.height,
+          height: 3 * viewport.height,
+        });
+
+        const fill = isTurnInsideViewport ? 'blue' : 'rgba(212, 213, 214, 1)';
+
         return (
           <rect
             key={i}
             x={turn.x}
             y={turn.y}
             width={turn.width}
-            fill="rgba(212, 213, 214, 1)"
+            fill={fill}
             height={turn.height}
           />
         );
       })}
+
       <rect
         x={viewport.x}
         y={viewport.y}
