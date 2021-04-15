@@ -73,6 +73,18 @@ class Game {
       y: viewportPointY,
     };
   }
+
+  setTurnsToRender(turnsToRender) {
+    this.turnCollection &&
+      this.turnCollection.getTurns().forEach((turn) => {
+        if (turnsToRender.indexOf(turn._id) === -1) {
+          turn.lowPriorityRender();
+        } else {
+          turn.highPriorityRender();
+        }
+      });
+  }
+
   async init() {
     const result = await getTurns();
     this.turnCollection = new TurnCollection(

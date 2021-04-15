@@ -36,7 +36,7 @@ class Turn {
     this.el = this.createDomEl();
     stageEl.append(this.el);
     this.updateSizes(this.data);
-    this.render();
+    this.render(); // @todo
 
     // common handlers
     this.el.onresize = this.handleResize.bind(this); // биндит контекст к другой функции
@@ -53,7 +53,7 @@ class Turn {
       },
       drag: (event, ui) => triggers.dispatch('DRAW_LINES'),
     });
-    this.handleResize();
+    this.handleResize(); // @todo
     this.wasChanged = false;
   }
   createDomEl() {
@@ -64,6 +64,15 @@ class Turn {
     el.dataset.contentType = contentType;
     return el;
   }
+
+  highPriorityRender() {
+    // this.el.style.display = 'block';
+  }
+
+  lowPriorityRender() {
+    // this.el.style.display = 'none';
+  }
+
   setData(data) {
     this.data = data;
     this.needToRender = true;

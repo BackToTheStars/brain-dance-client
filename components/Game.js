@@ -18,7 +18,11 @@ const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
   const { token, info, can, timecode } = useUserContext();
-  const { minimapDispatch, recPanelDispatch } = useUiContext();
+  const {
+    minimapState: { turnsToRender },
+    minimapDispatch,
+    recPanelDispatch,
+  } = useUiContext();
 
   const notificationAlert = (note) => {
     setNotes((notes) => {
@@ -54,6 +58,11 @@ const GameComponent = () => {
       },
     });
   }, []);
+
+  useEffect(() => {
+    console.log({ turnsToRender });
+    globalGame.setTurnsToRender(turnsToRender);
+  }, [turnsToRender]);
 
   return (
     <div style={{ width: '100%', display: 'flex' }}>

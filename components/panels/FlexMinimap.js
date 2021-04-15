@@ -1,8 +1,10 @@
 import { useUiContext } from '../contexts/UI_Context';
+import { useEffect } from 'react';
 
 const FlexMinimap = () => {
   const { minimapState, minimapDispatch } = useUiContext();
   const { left, right, top, bottom, turns = [] } = minimapState;
+  console.log({ turns });
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
@@ -59,14 +61,36 @@ const FlexMinimap = () => {
         }
       );
     },
-    turns: turns.map((turn) => ({
-      ...turn,
-      // для получения координаты шага на карте достаточно
-      // сместить его координаты на координаты viewport
-      x: turn.x - left + freeSpaceLeftRight,
-      y: turn.y - top + freeSpaceTopBottom,
-    })),
+    turns: turns
+      .map((turn) => ({
+        ...turn,
+        // для получения координаты шага на карте достаточно
+        // сместить его координаты на координаты viewport
+        x: turn.x - left + freeSpaceLeftRight,
+        y: turn.y - top + freeSpaceTopBottom,
+      }))
+      .map((turn) => {
+        const isTurnInsideViewport = areRectanglesIntersect(turn, {
+          x: viewport.x - viewport.width,
+          width: 3 * viewport.width,
+          y: viewport.y - viewport.height,
+          height: 3 * viewport.height,
+        });
+        return {
+          ...turn,
+          isTurnInsideViewport,
+        };
+      }),
   };
+
+  const turnsToRender = value.turns
+    .filter((turn) => turn.isTurnInsideViewport)
+    .map((turn) => turn.id); // отфильтровали какие ходы рендерить на экране
+
+  useEffect(() => {
+    minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
+  }, [turns]); // массив с id тех ходов, которые нужно render
+
   return (
     <div className="flex-minimap">
       <SVGMiniMap {...value} />
@@ -102,14 +126,9 @@ const SVGMiniMap = ({
         // viewport x y width height
         // turn x y width height
 
-        const isTurnInsideViewport = areRectanglesIntersect(turn, {
-          x: viewport.x - viewport.width,
-          width: 3 * viewport.width,
-          y: viewport.y - viewport.height,
-          height: 3 * viewport.height,
-        });
-
-        const fill = isTurnInsideViewport ? 'blue' : 'rgba(212, 213, 214, 1)';
+        const fill = turn.isTurnInsideViewport
+          ? 'blue'
+          : 'rgba(212, 213, 214, 1)';
 
         return (
           <rect

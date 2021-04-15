@@ -62,6 +62,10 @@ const minimapReducer = (state, action) => {
         isHidden: !state.isHidden,
       };
     }
+    case 'TURNS_TO_RENDER': {
+      state.turnsToRender = action.payload;
+      return state;
+    }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);
     }
