@@ -11,6 +11,8 @@ import { useUserContext } from './contexts/UserContext';
 import { useUiContext } from './contexts/UI_Context';
 import { API_URL } from '../src/config';
 import RecPanel from './panels/RecPanel';
+import TurnsComponent from './Turns';
+import { TurnProvider } from './contexts/TurnContext';
 
 let globalGame;
 
@@ -60,30 +62,33 @@ const GameComponent = () => {
   }, []);
 
   useEffect(() => {
-    console.log({ turnsToRender });
     globalGame.setTurnsToRender(turnsToRender);
   }, [turnsToRender]);
 
   return (
-    <div style={{ width: '100%', display: 'flex' }}>
-      <ClassesPanel />
+    <TurnProvider>
+      <div style={{ width: '100%', display: 'flex' }}>
+        <ClassesPanel />
 
-      <GameInfoPanel game={game} setGame={setGame} />
-      <div className="col p0">
-        <div className="gameFieldWrapper">
-          <div id="gameBox" className="ui-widget-content" />
+        <GameInfoPanel game={game} setGame={setGame} />
+        <div className="col p0">
+          <div className="gameFieldWrapper">
+            <div id="gameBox" className="ui-widget-content">
+              <TurnsComponent />
+            </div>
+          </div>
+
+          <ButtonsPanel />
+          <NotificationPanel notes={notes} />
+          <FlexMinimap />
+          <RecPanel />
+
+          <div className="quotes-panel" />
+
+          {/* <div id="minimap"></div> */}
         </div>
-
-        <ButtonsPanel />
-        <NotificationPanel notes={notes} />
-        <FlexMinimap />
-        <RecPanel />
-
-        <div className="quotes-panel" />
-
-        {/* <div id="minimap"></div> */}
       </div>
-    </div>
+    </TurnProvider>
   );
 };
 

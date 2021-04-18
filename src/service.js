@@ -32,15 +32,19 @@ const getUser = () => {
 
 /** USER INFO */
 
-const getTurns = async () =>
-  new Promise((resolve, reject) => {
-    $.ajax({
-      type: 'GET',
-      url: `${API_URL}/turns?hash=${HASH}`,
-      success: resolve,
-      error: reject,
-    });
+const getTurns = async () => {
+  return request(`${API_URL}/turns?hash=${HASH}`, {
+    tokenFlag: true,
   });
+};
+// new Promise((resolve, reject) => {
+//   $.ajax({
+//     type: 'GET',
+//     url: `${API_URL}/turns?hash=${HASH}`,
+//     success: resolve,
+//     error: reject,
+//   });
+// });
 
 const createTurn = async (turnObj) => {
   return new Promise(async (resolve, reject) => {
