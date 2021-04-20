@@ -1,8 +1,22 @@
 import { useTurnContext } from './contexts/TurnContext';
 
 const Turn = ({ turn }) => {
+  const { x, y, width, height } = turn;
   console.log('turn component', { turn });
-  return <p>{turn._id}</p>;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: `${x}px`,
+        top: `${y}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        border: `2px solid blue`,
+      }}
+    >
+      {turn._id}
+    </div>
+  );
 };
 
 const TurnsComponent = () => {

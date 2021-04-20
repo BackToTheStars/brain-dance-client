@@ -24,6 +24,7 @@ import LinesLayer from './linesLayer';
 import QuotesPanel from './quotesPanel';
 import { NotificationPanel, GameClassPanel } from './script';
 import { MiniMap } from './minimap';
+import { ACTION_FIELD_WAS_MOVED } from '../components/contexts/TurnContext';
 
 // настраивает компоненты игры,
 // обеспечивает передачу данных между компонентами
@@ -173,6 +174,17 @@ class Game {
           // двигает все ходы при отпускании draggable() поля
           const turns = await this.turnCollection.getTurns();
           this.gameField.recalculate(turns);
+          const {
+            x: left,
+            y: top,
+          } = this.turnCollection.getZeroPointTurn().getPositionInfo();
+          this.dispatchers.turnsDispatch({
+            type: ACTION_FIELD_WAS_MOVED,
+            payload: {
+              left,
+              top,
+            },
+          });
           this.dispatchers.minimapDispatch({
             type: 'VIEWPORT_MOVED_ON_FIELD',
             payload: {
