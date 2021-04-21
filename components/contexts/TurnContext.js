@@ -5,20 +5,28 @@ import {
   useReducer,
   createContext,
 } from 'react';
-import { getTurns } from '../../src/service';
+// import { getTurns } from '../../src/service';
+import { useUserContext } from './UserContext';
 
 export const TurnContext = createContext();
 
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 
 export const TurnProvider = ({ children }) => {
+  console.log('turn provider');
+  const {
+    request,
+    info: { hash },
+  } = useUserContext();
+  const [originalTurns, setOriginalTurns] = useState([]);
   const [turns, setTurns] = useState([]);
 
-  const dispatch = (actionType, payload) => {
+  const dispatch = ({ type, payload }) => {
+    console.log({ payload });
     // можно его переделать в reducer
-    if (actionType === ACTION_FIELD_WAS_MOVED) {
+    if (type === ACTION_FIELD_WAS_MOVED) {
       setTurns(
-        turns.map((turn) => ({
+        originalTurns.map((turn) => ({
           ...turn,
           x: turn.x + payload.left,
           y: turn.y + payload.top,
@@ -28,7 +36,10 @@ export const TurnProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    getTurns().then((data) => {
+    request(`turns?hash=${hash}`, {
+      tokenFlag: true,
+    }).then((data) => {
+      setOriginalTurns(data.items);
       setTurns(data.items);
     });
   }, []);

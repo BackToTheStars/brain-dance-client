@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 const FlexMinimap = () => {
   const { minimapState, minimapDispatch } = useUiContext();
   const { left, right, top, bottom, turns = [] } = minimapState;
-  console.log({ turns });
+  //   console.log({ turns });
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 

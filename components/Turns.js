@@ -2,7 +2,7 @@ import { useTurnContext } from './contexts/TurnContext';
 
 const Turn = ({ turn }) => {
   const { x, y, width, height } = turn;
-  console.log('turn component', { turn });
+  // console.log('turn component', { turn });
   return (
     <div
       style={{
@@ -12,6 +12,7 @@ const Turn = ({ turn }) => {
         width: `${width}px`,
         height: `${height}px`,
         border: `2px solid blue`,
+        zIndex: 2,
       }}
     >
       {turn._id}
