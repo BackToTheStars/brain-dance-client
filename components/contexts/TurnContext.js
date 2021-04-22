@@ -11,40 +11,58 @@ import { useUserContext } from './UserContext';
 export const TurnContext = createContext();
 
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
+export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
+
+const turnsInitialState = { turns: [], originalTurns: [] };
+const turnsReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_SET_ORIGINAL_TURNS: {
+      return {
+        ...state,
+        originalTurns: action.payload,
+        turns: action.payload,
+      };
+    }
+    case ACTION_FIELD_WAS_MOVED: {
+      const { left, top } = action.payload;
+      return {
+        ...state,
+        turns: state.originalTurns.map((turn) => ({
+          ...turn,
+          x: turn.x + left,
+          y: turn.y + top,
+        })),
+      };
+    }
+  }
+};
 
 export const TurnProvider = ({ children }) => {
+  const [turnsState, turnsDispatch] = useReducer(
+    turnsReducer,
+    turnsInitialState
+  );
+
   console.log('turn provider');
   const {
     request,
     info: { hash },
   } = useUserContext();
-  const [originalTurns, setOriginalTurns] = useState([]);
-  const [turns, setTurns] = useState([]);
-
-  const dispatch = ({ type, payload }) => {
-    console.log({ payload });
-    // можно его переделать в reducer
-    if (type === ACTION_FIELD_WAS_MOVED) {
-      setTurns(
-        originalTurns.map((turn) => ({
-          ...turn,
-          x: turn.x + payload.left,
-          y: turn.y + payload.top,
-        }))
-      );
-    }
-  };
+  // const [originalTurns, setOriginalTurns] = useState([]);
+  // const [turns, setTurns] = useState([]);
 
   useEffect(() => {
     request(`turns?hash=${hash}`, {
       tokenFlag: true,
     }).then((data) => {
-      setOriginalTurns(data.items);
-      setTurns(data.items);
+      turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
+
+      // setOriginalTurns(data.items);
+      // setTurns(data.items);
     });
   }, []);
 
-  const value = { turns, dispatch };
+  const value = { turns: turnsState.turns, dispatch: turnsDispatch };
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };
 
