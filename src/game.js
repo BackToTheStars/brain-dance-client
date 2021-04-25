@@ -260,7 +260,7 @@ class Game {
             this.linesLayer.linesCollection.removeLine(lineToRemove);
           }
           this.linesLayer.render();
-          console.log(linesToRemove);
+          // console.log(linesToRemove);
           deleteLines(linesToRemove.map((line) => line.data)).then(() =>
             deleteTurn(data)
           );

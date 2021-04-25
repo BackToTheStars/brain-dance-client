@@ -1,12 +1,59 @@
-import { useTurnContext } from './contexts/TurnContext';
+import { useTurnContext, ACTION_DELETE_TURN } from './contexts/TurnContext';
 import { useUserContext } from './contexts/UserContext';
 import { RULE_TURNS_CRUD } from './config';
 import { dateFormatter } from '../src/formatters/dateFormatter';
 import { getShortLink } from '../src/formatters/urlFormatter';
 import { youtubeFormatter } from '../src/formatters/youtubeFormatter';
+import { Fragment } from 'react';
 
-const Turn = ({ turn, can }) => {
-  const { x, y, width, height, header, sourceUrl, date } = turn;
+const getParagraphText = (arrText) => {
+  return (
+    <p className="paragraphText">
+      {arrText.map((textItem, i) => {
+        // @todo: refactoring
+        const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
+        const newInserts = [];
+        for (let arrInsert of arrInserts) {
+          newInserts.push(arrInsert);
+          newInserts.push(<br />);
+        }
+        newInserts.pop();
+        return (
+          <span key={i} style={textItem.attributes}>
+            {newInserts}
+          </span>
+        );
+      })}
+    </p>
+  );
+
+  // const el = document.createElement('p');
+  // for (let textItem of arrText) {
+  //   const spanEl = document.createElement('span');
+  //   if (textItem.attributes) {
+  //     for (let property of Object.keys(textItem.attributes)) {
+  //       spanEl.style[property] = textItem.attributes[property];
+  //     }
+  //   }
+  //   spanEl.innerText = textItem.insert;
+  //   el.appendChild(spanEl);
+  // }
+  // return el.innerHTML;
+};
+
+const Turn = ({ turn, can, dispatch }) => {
+  const {
+    _id,
+    x,
+    y,
+    width,
+    height,
+    header,
+    sourceUrl,
+    date,
+    imageUrl,
+    paragraph,
+  } = turn;
   let { videoUrl } = turn;
   if (videoUrl) {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -24,7 +71,11 @@ const Turn = ({ turn, can }) => {
 
   const handleDelete = (e) => {
     e.preventDefault();
-    alert('button_delete_clicked');
+    if (confirm('Точно удалить?')) {
+      // confirm - глобальная функция браузера
+      dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+      //alert('button_delete_clicked');
+    }
   };
 
   return (
@@ -86,35 +137,35 @@ const Turn = ({ turn, can }) => {
             ></iframe>
           </div>
         )}
-
-        {/*`
-
-            ${
-              imageUrl && imageUrl.trim()
-                ? `<div class="picture-content">
-                    <img src="${imageUrl}"
-                        style="background: rgb(0, 0, 0); width: 100%; height: 100%;">
-                </div>`
-                : ''
-            }
-            <p class="paragraphText">
-                ${getParagraphText(paragraph || [])}
-            </p>
-                  `*/}
+        {!!(imageUrl && imageUrl.trim()) && ( // карусель в будущем
+          <div className="picture-content">
+            <img
+              src={imageUrl}
+              style={{
+                background: 'rgb(0, 0, 0)',
+                width: '100%',
+                height: '100%',
+              }}
+            />
+          </div>
+        )}
+        {getParagraphText(paragraph || [])}
       </div>
     </div>
   );
 };
 
 const TurnsComponent = () => {
-  const { turns } = useTurnContext();
+  const { turns, dispatch } = useTurnContext();
   const { can } = useUserContext();
 
   console.log('turns component', { turns });
   return (
     <>
       {turns.map((turn) => {
-        return <Turn turn={turn} key={turn._id} can={can} />;
+        return (
+          <Turn turn={turn} key={turn._id} can={can} dispatch={dispatch} />
+        );
       })}
     </>
   );

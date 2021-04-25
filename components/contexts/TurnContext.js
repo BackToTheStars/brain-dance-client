@@ -12,6 +12,7 @@ export const TurnContext = createContext();
 
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
+export const ACTION_DELETE_TURN = 'action_delete_turn';
 
 const turnsInitialState = { turns: [], originalTurns: [] };
 const turnsReducer = (state, action) => {
@@ -32,6 +33,14 @@ const turnsReducer = (state, action) => {
           x: turn.x + left,
           y: turn.y + top,
         })),
+      };
+    }
+    case ACTION_DELETE_TURN: {
+      const { _id } = action.payload;
+      return {
+        ...state,
+        originalTurns: state.originalTurns.filter((turn) => turn._id !== _id),
+        turns: state.turns.filter((turn) => turn._id !== _id),
       };
     }
   }
