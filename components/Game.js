@@ -12,7 +12,7 @@ import { useUiContext } from './contexts/UI_Context';
 import { useTurnContext } from './contexts/TurnContext';
 import { API_URL } from '../src/config';
 import RecPanel from './panels/RecPanel';
-import TurnsComponent from './Turns';
+import TurnsComponent from './turn/Turns';
 // import { TurnProvider } from './contexts/TurnContext';
 
 let globalGame;

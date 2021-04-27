@@ -11,9 +11,9 @@ body {
   cursor: move;
   transition: opacity 0.25s;
   min-width: 300px;
-  max-width: 2000px;
+  /* max-width: 2000px; */
   min-height: 50px;
-  max-height: 3000px;
+  /* max-height: 3000px; */
   /* width: 600px;
     height: 600px; */
   border: 1px black;

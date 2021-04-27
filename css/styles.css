@@ -57,3 +57,27 @@ body {
   z-index: 3;
   background-color: rgba(49, 51, 51, 1);
 }
+
+/* REACT TURN */
+.react-turn {
+  position: absolute;
+  border: 2px solid blue;
+  z-index: 2;
+}
+
+.react-turn .media-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.react-turn .video iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.react-turn .picture-content {
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 0);
+}
