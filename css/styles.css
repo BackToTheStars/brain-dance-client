@@ -78,6 +78,10 @@ body {
 
 .react-turn .picture-content {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   background: rgb(0, 0, 0);
+}
+
+.react-turn .picture-content img {
+  width: 100%;
 }

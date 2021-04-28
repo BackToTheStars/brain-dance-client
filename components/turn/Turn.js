@@ -20,6 +20,18 @@ const Turn = ({ turn, can, dispatch }) => {
     paragraph,
   } = turn;
   const wrapper = useRef(null);
+  const paragraphEl = useRef(null);
+  const imgEl = useRef(null);
+  const imgWrapperEl = useRef(null);
+  const mediaWrapperEl = useRef(null);
+  const videoEl = useRef(null);
+  const headerEl = useRef(null);
+
+  const isParagraphExist = !!paragraph
+    .map((item) => item.insert)
+    .join('')
+    .trim(); // @todo: remove after quill fix
+
   let { videoUrl } = turn;
   if (videoUrl) {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -44,6 +56,49 @@ const Turn = ({ turn, can, dispatch }) => {
     }
   };
 
+  const handleResize = () => {
+    // this.wasChanged = true;
+    let minMediaHeight = 15; // @todo
+
+    let maxMediaHeight = isParagraphExist
+      ? paragraphEl.current.scrollHeight + 15
+      : 15; // 15 это снизу появляется нестыковка
+    if (imgEl) {
+      const newImgHeight = Math.floor(
+        (imgEl.current.naturalHeight * $(wrapper.current).width()) /
+          imgEl.current.naturalWidth
+      );
+      $(imgWrapperEl.current).width($(wrapper.current).width());
+      $(imgWrapperEl.current).height(newImgHeight);
+      minMediaHeight += newImgHeight;
+      maxMediaHeight += newImgHeight;
+      $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
+    } else if (videoEl) {
+      $(videoEl.current).width($(wrapper.current).width() - 3); // можно использовать в дизайне
+      $(videoEl.current).height(
+        Math.floor((9 * $(wrapper.current).width()) / 16)
+      );
+      minMediaHeight += $(videoEl.current).height();
+      maxMediaHeight += $(videoEl.current).height();
+      $(mediaWrapperEl.curren).css('min-height', `${minMediaHeight}px`);
+    }
+    // получить высоту el, вычесть высоту header, сохранить в media wrapper
+    $(mediaWrapperEl.current).height(
+      // @fixme: 1px
+      $(wrapper.current).height() + 1 - $(headerEl.current).height()
+    );
+    const paragraphExtraPx = isParagraphExist ? 50 : 0;
+
+    $(wrapper.current).css(
+      'min-height',
+      `${minMediaHeight + $(headerEl.current).height() + paragraphExtraPx}px`
+    );
+    $(wrapper.current).css(
+      'max-height',
+      `${maxMediaHeight + $(headerEl.current).height() - 2}px`
+    );
+  };
+
   useEffect(() => {
     $(wrapper.current).draggable({
       start: (event, ui) => {
@@ -65,6 +120,15 @@ const Turn = ({ turn, can, dispatch }) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (!wrapper) return;
+    wrapper.current.onresize = handleResize;
+    // wrapper.current.addEventListener('resize', handleResize);
+    // return () => {
+    //   wrapper.current.removeEventListener('resize', handleResize);
+    // };
+  }, [wrapper]);
+
   const styles = {
     wrapper: {
       left: `${x}px`,
@@ -76,7 +140,7 @@ const Turn = ({ turn, can, dispatch }) => {
 
   return (
     <div ref={wrapper} className="react-turn" style={styles.wrapper}>
-      <h5 className="headerText">
+      <h5 className="headerText" ref={headerEl}>
         <div className="headerTextTitle">{header}</div>
         <div className="headerTextActions">
           {can(RULE_TURNS_CRUD) && (
@@ -103,9 +167,9 @@ const Turn = ({ turn, can, dispatch }) => {
         <div className="right-bottom-label">{dateFormatter(date)}</div>
       )}
 
-      <div className="media-wrapper">
+      <div className="media-wrapper" ref={mediaWrapperEl}>
         {!!(videoUrl && videoUrl.trim()) && (
-          <div className="video">
+          <div className="video" ref={videoEl}>
             <div className="iframe-overlay" />
             <iframe
               src={`https://www.youtube.com/embed/${videoUrl}`}
@@ -116,11 +180,15 @@ const Turn = ({ turn, can, dispatch }) => {
           </div>
         )}
         {!!(imageUrl && imageUrl.trim()) && ( // карусель в будущем
-          <div className="picture-content">
-            <img src={imageUrl} />
+          <div className="picture-content" ref={imgWrapperEl}>
+            <img src={imageUrl} ref={imgEl} />
           </div>
         )}
-        {getParagraphText(paragraph || [])}
+        {isParagraphExist && (
+          <p className="paragraphText" ref={paragraphEl}>
+            {getParagraphText(paragraph || [])}
+          </p>
+        )}
       </div>
     </div>
   );

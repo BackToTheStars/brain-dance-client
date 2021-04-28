@@ -1,6 +1,6 @@
 export const getParagraphText = (arrText) => {
   return (
-    <p className="paragraphText">
+    <>
       {arrText.map((textItem, i) => {
         // @todo: refactoring
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
@@ -16,6 +16,6 @@ export const getParagraphText = (arrText) => {
           </span>
         );
       })}
-    </p>
+    </>
   );
 };
