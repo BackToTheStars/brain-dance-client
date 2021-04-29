@@ -85,3 +85,12 @@ body {
 .react-turn .picture-content img {
   width: 100%;
 }
+
+.react-wrapper {
+  width: 100%;
+  display: flex;
+}
+
+.react-wrapper #modalBackground {
+  /* display: block; */
+}

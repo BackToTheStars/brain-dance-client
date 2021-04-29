@@ -13,6 +13,8 @@ import { useTurnContext } from './contexts/TurnContext';
 import { API_URL } from '../src/config';
 import RecPanel from './panels/RecPanel';
 import TurnsComponent from './turn/Turns';
+import AddEditTurnPopup from './popups/AddEditTurnPopup';
+import { Fragment } from 'react';
 // import { TurnProvider } from './contexts/TurnContext';
 
 let globalGame;
@@ -70,9 +72,8 @@ const GameComponent = () => {
   }, [turnsToRender]);
 
   return (
-    <div style={{ width: '100%', display: 'flex' }}>
+    <div className="react-wrapper">
       <ClassesPanel />
-
       <GameInfoPanel game={game} setGame={setGame} />
       <div className="col p0">
         <div className="gameFieldWrapper">
@@ -90,6 +91,7 @@ const GameComponent = () => {
 
         {/* <div id="minimap"></div> */}
       </div>
+      <AddEditTurnPopup />
     </div>
   );
 };
