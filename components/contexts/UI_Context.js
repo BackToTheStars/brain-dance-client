@@ -108,6 +108,10 @@ export const UI_Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
   const [gameInfoPanelIsHidden, setGameInfoPanelIsHidden] = useState(true);
+  const [
+    createEditTurnPopupIsHidden,
+    setCreateEditTurnPopupIsHidden,
+  ] = useState(true);
 
   const [minimapState, minimapDispatch] = useReducer(
     minimapReducer,
@@ -127,6 +131,9 @@ export const UI_Provider = ({ children }) => {
 
         gameInfoPanelIsHidden,
         setGameInfoPanelIsHidden,
+
+        createEditTurnPopupIsHidden,
+        setCreateEditTurnPopupIsHidden,
 
         state,
         dispatch,

@@ -1,27 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getQuill } from '../helpers/quillHandler';
+import { useUiContext } from '../contexts/UI_Context';
 
 const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
 
+  const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
+
+  const {
+    createEditTurnPopupIsHidden,
+    setCreateEditTurnPopupIsHidden,
+  } = useUiContext();
+
+  useEffect(() => {
+    setQuillConstants(
+      getQuill('#editor-container-new', '#toolbar-container-new')
+    );
+  }, []);
+
   return (
-    <div id="modalBackground">
+    <div
+      id="modalBackground"
+      style={{ display: createEditTurnPopupIsHidden ? 'none' : 'block' }}
+    >
       <div id="modal" className="container">
         <div className="row my-4 flex-1">
           <div className="col-8 quill-wrapper">
-            <div id="toolbar-container">
+            <div id="toolbar-container-new">
               <span className="ql-formats">
                 <select className="ql-background">
-                  <option selected />
-                  <option value="rgb(255, 255, 0)" />
-                  <option value="rgb(138, 255, 36)" />
-                  <option value="rgb(253, 201, 255)" />
-                  <option value="rgb(156, 245, 255)" />
-                  <option value="rgb(210, 211, 212)" />
-                  <option value="rgb(255, 213, 150)" />
+                  {[
+                    '',
+                    'rgb(255, 255, 0)',
+                    'rgb(138, 255, 36)',
+                    'rgb(253, 201, 255)',
+                    'rgb(156, 245, 255)',
+                    'rgb(210, 211, 212)',
+                    'rgb(255, 213, 150)',
+                  ].map((val, i) => (
+                    <option value={val} key={i} />
+                  ))}
                 </select>
               </span>
             </div>
-            <div id="editor-container" />
+            <div id="editor-container-new" />
             {/* class="h-85"> */}
           </div>
           <div className="col-4">
@@ -56,7 +78,12 @@ const AddEditTurnPopup = () => {
         <div className="row mb-4">
           <div className="col">
             <button id="save-turn-modal">Save</button>
-            <button id="cancel-turn-modal">Cancel</button>
+            <button
+              id="cancel-turn-modal"
+              onClick={(e) => setCreateEditTurnPopupIsHidden(true)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

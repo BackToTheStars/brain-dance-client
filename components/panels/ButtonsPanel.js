@@ -12,6 +12,7 @@ const ButtonsPanel = () => {
     state: { classesPanelIsHidden },
     dispatch,
     minimapDispatch,
+    setCreateEditTurnPopupIsHidden,
   } = useUiContext();
   const router = useRouter();
   const { info, can } = useUserContext();
@@ -20,7 +21,12 @@ const ButtonsPanel = () => {
     <div className="actions">
       {can(RULE_TURNS_CRUD) && (
         <>
-          <button id="add-new-box-to-game-btn">Add Turn</button>
+          <button
+            id="add-new-box-to-game-btn"
+            onClick={(e) => setCreateEditTurnPopupIsHidden(false)}
+          >
+            Add Turn
+          </button>
           <button id="save-positions-btn">Save Field</button>
         </>
       )}
