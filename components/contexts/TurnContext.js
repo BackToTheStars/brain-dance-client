@@ -60,6 +60,16 @@ export const TurnProvider = ({ children }) => {
   // const [originalTurns, setOriginalTurns] = useState([]);
   // const [turns, setTurns] = useState([]);
 
+  const createTurn = (body) => {
+    request(`turns?hash=${hash}`, {
+      method: 'POST',
+      tokenFlag: true,
+      body: body,
+    }).then((data) => {
+      //   turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
+    });
+  };
+
   useEffect(() => {
     request(`turns?hash=${hash}`, {
       tokenFlag: true,
@@ -71,7 +81,11 @@ export const TurnProvider = ({ children }) => {
     });
   }, []);
 
-  const value = { turns: turnsState.turns, dispatch: turnsDispatch };
+  const value = {
+    turns: turnsState.turns,
+    dispatch: turnsDispatch,
+    createTurn,
+  };
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };
 

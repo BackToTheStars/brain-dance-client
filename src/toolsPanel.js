@@ -25,7 +25,8 @@ class ToolsPanel {
   }
 
   addEventHandlers() {
-    this.addTurnBtn.click(() => this.triggers.dispatch('OPEN_POPUP'));
+    // this.addTurnBtn.click(() => this.triggers.dispatch('OPEN_POPUP'));
+
     // this.toggleLeftPanelBtn.click(() =>
     //   this.triggers.dispatch('TOGGLE_CLASS_PANEL')
     // );

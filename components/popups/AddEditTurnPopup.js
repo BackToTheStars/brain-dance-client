@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getQuill } from '../helpers/quillHandler';
 import { useUiContext } from '../contexts/UI_Context';
+import { useTurnContext } from '../contexts/TurnContext';
 
 const TEMPLATE_PICTURE = 1;
 const TEMPLATE_VIDEO = 2;
@@ -11,11 +12,11 @@ const TEMPLATE_AUDIO = 6;
 const TEMPLATE_CAROUSEL = 7;
 const TEMPLATE_NEWS = 8;
 
-const FIELD_HEADER = 1;
-const FIELD_PICTURE = 2;
-const FIELD_VIDEO = 3;
-const FIELD_DATE = 4;
-const FIELD_SOURCE = 5;
+const FIELD_HEADER = 'header';
+const FIELD_PICTURE = 'imageUrl';
+const FIELD_VIDEO = 'videoUrl';
+const FIELD_DATE = 'date';
+const FIELD_SOURCE = 'sourceUrl';
 
 const settings = {
   [TEMPLATE_PICTURE]: {
@@ -71,6 +72,9 @@ const AddEditTurnPopup = () => {
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const availableFields = settings[activeTemplate].availableFields;
+  console.log({ activeTemplate, availableFields });
+  const [form, setForm] = useState({});
+  const { createTurn } = useTurnContext();
 
   const {
     createEditTurnPopupIsHidden,
@@ -82,6 +86,19 @@ const AddEditTurnPopup = () => {
       getQuill('#editor-container-new', '#toolbar-container-new')
     );
   }, []);
+
+  const saveHandler = (e) => {
+    e.preventDefault(); // почитать про preventDefault()
+    console.log(form);
+    const textArr = quillConstants.getQuillTextArr();
+    let turnObj = {
+      ...form,
+      paragraph: textArr,
+    };
+    // создать шаг, закрыть модальное окно
+    createTurn(turnObj);
+    setCreateEditTurnPopupIsHidden(true);
+  };
 
   return (
     <div
@@ -116,12 +133,15 @@ const AddEditTurnPopup = () => {
               {templatesToShow.map((el) => {
                 const templateSettings = settings[el];
                 return (
-                  <div className="form-group row">
+                  <div className="form-group row" key={el}>
                     <input
                       type="radio"
                       name="template"
                       value={templateSettings.value}
                       defaultChecked={activeTemplate === el}
+                      onChange={(e) => {
+                        setActiveTemplate(el);
+                      }}
                     />
                     <span>{templateSettings.label}</span>
                   </div>
@@ -135,29 +155,27 @@ const AddEditTurnPopup = () => {
                 if (!fieldSettings[field].special) {
                   return true;
                 }
-                return availableFields.includes(parseInt(field));
+                return availableFields.includes(field);
               })
               .map((field) => {
                 return (
                   <FormInput
+                    changeHandler={(value) => {
+                      setForm({ ...form, [field]: value });
+                    }}
                     label={fieldSettings[field].label}
                     prefixClass={fieldSettings[field].prefixClass}
                     inputType={fieldSettings[field].inputType}
+                    key={field}
+                    value={form[field] || ''}
                   />
                 );
               })}
-
-            {/* <FormInput label="Header" prefixClass="header" />
-            <FormInput label="Date" prefixClass="date" inputType="date" />
-            <FormInput label="Source Url" prefixClass="source-url" />
-
-            <FormInput label="Image Url" prefixClass="image-url" />
-            <FormInput label="Video Url" prefixClass="video-url" /> */}
           </div>
         </div>
         <div className="row mb-4">
           <div className="col">
-            <button id="save-turn-modal">Save</button>
+            <button onClick={(e) => saveHandler(e)}>Save</button>
             <button
               id="cancel-turn-modal"
               onClick={(e) => setCreateEditTurnPopupIsHidden(true)}
@@ -171,12 +189,23 @@ const AddEditTurnPopup = () => {
   );
 };
 
-const FormInput = ({ label, prefixClass, inputType = 'text' }) => {
+const FormInput = ({
+  label,
+  prefixClass,
+  inputType = 'text',
+  changeHandler = () => {},
+  value,
+}) => {
   return (
     <div className={`form-group row ${prefixClass}-row`}>
       <label className="col-sm-3 col-form-label">{label}</label>
       <div className="col-sm-9">
-        <input type={inputType} className="form-control" />
+        <input
+          type={inputType}
+          className="form-control"
+          value={value}
+          onChange={(e) => changeHandler(e.target.value)}
+        />
       </div>
     </div>
   );
