@@ -2,81 +2,29 @@ import { useEffect, useState } from 'react';
 import { getQuill } from '../helpers/quillHandler';
 import { useUiContext } from '../contexts/UI_Context';
 import { useTurnContext } from '../contexts/TurnContext';
+import turnSettings from '../turn/settings';
 
-const TEMPLATE_PICTURE = 1;
-const TEMPLATE_VIDEO = 2;
-const TEMPLATE_COMMENT = 3;
-const TEMPLATE_MIXED = 4;
-const TEMPLATE_PDF = 5;
-const TEMPLATE_AUDIO = 6;
-const TEMPLATE_CAROUSEL = 7;
-const TEMPLATE_NEWS = 8;
-
-const FIELD_HEADER = 'header';
-const FIELD_PICTURE = 'imageUrl';
-const FIELD_VIDEO = 'videoUrl';
-const FIELD_DATE = 'date';
-const FIELD_SOURCE = 'sourceUrl';
-
-const settings = {
-  [TEMPLATE_PICTURE]: {
-    availableFields: [FIELD_PICTURE],
-    value: 'picture',
-    label: 'Text / picture',
-  },
-  [TEMPLATE_VIDEO]: {
-    availableFields: [FIELD_VIDEO],
-    value: 'video',
-    label: 'Text / video',
-  },
-  [TEMPLATE_COMMENT]: {
-    availableFields: [],
-    value: 'comment',
-    label: 'Comment',
-  },
-};
-
-const templatesToShow = [TEMPLATE_PICTURE, TEMPLATE_VIDEO, TEMPLATE_COMMENT];
-
-const fieldSettings = {
-  [FIELD_HEADER]: {
-    label: 'Header',
-    prefixClass: 'header',
-  },
-  [FIELD_PICTURE]: {
-    label: 'Image Url',
-    prefixClass: 'image-url',
-    special: true,
-  },
-  [FIELD_VIDEO]: {
-    label: 'Video Url',
-    prefixClass: 'video-url',
-    special: true,
-  },
-  [FIELD_DATE]: {
-    label: 'Date',
-    prefixClass: 'date',
-    inputType: 'date',
-  },
-  [FIELD_SOURCE]: {
-    label: 'Source Url',
-    prefixClass: 'source-url',
-  },
-};
-
-const fieldsToShow = Object.keys(fieldSettings); // возвращает массив строк-ключей объекта
+const {
+  settings,
+  templatesToShow,
+  fieldSettings,
+  fieldsToShow,
+  TEMPLATE_PICTURE,
+} = turnSettings;
 
 const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
 
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
+  const [error, setError] = useState(null);
   const availableFields = settings[activeTemplate].availableFields;
   console.log({ activeTemplate, availableFields });
   const [form, setForm] = useState({});
   const { createTurn } = useTurnContext();
 
   const {
+    minimapState: { left, top },
     createEditTurnPopupIsHidden,
     setCreateEditTurnPopupIsHidden,
   } = useUiContext();
@@ -93,11 +41,23 @@ const AddEditTurnPopup = () => {
     const textArr = quillConstants.getQuillTextArr();
     let turnObj = {
       ...form,
+      height: 500,
+      width: 500,
+      x: left + 50,
+      y: top + 50,
       paragraph: textArr,
+      contentType: activeTemplate,
     };
     // создать шаг, закрыть модальное окно
-    createTurn(turnObj);
-    setCreateEditTurnPopupIsHidden(true);
+    createTurn(turnObj, {
+      successCallback: () => {
+        console.log('успешный коллбэк на уровне Попапа');
+        setCreateEditTurnPopupIsHidden(true);
+      },
+      errorCallback: (message) => {
+        setError({ message });
+      },
+    });
   };
 
   return (
@@ -161,6 +121,7 @@ const AddEditTurnPopup = () => {
                 return (
                   <FormInput
                     changeHandler={(value) => {
+                      if (!!error) setError(null);
                       setForm({ ...form, [field]: value });
                     }}
                     label={fieldSettings[field].label}
@@ -171,6 +132,9 @@ const AddEditTurnPopup = () => {
                   />
                 );
               })}
+            {!!error && (
+              <div className="alert alert-danger">{error.message}</div>
+            )}
           </div>
         </div>
         <div className="row mb-4">

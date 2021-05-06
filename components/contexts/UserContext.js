@@ -26,7 +26,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
   const request = async (
     path,
     { body = null, tokenFlag = false, method = 'GET' } = {},
-    { errorMessage } = {}
+    { errorMessage, errorCallback, successCallback } = {}
   ) => {
     let defaultMessage =
       errorMessage || `Произошла ошибка service.js:187, метод ${method}`;
@@ -53,8 +53,15 @@ export const UserProvider = ({ children, hash, timecode }) => {
           // @todo: более гибкая обработка
           if (item || items) {
             resolve(res);
+            if (successCallback) {
+              successCallback(res);
+            }
           } else {
-            alert(message);
+            if (errorCallback) {
+              errorCallback(message);
+            } else {
+              alert(message);
+            }
           }
         })
         .catch((err) => {

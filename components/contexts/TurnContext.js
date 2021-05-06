@@ -60,14 +60,33 @@ export const TurnProvider = ({ children }) => {
   // const [originalTurns, setOriginalTurns] = useState([]);
   // const [turns, setTurns] = useState([]);
 
-  const createTurn = (body) => {
-    request(`turns?hash=${hash}`, {
-      method: 'POST',
-      tokenFlag: true,
-      body: body,
-    }).then((data) => {
-      //   turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
-    });
+  const createTurn = (body, callbacks = {}) => {
+    request(
+      `turns?hash=${hash}`,
+      {
+        method: 'POST',
+        tokenFlag: true,
+        body: body,
+      },
+      {
+        successCallback: (data) => {
+          console.log('успешный коллбэк на уровне TurnContext');
+          console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+          // turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
+        },
+        ...callbacks,
+      }
+    );
+    // .then((data) => {
+    //   console.log({ data });
+    //   //   turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
+    // })
+    // .catch((err) => {
+    //   console.log({ err });
+    // });
   };
 
   useEffect(() => {
