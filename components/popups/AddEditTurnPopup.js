@@ -19,9 +19,10 @@ const AddEditTurnPopup = () => {
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const [error, setError] = useState(null);
   const availableFields = settings[activeTemplate].availableFields;
-  console.log({ activeTemplate, availableFields });
   const [form, setForm] = useState({});
-  const { createTurn } = useTurnContext();
+  const { createTurn, turns } = useTurnContext();
+  // console.log('AddEditTurnPopup');
+  // console.log({ turns });
 
   const {
     minimapState: { left, top },
@@ -39,12 +40,25 @@ const AddEditTurnPopup = () => {
     e.preventDefault(); // почитать про preventDefault()
     console.log(form);
     const textArr = quillConstants.getQuillTextArr();
+    const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
+    const { x: zeroPointX, y: zeroPointY } = zeroPoint;
+
+    // const viewportHeight = window ? window.innerHeight : 1600;
+    // const viewportWidth = window ? window.innerWidth : 1200;
+
+    // const widthK = 0.3; // коэффициент ширины вокруг мини-карты
+
+    // const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
+    // const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
+
     let turnObj = {
       ...form,
       height: 500,
       width: 500,
-      x: left + 50,
-      y: top + 50,
+      x: zeroPointX + 50,
+      y: zeroPointX + 50,
+      // x: -left + freeSpaceLeftRight + 50,
+      // y: -top + freeSpaceTopBottom + 50,
       paragraph: textArr,
       contentType: activeTemplate,
     };

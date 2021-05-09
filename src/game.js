@@ -88,9 +88,13 @@ class Game {
 
   async init() {
     const result = await getTurns();
+    // @fixme !!! Отключаем все шаги
     this.turnCollection = new TurnCollection(
       {
-        turnsData: result.items,
+        turnsData: result.items.filter(
+          (turn) => turn.contentType === 'zero-point'
+        ),
+        // turnsData: result.items,
         stageEl: this.stageEl,
         timecode: this.timecode,
       },
@@ -98,12 +102,13 @@ class Game {
       this.user
     );
 
-    this.dispatchers.minimapDispatch({
-      type: 'MAP_INIT',
-      payload: {
-        ...this.turnCollection.getScreenRect(),
-      },
-    });
+    // @fixme !!! отправка шагов прежней версии в MiniMap
+    // this.dispatchers.minimapDispatch({
+    //   type: 'MAP_INIT',
+    //   payload: {
+    //     ...this.turnCollection.getScreenRect(),
+    //   },
+    // });
 
     const {
       item: { redLogicLines },
@@ -138,11 +143,11 @@ class Game {
             .getTurns()
             .filter((turn) => turn.wasChanged === true); // ход был изменён, сохранить только его
 
-          const reggaeTurn = await this.turnCollection
-            .getTurns()
-            .find((turn) => turn.data.header === 'Reggae');
+          // const reggaeTurn = await this.turnCollection
+          //   .getTurns()
+          //   .find((turn) => turn.data.header === 'Reggae');
 
-          console.log({ reggaeTurn });
+          // console.log({ reggaeTurn });
 
           for (let turn of turns) {
             turn.wasChanged = false;
@@ -185,12 +190,13 @@ class Game {
               top,
             },
           });
-          this.dispatchers.minimapDispatch({
-            type: 'VIEWPORT_MOVED_ON_FIELD',
-            payload: {
-              ...this.turnCollection.getScreenRect(),
-            },
-          });
+          // @fixme !!! прежняя версия изменения шагов в MiniMap
+          // this.dispatchers.minimapDispatch({
+          //   type: 'VIEWPORT_MOVED_ON_FIELD',
+          //   payload: {
+          //     ...this.turnCollection.getScreenRect(),
+          //   },
+          // });
           break;
         }
         case 'DRAW_LINES': {

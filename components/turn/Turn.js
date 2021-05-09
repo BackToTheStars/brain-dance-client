@@ -63,7 +63,7 @@ const Turn = ({ turn, can, dispatch }) => {
     let maxMediaHeight = isParagraphExist
       ? paragraphEl.current.scrollHeight + 15
       : 15; // 15 это снизу появляется нестыковка
-    if (imgEl) {
+    if (imgEl && imgEl.current) {
       const newImgHeight = Math.floor(
         (imgEl.current.naturalHeight * $(wrapper.current).width()) /
           imgEl.current.naturalWidth
@@ -123,6 +123,7 @@ const Turn = ({ turn, can, dispatch }) => {
   useEffect(() => {
     if (!wrapper) return;
     wrapper.current.onresize = handleResize;
+    handleResize();
     // wrapper.current.addEventListener('resize', handleResize);
     // return () => {
     //   wrapper.current.removeEventListener('resize', handleResize);
