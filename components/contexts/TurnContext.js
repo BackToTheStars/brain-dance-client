@@ -15,7 +15,12 @@ export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
 
-const turnsInitialState = { turns: [], originalTurns: [] };
+const turnsInitialState = {
+  turns: [],
+  originalTurns: [],
+  left: 0,
+  top: 0,
+};
 const turnsReducer = (state, action) => {
   switch (action.type) {
     case ACTION_SET_ORIGINAL_TURNS: {
@@ -29,7 +34,10 @@ const turnsReducer = (state, action) => {
       const { left, top } = action.payload;
       return {
         ...state,
-        turns: state.originalTurns.map((turn) => ({
+        left,
+        top,
+        // turns: state.originalTurns.map((turn) => ({
+        turns: state.turns.map((turn) => ({
           ...turn,
           x: turn.x + left,
           y: turn.y + top,
@@ -96,6 +104,7 @@ export const TurnProvider = ({ children }) => {
     turnsReducer,
     turnsInitialState
   );
+  const { turns } = turnsState;
 
   console.log('turn provider');
   const {
@@ -147,14 +156,15 @@ export const TurnProvider = ({ children }) => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   minimapDispatch({
-  //     type: 'VIEWPORT_MOVED_ON_FIELD',
-  //     payload: {
-  //       turnsState.turns, // с учётом новых координат ZeroPoint
-  //     },
-  //   });
-  // }, []); // @todo: вызвать при изменении координат ZeroPoint
+  useEffect(() => {
+    minimapDispatch({
+      type: 'VIEWPORT_MOVED_ON_FIELD',
+      payload: {
+        turns,
+        // turnsState.turns, // с учётом новых координат ZeroPoint
+      },
+    });
+  }, [turns]);
 
   const value = {
     turns: turnsState.turns,

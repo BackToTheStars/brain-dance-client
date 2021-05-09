@@ -1,8 +1,13 @@
 import { useUiContext } from '../contexts/UI_Context';
 import { useEffect } from 'react';
+import {
+  useTurnContext,
+  ACTION_FIELD_WAS_MOVED,
+} from '../contexts/TurnContext';
 
-const FlexMinimap = () => {
+const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
+  const { dispatch: turnsDispatch } = useTurnContext();
   const { left, right, top, bottom, turns = [] } = minimapState;
   //   console.log({ turns });
   const widthPx = right - left; // ширина всего поля
@@ -48,16 +53,29 @@ const FlexMinimap = () => {
       // - freeSpaceLeftRight;
       const targetYMap = Math.floor((e.clientY - rect.top) * mapPxToFieldPx);
       // - freeSpaceTopBottom;
-      const gf = window[Symbol.for('MyGame')].gameField;
-      $(gf.stageEl).animate(
+      //   const gf = window[Symbol.for('MyGame')].gameField;
+
+      const left = viewport.x - targetXMap + Math.floor(viewport.width / 2);
+      const top = viewport.y - targetYMap + Math.floor(viewport.height / 2);
+
+      $(gameBox.current).animate(
         {
-          left: `${viewport.x - targetXMap + Math.floor(viewport.width / 2)}px`,
-          top: `${viewport.y - targetYMap + Math.floor(viewport.height / 2)}px`,
+          left: `${left}px`,
+          top: `${top}px`,
         },
         300,
         () => {
-          gf.triggers.dispatch('RECALCULATE_FIELD');
-          gf.triggers.dispatch('DRAW_LINES');
+          //   gf.triggers.dispatch('RECALCULATE_FIELD');
+          //   gf.triggers.dispatch('DRAW_LINES');
+          turnsDispatch({
+            type: ACTION_FIELD_WAS_MOVED,
+            payload: {
+              left,
+              top,
+            },
+          });
+          $(gameBox.current).css('left', 0);
+          $(gameBox.current).css('top', 0);
         }
       );
     },
