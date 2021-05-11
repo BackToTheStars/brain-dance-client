@@ -8,12 +8,12 @@ import {
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
   const { dispatch: turnsDispatch } = useTurnContext();
-  const { left, right, top, bottom, turns = [] } = minimapState;
-  //   console.log({ turns });
+  const { left, right, top, bottom, zeroX, zeroY, turns = [] } = minimapState;
+  console.log({ zeroX, zeroY });
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 1000;
+  const maxMinimapSizeWidthPlusHeight = 600;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
@@ -35,8 +35,8 @@ const FlexMinimap = ({ gameBox }) => {
 
   const viewport = {
     // смещение viewport - это координата левого верхнего шага
-    x: -left + freeSpaceLeftRight,
-    y: -top + freeSpaceTopBottom,
+    x: -left + freeSpaceLeftRight - zeroX,
+    y: -top + freeSpaceTopBottom - zeroY,
     width: viewportWidth,
     height: viewportHeight,
   };
@@ -84,8 +84,8 @@ const FlexMinimap = ({ gameBox }) => {
         ...turn,
         // для получения координаты шага на карте достаточно
         // сместить его координаты на координаты viewport
-        x: turn.x - left + freeSpaceLeftRight,
-        y: turn.y - top + freeSpaceTopBottom,
+        x: turn.x - left + freeSpaceLeftRight - zeroX,
+        y: turn.y - top + freeSpaceTopBottom - zeroY,
       }))
       .map((turn) => {
         const isTurnInsideViewport = areRectanglesIntersect(turn, {

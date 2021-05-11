@@ -4,7 +4,10 @@ import { dateFormatter } from '../../src/formatters/dateFormatter';
 import { getShortLink } from '../../src/formatters/urlFormatter';
 import { youtubeFormatter } from '../../src/formatters/youtubeFormatter';
 import { useRef, useEffect } from 'react';
-import { ACTION_DELETE_TURN } from '../contexts/TurnContext';
+import {
+  ACTION_DELETE_TURN,
+  ACTION_TURN_WAS_CHANGED,
+} from '../contexts/TurnContext';
 
 const Turn = ({ turn, can, dispatch }) => {
   const {
@@ -18,6 +21,7 @@ const Turn = ({ turn, can, dispatch }) => {
     date,
     imageUrl,
     paragraph,
+    wasChanged = false,
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -26,6 +30,7 @@ const Turn = ({ turn, can, dispatch }) => {
   const mediaWrapperEl = useRef(null);
   const videoEl = useRef(null);
   const headerEl = useRef(null);
+  console.log({ wasChanged });
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -41,6 +46,15 @@ const Turn = ({ turn, can, dispatch }) => {
       console.log(`Unknown video source: "${videoUrl}"`);
     }
   }
+
+  const handleTurnWasChanged = () => {
+    if (!wasChanged) {
+      dispatch({
+        type: ACTION_TURN_WAS_CHANGED,
+        payload: { _id: _id, wasChanged: true },
+      });
+    }
+  };
 
   const handleEdit = (e) => {
     e.preventDefault();
@@ -108,6 +122,7 @@ const Turn = ({ turn, can, dispatch }) => {
         // this.wasChanged = true;
         // triggers.dispatch('DRAW_LINES');
         // triggers.dispatch('MAKE_FIELD_TRANSLUCENT', false);
+        handleTurnWasChanged();
       },
       drag: (event, ui) => {
         // triggers.dispatch('DRAW_LINES')

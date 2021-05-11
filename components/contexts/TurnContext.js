@@ -14,6 +14,7 @@ export const TurnContext = createContext();
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
+export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 
 const turnsInitialState = {
   turns: [],
@@ -44,11 +45,27 @@ const turnsReducer = (state, action) => {
         })),
       };
     }
+    case ACTION_TURN_WAS_CHANGED: {
+      const { _id, wasChanged } = action.payload;
+      return {
+        ...state,
+        turns: state.turns.map((turn) => {
+          if (_id === turn._id) {
+            return {
+              ...turn,
+              wasChanged: wasChanged,
+            };
+          } else {
+            return turn;
+          }
+        }),
+      };
+    }
     case ACTION_DELETE_TURN: {
       const { _id } = action.payload;
       return {
         ...state,
-        originalTurns: state.originalTurns.filter((turn) => turn._id !== _id),
+        originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
         turns: state.turns.filter((turn) => turn._id !== _id),
       };
     }
@@ -104,7 +121,9 @@ export const TurnProvider = ({ children }) => {
     turnsReducer,
     turnsInitialState
   );
-  const { turns } = turnsState;
+  const [viewPort, setViewPort] = useState({ left: 0, top: 0 });
+
+  const { turns, left, top } = turnsState;
 
   console.log('turn provider');
   const {
@@ -157,14 +176,27 @@ export const TurnProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
     minimapDispatch({
       type: 'VIEWPORT_MOVED_ON_FIELD',
       payload: {
         turns,
+        zeroX: viewPort.left + left,
+        zeroY: viewPort.top + top,
         // turnsState.turns, // с учётом новых координат ZeroPoint
       },
     });
-  }, [turns]);
+  }, [left, top]);
+
+  //   useEffect(() => {
+  //     minimapDispatch({
+  //     type: 'VIEWPORT_MOVED_ON_FIELD',
+  //     payload: {
+  //       turns,
+  //       // turnsState.turns, // с учётом новых координат ZeroPoint
+  //     },
+  //   });
+  //   }, [turns]);
 
   const value = {
     turns: turnsState.turns,

@@ -49,8 +49,25 @@ const GameComponent = () => {
       .then((data) => data.json())
       .then(({ item }) => {
         setGame(item);
-        // globalGame.setGameData(item);
-        // globalGame.init();
+
+        $(gameBox.current).animate(
+          {
+            left: `${-item.viewportPointX}px`,
+            top: `${-item.viewportPointY}px`,
+          },
+          300,
+          () => {
+            turnsDispatch({
+              type: ACTION_FIELD_WAS_MOVED,
+              payload: {
+                left: -item.viewportPointX,
+                top: -item.viewportPointY,
+              },
+            });
+            $(gameBox.current).css('left', 0);
+            $(gameBox.current).css('top', 0);
+          }
+        );
       });
 
     $(gameBox.current).draggable({
