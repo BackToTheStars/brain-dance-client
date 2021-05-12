@@ -22,6 +22,7 @@ const minimapInitialState = {
   right: 0,
   zeroX: 0,
   zeroY: 0,
+  turnsToRender: [],
 };
 
 const minimapReducer = (state, action) => {
@@ -46,8 +47,10 @@ const minimapReducer = (state, action) => {
       };
     }
     case 'TURNS_TO_RENDER': {
-      state.turnsToRender = action.payload;
-      return state;
+      return {
+        ...state,
+        turnsToRender: action.payload,
+      };
     }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);

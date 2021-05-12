@@ -53,7 +53,7 @@ const turnsReducer = (state, action) => {
           if (_id === turn._id) {
             return {
               ...turn,
-              wasChanged: wasChanged,
+              ...action.payload,
             };
           } else {
             return turn;
@@ -202,6 +202,8 @@ export const TurnProvider = ({ children }) => {
     turns: turnsState.turns,
     dispatch: turnsDispatch,
     createTurn,
+    left: viewPort.left,
+    top: viewPort.top,
   };
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };

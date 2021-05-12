@@ -13,7 +13,7 @@ const FlexMinimap = ({ gameBox }) => {
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 600;
+  const maxMinimapSizeWidthPlusHeight = 800;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
@@ -103,7 +103,7 @@ const FlexMinimap = ({ gameBox }) => {
 
   const turnsToRender = value.turns
     .filter((turn) => turn.isTurnInsideViewport)
-    .map((turn) => turn.id); // отфильтровали какие ходы рендерить на экране
+    .map((turn) => turn._id); // отфильтровали какие ходы рендерить на экране
 
   useEffect(() => {
     minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });

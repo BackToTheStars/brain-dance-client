@@ -24,19 +24,21 @@ const GameComponent = () => {
   const [game, setGame] = useState(null);
   const gameBox = useRef();
   const { token, info, can, timecode } = useUserContext();
-  const {
-    minimapState: { turnsToRender },
-    minimapDispatch,
-    recPanelDispatch,
-  } = useUiContext();
+  // const {
+  // minimapState: {
+  // turnsToRender
+  // },
+  // minimapDispatch,
+  // recPanelDispatch,
+  // } = useUiContext();
   const turnContext = useTurnContext();
   const turnsDispatch = turnContext ? turnContext.dispatch : () => {};
 
-  const notificationAlert = (note) => {
-    setNotes((notes) => {
-      return [...notes, note];
-    });
-  };
+  //   const notificationAlert = (note) => {
+  //     setNotes((notes) => {
+  //       return [...notes, note];
+  //     });
+  //   };
 
   useEffect(() => {
     fetch(`${API_URL}/game?hash=${info.hash}`, {

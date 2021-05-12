@@ -9,7 +9,7 @@ import {
   ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnContext';
 
-const Turn = ({ turn, can, dispatch }) => {
+const Turn = ({ turn, can, dispatch, left, top }) => {
   const {
     _id,
     x,
@@ -30,7 +30,7 @@ const Turn = ({ turn, can, dispatch }) => {
   const mediaWrapperEl = useRef(null);
   const videoEl = useRef(null);
   const headerEl = useRef(null);
-  console.log({ wasChanged });
+  // console.log({ wasChanged });
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -46,15 +46,6 @@ const Turn = ({ turn, can, dispatch }) => {
       console.log(`Unknown video source: "${videoUrl}"`);
     }
   }
-
-  const handleTurnWasChanged = () => {
-    if (!wasChanged) {
-      dispatch({
-        type: ACTION_TURN_WAS_CHANGED,
-        payload: { _id: _id, wasChanged: true },
-      });
-    }
-  };
 
   const handleEdit = (e) => {
     e.preventDefault();
@@ -122,7 +113,16 @@ const Turn = ({ turn, can, dispatch }) => {
         // this.wasChanged = true;
         // triggers.dispatch('DRAW_LINES');
         // triggers.dispatch('MAKE_FIELD_TRANSLUCENT', false);
-        handleTurnWasChanged();
+        console.log({ x, y, position: ui.position, left, top });
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            x: x - left - ui.position.left,
+            y: y - top - ui.position.top,
+          },
+        });
       },
       drag: (event, ui) => {
         // triggers.dispatch('DRAW_LINES')

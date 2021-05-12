@@ -1,19 +1,29 @@
 import { useTurnContext } from '../contexts/TurnContext';
 import { useUserContext } from '../contexts/UserContext';
+import { useUiContext } from '../contexts/UI_Context';
 import Turn from './Turn';
 
 const TurnsComponent = () => {
-  const { turns, dispatch } = useTurnContext();
+  const { turns, dispatch, left, top } = useTurnContext();
   const { can } = useUserContext();
+  const {
+    minimapState: { turnsToRender },
+  } = useUiContext();
 
-  console.log('turns component', { turns });
+  console.log('turns component', { turns }, ' turnsToRender: ', {
+    turnsToRender,
+  });
   return (
     <>
-      {turns.map((turn) => {
-        return (
-          <Turn turn={turn} key={turn._id} can={can} dispatch={dispatch} />
-        );
-      })}
+      {turns
+        .filter((turn) => {
+          return turnsToRender.includes(turn._id);
+        })
+        .map((turn) => {
+          return (
+            <Turn key={turn._id} {...{ turn, can, dispatch, left, top }} />
+          );
+        })}
     </>
   );
 };
