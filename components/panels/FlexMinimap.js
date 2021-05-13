@@ -9,7 +9,7 @@ const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
   const { dispatch: turnsDispatch } = useTurnContext();
   const { left, right, top, bottom, zeroX, zeroY, turns = [] } = minimapState;
-  console.log({ zeroX, zeroY });
+  //console.log({ zeroX, zeroY });
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 

@@ -22,6 +22,7 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
     imageUrl,
     paragraph,
     wasChanged = false,
+    scrollPosition, // @todo
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -113,14 +114,13 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
         // this.wasChanged = true;
         // triggers.dispatch('DRAW_LINES');
         // triggers.dispatch('MAKE_FIELD_TRANSLUCENT', false);
-        console.log({ x, y, position: ui.position, left, top });
         dispatch({
           type: ACTION_TURN_WAS_CHANGED,
           payload: {
             _id: _id,
             wasChanged: true,
-            x: x - left - ui.position.left,
-            y: y - top - ui.position.top,
+            x: ui.position.left, // x - left - ui.position.left,
+            y: ui.position.top, // y - top - ui.position.top,
           },
         });
       },
@@ -131,6 +131,16 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
     $(wrapper.current).resizable({
       stop: (event, ui) => {
         // triggers.dispatch('DRAW_LINES')
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            width: ui.size.width,
+            height: ui.size.height,
+          },
+        });
+        console.log(ui);
       },
     });
   }, []);

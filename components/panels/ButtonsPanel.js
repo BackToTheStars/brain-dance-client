@@ -2,18 +2,19 @@ import { useRouter } from 'next/router';
 import { useUiContext } from '../contexts/UI_Context'; // export const useUiContext
 import useUser from '../hooks/user'; // export default useUser
 import { useUserContext } from '../contexts/UserContext';
+import { useTurnContext } from '../contexts/TurnContext';
 
 import { RULE_VIEW, RULE_TURNS_CRUD, RULE_GAME_EDIT } from '../config';
 
 const ButtonsPanel = () => {
   const {
     setGameInfoPanelIsHidden,
-
     state: { classesPanelIsHidden },
     dispatch,
     minimapDispatch,
     setCreateEditTurnPopupIsHidden,
   } = useUiContext();
+  const { saveField } = useTurnContext();
   const router = useRouter();
   const { info, can } = useUserContext();
 
@@ -27,7 +28,9 @@ const ButtonsPanel = () => {
           >
             Add Turn
           </button>
-          <button id="save-positions-btn">Save Field</button>
+          <button id="save-positions-btn" onClick={saveField}>
+            Save Field
+          </button>
         </>
       )}
       <button

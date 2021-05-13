@@ -28,22 +28,39 @@ const minimapInitialState = {
 const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_INIT': {
-      const { left, top, right, bottom } = action.payload;
+      const { left, right, top, bottom, zeroX, zeroY, turns } = action.payload;
       return {
         ...state,
-        ...action.payload,
+        left,
+        right,
+        top,
+        bottom,
+        zeroX,
+        zeroY,
+        turns,
       };
     }
     case 'VIEWPORT_MOVED_ON_FIELD': {
+      const { turns, zeroX, zeroY } = action.payload;
       return {
         ...state,
-        ...action.payload,
+        // ...action.payload,
+        zeroX,
+        zeroY,
+        turns,
       };
     }
     case 'MINIMAP_SHOW_HIDE': {
       return {
         ...state,
         isHidden: !state.isHidden,
+      };
+    }
+    case 'TURNS_WERE_CHANGED': {
+      const { turns } = action.payload;
+      return {
+        ...state,
+        turns,
       };
     }
     case 'TURNS_TO_RENDER': {

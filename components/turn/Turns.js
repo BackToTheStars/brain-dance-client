@@ -10,9 +10,9 @@ const TurnsComponent = () => {
     minimapState: { turnsToRender },
   } = useUiContext();
 
-  console.log('turns component', { turns }, ' turnsToRender: ', {
-    turnsToRender,
-  });
+  // console.log('turns component', { turns }, ' turnsToRender: ', {
+  // turnsToRender,
+  //   });
   return (
     <>
       {turns

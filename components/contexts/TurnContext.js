@@ -125,7 +125,6 @@ export const TurnProvider = ({ children }) => {
 
   const { turns, left, top } = turnsState;
 
-  console.log('turn provider');
   const {
     request,
     info: { hash },
@@ -163,6 +162,30 @@ export const TurnProvider = ({ children }) => {
     // });
   };
 
+  const saveField = () => {
+    const changedTurns = turns
+      .filter((turn) => turn.wasChanged === true)
+      .map((turn) => {
+        const { _id, x, y, height, width, contentType, scrollPosition } = turn;
+        return {
+          _id,
+          x: x - viewPort.left,
+          y: y - viewPort.top,
+          height,
+          width,
+          contentType,
+          scrollPosition,
+        };
+      }); // ход был изменён, сохранить только его
+
+    console.log(changedTurns);
+
+    // for (let turn of turns) {
+    //   turn.wasChanged = false;
+    //   console.log('turn.x turn.y', turn.x, turn.y);
+    // }
+  };
+
   useEffect(() => {
     request(`turns?hash=${hash}`, {
       tokenFlag: true,
@@ -174,6 +197,13 @@ export const TurnProvider = ({ children }) => {
       // setTurns(data.items);
     });
   }, []);
+
+  useEffect(() => {
+    minimapDispatch({
+      type: 'TURNS_WERE_CHANGED',
+      payload: { turns },
+    });
+  }, [turns]);
 
   useEffect(() => {
     setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
@@ -199,6 +229,7 @@ export const TurnProvider = ({ children }) => {
   //   }, [turns]);
 
   const value = {
+    saveField,
     turns: turnsState.turns,
     dispatch: turnsDispatch,
     createTurn,

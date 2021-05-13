@@ -82,7 +82,6 @@ const GameComponent = () => {
         //   });
         //   this.triggers.dispatch('RECALCULATE_FIELD');
         //   this.triggers.dispatch('DRAW_LINES');
-        console.log(ui.position.left, ui.position.top);
         turnsDispatch({
           type: ACTION_FIELD_WAS_MOVED,
           payload: {
