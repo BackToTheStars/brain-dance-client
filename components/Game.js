@@ -9,11 +9,16 @@ import FlexMinimap from './panels/FlexMinimap';
 
 import { useUserContext } from './contexts/UserContext';
 // import { useUiContext } from './contexts/UI_Context';
-import { useTurnContext, ACTION_FIELD_WAS_MOVED } from './contexts/TurnContext';
+import {
+  useTurnContext,
+  ACTION_FIELD_WAS_MOVED,
+  ACTION_LINES_INIT,
+} from './contexts/TurnContext';
 import { API_URL } from './config';
 import RecPanel from './panels/RecPanel';
 import TurnsComponent from './turn/Turns';
 import AddEditTurnPopup from './popups/AddEditTurnPopup';
+import QuotesLinesLayer from './panels/QuotesLinesLayer';
 
 // import { TurnProvider } from './contexts/TurnContext';
 
@@ -31,8 +36,8 @@ const GameComponent = () => {
   // minimapDispatch,
   // recPanelDispatch,
   // } = useUiContext();
-  const turnContext = useTurnContext();
-  const turnsDispatch = turnContext ? turnContext.dispatch : () => {};
+
+  const { dispatch: turnsDispatch, linesDispatch } = useTurnContext();
 
   //   const notificationAlert = (note) => {
   //     setNotes((notes) => {
@@ -51,6 +56,7 @@ const GameComponent = () => {
       .then((data) => data.json())
       .then(({ item }) => {
         setGame(item);
+        linesDispatch({ type: ACTION_LINES_INIT, payload: item.redLogicLines });
 
         $(gameBox.current).animate(
           {
@@ -121,6 +127,7 @@ const GameComponent = () => {
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" ref={gameBox}>
             <TurnsComponent />
+            <QuotesLinesLayer />
           </div>
         </div>
 

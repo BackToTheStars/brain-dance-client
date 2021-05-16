@@ -11,11 +11,24 @@ import { useUiContext } from './UI_Context';
 
 export const TurnContext = createContext();
 
+export const ACTION_LINES_INIT = 'action_lines_init';
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
+
+const linesInitialState = { lines: [] };
+const linesReducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_LINES_INIT: {
+      return {
+        ...state,
+        lines: action.payload,
+      };
+    }
+  }
+};
 
 const turnsInitialState = {
   turns: [],
@@ -130,6 +143,11 @@ export const TurnProvider = ({ children }) => {
     turnsReducer,
     turnsInitialState
   );
+  const [linesState, linesDispatch] = useReducer(
+    linesReducer,
+    linesInitialState
+  );
+
   const [viewPort, setViewPort] = useState({ left: 0, top: 0 });
 
   const { turns, left, top } = turnsState;
@@ -258,6 +276,8 @@ export const TurnProvider = ({ children }) => {
     createTurn,
     left: viewPort.left,
     top: viewPort.top,
+    linesState,
+    linesDispatch,
   };
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };

@@ -7,9 +7,9 @@ import {
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
-  const { dispatch: turnsDispatch } = useTurnContext();
+  const { dispatch: turnsDispatch, linesState } = useTurnContext();
   const { left, right, top, bottom, zeroX, zeroY, turns = [] } = minimapState;
-  //console.log({ zeroX, zeroY });
+  const { lines } = linesState;
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
@@ -109,11 +109,49 @@ const FlexMinimap = ({ gameBox }) => {
     minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
   }, [turns]); // массив с id тех ходов, которые нужно render
 
+  value.lines = getLinesByTurns(value.turns, lines);
+
   return (
     <div className="flex-minimap">
       <SVGMiniMap {...value} />
     </div>
   );
+};
+
+const getLinesByTurns = (turns, lines) => {
+  // turns {_id, x, y, width, height}
+  // lines {sourceTurnId, targetTurnId}
+  const turnCentersDictionary = {};
+  for (let turn of turns) {
+    turnCentersDictionary[turn._id] = {
+      x: Math.floor(turn.x + turn.width / 2),
+      y: Math.floor(turn.y + turn.height / 2),
+    };
+  }
+
+  const resLines = [];
+  for (let line of lines) {
+    if (line.sourceTurnId === line.targetTurnId) {
+      continue;
+    }
+    if (!turnCentersDictionary[line.sourceTurnId]) {
+      console.log(`Нет исходного шага у линии ${line._id}`);
+      continue;
+    }
+    if (!turnCentersDictionary[line.targetTurnId]) {
+      console.log(`Нет целевого шага у линии ${line._id}`);
+      continue;
+    }
+
+    resLines.push({
+      id: line._id,
+      x1: turnCentersDictionary[line.sourceTurnId].x,
+      y1: turnCentersDictionary[line.sourceTurnId].y,
+      x2: turnCentersDictionary[line.targetTurnId].x,
+      y2: turnCentersDictionary[line.targetTurnId].y,
+    });
+  }
+  return resLines;
 };
 
 const areRectanglesIntersect = (rect1, rect2) => {
@@ -131,6 +169,7 @@ const SVGMiniMap = ({
   height,
   viewport,
   turns,
+  lines,
   onMapClick,
 }) => {
   return (
@@ -156,6 +195,16 @@ const SVGMiniMap = ({
             width={turn.width}
             fill={fill}
             height={turn.height}
+          />
+        );
+      })}
+      {lines.map(({ x1, y1, x2, y2, id }) => {
+        return (
+          <line
+            {...{ x1, y1, x2, y2 }}
+            key={id}
+            stroke="red"
+            strokeWidth="50"
           />
         );
       })}
