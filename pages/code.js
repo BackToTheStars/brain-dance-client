@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { API_URL } from '../src/config';
+import { API_URL } from '../components/config';
 
-import { setGameInfo } from '../src/lib/gameToken';
+import { setGameInfo } from '../components/lib/gameToken';
 
 const CodePage = () => {
   const router = useRouter();

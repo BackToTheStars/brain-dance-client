@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_URL } from '../../src/config';
+import { API_URL } from '../config';
 // import { getToken } from '../../src/lib/token';
 import { useRouter } from 'next/router';
 

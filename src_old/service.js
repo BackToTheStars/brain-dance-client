@@ -1,4 +1,4 @@
-import { API_URL } from './config';
+import { API_URL } from '../components/config';
 import { getGameInfo } from './lib/gameToken';
 import { checkRuleByRole, RULE_TURNS_CRUD } from '../components/config';
 

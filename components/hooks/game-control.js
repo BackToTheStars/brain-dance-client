@@ -1,8 +1,8 @@
 // Custom hook, отвечающий за взаимодействие с игрой и хранение её state'ов
 
 import { useState, useEffect } from 'react';
-import { API_URL } from '../../src/config';
-import { getToken } from '../../src/lib/token';
+import { API_URL } from '../config';
+import { getToken } from '../lib/token';
 
 const useGameControl = () => {
   const [games, setGames] = useState([]);

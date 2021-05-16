@@ -1,4 +1,4 @@
-import Game from '../src/game';
+// import Game from '../src/game';
 import { useState, useEffect, useRef } from 'react';
 import ButtonsPanel from './panels/ButtonsPanel';
 import ClassesPanel from './panels/ClassesPanel';
@@ -8,9 +8,9 @@ import NotificationPanel from './panels/NotificationPanel';
 import FlexMinimap from './panels/FlexMinimap';
 
 import { useUserContext } from './contexts/UserContext';
-import { useUiContext } from './contexts/UI_Context';
+// import { useUiContext } from './contexts/UI_Context';
 import { useTurnContext, ACTION_FIELD_WAS_MOVED } from './contexts/TurnContext';
-import { API_URL } from '../src/config';
+import { API_URL } from './config';
 import RecPanel from './panels/RecPanel';
 import TurnsComponent from './turn/Turns';
 import AddEditTurnPopup from './popups/AddEditTurnPopup';

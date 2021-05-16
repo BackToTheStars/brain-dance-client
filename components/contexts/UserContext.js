@@ -1,7 +1,7 @@
 import { useState, useContext, useReducer, createContext } from 'react';
-import { getGameInfo } from '../../src/lib/gameToken';
+import { getGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
-import { API_URL } from '../../src/config';
+import { API_URL } from '../config';
 
 const guestUser = {
   info: {
@@ -28,8 +28,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
     { body = null, tokenFlag = false, method = 'GET' } = {},
     { errorMessage, errorCallback, successCallback } = {}
   ) => {
-    let defaultMessage =
-      errorMessage || `Произошла ошибка service.js:187, метод ${method}`;
+    let defaultMessage = errorMessage || `Произошла ошибка, метод ${method}`;
     const params = {
       method,
       headers: {

@@ -15,6 +15,7 @@ export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
+export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 
 const turnsInitialState = {
   turns: [],
@@ -43,6 +44,14 @@ const turnsReducer = (state, action) => {
           x: turn.x + left,
           y: turn.y + top,
         })),
+      };
+    }
+    case ACTION_TURNS_SYNC_DONE: {
+      return {
+        ...state,
+        turns: state.turns.map((turn) => {
+          return { ...turn, wasChanged: false };
+        }),
       };
     }
     case ACTION_TURN_WAS_CHANGED: {
@@ -178,12 +187,26 @@ export const TurnProvider = ({ children }) => {
         };
       }); // ход был изменён, сохранить только его
 
-    console.log(changedTurns);
+    request(`games/viewport?hash=${hash}`, {
+      tokenFlag: true,
+      method: 'PUT',
+      body: {
+        x: -viewPort.left,
+        y: -viewPort.top,
+      },
+    }).then((data) => {
+      // console.log(data);
+    });
 
-    // for (let turn of turns) {
-    //   turn.wasChanged = false;
-    //   console.log('turn.x turn.y', turn.x, turn.y);
-    // }
+    request(`turns/coordinates?hash=${hash}`, {
+      tokenFlag: true,
+      method: 'PUT',
+      body: {
+        turns: changedTurns,
+      },
+    }).then((data) => {
+      turnsDispatch({ type: ACTION_TURNS_SYNC_DONE });
+    });
   };
 
   useEffect(() => {

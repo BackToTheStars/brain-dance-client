@@ -1,8 +1,8 @@
 import { getParagraphText } from './functions';
 import { RULE_TURNS_CRUD } from '../config';
-import { dateFormatter } from '../../src/formatters/dateFormatter';
-import { getShortLink } from '../../src/formatters/urlFormatter';
-import { youtubeFormatter } from '../../src/formatters/youtubeFormatter';
+import { dateFormatter } from '../helpers/formatters/dateFormatter';
+import { getShortLink } from '../helpers/formatters/urlFormatter';
+import { youtubeFormatter } from '../helpers/formatters/youtubeFormatter';
 import { useRef, useEffect } from 'react';
 import {
   ACTION_DELETE_TURN,

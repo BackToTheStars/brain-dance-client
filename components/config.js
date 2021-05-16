@@ -1,3 +1,8 @@
+// let API_URL = '';
+// if (typeof process !== 'undefined' && process.env.API_URL) {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+// }
+
 const ROLE_GAME_VISITOR = 1;
 const ROLE_GAME_PLAYER = 2; // остаётся вопрос, можно ли удалять чужие ходы (по идее, нельзя)
 const ROLE_GAME_OWNER = 3; // может выдавать хэши ?
@@ -37,4 +42,5 @@ export {
   RULE_TURNS_CRUD,
   RULE_GAME_EDIT,
   checkRuleByRole,
+  API_URL,
 };

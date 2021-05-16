@@ -1,4 +1,4 @@
-import { getGameInfo } from '../../src/lib/gameToken';
+import { getGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
 
 const guestUser = {

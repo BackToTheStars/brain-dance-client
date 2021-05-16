@@ -2,7 +2,7 @@ import { dateFormatter } from './formatters/dateFormatter';
 import { youtubeFormatter } from './formatters/youtubeFormatter';
 import { getShortLink } from './formatters/urlFormatter';
 import { RULE_TURNS_CRUD } from '../components/config';
-import { markerColors } from '../src/popup';
+import { markerColors } from './popup';
 
 const getParagraphText = (arrText) => {
   // @todo: remove
