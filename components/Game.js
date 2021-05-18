@@ -15,7 +15,6 @@ import {
   ACTION_LINES_INIT,
 } from './contexts/TurnContext';
 import { API_URL } from './config';
-import RecPanel from './panels/RecPanel';
 import TurnsComponent from './turn/Turns';
 import AddEditTurnPopup from './popups/AddEditTurnPopup';
 import QuotesLinesLayer from './panels/QuotesLinesLayer';
@@ -34,7 +33,6 @@ const GameComponent = () => {
   // turnsToRender
   // },
   // minimapDispatch,
-  // recPanelDispatch,
   // } = useUiContext();
 
   const { dispatch: turnsDispatch, linesDispatch } = useTurnContext();
@@ -109,7 +107,6 @@ const GameComponent = () => {
   //       timecode,
   //       dispatchers: {
   //         minimapDispatch,
-  //         recPanelDispatch,
   //         turnsDispatch,
   //       },
   //     });
@@ -134,7 +131,6 @@ const GameComponent = () => {
         <ButtonsPanel />
         <NotificationPanel notes={notes} />
         <FlexMinimap gameBox={gameBox} />
-        <RecPanel />
 
         <div className="quotes-panel" />
 

@@ -106,6 +106,18 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
   };
 
   useEffect(() => {
+    if (!paragraphEl) return;
+    if (!paragraphEl.current) return;
+    const spans = [];
+    paragraphEl.current.querySelectorAll('span').forEach((span) => {
+      spans.push(span);
+    });
+    console.log({ spans });
+    const quotes = spans.filter((span) => !!span.style.backgroundColor);
+    console.log({ quotes });
+  }, [paragraphEl]);
+
+  useEffect(() => {
     $(wrapper.current).draggable({
       start: (event, ui) => {
         // triggers.dispatch('MAKE_FIELD_TRANSLUCENT', true)

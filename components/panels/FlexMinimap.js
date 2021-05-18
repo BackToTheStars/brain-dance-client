@@ -204,7 +204,7 @@ const SVGMiniMap = ({
             {...{ x1, y1, x2, y2 }}
             key={id}
             stroke="red"
-            strokeWidth="50"
+            strokeWidth="75"
           />
         );
       })}

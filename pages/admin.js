@@ -1,8 +1,8 @@
 import IndexPage from './index.js';
 import { useRouter } from 'next/router';
 
-import { API_URL } from '../src/config';
-import { setToken } from '../src/lib/token';
+import { API_URL } from '../components/config';
+import { setToken } from '../components/lib/token';
 
 const LoginForm = () => {
   const router = useRouter();

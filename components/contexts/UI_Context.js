@@ -75,38 +75,6 @@ const minimapReducer = (state, action) => {
   }
 };
 
-const recPanelInitialState = {
-  isHidden: true,
-};
-
-function recPanelReducer(state, action) {
-  switch (action.type) {
-    case 'SHOW_RECPANEL': {
-      return {
-        isHidden: false,
-      };
-    }
-    case 'HIDE_RECPANEL': {
-      return {
-        isHidden: true,
-      };
-    }
-    case 'TOGGLE_RECPANEL': {
-      return {
-        isHidden: !state.isHidden,
-      };
-    }
-    default: {
-      console.error(
-        `recPanelReducer: unknown type ${JSON.stringify(action.type)}`
-      );
-      throw new Error(
-        `recPanelReducer: unknown type ${JSON.stringify(action.type)}`
-      );
-    }
-  }
-}
-
 export const UI_Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
@@ -117,11 +85,6 @@ export const UI_Provider = ({ children }) => {
   const [minimapState, minimapDispatch] = useReducer(
     minimapReducer,
     minimapInitialState
-  );
-
-  const [recPanelState, recPanelDispatch] = useReducer(
-    recPanelReducer,
-    recPanelInitialState
   );
 
   return (
@@ -141,9 +104,6 @@ export const UI_Provider = ({ children }) => {
 
         minimapState,
         minimapDispatch,
-
-        recPanelState,
-        recPanelDispatch,
       }}
     >
       {children}
