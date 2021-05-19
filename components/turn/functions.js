@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 export const getParagraphText = (arrText) => {
   return (
     <>
@@ -10,12 +12,38 @@ export const getParagraphText = (arrText) => {
           newInserts.push(<br />);
         }
         newInserts.pop();
-        return (
-          <span key={i} style={textItem.attributes}>
-            {newInserts}
-          </span>
-        );
+        return <SpanTextPiece {...{ textItem, newInserts }} />;
       })}
     </>
+  );
+};
+
+export const SpanTextPiece = ({ textItem, newInserts }) => {
+  const spanFragment = useRef(null);
+  const isItQuote = textItem.attributes
+    ? !!textItem.attributes.background
+    : false;
+
+  useEffect(() => {
+    if (!isItQuote) {
+      return;
+    }
+    console.log(spanFragment.current.getBoundingClientRect());
+    console.log({ newInserts });
+  }, []);
+
+  return (
+    <span
+      style={textItem.attributes}
+      onClick={() => {
+        if (isItQuote && textItem.attributes.id) {
+          alert(`Мой id: ${textItem.attributes.id}`);
+        }
+        console.log(isItQuote);
+      }}
+      ref={spanFragment}
+    >
+      {newInserts}
+    </span>
   );
 };

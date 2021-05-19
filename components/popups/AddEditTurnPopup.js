@@ -51,6 +51,21 @@ const AddEditTurnPopup = () => {
     // const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
     // const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
 
+    let incId = Math.floor(new Date().getTime() / 1000);
+
+    const resTextArr = textArr.map((textItem) => {
+      if (!textItem.attributes || !textItem.attributes.background) {
+        return textItem;
+      }
+      return {
+        ...textItem,
+        attributes: {
+          ...textItem.attributes,
+          id: `quote-${(incId += 1)}`,
+        },
+      };
+    });
+
     let turnObj = {
       ...form,
       height: 500,
@@ -59,13 +74,13 @@ const AddEditTurnPopup = () => {
       y: zeroPointX + 50,
       // x: -left + freeSpaceLeftRight + 50,
       // y: -top + freeSpaceTopBottom + 50,
-      paragraph: textArr,
+      paragraph: resTextArr,
       contentType: activeTemplate,
     };
     // создать шаг, закрыть модальное окно
     createTurn(turnObj, {
       successCallback: () => {
-        console.log('успешный коллбэк на уровне Попапа');
+        // console.log('успешный коллбэк на уровне Попапа');
         setCreateEditTurnPopupIsHidden(true);
       },
       errorCallback: (message) => {
