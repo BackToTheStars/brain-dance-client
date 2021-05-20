@@ -9,7 +9,7 @@ import {
   ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnContext';
 
-const Turn = ({ turn, can, dispatch, left, top }) => {
+const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
   const {
     _id,
     x,
@@ -57,7 +57,12 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
       // confirm - глобальная функция браузера
-      dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+      deleteTurn(_id, {
+        successCallback: () => {
+          dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+        },
+      });
+
       //alert('button_delete_clicked');
     }
   };
@@ -79,20 +84,15 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
       minMediaHeight += newImgHeight;
       maxMediaHeight += newImgHeight;
       $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
-    } else if (videoEl) {
+    } else if (videoEl && videoEl.current) {
       $(videoEl.current).width($(wrapper.current).width() - 3); // можно использовать в дизайне
       $(videoEl.current).height(
         Math.floor((9 * $(wrapper.current).width()) / 16)
       );
       minMediaHeight += $(videoEl.current).height();
       maxMediaHeight += $(videoEl.current).height();
-      $(mediaWrapperEl.curren).css('min-height', `${minMediaHeight}px`);
+      $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
     }
-    // получить высоту el, вычесть высоту header, сохранить в media wrapper
-    $(mediaWrapperEl.current).height(
-      // @fixme: 1px
-      $(wrapper.current).height() + 1 - $(headerEl.current).height()
-    );
     const paragraphExtraPx = isParagraphExist ? 50 : 0;
 
     $(wrapper.current).css(
@@ -103,6 +103,18 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
       'max-height',
       `${maxMediaHeight + $(headerEl.current).height() - 2}px`
     );
+    // получить высоту el, вычесть высоту header, сохранить в media wrapper
+    $(mediaWrapperEl.current).height(
+      // @fixme: 1px
+      $(wrapper.current).height() + 1 - $(headerEl.current).height()
+    );
+
+    if (!(minMediaHeight + $(headerEl.current).height() + paragraphExtraPx)) {
+      console.log('Необходимо выполнить проверку минимальной высоты шага');
+    }
+    if (!(maxMediaHeight + $(headerEl.current).height() - 2)) {
+      console.log('Необходимо выполнить проверку максимальной высоты шага');
+    }
   };
 
   useEffect(() => {
@@ -112,9 +124,9 @@ const Turn = ({ turn, can, dispatch, left, top }) => {
     paragraphEl.current.querySelectorAll('span').forEach((span) => {
       spans.push(span);
     });
-    console.log({ spans });
+    // console.log({ spans });
     const quotes = spans.filter((span) => !!span.style.backgroundColor);
-    console.log({ quotes });
+    // console.log({ quotes });
   }, [paragraphEl]);
 
   useEffect(() => {

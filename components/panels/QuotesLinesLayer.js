@@ -9,7 +9,7 @@ const QuotesLinesLayer = () => {
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
   const { linesState } = useTurnContext();
   const { lines } = linesState;
-  console.log(lines);
+  // console.log(lines);
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
 

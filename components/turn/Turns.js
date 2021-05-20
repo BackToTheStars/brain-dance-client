@@ -4,7 +4,7 @@ import { useUiContext } from '../contexts/UI_Context';
 import Turn from './Turn';
 
 const TurnsComponent = () => {
-  const { turns, dispatch, left, top } = useTurnContext();
+  const { turns, dispatch, left, top, deleteTurn } = useTurnContext();
   const { can } = useUserContext();
   const {
     minimapState: { turnsToRender },
@@ -21,7 +21,10 @@ const TurnsComponent = () => {
         })
         .map((turn) => {
           return (
-            <Turn key={turn._id} {...{ turn, can, dispatch, left, top }} />
+            <Turn
+              key={turn._id}
+              {...{ turn, can, dispatch, left, top, deleteTurn }}
+            />
           );
         })}
     </>

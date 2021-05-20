@@ -16,6 +16,7 @@ export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
+export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 
 const linesInitialState = { lines: [] };
@@ -81,6 +82,13 @@ const turnsReducer = (state, action) => {
             return turn;
           }
         }),
+      };
+    }
+    case ACTION_TURN_CREATED: {
+      return {
+        ...state,
+        turns: [...state.turns, action.payload],
+        originalTurns: [...state.originalTurns, action.payload],
       };
     }
     case ACTION_DELETE_TURN: {
@@ -175,18 +183,29 @@ export const TurnProvider = ({ children }) => {
           if (callbacks.successCallback) {
             callbacks.successCallback(data);
           }
-          // turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
         },
         ...callbacks,
       }
     );
-    // .then((data) => {
-    //   console.log({ data });
-    //   //   turnsDispatch({ type: ACTION_SET_ORIGINAL_TURNS, payload: data.items });
-    // })
-    // .catch((err) => {
-    //   console.log({ err });
-    // });
+  };
+  const deleteTurn = (id, callbacks = {}) => {
+    request(
+      `turns/${id}?hash=${hash}`,
+      {
+        method: 'DELETE',
+        tokenFlag: true,
+      },
+      {
+        successCallback: (data) => {
+          //   console.log('успешный коллбэк на уровне TurnContext');
+          //   console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
   };
 
   const saveField = () => {
@@ -274,6 +293,7 @@ export const TurnProvider = ({ children }) => {
     turns: turnsState.turns,
     dispatch: turnsDispatch,
     createTurn,
+    deleteTurn,
     left: viewPort.left,
     top: viewPort.top,
     linesState,

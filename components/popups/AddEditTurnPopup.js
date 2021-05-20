@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getQuill } from '../helpers/quillHandler';
 import { useUiContext } from '../contexts/UI_Context';
-import { useTurnContext } from '../contexts/TurnContext';
+import { useTurnContext, ACTION_TURN_CREATED } from '../contexts/TurnContext';
 import turnSettings from '../turn/settings';
 
 const {
@@ -20,7 +20,7 @@ const AddEditTurnPopup = () => {
   const [error, setError] = useState(null);
   const availableFields = settings[activeTemplate].availableFields;
   const [form, setForm] = useState({});
-  const { createTurn, turns } = useTurnContext();
+  const { createTurn, turns, dispatch } = useTurnContext();
   // console.log('AddEditTurnPopup');
   // console.log({ turns });
 
@@ -61,7 +61,7 @@ const AddEditTurnPopup = () => {
         ...textItem,
         attributes: {
           ...textItem.attributes,
-          id: `quote-${(incId += 1)}`,
+          id: textItem.attributes.id || `quote-${(incId += 1)}`,
         },
       };
     });
@@ -70,8 +70,8 @@ const AddEditTurnPopup = () => {
       ...form,
       height: 500,
       width: 500,
-      x: zeroPointX + 50,
-      y: zeroPointX + 50,
+      x: -zeroPointX + Math.floor(window.innerWidth / 2) - 250,
+      y: -zeroPointY + Math.floor(window.innerHeight / 2) - 250,
       // x: -left + freeSpaceLeftRight + 50,
       // y: -top + freeSpaceTopBottom + 50,
       paragraph: resTextArr,
@@ -79,9 +79,17 @@ const AddEditTurnPopup = () => {
     };
     // создать шаг, закрыть модальное окно
     createTurn(turnObj, {
-      successCallback: () => {
+      successCallback: (data) => {
         // console.log('успешный коллбэк на уровне Попапа');
         setCreateEditTurnPopupIsHidden(true);
+        dispatch({
+          type: ACTION_TURN_CREATED,
+          payload: {
+            ...data.item,
+            x: data.item.x + zeroPointX,
+            y: data.item.y + zeroPointY,
+          },
+        });
       },
       errorCallback: (message) => {
         setError({ message });
