@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export const getParagraphText = (arrText) => {
+export const getParagraphText = (arrText, setQuotes) => {
   return (
     <>
       {arrText.map((textItem, i) => {
@@ -12,13 +12,13 @@ export const getParagraphText = (arrText) => {
           newInserts.push(<br />);
         }
         newInserts.pop();
-        return <SpanTextPiece {...{ textItem, newInserts }} />;
+        return <SpanTextPiece {...{ textItem, newInserts, setQuotes }} />;
       })}
     </>
   );
 };
 
-export const SpanTextPiece = ({ textItem, newInserts }) => {
+export const SpanTextPiece = ({ textItem, newInserts, setQuotes }) => {
   const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
     ? !!textItem.attributes.background
@@ -28,8 +28,27 @@ export const SpanTextPiece = ({ textItem, newInserts }) => {
     if (!isItQuote) {
       return;
     }
-    console.log(spanFragment.current.getBoundingClientRect());
-    console.log({ newInserts });
+
+    setQuotes((quotes) => {
+      const rect = spanFragment.current.getBoundingClientRect();
+      const turnEl =
+        spanFragment.current.parentElement.parentElement.parentElement;
+      const left = rect.left - turnEl.offsetLeft;
+      const top = rect.top - turnEl.offsetTop;
+
+      return [
+        ...quotes,
+        {
+          id: textItem.attributes.id || new Date().getTime(),
+          width: rect.width,
+          height: rect.height,
+          left,
+          top,
+        },
+      ];
+    });
+    // console.log(spanFragment.current.getBoundingClientRect());
+    // console.log({ newInserts });
   }, []);
 
   return (

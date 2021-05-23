@@ -3,7 +3,7 @@ import { RULE_TURNS_CRUD } from '../config';
 import { dateFormatter } from '../helpers/formatters/dateFormatter';
 import { getShortLink } from '../helpers/formatters/urlFormatter';
 import { youtubeFormatter } from '../helpers/formatters/youtubeFormatter';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import {
   ACTION_DELETE_TURN,
   ACTION_TURN_WAS_CHANGED,
@@ -31,6 +31,10 @@ const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
   const mediaWrapperEl = useRef(null);
   const videoEl = useRef(null);
   const headerEl = useRef(null);
+
+  const [quotes, setQuotes] = useState([]);
+  console.log({ quotes });
+
   // console.log({ wasChanged });
 
   const isParagraphExist = !!paragraph
@@ -236,9 +240,24 @@ const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
         )}
         {isParagraphExist && (
           <p className="paragraphText" ref={paragraphEl}>
-            {getParagraphText(paragraph || [])}
+            {getParagraphText(paragraph || [], setQuotes)}
           </p>
         )}
+      </div>
+
+      <div className="turn-overlay">
+        {quotes.map((quote, i) => {
+          return (
+            <div
+              key={i}
+              style={{
+                ...quote,
+                position: 'absolute',
+                border: '2px solid red',
+              }}
+            ></div>
+          );
+        })}
       </div>
     </div>
   );

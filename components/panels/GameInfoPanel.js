@@ -31,7 +31,15 @@ const GameInfoPanel = ({ game, setGame }) => {
     }
   }, [editedGame]);
 
-  if (!game) return 'Loading...';
+  if (!game)
+    return (
+      <div
+        className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''}`}
+        id="gameInfoPanel"
+      >
+        Loading...
+      </div>
+    );
 
   const { name, description, image, public: publicStatus, codes = [] } = game;
 
