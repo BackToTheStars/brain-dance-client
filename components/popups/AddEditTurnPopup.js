@@ -62,9 +62,20 @@ const AddEditTurnPopup = () => {
         attributes: {
           ...textItem.attributes,
           id: textItem.attributes.id || `quote-${(incId += 1)}`,
+          // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
         },
       };
     });
+
+    const quotes = [];
+
+    for (let textItem of resTextArr) {
+      if (textItem.attributes && textItem.attributes.id) {
+        quotes.push({
+          id: textItem.attributes.id,
+        });
+      }
+    }
 
     let turnObj = {
       ...form,
@@ -76,6 +87,7 @@ const AddEditTurnPopup = () => {
       // y: -top + freeSpaceTopBottom + 50,
       paragraph: resTextArr,
       contentType: activeTemplate,
+      quotes,
     };
     // создать шаг, закрыть модальное окно
     createTurn(turnObj, {

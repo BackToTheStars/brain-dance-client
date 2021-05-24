@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+let incId = Math.floor(new Date().getTime() / 1000);
+
 export const getParagraphText = (arrText, setQuotes) => {
   return (
     <>
@@ -40,6 +42,7 @@ export const SpanTextPiece = ({ textItem, newInserts, setQuotes }) => {
         ...quotes,
         {
           id: textItem.attributes.id || new Date().getTime(),
+          // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
           width: rect.width,
           height: rect.height,
           left,
