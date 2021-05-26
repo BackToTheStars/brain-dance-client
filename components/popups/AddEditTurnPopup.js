@@ -19,6 +19,8 @@ const AddEditTurnPopup = () => {
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const [error, setError] = useState(null);
   const availableFields = settings[activeTemplate].availableFields;
+  const requiredFields = settings[activeTemplate].requiredFields || [];
+  const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
   const { createTurn, turns, dispatch } = useTurnContext();
   // console.log('AddEditTurnPopup');
@@ -61,7 +63,7 @@ const AddEditTurnPopup = () => {
         ...textItem,
         attributes: {
           ...textItem.attributes,
-          id: textItem.attributes.id || `quote-${(incId += 1)}`,
+          id: textItem.attributes.id || (incId += 1),
           // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
         },
       };
@@ -77,8 +79,33 @@ const AddEditTurnPopup = () => {
       }
     }
 
+    const preparedForm = {};
+    for (let fieldToShow of fieldsToShow) {
+      if (
+        !fieldSettings[fieldToShow].special ||
+        availableFields.includes(fieldToShow)
+      ) {
+        preparedForm[fieldToShow] = form[fieldToShow];
+      }
+    }
+
+    for (let requiredField of requiredFields) {
+      if (!preparedForm[requiredField]) {
+        return setError({ message: `Need ${requiredField}` });
+      }
+    }
+
+    if (
+      requiredParagraph &&
+      (!resTextArr ||
+        !resTextArr.length ||
+        (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
+    ) {
+      return setError({ message: 'Need text body' });
+    }
+
     let turnObj = {
-      ...form,
+      ...preparedForm,
       height: 500,
       width: 500,
       x: -zeroPointX + Math.floor(window.innerWidth / 2) - 250,
@@ -150,6 +177,7 @@ const AddEditTurnPopup = () => {
                       defaultChecked={activeTemplate === el}
                       onChange={(e) => {
                         setActiveTemplate(el);
+                        setError(null);
                       }}
                     />
                     <span>{templateSettings.label}</span>

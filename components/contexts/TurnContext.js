@@ -1,10 +1,5 @@
-import {
-  useState,
-  useEffect,
-  useContext,
-  useReducer,
-  createContext,
-} from 'react';
+import { useState, useEffect, useContext, createContext } from 'react';
+import { useReducer } from 'reinspect';
 // import { getTurns } from '../../src/service';
 import { useUserContext } from './UserContext';
 import { useUiContext } from './UI_Context';
@@ -149,7 +144,9 @@ const getScreenRect = (turnObjects) => {
 export const TurnProvider = ({ children }) => {
   const [turnsState, turnsDispatch] = useReducer(
     turnsReducer,
-    turnsInitialState
+    turnsInitialState,
+    (store) => store,
+    'turns'
   );
   const [linesState, linesDispatch] = useReducer(
     linesReducer,

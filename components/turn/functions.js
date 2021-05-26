@@ -9,12 +9,14 @@ export const getParagraphText = (arrText, setQuotes) => {
         // @todo: refactoring
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
         const newInserts = [];
-        for (let arrInsert of arrInserts) {
-          newInserts.push(arrInsert);
-          newInserts.push(<br />);
+        for (let j = 0; j < arrInserts.length; j++) {
+          newInserts.push(arrInserts[j]);
+          newInserts.push(<br key={j} />);
         }
         newInserts.pop();
-        return <SpanTextPiece {...{ textItem, newInserts, setQuotes }} />;
+        return (
+          <SpanTextPiece key={i} {...{ textItem, newInserts, setQuotes }} />
+        );
       })}
     </>
   );
@@ -57,6 +59,7 @@ export const SpanTextPiece = ({ textItem, newInserts, setQuotes }) => {
   return (
     <span
       style={textItem.attributes}
+      data-id={isItQuote ? textItem.attributes.id : ''}
       onClick={() => {
         if (isItQuote && textItem.attributes.id) {
           alert(`Мой id: ${textItem.attributes.id}`);

@@ -183,6 +183,11 @@ const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
     // };
   }, [wrapper]);
 
+  useEffect(() => {
+    if (!imgEl || !imgEl.current) return;
+    imgEl.current.onload = handleResize;
+  }, [imgEl]);
+
   const styles = {
     wrapper: {
       left: `${x}px`,

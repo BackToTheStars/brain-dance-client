@@ -27,16 +27,19 @@ const settings = {
     availableFields: [FIELD_PICTURE],
     value: 'picture',
     label: 'Text / picture',
+    requiredFields: [FIELD_PICTURE],
   },
   [TEMPLATE_VIDEO]: {
     availableFields: [FIELD_VIDEO],
     value: 'video',
     label: 'Text / video',
+    requiredFields: [FIELD_VIDEO],
   },
   [TEMPLATE_COMMENT]: {
     availableFields: [],
     value: 'comment',
     label: 'Comment',
+    requiredParagraph: true,
   },
 };
 
