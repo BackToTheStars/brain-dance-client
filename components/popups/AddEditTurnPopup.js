@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getQuill } from '../helpers/quillHandler';
 import { useUiContext } from '../contexts/UI_Context';
-import { useTurnContext, ACTION_TURN_CREATED } from '../contexts/TurnContext';
+import {
+  useTurnContext,
+  ACTION_TURN_CREATED,
+  ACTION_TURN_WAS_CHANGED,
+} from '../contexts/TurnContext';
 import turnSettings from '../turn/settings';
 
 const {
@@ -22,7 +26,8 @@ const AddEditTurnPopup = () => {
   const requiredFields = settings[activeTemplate].requiredFields || [];
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
-  const { createTurn, turns, dispatch } = useTurnContext();
+  const { createTurn, turns, dispatch, turnToEdit, updateTurn } =
+    useTurnContext();
   // console.log('AddEditTurnPopup');
   // console.log({ turns });
 
@@ -31,6 +36,28 @@ const AddEditTurnPopup = () => {
     createEditTurnPopupIsHidden,
     setCreateEditTurnPopupIsHidden,
   } = useUiContext();
+
+  useEffect(() => {
+    if (!!turnToEdit) {
+      console.log(turnToEdit.date.slice(0, 10));
+      const newForm = {};
+      for (let fieldToShow of fieldsToShow) {
+        if (!!turnToEdit[fieldToShow]) {
+          if (!!fieldSettings[fieldToShow].valueCallback) {
+            newForm[fieldToShow] =
+              fieldSettings[fieldToShow].valueCallback(turnToEdit); // можно использовать не только для даты, но и для других полей
+          } else {
+            newForm[fieldToShow] = turnToEdit[fieldToShow]; // получаем все поля кроме параграфа
+          }
+        }
+      }
+      setForm(newForm);
+      if (turnToEdit.paragraph) {
+        const { quill } = quillConstants;
+        quill.setContents(turnToEdit.paragraph);
+      }
+    } else setForm({});
+  }, [turnToEdit]);
 
   useEffect(() => {
     setQuillConstants(
@@ -116,24 +143,45 @@ const AddEditTurnPopup = () => {
       contentType: activeTemplate,
       quotes,
     };
-    // создать шаг, закрыть модальное окно
-    createTurn(turnObj, {
-      successCallback: (data) => {
-        // console.log('успешный коллбэк на уровне Попапа');
-        setCreateEditTurnPopupIsHidden(true);
-        dispatch({
-          type: ACTION_TURN_CREATED,
-          payload: {
-            ...data.item,
-            x: data.item.x + zeroPointX,
-            y: data.item.y + zeroPointY,
-          },
-        });
-      },
-      errorCallback: (message) => {
-        setError({ message });
-      },
-    });
+
+    if (!!turnToEdit) {
+      // @todo: логика проверки корректности связей
+      updateTurn(turnToEdit._id, turnObj, {
+        successCallback: (data) => {
+          setCreateEditTurnPopupIsHidden(true); // закрыть popup
+          dispatch({
+            type: ACTION_TURN_WAS_CHANGED,
+            payload: {
+              ...data.item,
+              x: data.item.x + zeroPointX,
+              y: data.item.y + zeroPointY,
+            },
+          });
+        },
+        errorCallback: (message) => {
+          setError({ message });
+        },
+      });
+    } else {
+      // создать шаг, закрыть модальное окно
+      createTurn(turnObj, {
+        successCallback: (data) => {
+          // console.log('успешный коллбэк на уровне Попапа');
+          setCreateEditTurnPopupIsHidden(true);
+          dispatch({
+            type: ACTION_TURN_CREATED,
+            payload: {
+              ...data.item,
+              x: data.item.x + zeroPointX,
+              y: data.item.y + zeroPointY,
+            },
+          });
+        },
+        errorCallback: (message) => {
+          setError({ message });
+        },
+      });
+    }
   };
 
   return (

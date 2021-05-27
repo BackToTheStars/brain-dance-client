@@ -8,6 +8,7 @@ const TurnsComponent = () => {
   const { can } = useUserContext();
   const {
     minimapState: { turnsToRender },
+    setCreateEditTurnPopupIsHidden,
   } = useUiContext();
 
   // console.log('turns component', { turns }, ' turnsToRender: ', {
@@ -23,7 +24,15 @@ const TurnsComponent = () => {
           return (
             <Turn
               key={turn._id}
-              {...{ turn, can, dispatch, left, top, deleteTurn }}
+              {...{
+                turn,
+                can,
+                dispatch,
+                left,
+                top,
+                deleteTurn,
+                setCreateEditTurnPopupIsHidden,
+              }}
             />
           );
         })}

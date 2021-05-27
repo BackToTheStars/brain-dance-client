@@ -13,6 +13,7 @@ export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
+export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 const linesInitialState = { lines: [] };
 const linesReducer = (state, action) => {
@@ -27,6 +28,7 @@ const linesReducer = (state, action) => {
 };
 
 const turnsInitialState = {
+  turnToEdit: null,
   turns: [],
   originalTurns: [],
   left: 0,
@@ -86,6 +88,12 @@ const turnsReducer = (state, action) => {
         originalTurns: [...state.originalTurns, action.payload],
       };
     }
+    case ACTION_SET_TURN_TO_EDIT_MODE: {
+      return {
+        ...state,
+        turnToEdit: state.turns.find((turn) => turn._id === action.payload._id),
+      };
+    }
     case ACTION_DELETE_TURN: {
       const { _id } = action.payload;
       return {
@@ -93,6 +101,9 @@ const turnsReducer = (state, action) => {
         originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
         turns: state.turns.filter((turn) => turn._id !== _id),
       };
+    }
+    default: {
+      throw new Error(`unknown action type ${action.type}`);
     }
   }
 };
@@ -185,6 +196,28 @@ export const TurnProvider = ({ children }) => {
       }
     );
   };
+
+  const updateTurn = (id, body, callbacks = {}) => {
+    request(
+      `turns/${id}?hash=${hash}`,
+      {
+        method: 'PUT',
+        tokenFlag: true,
+        body: body,
+      },
+      {
+        successCallback: (data) => {
+          //   console.log('успешный коллбэк на уровне TurnContext');
+          //   console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
   const deleteTurn = (id, callbacks = {}) => {
     request(
       `turns/${id}?hash=${hash}`,
@@ -288,9 +321,11 @@ export const TurnProvider = ({ children }) => {
   const value = {
     saveField,
     turns: turnsState.turns,
+    turnToEdit: turnsState.turnToEdit,
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,
+    updateTurn,
     left: viewPort.left,
     top: viewPort.top,
     linesState,

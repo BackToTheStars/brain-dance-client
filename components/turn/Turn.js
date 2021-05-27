@@ -7,9 +7,18 @@ import { useRef, useEffect, useState } from 'react';
 import {
   ACTION_DELETE_TURN,
   ACTION_TURN_WAS_CHANGED,
+  ACTION_SET_TURN_TO_EDIT_MODE,
 } from '../contexts/TurnContext';
 
-const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
+const Turn = ({
+  turn,
+  can,
+  dispatch,
+  left,
+  top,
+  deleteTurn,
+  setCreateEditTurnPopupIsHidden,
+}) => {
   const {
     _id,
     x,
@@ -54,7 +63,9 @@ const Turn = ({ turn, can, dispatch, left, top, deleteTurn }) => {
 
   const handleEdit = (e) => {
     e.preventDefault();
-    alert('button_edit_clicked');
+    dispatch({ type: ACTION_SET_TURN_TO_EDIT_MODE, payload: { _id } });
+    setCreateEditTurnPopupIsHidden(false);
+    // alert('button_edit_clicked');
   };
 
   const handleDelete = (e) => {

@@ -64,6 +64,7 @@ const fieldSettings = {
     label: 'Date',
     prefixClass: 'date',
     inputType: 'date',
+    valueCallback: (value) => value.date.slice(0, 10),
   },
   [FIELD_SOURCE]: {
     label: 'Source Url',
