@@ -54,7 +54,41 @@ const AddEditTurnPopup = () => {
       setForm(newForm);
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
-        quill.setContents(turnToEdit.paragraph);
+        console.log('set contents');
+        console.log(
+          turnToEdit.paragraph.map((insert) => ({
+            ...insert,
+            attributes: insert.attributes
+              ? {
+                  ...insert.attributes,
+                  border: '1px solid black',
+                  // color: `#${insert.attributes.id}`,
+                  color: '#cccccc',
+                }
+              : {},
+          }))
+        );
+        // quill.setContents(turnToEdit.paragraph);
+        quill.setContents(
+          turnToEdit.paragraph.map((insert) => ({
+            ...insert,
+            attributes: insert.attributes
+              ? {
+                  ...insert.attributes,
+                  border: '1px solid black',
+                  // color: `#${insert.attributes.id}`,
+                  color: '#cccccc',
+                }
+              : {},
+          }))
+        );
+        setTimeout(() => {
+          const spans = document.querySelectorAll('.ql-editor span');
+          let i = 1;
+          for (let span of spans) {
+            span.setAttribute('id', (i += 1));
+          }
+        }, 300);
       }
     } else setForm({});
   }, [turnToEdit]);
@@ -69,6 +103,7 @@ const AddEditTurnPopup = () => {
     e.preventDefault(); // почитать про preventDefault()
     console.log(form);
     const textArr = quillConstants.getQuillTextArr();
+    console.log({ textArr });
     const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
     const { x: zeroPointX, y: zeroPointY } = zeroPoint;
 
@@ -146,6 +181,18 @@ const AddEditTurnPopup = () => {
 
     if (!!turnToEdit) {
       // @todo: логика проверки корректности связей
+      const prevQuotes = turnToEdit.quotes;
+      // quotes
+      const quoteIds = quotes.map((quote) => +quote.id); // map в любом случае возвращает массив
+      const quoteIdsToDelete = prevQuotes
+        .filter((quote) => {
+          debugger;
+          return !quoteIds.includes(+quote.id);
+        }) // + это то же самое что parseFloat
+        .map((quote) => quote.id);
+
+      console.log({ prevQuotes, quotes, quoteIdsToDelete });
+
       updateTurn(turnToEdit._id, turnObj, {
         successCallback: (data) => {
           setCreateEditTurnPopupIsHidden(true); // закрыть popup

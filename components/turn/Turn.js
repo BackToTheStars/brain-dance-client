@@ -42,9 +42,6 @@ const Turn = ({
   const headerEl = useRef(null);
 
   const [quotes, setQuotes] = useState([]);
-  console.log({ quotes });
-
-  // console.log({ wasChanged });
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -179,7 +176,6 @@ const Turn = ({
             height: ui.size.height,
           },
         });
-        console.log(ui);
       },
     });
   }, []);
