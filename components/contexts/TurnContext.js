@@ -14,6 +14,7 @@ export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
+export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
 
 const linesInitialState = { lines: [] };
 const linesReducer = (state, action) => {
@@ -100,6 +101,14 @@ const turnsReducer = (state, action) => {
         ...state,
         originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
         turns: state.turns.filter((turn) => turn._id !== _id),
+      };
+    }
+    case ACTION_QUOTE_CLICKED: {
+      const { turnId, quoteId } = action.payload;
+      //
+      console.log({ turnId, quoteId });
+      return {
+        ...state,
       };
     }
     default: {

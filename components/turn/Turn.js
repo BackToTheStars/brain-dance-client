@@ -8,6 +8,7 @@ import {
   ACTION_DELETE_TURN,
   ACTION_TURN_WAS_CHANGED,
   ACTION_SET_TURN_TO_EDIT_MODE,
+  ACTION_QUOTE_CLICKED,
 } from '../contexts/TurnContext';
 
 const Turn = ({
@@ -57,6 +58,10 @@ const Turn = ({
       console.log(`Unknown video source: "${videoUrl}"`);
     }
   }
+
+  const onQuoteClick = (quoteId) => {
+    dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId: _id, quoteId } });
+  };
 
   const handleEdit = (e) => {
     e.preventDefault();
@@ -252,7 +257,7 @@ const Turn = ({
         )}
         {isParagraphExist && (
           <p className="paragraphText" ref={paragraphEl}>
-            {getParagraphText(paragraph || [], setQuotes)}
+            {getParagraphText(paragraph || [], setQuotes, onQuoteClick)}
           </p>
         )}
       </div>

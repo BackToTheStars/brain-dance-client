@@ -39,7 +39,6 @@ const AddEditTurnPopup = () => {
 
   useEffect(() => {
     if (!!turnToEdit) {
-      console.log(turnToEdit.date.slice(0, 10));
       const newForm = {};
       for (let fieldToShow of fieldsToShow) {
         if (!!turnToEdit[fieldToShow]) {
@@ -54,33 +53,21 @@ const AddEditTurnPopup = () => {
       setForm(newForm);
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
-        console.log('set contents');
-        console.log(
-          turnToEdit.paragraph.map((insert) => ({
-            ...insert,
-            attributes: insert.attributes
-              ? {
-                  ...insert.attributes,
-                  border: '1px solid black',
-                  // color: `#${insert.attributes.id}`,
-                  color: '#cccccc',
-                }
-              : {},
-          }))
-        );
         // quill.setContents(turnToEdit.paragraph);
         quill.setContents(
-          turnToEdit.paragraph.map((insert) => ({
-            ...insert,
-            attributes: insert.attributes
-              ? {
-                  ...insert.attributes,
-                  border: '1px solid black',
-                  // color: `#${insert.attributes.id}`,
-                  color: '#cccccc',
-                }
-              : {},
-          }))
+          turnToEdit.paragraph
+          // .map((insert) => ({
+          //   ...insert,
+          //   attributes: insert.attributes
+          //     ? {
+          //         ...insert.attributes,
+          //         border: '1px solid black',
+          //         // color: `#${insert.attributes.id}`,
+          //         color: '#cccccc',
+          //       }
+          //     : {},
+          // })
+          // )
         );
         setTimeout(() => {
           const spans = document.querySelectorAll('.ql-editor span');
@@ -180,18 +167,19 @@ const AddEditTurnPopup = () => {
     };
 
     if (!!turnToEdit) {
-      // @todo: логика проверки корректности связей
-      const prevQuotes = turnToEdit.quotes;
-      // quotes
-      const quoteIds = quotes.map((quote) => +quote.id); // map в любом случае возвращает массив
-      const quoteIdsToDelete = prevQuotes
-        .filter((quote) => {
-          debugger;
-          return !quoteIds.includes(+quote.id);
-        }) // + это то же самое что parseFloat
-        .map((quote) => quote.id);
+      const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
 
-      console.log({ prevQuotes, quotes, quoteIdsToDelete });
+      if (prevQuotes.length > quotes.length) {
+        const deletedQuotes = prevQuotes.slice(quotes.length);
+        // @todo: удалить связи, которые содержат эти цитаты
+      }
+
+      // const quoteIds = quotes.map((quote) => +quote.id); // map в любом случае возвращает массив
+      // const quoteIdsToDelete = prevQuotes
+      //   .filter((quote) => {
+      //     return !quoteIds.includes(+quote.id); // + это то же самое что parseFloat
+      //   })
+      //   .map((quote) => quote.id);
 
       updateTurn(turnToEdit._id, turnObj, {
         successCallback: (data) => {
