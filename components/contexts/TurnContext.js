@@ -3,6 +3,7 @@ import { useReducer } from 'reinspect';
 // import { getTurns } from '../../src/service';
 import { useUserContext } from './UserContext';
 import { useUiContext } from './UI_Context';
+import { createLiteralTypeNode } from 'typescript';
 
 export const TurnContext = createContext();
 
@@ -15,6 +16,7 @@ export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
+export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
 
 const linesInitialState = { lines: [] };
 const linesReducer = (state, action) => {
@@ -34,6 +36,9 @@ const turnsInitialState = {
   originalTurns: [],
   left: 0,
   top: 0,
+  activeQuote: null,
+  lines: [],
+  lineToAdd: null,
 };
 const turnsReducer = (state, action) => {
   switch (action.type) {
@@ -105,10 +110,53 @@ const turnsReducer = (state, action) => {
     }
     case ACTION_QUOTE_CLICKED: {
       const { turnId, quoteId } = action.payload;
-      //
-      console.log({ turnId, quoteId });
+      // активной цитаты не было
+      if (!state.activeQuote) {
+        return {
+          ...state,
+          activeQuote: { turnId, quoteId },
+        };
+      }
+      // кликнули на ту же цитату
+      if (
+        turnId === state.activeQuote.turnId &&
+        quoteId === state.activeQuote.quoteId
+      ) {
+        return {
+          ...state,
+          activeQuote: null,
+        };
+      }
+      //   console.log({ turnId, quoteId });
+
+      const line = state.lines.find(
+        (line) =>
+          (line.sourceTurnId === turnId &&
+            line.sourceMarker === quoteId &&
+            line.targetTurnId === state.activeQuote.turnId &&
+            line.targetMarker === state.activeQuote.quoteId) ||
+          (line.sourceTurnId === state.activeQuote.turnId &&
+            line.sourceMarker === state.activeQuote.quoteId &&
+            line.targetTurnId === turnId &&
+            line.targetMarker === quoteId)
+      );
+
+      if (line) {
+        return {
+          ...state,
+          activeQuote: { turnId, quoteId },
+        };
+      }
+
       return {
         ...state,
+        activeQuote: { turnId, quoteId },
+        lineToAdd: {
+          sourceTurnId: state.activeQuote.turnId,
+          targetTurnId: turnId,
+          sourceMarker: state.activeQuote.quoteId,
+          targetMarker: quoteId,
+        },
       };
     }
     default: {
@@ -168,6 +216,8 @@ export const TurnProvider = ({ children }) => {
     (store) => store,
     'turns'
   );
+
+  // @todo: remove
   const [linesState, linesDispatch] = useReducer(
     linesReducer,
     linesInitialState
@@ -175,7 +225,7 @@ export const TurnProvider = ({ children }) => {
 
   const [viewPort, setViewPort] = useState({ left: 0, top: 0 });
 
-  const { turns, left, top } = turnsState;
+  const { turns, left, top, lineToAdd } = turnsState;
 
   const {
     request,
@@ -285,6 +335,27 @@ export const TurnProvider = ({ children }) => {
     });
   };
 
+  const createLine = (lineToAdd, callbacks = {}) => {
+    request(
+      `lines?hash=${hash}`,
+      {
+        method: 'POST',
+        tokenFlag: true,
+        body: lineToAdd,
+      },
+      {
+        successCallback: (data) => {
+          console.log('успешный коллбэк createLine');
+          console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
   useEffect(() => {
     request(`turns?hash=${hash}`, {
       tokenFlag: true,
@@ -296,6 +367,12 @@ export const TurnProvider = ({ children }) => {
       // setTurns(data.items);
     });
   }, []);
+
+  useEffect(() => {
+    if (!lineToAdd) return;
+    turnsDispatch({ type: ACTION_LINE_SENT_TO_BACKEND });
+    createLine(lineToAdd);
+  }, [lineToAdd]);
 
   useEffect(() => {
     minimapDispatch({
@@ -331,6 +408,7 @@ export const TurnProvider = ({ children }) => {
     saveField,
     turns: turnsState.turns,
     turnToEdit: turnsState.turnToEdit,
+    activeQuote: turnsState.activeQuote,
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,
