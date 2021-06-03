@@ -36,7 +36,7 @@ const GameComponent = () => {
   // minimapDispatch,
   // } = useUiContext();
 
-  const { dispatch: turnsDispatch, linesDispatch } = useTurnContext();
+  const { dispatch: turnsDispatch } = useTurnContext();
 
   //   const notificationAlert = (note) => {
   //     setNotes((notes) => {
@@ -55,7 +55,8 @@ const GameComponent = () => {
       .then((data) => data.json())
       .then(({ item }) => {
         setGame(item);
-        linesDispatch({ type: ACTION_LINES_INIT, payload: item.redLogicLines });
+        // linesDispatch({ type: ACTION_LINES_INIT, payload: item.redLogicLines });
+        turnsDispatch({ type: ACTION_LINES_INIT, payload: item.lines });
 
         $(gameBox.current).animate(
           {

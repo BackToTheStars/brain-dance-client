@@ -19,6 +19,7 @@ const Turn = ({
   top,
   deleteTurn,
   setCreateEditTurnPopupIsHidden,
+  tempMiddlewareFn,
 }) => {
   const {
     _id,
@@ -77,6 +78,7 @@ const Turn = ({
       deleteTurn(_id, {
         successCallback: () => {
           dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+          tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { _id } });
         },
       });
 

@@ -4,7 +4,8 @@ import { useUiContext } from '../contexts/UI_Context';
 import Turn from './Turn';
 
 const TurnsComponent = () => {
-  const { turns, dispatch, left, top, deleteTurn } = useTurnContext();
+  const { turns, dispatch, left, top, deleteTurn, tempMiddlewareFn } =
+    useTurnContext();
   const { can } = useUserContext();
   const {
     minimapState: { turnsToRender },
@@ -32,6 +33,7 @@ const TurnsComponent = () => {
                 top,
                 deleteTurn,
                 setCreateEditTurnPopupIsHidden,
+                tempMiddlewareFn,
               }}
             />
           );

@@ -3,32 +3,35 @@ import { useReducer } from 'reinspect';
 // import { getTurns } from '../../src/service';
 import { useUserContext } from './UserContext';
 import { useUiContext } from './UI_Context';
-import { createLiteralTypeNode } from 'typescript';
 
 export const TurnContext = createContext();
-
-export const ACTION_LINES_INIT = 'action_lines_init';
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
+
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
 export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
-export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
-export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
 
-const linesInitialState = { lines: [] };
-const linesReducer = (state, action) => {
-  switch (action.type) {
-    case ACTION_LINES_INIT: {
-      return {
-        ...state,
-        lines: action.payload,
-      };
-    }
-  }
-};
+export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
+
+export const ACTION_LINES_INIT = 'action_lines_init';
+export const ACTION_LINES_DELETE = 'action_lines_delete';
+export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
+export const ACTION_LINE_CREATED = 'action_line_created';
+
+// const linesInitialState = { lines: [] };
+// const linesReducer = (state, action) => {
+//   switch (action.type) {
+//     case ACTION_LINES_INIT: {
+//       return {
+//         ...state,
+//         lines: action.payload,
+//       };
+//     }
+//   }
+// };
 
 const turnsInitialState = {
   turnToEdit: null,
@@ -159,6 +162,35 @@ const turnsReducer = (state, action) => {
         },
       };
     }
+
+    case ACTION_LINES_INIT: {
+      return {
+        ...state,
+        lines: action.payload,
+      };
+    }
+    case ACTION_LINES_DELETE: {
+      const lineIds = {};
+      for (let lineToDelete of action.payload) {
+        lineIds[lineToDelete._id] = true;
+      }
+      return {
+        ...state,
+        lines: state.lines.filter((line) => !lineIds[line._id]),
+      };
+    }
+    case ACTION_LINE_SENT_TO_BACKEND: {
+      return {
+        ...state,
+        lineToAdd: null,
+      };
+    }
+    case ACTION_LINE_CREATED: {
+      return {
+        ...state,
+        lines: [...state.lines, action.payload],
+      };
+    }
     default: {
       throw new Error(`unknown action type ${action.type}`);
     }
@@ -218,10 +250,10 @@ export const TurnProvider = ({ children }) => {
   );
 
   // @todo: remove
-  const [linesState, linesDispatch] = useReducer(
-    linesReducer,
-    linesInitialState
-  );
+  // const [linesState, linesDispatch] = useReducer(
+  //   linesReducer,
+  //   linesInitialState
+  // );
 
   const [viewPort, setViewPort] = useState({ left: 0, top: 0 });
 
@@ -371,7 +403,11 @@ export const TurnProvider = ({ children }) => {
   useEffect(() => {
     if (!lineToAdd) return;
     turnsDispatch({ type: ACTION_LINE_SENT_TO_BACKEND });
-    createLine(lineToAdd);
+    createLine(lineToAdd, {
+      successCallback: (data) => {
+        turnsDispatch({ type: ACTION_LINE_CREATED, payload: data.item });
+      },
+    });
   }, [lineToAdd]);
 
   useEffect(() => {
@@ -404,6 +440,23 @@ export const TurnProvider = ({ children }) => {
   //   });
   //   }, [turns]);
 
+  const tempMiddlewareFn = (action) => {
+    // @todo move
+    switch (action.type) {
+      case ACTION_DELETE_TURN:
+        // найти линии по этому шагу
+        const linesToDelete = turnsState.lines.filter(
+          (line) =>
+            line.sourceTurnId === action.payload._id ||
+            line.targetTurnId === action.payload._id
+        );
+        if (!!linesToDelete.length) {
+          turnsDispatch({ type: ACTION_LINES_DELETE, payload: linesToDelete });
+        }
+        break;
+    }
+  };
+
   const value = {
     saveField,
     turns: turnsState.turns,
@@ -415,8 +468,10 @@ export const TurnProvider = ({ children }) => {
     updateTurn,
     left: viewPort.left,
     top: viewPort.top,
-    linesState,
-    linesDispatch,
+    lines: turnsState.lines,
+    tempMiddlewareFn,
+    // linesState,
+    // linesDispatch,
   };
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };

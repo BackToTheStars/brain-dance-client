@@ -7,9 +7,8 @@ import {
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
-  const { dispatch: turnsDispatch, linesState } = useTurnContext();
+  const { dispatch: turnsDispatch, lines } = useTurnContext();
   const { left, right, top, bottom, zeroX, zeroY, turns = [] } = minimapState;
-  const { lines } = linesState;
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
