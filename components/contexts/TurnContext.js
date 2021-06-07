@@ -5,6 +5,7 @@ import { useUserContext } from './UserContext';
 import { useUiContext } from './UI_Context';
 
 export const TurnContext = createContext();
+
 export const ACTION_FIELD_WAS_MOVED = 'action_field_was_moved';
 
 export const ACTION_SET_ORIGINAL_TURNS = 'action_set_original_turns';
@@ -15,6 +16,7 @@ export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
+export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
 
 export const ACTION_LINES_INIT = 'action_lines_init';
 export const ACTION_LINES_DELETE = 'action_lines_delete';
@@ -42,6 +44,7 @@ const turnsInitialState = {
   activeQuote: null,
   lines: [],
   lineToAdd: null,
+  quoteCoords: {},
 };
 const turnsReducer = (state, action) => {
   switch (action.type) {
@@ -160,6 +163,14 @@ const turnsReducer = (state, action) => {
           sourceMarker: state.activeQuote.quoteId,
           targetMarker: quoteId,
         },
+      };
+    }
+
+    case ACTION_QUOTE_COORDS_UPDATED: {
+      const { turnId, quoteCoords } = action.payload;
+      return {
+        ...state,
+        quoteCoords: { ...state.quoteCoords, [turnId]: quoteCoords },
       };
     }
 
@@ -462,6 +473,7 @@ export const TurnProvider = ({ children }) => {
     turns: turnsState.turns,
     turnToEdit: turnsState.turnToEdit,
     activeQuote: turnsState.activeQuote,
+    quoteCoords: turnsState.quoteCoords,
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,

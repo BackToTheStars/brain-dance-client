@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import Line from '../line/line';
 import { useUiContext } from '../contexts/UI_Context';
 
-const getLinesCoords = (lines, turns, turnsToRender) => {
+const getLinesCoords = (lines, turns, turnsToRender, quoteCoords) => {
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, targetTurnId}
 
@@ -25,19 +25,48 @@ const getLinesCoords = (lines, turns, turnsToRender) => {
     ) {
       continue;
     }
+    let sourceCoords = {
+      left: turnsDictionary[line.sourceTurnId].x,
+      top: turnsDictionary[line.sourceTurnId].y,
+      width: 10,
+      height: 10,
+    };
+    let targetCoords = {
+      left: turnsDictionary[line.targetTurnId].x,
+      top: turnsDictionary[line.targetTurnId].y,
+      width: 10,
+      height: 10,
+    };
+    if (line.sourceMarker && quoteCoords[line.sourceTurnId]) {
+      const sourceQuoteCoords = quoteCoords[line.sourceTurnId].find(
+        (quote) => quote.id == line.sourceMarker
+      );
+      if (sourceQuoteCoords) {
+        sourceCoords = {
+          left: turnsDictionary[line.sourceTurnId].x + sourceQuoteCoords.left,
+          top: turnsDictionary[line.sourceTurnId].y + sourceQuoteCoords.top,
+          width: sourceQuoteCoords.width,
+          height: sourceQuoteCoords.height,
+        };
+      }
+    }
+    if (line.targetMarker && quoteCoords[line.targetTurnId]) {
+      const targetQuoteCoords = quoteCoords[line.targetTurnId].find(
+        (quote) => quote.id == line.targetMarker
+      );
+      if (targetQuoteCoords) {
+        targetCoords = {
+          left: turnsDictionary[line.targetTurnId].x + targetQuoteCoords.left,
+          top: turnsDictionary[line.targetTurnId].y + targetQuoteCoords.top,
+          width: targetQuoteCoords.width,
+          height: targetQuoteCoords.height,
+        };
+      }
+    }
+
     resLines.push({
-      sourceCoords: {
-        left: turnsDictionary[line.sourceTurnId].x,
-        top: turnsDictionary[line.sourceTurnId].y,
-        width: 10,
-        height: 10,
-      },
-      targetCoords: {
-        left: turnsDictionary[line.targetTurnId].x,
-        top: turnsDictionary[line.targetTurnId].y,
-        width: 10,
-        height: 10,
-      },
+      sourceCoords,
+      targetCoords,
     });
   }
 
@@ -82,18 +111,12 @@ const QuotesLinesLayer = () => {
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
-  const { lines, turns } = useTurnContext();
+  const { lines, turns, quoteCoords } = useTurnContext();
   const {
     minimapState: { turnsToRender },
   } = useUiContext();
 
-  console.log({
-    lines,
-    turns,
-    turnsToRender,
-  });
-
-  const resLines = getLinesCoords(lines, turns, turnsToRender);
+  const resLines = getLinesCoords(lines, turns, turnsToRender, quoteCoords);
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
 
@@ -107,9 +130,10 @@ const QuotesLinesLayer = () => {
         onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
         ref={svgLayer}
       >
-        {resLines.map((line) => {
+        {resLines.map((line, i) => {
           return (
             <Line
+              key={i}
               sourceCoords={line.sourceCoords}
               targetCoords={line.targetCoords}
             />

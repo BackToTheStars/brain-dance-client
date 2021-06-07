@@ -9,6 +9,7 @@ import {
   ACTION_TURN_WAS_CHANGED,
   ACTION_SET_TURN_TO_EDIT_MODE,
   ACTION_QUOTE_CLICKED,
+  ACTION_QUOTE_COORDS_UPDATED,
 } from '../contexts/TurnContext';
 
 const Turn = ({
@@ -34,6 +35,7 @@ const Turn = ({
     paragraph,
     wasChanged = false,
     scrollPosition, // @todo
+    quotes,
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -43,7 +45,8 @@ const Turn = ({
   const videoEl = useRef(null);
   const headerEl = useRef(null);
 
-  const [quotes, setQuotes] = useState([]);
+  const [quotesWithCoords, setQuotesWithCoords] = useState([]);
+  const [quotesLoaded, setQuotesLoaded] = useState(false);
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -123,6 +126,7 @@ const Turn = ({
       `${maxMediaHeight + $(headerEl.current).height() - 2}px`
     );
     // получить высоту el, вычесть высоту header, сохранить в media wrapper
+
     $(mediaWrapperEl.current).height(
       // @fixme: 1px
       $(wrapper.current).height() + 1 - $(headerEl.current).height()
@@ -137,16 +141,29 @@ const Turn = ({
   };
 
   useEffect(() => {
-    if (!paragraphEl) return;
-    if (!paragraphEl.current) return;
-    const spans = [];
-    paragraphEl.current.querySelectorAll('span').forEach((span) => {
-      spans.push(span);
-    });
-    // console.log({ spans });
-    const quotes = spans.filter((span) => !!span.style.backgroundColor);
-    // console.log({ quotes });
-  }, [paragraphEl]);
+    if (quotesLoaded) return;
+    if (quotesWithCoords.length === quotes.length) {
+      setQuotesLoaded(true);
+    }
+    if (quotesWithCoords.length === quotes.length) {
+      dispatch({
+        type: ACTION_QUOTE_COORDS_UPDATED,
+        payload: { turnId: _id, quoteCoords: quotesWithCoords },
+      });
+    }
+  }, [quotesWithCoords]);
+
+  // useEffect(() => {
+  //   if (!paragraphEl) return;
+  //   if (!paragraphEl.current) return;
+  //   const spans = [];
+  //   paragraphEl.current.querySelectorAll('span').forEach((span) => {
+  //     spans.push(span);
+  //   });
+  //   // console.log({ spans });
+  //   const quotes = spans.filter((span) => !!span.style.backgroundColor);
+  //   // console.log({ quotes });
+  // }, [paragraphEl]);
 
   useEffect(() => {
     $(wrapper.current).draggable({
@@ -259,20 +276,24 @@ const Turn = ({
         )}
         {isParagraphExist && (
           <p className="paragraphText" ref={paragraphEl}>
-            {getParagraphText(paragraph || [], setQuotes, onQuoteClick)}
+            {getParagraphText(
+              paragraph || [],
+              setQuotesWithCoords,
+              onQuoteClick
+            )}
           </p>
         )}
       </div>
 
       <div className="turn-overlay">
-        {quotes.map((quote, i) => {
+        {quotesWithCoords.map((quote, i) => {
           return (
             <div
               key={i}
               style={{
                 ...quote,
                 position: 'absolute',
-                border: '2px solid red',
+                outline: '2px solid red',
               }}
             ></div>
           );
