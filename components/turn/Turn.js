@@ -294,7 +294,9 @@ const Turn = ({
                 ...quote,
                 position: 'absolute',
                 outline: '2px solid red',
+                cursor: 'pointer',
               }}
+              onClick={() => onQuoteClick(quote.id)}
             ></div>
           );
         })}

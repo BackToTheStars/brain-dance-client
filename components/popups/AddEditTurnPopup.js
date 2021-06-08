@@ -104,19 +104,28 @@ const AddEditTurnPopup = () => {
 
     let incId = Math.floor(new Date().getTime() / 1000);
 
-    const resTextArr = textArr.map((textItem) => {
+    const resTextArr = [];
+    let i = 0;
+    for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
-        return textItem;
+        resTextArr.push(textItem);
+        continue;
       }
-      return {
+      const quoteId =
+        !!turnToEdit && turnToEdit.quotes[i]
+          ? turnToEdit.quotes[i].id
+          : (incId += 1);
+      i += 1;
+      resTextArr.push({
         ...textItem,
         attributes: {
           ...textItem.attributes,
-          id: textItem.attributes.id || (incId += 1),
+          id: quoteId,
+          // id: textItem.attributes.id || (incId += 1),
           // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
         },
-      };
-    });
+      });
+    }
 
     const quotes = [];
 

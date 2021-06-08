@@ -1,0 +1,91 @@
+/* REACT TURN */
+
+$black-color: rgb(0, 0, 0);
+
+.react-turn {
+  position: absolute;
+  /* border: 2px solid blue; */
+  z-index: 2;
+
+  .media-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .video iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .picture-content {
+    width: 100%;
+    /* height: 100%; */
+    background: $black-color;
+    img {
+      width: 100%;
+    }
+  }
+}
+
+.react-wrapper {
+  width: 100%;
+  display: flex;
+
+  #modalBackground {
+    /* display: block; */
+  }
+}
+
+.turn-overlay {
+  /* background: rgba(0, 0, 0, 0.7); */
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  /* visibility: hidden; */
+}
+
+.headerTextActions {
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.headerText {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .edit-btn,
+  .delete-btn {
+    transition: 0.2s;
+    font-size: 22px;
+    display: inline-block;
+    margin-left: 14px;
+    cursor: pointer;
+  }
+
+  a.delete-btn,
+  a.edit-btn {
+    font-size: 21px;
+    position: relative;
+    top: -0.5px;
+
+    color: rgb(160, 160, 160);
+    margin-top: 0px;
+  }
+  a.edit-btn:hover {
+    color: rgb(58, 58, 58);
+  }
+  a.delete-btn:hover {
+    color: rgb(255, 92, 92);
+  }
+}
+
+// .react-turn .media-wrapper { вместо нестинга CSS сделали нестинг SASS
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+// }
