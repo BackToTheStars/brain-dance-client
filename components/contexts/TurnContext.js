@@ -3,6 +3,7 @@ import { useReducer } from 'reinspect';
 // import { getTurns } from '../../src/service';
 import { useUserContext } from './UserContext';
 import { useUiContext } from './UI_Context';
+import { getLinesCoords, getLineEnds } from '../helpers/line';
 
 export const TurnContext = createContext();
 
@@ -17,11 +18,13 @@ export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
 export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
+export const ACTION_UPDATE_LINE_ENDS = 'action_update_line_ends';
 
 export const ACTION_LINES_INIT = 'action_lines_init';
 export const ACTION_LINES_DELETE = 'action_lines_delete';
 export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
 export const ACTION_LINE_CREATED = 'action_line_created';
+export const ACTION_RECALCULATE_LINES = 'action_recalculate_lines';
 
 // const linesInitialState = { lines: [] };
 // const linesReducer = (state, action) => {
@@ -45,6 +48,8 @@ const turnsInitialState = {
   lines: [],
   lineToAdd: null,
   quoteCoords: {},
+  linesWithEndCoords: [],
+  lineEnds: {},
 };
 const turnsReducer = (state, action) => {
   switch (action.type) {
@@ -202,6 +207,18 @@ const turnsReducer = (state, action) => {
         lines: [...state.lines, action.payload],
       };
     }
+    case ACTION_RECALCULATE_LINES: {
+      return {
+        ...state,
+        linesWithEndCoords: action.payload,
+      };
+    }
+    case ACTION_UPDATE_LINE_ENDS: {
+      return {
+        ...state,
+        lineEnds: action.payload,
+      };
+    }
     default: {
       throw new Error(`unknown action type ${action.type}`);
     }
@@ -260,6 +277,19 @@ export const TurnProvider = ({ children }) => {
     'turns'
   );
 
+  const {
+    turns,
+    lines,
+    turnToEdit,
+    activeQuote,
+    quoteCoords,
+    linesWithEndCoords,
+    left,
+    top,
+    lineToAdd,
+    lineEnds,
+  } = turnsState;
+
   // @todo: remove
   // const [linesState, linesDispatch] = useReducer(
   //   linesReducer,
@@ -268,13 +298,14 @@ export const TurnProvider = ({ children }) => {
 
   const [viewPort, setViewPort] = useState({ left: 0, top: 0 });
 
-  const { turns, left, top, lineToAdd } = turnsState;
-
   const {
     request,
     info: { hash },
   } = useUserContext();
-  const { minimapDispatch } = useUiContext();
+  const {
+    minimapDispatch,
+    minimapState: { turnsToRender },
+  } = useUiContext();
   // const [originalTurns, setOriginalTurns] = useState([]);
   // const [turns, setTurns] = useState([]);
 
@@ -429,6 +460,23 @@ export const TurnProvider = ({ children }) => {
   }, [turns]);
 
   useEffect(() => {
+    const linesWithEndCoords = getLinesCoords(
+      lines,
+      turns,
+      turnsToRender,
+      quoteCoords
+    );
+    turnsDispatch({
+      type: ACTION_RECALCULATE_LINES,
+      payload: linesWithEndCoords,
+    });
+    turnsDispatch({
+      type: ACTION_UPDATE_LINE_ENDS,
+      payload: getLineEnds(linesWithEndCoords),
+    });
+  }, [lines, turns, turnsToRender, quoteCoords]);
+
+  useEffect(() => {
     setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
     minimapDispatch({
       type: 'VIEWPORT_MOVED_ON_FIELD',
@@ -470,10 +518,12 @@ export const TurnProvider = ({ children }) => {
 
   const value = {
     saveField,
-    turns: turnsState.turns,
-    turnToEdit: turnsState.turnToEdit,
-    activeQuote: turnsState.activeQuote,
-    quoteCoords: turnsState.quoteCoords,
+    turns,
+    turnToEdit,
+    activeQuote,
+    quoteCoords,
+    linesWithEndCoords,
+    lineEnds, // концы линий с цитатами
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,

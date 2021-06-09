@@ -4,8 +4,16 @@ import { useUiContext } from '../contexts/UI_Context';
 import Turn from './Turn';
 
 const TurnsComponent = () => {
-  const { turns, dispatch, left, top, deleteTurn, tempMiddlewareFn } =
-    useTurnContext();
+  const {
+    turns,
+    dispatch,
+    left,
+    top,
+    deleteTurn,
+    tempMiddlewareFn,
+    lineEnds,
+    activeQuote,
+  } = useTurnContext();
   const { can } = useUserContext();
   const {
     minimapState: { turnsToRender },
@@ -34,6 +42,8 @@ const TurnsComponent = () => {
                 deleteTurn,
                 setCreateEditTurnPopupIsHidden,
                 tempMiddlewareFn,
+                lineEnds,
+                activeQuote, // активная цитата, на которую кликнули мышкой
               }}
             />
           );

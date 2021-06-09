@@ -21,6 +21,8 @@ const Turn = ({
   deleteTurn,
   setCreateEditTurnPopupIsHidden,
   tempMiddlewareFn,
+  lineEnds,
+  activeQuote,
 }) => {
   const {
     _id,
@@ -285,22 +287,30 @@ const Turn = ({
         )}
       </div>
 
-      <div className="turn-overlay">
+      <>
         {quotesWithCoords.map((quote, i) => {
+          let bordered = !!lineEnds[quote.id]; // проверка нужно показывать рамку или нет
+          if (
+            activeQuote &&
+            activeQuote.turnId === _id &&
+            activeQuote.quoteId === quote.id
+          ) {
+            bordered = true;
+          }
           return (
             <div
               key={i}
               style={{
                 ...quote,
                 position: 'absolute',
-                outline: '2px solid red',
+                outline: bordered ? '2px solid red' : '0px solid transparent',
                 cursor: 'pointer',
               }}
               onClick={() => onQuoteClick(quote.id)}
             ></div>
           );
         })}
-      </div>
+      </>
     </div>
   );
 };
