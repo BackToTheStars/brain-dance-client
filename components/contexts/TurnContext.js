@@ -47,7 +47,7 @@ const turnsInitialState = {
   activeQuote: null,
   lines: [],
   lineToAdd: null,
-  quoteCoords: {},
+  quotesInfo: {},
   linesWithEndCoords: [],
   lineEnds: {},
 };
@@ -172,10 +172,10 @@ const turnsReducer = (state, action) => {
     }
 
     case ACTION_QUOTE_COORDS_UPDATED: {
-      const { turnId, quoteCoords } = action.payload;
+      const { turnId, quotesInfo } = action.payload;
       return {
         ...state,
-        quoteCoords: { ...state.quoteCoords, [turnId]: quoteCoords },
+        quotesInfo: { ...state.quotesInfo, [turnId]: quotesInfo },
       };
     }
 
@@ -282,7 +282,7 @@ export const TurnProvider = ({ children }) => {
     lines,
     turnToEdit,
     activeQuote,
-    quoteCoords,
+    quotesInfo,
     linesWithEndCoords,
     left,
     top,
@@ -362,6 +362,25 @@ export const TurnProvider = ({ children }) => {
         successCallback: (data) => {
           //   console.log('успешный коллбэк на уровне TurnContext');
           //   console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
+  const deleteLines = (ids, callbacks = {}) => {
+    request(
+      `lines?hash=${hash}`,
+      {
+        method: 'DELETE',
+        tokenFlag: true,
+        body: ids,
+      },
+      {
+        successCallback: (data) => {
           if (callbacks.successCallback) {
             callbacks.successCallback(data);
           }
@@ -464,7 +483,7 @@ export const TurnProvider = ({ children }) => {
       lines,
       turns,
       turnsToRender,
-      quoteCoords
+      quotesInfo
     );
     turnsDispatch({
       type: ACTION_RECALCULATE_LINES,
@@ -474,7 +493,7 @@ export const TurnProvider = ({ children }) => {
       type: ACTION_UPDATE_LINE_ENDS,
       payload: getLineEnds(linesWithEndCoords),
     });
-  }, [lines, turns, turnsToRender, quoteCoords]);
+  }, [lines, turns, turnsToRender, quotesInfo]);
 
   useEffect(() => {
     setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
@@ -521,13 +540,14 @@ export const TurnProvider = ({ children }) => {
     turns,
     turnToEdit,
     activeQuote,
-    quoteCoords,
+    quotesInfo,
     linesWithEndCoords,
     lineEnds, // концы линий с цитатами
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,
     updateTurn,
+    deleteLines,
     left: viewPort.left,
     top: viewPort.top,
     lines: turnsState.lines,

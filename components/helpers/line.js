@@ -1,4 +1,4 @@
-export const getLinesCoords = (lines, turns, turnsToRender, quoteCoords) => {
+export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, targetTurnId}
 
@@ -32,8 +32,8 @@ export const getLinesCoords = (lines, turns, turnsToRender, quoteCoords) => {
       width: 10,
       height: 10,
     };
-    if (line.sourceMarker && quoteCoords[line.sourceTurnId]) {
-      const sourceQuoteCoords = quoteCoords[line.sourceTurnId].find(
+    if (line.sourceMarker && quotesInfo[line.sourceTurnId]) {
+      const sourceQuoteCoords = quotesInfo[line.sourceTurnId].find(
         (quote) => quote.id == line.sourceMarker
       );
       if (sourceQuoteCoords) {
@@ -46,8 +46,8 @@ export const getLinesCoords = (lines, turns, turnsToRender, quoteCoords) => {
         };
       }
     }
-    if (line.targetMarker && quoteCoords[line.targetTurnId]) {
-      const targetQuoteCoords = quoteCoords[line.targetTurnId].find(
+    if (line.targetMarker && quotesInfo[line.targetTurnId]) {
+      const targetQuoteCoords = quotesInfo[line.targetTurnId].find(
         (quote) => quote.id == line.targetMarker
       );
       if (targetQuoteCoords) {

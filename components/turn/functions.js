@@ -57,6 +57,7 @@ export const SpanTextPiece = ({
           height: rect.height,
           left,
           top,
+          text: textItem.insert.trim(),
         },
       ];
     });

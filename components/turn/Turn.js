@@ -150,7 +150,7 @@ const Turn = ({
     if (quotesWithCoords.length === quotes.length) {
       dispatch({
         type: ACTION_QUOTE_COORDS_UPDATED,
-        payload: { turnId: _id, quoteCoords: quotesWithCoords },
+        payload: { turnId: _id, quotesInfo: quotesWithCoords },
       });
     }
   }, [quotesWithCoords]);
