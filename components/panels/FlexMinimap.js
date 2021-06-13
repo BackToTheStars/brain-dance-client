@@ -12,7 +12,7 @@ const FlexMinimap = ({ gameBox }) => {
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 800;
+  const maxMinimapSizeWidthPlusHeight = 700;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 

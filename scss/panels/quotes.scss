@@ -1,0 +1,16 @@
+.quotes-panel {
+  position: absolute;
+  left: 570px;
+  bottom: 30px;
+  background-color: white;
+  min-width: 300px;
+  z-index: 4;
+  border-radius: 3px;
+  overflow: hidden;
+  table {
+    width: 100%;
+    &.table th {
+      padding: 0.4rem;
+    }
+  }
+}

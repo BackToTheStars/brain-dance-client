@@ -114,18 +114,6 @@ button {
   z-index: 3;
 }
 
-.quotes-panel {
-  position: absolute;
-  left: 570px;
-  bottom: 30px;
-  background-color: white;
-  min-width: 300px;
-  z-index: 4;
-}
-.quotes-panel table {
-  width: 100%;
-}
-
 #classMenu.hidden {
   transform: translateX(-100%);
   /* display: none;

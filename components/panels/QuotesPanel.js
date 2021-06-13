@@ -31,14 +31,14 @@ const QuotesPanel = () => {
         {activeQuote.turnId} {activeQuote.quoteId}
       </div> */}
       {!!lines.length && (
-        <table>
+        <table className="table table-striped mb-0">
           <thead>
             <tr>
               <th>Author</th>
               <th>Type</th>
               <th>From</th>
               <th>To</th>
-              {can(RULE_TURNS_CRUD) && <th>actions</th>}
+              {can(RULE_TURNS_CRUD) && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>

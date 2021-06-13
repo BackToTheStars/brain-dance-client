@@ -188,7 +188,7 @@ const turnsReducer = (state, action) => {
     case ACTION_LINES_DELETE: {
       const lineIds = {};
       for (let lineToDelete of action.payload) {
-        lineIds[lineToDelete._id] = true;
+        lineIds[lineToDelete] = true;
       }
       return {
         ...state,
