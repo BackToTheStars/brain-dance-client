@@ -36,27 +36,6 @@ body {
   z-index: 4;
 }
 
-.gameFieldWrapper {
-  height: 100vh;
-  /* overflow-x: auto;
-  overflow-y: auto; */
-  overflow: hidden;
-  background: #595959;
-  /* border: 1px solid blue; */
-}
-
-#gameBox {
-  /* min-height: 1000px; */
-  border: none;
-  width: 100vw;
-  /* Было 100%, линии сбивались */
-  height: 100vh;
-  /* Было 100%, линии сбивались */
-  overflow: hidden;
-  background: #595959;
-  /* #728db8; */
-}
-
 #image-url-wrapper {
   display: none;
 }

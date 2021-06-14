@@ -125,6 +125,7 @@ const GameComponent = () => {
       <div className="col p0">
         <div className="gameFieldWrapper">
           <div id="gameBox" className="ui-widget-content" ref={gameBox}>
+            {/* <div className="doodlePic"></div> */}
             <TurnsComponent />
             <QuotesLinesLayer />
           </div>

@@ -5,7 +5,7 @@ import { useUiContext } from '../contexts/UI_Context';
 
 const QuotesLinesLayer = () => {
   const svgLayer = useRef();
-  const [svgLayerZIndex, setSvgLayerZIndex] = useState(false);
+  const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context

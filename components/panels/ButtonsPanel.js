@@ -42,7 +42,9 @@ const ButtonsPanel = () => {
         Classes
       </button>
       {/* <button id="show-minimap-btn">Minimap</button> */}
-      <button id="go-to-lobby">Lobby</button>
+      <button id="go-to-lobby" onClick={() => window.location.replace('/')}>
+        Lobby
+      </button>
       {can(RULE_VIEW) && (
         <button
           id="game-info-panel-btn"
