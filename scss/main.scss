@@ -1,6 +1,15 @@
+@import './variables.scss';
+
 @import './style1.scss';
 @import './style2.scss';
+
 @import './modal.scss';
+
 @import './game/turn.scss';
 @import './game/field.scss';
+
+@import './panels/panel.scss';
 @import './panels/quotes.scss';
+@import './panels/minimap.scss';
+@import './panels/buttons.scss';
+@import './panels/classes.scss';

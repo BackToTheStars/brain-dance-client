@@ -6,7 +6,7 @@ const ClassesPanel = () => {
   } = useUiContext();
   return (
     <div
-      className={['p0', classesPanelIsHidden ? 'hidden' : ''].join(' ')}
+      className={`${classesPanelIsHidden ? 'hidden' : ''} po panel`}
       id="classMenu"
     />
   );

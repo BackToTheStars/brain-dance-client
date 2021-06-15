@@ -27,15 +27,6 @@ body {
   border: none;
 }
 
-.actions {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  padding: 5px;
-  border: 0px solid #eee;
-  z-index: 4;
-}
-
 #image-url-wrapper {
   display: none;
 }
@@ -93,12 +84,6 @@ button {
   z-index: 3;
 }
 
-#classMenu.hidden {
-  transform: translateX(-100%);
-  /* display: none;
-    width: 0; */
-}
-
 #gameInfoPanel {
   transition: 0.3s;
   position: absolute;
@@ -118,176 +103,6 @@ button {
 
 .p0 {
   padding: 0;
-}
-
-.video {
-  position: relative;
-}
-
-.iframe-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 0;
-  background-color: rgba(255, 255, 255, 0);
-}
-
-.ui-resizable-resizing .iframe-overlay {
-  height: 100%;
-}
-
-.textBox .picture-content {
-  object-fit: contain;
-  max-height: 100%;
-  max-width: 100%;
-}
-
-.zero-point-type {
-  display: none;
-}
-
-.textBox.comment-type .paragraphText {
-  height: 100%;
-  overflow-y: hidden;
-}
-
-.textBox.comment-type .paragraphText,
-.textBox.comment-type .headerText {
-  background: rgb(236, 237, 154);
-}
-
-/* два вместе, это два класса вместе, а пробел, это вложенность */
-
-.ql-container {
-  font-size: 1.35rem;
-}
-
-/* подписи для ссылки и для даты */
-.left-bottom-label,
-.right-bottom-label {
-  position: absolute;
-  /* bottom: -21px; */
-  bottom: 5px;
-  transform: translateY(100%);
-  padding: 5px;
-  color: #fff;
-  font-size: 1.2rem;
-}
-
-.left-bottom-label {
-  left: 0;
-}
-
-.left-bottom-label a {
-  color: #fff;
-}
-
-.right-bottom-label {
-  right: 0;
-}
-.addclass {
-  font-size: 1.4rem;
-}
-.class-list {
-  padding-left: 0;
-  padding-right: 0;
-  font-size: 1.1rem;
-}
-
-.class-list .title-block {
-  padding-left: 3%;
-  outline: 1px solid #000;
-  height: 24px;
-  font-weight: 600;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-content: center;
-  align-items: center;
-  background-color: lightgrey;
-}
-
-.class-list .title-block .title-name-input {
-  padding: 0;
-  margin: 0;
-  margin-top: 1px;
-  border: 2px solid #000;
-  height: 100%;
-  width: 100%;
-}
-
-.class-list .el {
-  background: #fff;
-  padding-left: 7%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-content: center;
-}
-
-.class-list input {
-  margin-left: 3%;
-  width: 65%;
-  display: inline-block;
-}
-
-#newClassName {
-  margin-left: 5%;
-  width: 70%;
-  display: inline-block;
-}
-
-#classMenu {
-  transition: 0.3s;
-  background-color: #fff;
-  overflow-y: scroll;
-  height: 100vh;
-  width: 500px;
-  position: absolute;
-  z-index: 4;
-}
-
-.title-button-add {
-  background: url('/icons/add.svg') no-repeat center center;
-  border: none;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.title-button-edit {
-  background: url('/icons/edit.svg') no-repeat center center;
-  border: none;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.title-button-delete {
-  background: url('/icons/delete.svg') no-repeat center center;
-  border: none;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-.subclasses-block p {
-  margin: 0;
-  padding: 0;
-  flex-shrink: 1;
-  flex-grow: 1;
-}
-
-.subclasses-block button {
-  flex-shrink: 0;
-  flex-grow: 0;
 }
 
 #notificationPanel {

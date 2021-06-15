@@ -8,11 +8,20 @@ import {
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
   const { dispatch: turnsDispatch, lines } = useTurnContext();
-  const { left, right, top, bottom, zeroX, zeroY, turns = [] } = minimapState;
+  const {
+    left,
+    right,
+    top,
+    bottom,
+    zeroX,
+    zeroY,
+    turns = [],
+    isHidden,
+  } = minimapState;
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 700;
+  const maxMinimapSizeWidthPlusHeight = 650;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
@@ -111,7 +120,7 @@ const FlexMinimap = ({ gameBox }) => {
   value.lines = getLinesByTurns(value.turns, lines);
 
   return (
-    <div className="flex-minimap">
+    <div className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}>
       <SVGMiniMap {...value} />
     </div>
   );

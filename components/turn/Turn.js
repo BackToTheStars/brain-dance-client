@@ -38,6 +38,7 @@ const Turn = ({
     wasChanged = false,
     scrollPosition, // @todo
     quotes,
+    contentType,
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -231,7 +232,11 @@ const Turn = ({
   };
 
   return (
-    <div ref={wrapper} className="react-turn" style={styles.wrapper}>
+    <div
+      ref={wrapper}
+      className={`${contentType} react-turn`}
+      style={styles.wrapper}
+    >
       <h5 className="headerText" ref={headerEl}>
         <div className="headerTextTitle">{header}</div>
         <div className="headerTextActions">

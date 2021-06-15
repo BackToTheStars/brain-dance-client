@@ -48,13 +48,3 @@ body {
 .games-list__item {
   cursor: pointer;
 }
-
-.flex-minimap {
-  position: fixed;
-  /* width: 300px; */
-  right: 0px;
-  bottom: 0px;
-  z-index: 3;
-  background-color: rgba(49, 51, 51, 1);
-}
-
