@@ -1,5 +1,5 @@
-import { useState, useContext, useReducer, createContext } from 'react';
-
+import { useState, useContext, createContext } from 'react';
+import { useReducer } from 'reinspect';
 export const UI_Context = createContext();
 const initialState = {
   classesPanelIsHidden: true,
@@ -23,6 +23,7 @@ const minimapInitialState = {
   zeroX: 0,
   zeroY: 0,
   turnsToRender: [],
+  minimapSize: { left: 0, top: 0, width: 0, height: 0 }, // размеры миникарты приходят из DOM (из компонента миникарты)
 };
 
 const minimapReducer = (state, action) => {
@@ -69,6 +70,12 @@ const minimapReducer = (state, action) => {
         turnsToRender: action.payload,
       };
     }
+    case 'MINIMAP_SIZE_UPDATED': {
+      return {
+        ...state,
+        minimapSize: action.payload,
+      };
+    }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);
     }
@@ -76,7 +83,12 @@ const minimapReducer = (state, action) => {
 };
 
 export const UI_Provider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialState,
+    (store) => store,
+    'ui'
+  );
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
   const [gameInfoPanelIsHidden, setGameInfoPanelIsHidden] = useState(true);
   const [createEditTurnPopupIsHidden, setCreateEditTurnPopupIsHidden] =
@@ -84,7 +96,9 @@ export const UI_Provider = ({ children }) => {
 
   const [minimapState, minimapDispatch] = useReducer(
     minimapReducer,
-    minimapInitialState
+    minimapInitialState,
+    (store) => store,
+    'minimap'
   );
 
   return (

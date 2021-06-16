@@ -1,6 +1,6 @@
 #classMenu {
   // background-color: #fff;
-  overflow-y: scroll;
+  overflow-y: auto;
   height: calc(100vh - 2 * #{$panels-spacer});
   width: 500px;
   top: $panels-spacer;

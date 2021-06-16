@@ -1,5 +1,5 @@
 import { useUiContext } from '../contexts/UI_Context';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   useTurnContext,
   ACTION_FIELD_WAS_MOVED,
@@ -18,6 +18,8 @@ const FlexMinimap = ({ gameBox }) => {
     turns = [],
     isHidden,
   } = minimapState;
+
+  const minimapPnlRef = useRef(null);
   const widthPx = right - left; // ширина всего поля
   const heightPx = bottom - top; // высота всего поля
 
@@ -114,13 +116,29 @@ const FlexMinimap = ({ gameBox }) => {
     .map((turn) => turn._id); // отфильтровали какие ходы рендерить на экране
 
   useEffect(() => {
+    // @todo: оптимизировать
     minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
   }, [turns]); // массив с id тех ходов, которые нужно render
+
+  useEffect(() => {
+    if (!minimapPnlRef.current) return;
+    setTimeout(() => {
+      const { left, top, width, height } =
+        minimapPnlRef.current.getBoundingClientRect();
+      minimapDispatch({
+        type: 'MINIMAP_SIZE_UPDATED',
+        payload: { left, top, width, height },
+      });
+    }, 250);
+  }, [isHidden, left, right, top, bottom]); // подумать ещё, при изменениях самой миникарты, ширины и проч.
 
   value.lines = getLinesByTurns(value.turns, lines);
 
   return (
-    <div className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}>
+    <div
+      className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}
+      ref={minimapPnlRef}
+    >
       <SVGMiniMap {...value} />
     </div>
   );

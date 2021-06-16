@@ -1,13 +1,30 @@
 import { useUiContext } from '../contexts/UI_Context';
+import { useEffect, useState } from 'react';
+
+const panelSpacer = 10;
 
 const ClassesPanel = () => {
   const {
     state: { classesPanelIsHidden },
+    minimapState: { minimapSize, isHidden },
   } = useUiContext();
+
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    if (classesPanelIsHidden) return;
+    if (isHidden) {
+      setHeight(window.innerHeight - 2 * panelSpacer); // отправили доступную высоту для панели классов в State
+    } else {
+      setHeight(minimapSize.top - 2 * panelSpacer);
+    }
+  }, [minimapSize, isHidden, classesPanelIsHidden]);
+
   return (
     <div
       className={`${classesPanelIsHidden ? 'hidden' : ''} po panel`}
       id="classMenu"
+      style={{ height: `${height}px` }}
     />
   );
 };
