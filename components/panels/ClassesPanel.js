@@ -1,7 +1,6 @@
 import { useUiContext } from '../contexts/UI_Context';
 import { useEffect, useState } from 'react';
-
-const panelSpacer = 10;
+import { panelSpacer } from './сonst';
 
 const ClassesPanel = () => {
   const {
@@ -25,7 +24,59 @@ const ClassesPanel = () => {
       className={`${classesPanelIsHidden ? 'hidden' : ''} po panel`}
       id="classMenu"
       style={{ height: `${height}px` }}
-    />
+    >
+      <ClassList />
+    </div>
+  );
+};
+
+const getNextId = (classes) => {
+  let max = 1;
+  for (const classItem of classes) {
+    if (classItem.id > max) {
+      max = classItem.id;
+    }
+  }
+  return max + 1;
+};
+
+const ClassList = () => {
+  const [classes, setClasses] = useState([]);
+  const [title, setTitle] = useState('');
+
+  const addClass = (e) => {
+    e.preventDefault();
+    setClasses([
+      ...classes,
+      {
+        id: getNextId(classes),
+        title,
+      },
+    ]);
+    setTitle('');
+  };
+
+  return (
+    <div className="p-2">
+      <form className="form-inline" onSubmit={addClass}>
+        <input
+          type="text"
+          value={title}
+          className="form-group"
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+        />
+        <button className="btn btn-primary">Add</button>
+      </form>
+      {classes.map((classItem, i) => {
+        return (
+          <div className="class-item" key={i}>
+            {classItem.title}
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

@@ -1,8 +1,9 @@
 .panel {
   position: fixed;
-  z-index: 3;
+  z-index: 4;
   background-color: $dark-grey;
   border: 2px solid $light-grey;
   border-radius: 9px;
   transition: 0.2s;
+  color: $white;
 }

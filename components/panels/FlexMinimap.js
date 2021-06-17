@@ -4,6 +4,7 @@ import {
   useTurnContext,
   ACTION_FIELD_WAS_MOVED,
 } from '../contexts/TurnContext';
+import { panelSpacer } from './сonst';
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
@@ -122,21 +123,41 @@ const FlexMinimap = ({ gameBox }) => {
 
   useEffect(() => {
     if (!minimapPnlRef.current) return;
-    setTimeout(() => {
-      const { left, top, width, height } =
-        minimapPnlRef.current.getBoundingClientRect();
+    // setTimeout(() => {
+    const { left, top, width, height } =
+      minimapPnlRef.current.getBoundingClientRect();
+    if (isHidden) {
       minimapDispatch({
         type: 'MINIMAP_SIZE_UPDATED',
-        payload: { left, top, width, height },
+        payload: {
+          left,
+          top: window.innerHeight + 0.2 * height,
+          width,
+          height,
+        },
       });
-    }, 250);
+    } else {
+      minimapDispatch({
+        type: 'MINIMAP_SIZE_UPDATED',
+        payload: {
+          left,
+          top: window.innerHeight - height - panelSpacer,
+          width,
+          height,
+        },
+      });
+    }
+    // }, 250);
   }, [isHidden, left, right, top, bottom]); // подумать ещё, при изменениях самой миникарты, ширины и проч.
 
   value.lines = getLinesByTurns(value.turns, lines);
+  const style = { transform: `translateY(${isHidden ? '120%' : '0%'})` }; // контролируем стиль из компонента
 
   return (
     <div
-      className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}
+      // className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}
+      style={style}
+      className="flex-minimap panel"
       ref={minimapPnlRef}
     >
       <SVGMiniMap {...value} />
