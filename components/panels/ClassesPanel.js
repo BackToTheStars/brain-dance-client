@@ -44,6 +44,10 @@ const ClassList = () => {
   const [classes, setClasses] = useState([]);
   const [title, setTitle] = useState('');
 
+  const removeClass = (classId) => {
+    setClasses(classes.filter((classItem) => classItem.id !== classId));
+  };
+
   const addClass = (e) => {
     e.preventDefault();
     setClasses([
@@ -58,24 +62,71 @@ const ClassList = () => {
 
   return (
     <div className="p-2">
-      <form className="form-inline" onSubmit={addClass}>
+      <form className="form-inline d-flex" onSubmit={addClass}>
         <input
           type="text"
           value={title}
-          className="form-group"
+          className="form-group mr-2 flex-grow-1"
           onChange={(e) => {
             setTitle(e.target.value);
           }}
         />
         <button className="btn btn-primary">Add</button>
       </form>
-      {classes.map((classItem, i) => {
-        return (
-          <div className="class-item" key={i}>
-            {classItem.title}
+      {classes.map((classItem, i) => (
+        <ClassComponent
+          key={classItem.id}
+          classItem={classItem}
+          removeClass={removeClass}
+        />
+      ))}
+    </div>
+  );
+};
+
+export const ClassComponent = ({ classItem, removeClass }) => {
+  const [editTitleMode, setEditTitleMode] = useState(false);
+  const [title, setTitle] = useState(classItem.title);
+
+  return (
+    <div className="class-item">
+      {editTitleMode ? (
+        <div className="d-flex pt-2 class-title-row">
+          <input
+            className="mr-2 flex-grow-1"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <button
+            className="btn btn-success"
+            onClick={(e) => setEditTitleMode(false)}
+          >
+            {/* <img src="/icons/ok.svg" /> */}Ok
+          </button>
+        </div>
+      ) : (
+        <div className="d-flex pt-2 class-title-row">
+          <div className="mr-3">{title}</div>
+          <div className="btn-group classes-btn-group">
+            <button className="btn btn-success">
+              <img src="/icons/add.svg" />
+            </button>
+            <button
+              className="btn btn-success"
+              onClick={(e) => setEditTitleMode(true)}
+            >
+              <img src="/icons/edit.svg" />
+            </button>
+            <button
+              className="btn btn-success"
+              onClick={() => removeClass(classItem.id)}
+            >
+              <img src="/icons/delete.svg" />
+            </button>
           </div>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 };
