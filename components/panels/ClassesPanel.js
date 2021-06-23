@@ -50,13 +50,15 @@ const ClassList = () => {
 
   const addClass = (e) => {
     e.preventDefault();
-    setClasses([
+    const newClasses = [
       ...classes,
       {
         id: getNextId(classes),
         title,
+        subClasses: [],
       },
-    ]);
+    ];
+    setClasses(newClasses);
     setTitle('');
   };
 
@@ -88,8 +90,32 @@ export const ClassComponent = ({ classItem, removeClass }) => {
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
 
+  // для SubClasses
+  const [editSubclassMode, setEditSubclassMode] = useState(false);
+  const [subClassTitle, setSubClassTitle] = useState('');
+  const [subClasses, setSubClasses] = useState([]);
+
+  const handleAddSubClass = (e) => {
+    e.preventDefault();
+    setEditSubclassMode(true);
+  };
+
+  const addSubClass = (e) => {
+    e.preventDefault();
+    const newSubClasses = [
+      ...subClasses,
+      {
+        id: Math.floor(Math.random() * 10000000000000000).toString(),
+        title: subClassTitle,
+      },
+    ];
+    setSubClasses(newSubClasses);
+    setEditSubclassMode(false);
+    setSubClassTitle('');
+  };
+
   return (
-    <div className="class-item">
+    <div className="class-item mb-3">
       {editTitleMode ? (
         <div className="d-flex pt-2 class-title-row">
           <input
@@ -109,7 +135,7 @@ export const ClassComponent = ({ classItem, removeClass }) => {
         <div className="d-flex pt-2 class-title-row">
           <div className="mr-3">{title}</div>
           <div className="btn-group classes-btn-group">
-            <button className="btn btn-success">
+            <button className="btn btn-success" onClick={handleAddSubClass}>
               <img src="/icons/add.svg" />
             </button>
             <button
@@ -126,6 +152,28 @@ export const ClassComponent = ({ classItem, removeClass }) => {
             </button>
           </div>
         </div>
+      )}
+
+      {editSubclassMode ? (
+        <div className="p-2">
+          <form className="form-inline d-flex" onSubmit={addSubClass}>
+            <input
+              className="mr-2 flex-grow-1"
+              type="text"
+              value={subClassTitle}
+              onChange={(e) => setSubClassTitle(e.target.value)}
+            />
+            <button className="btn btn-success" onClick={addSubClass}>
+              Add
+            </button>
+          </form>
+        </div>
+      ) : (
+        subClasses.map((subClass) => (
+          <div key={subClass.id} className="mr-3 ml-3">
+            {subClass.title}
+          </div>
+        ))
       )}
     </div>
   );
