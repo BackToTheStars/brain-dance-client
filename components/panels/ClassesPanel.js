@@ -2,6 +2,7 @@ import { useUiContext } from '../contexts/UI_Context';
 import { useEffect, useState } from 'react';
 import { panelSpacer } from './сonst';
 import ClassList from '../classes/ClassList';
+import { ClassProvider } from '../contexts/ClassContext';
 
 const ClassesPanel = () => {
   const {
@@ -26,7 +27,9 @@ const ClassesPanel = () => {
       id="classMenu"
       style={{ height: `${height}px` }}
     >
-      <ClassList />
+      <ClassProvider>
+        <ClassList />
+      </ClassProvider>
     </div>
   );
 };

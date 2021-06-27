@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import ClassComponent from './ClassComponent';
 import { getNextId } from './functions';
+import { useClassContext } from '../contexts/ClassContext';
 
 const ClassList = () => {
-  const [classes, setClasses] = useState([]);
+  const { defaultClasses } = useClassContext();
+
+  const [classes, setClasses] = useState(defaultClasses);
   const [title, setTitle] = useState('');
 
   const removeClass = (classId) => {
