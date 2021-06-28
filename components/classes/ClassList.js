@@ -1,29 +1,36 @@
 import { useState } from 'react';
 import ClassComponent from './ClassComponent';
 import { getNextId } from './functions';
-import { useClassContext } from '../contexts/ClassContext';
+import { useClassContext, ACTION_CLASS_ADD } from '../contexts/ClassContext';
 
 const ClassList = () => {
-  const { defaultClasses } = useClassContext();
+  const { classesTree: classes, classesDispatch } = useClassContext();
 
-  const [classes, setClasses] = useState(defaultClasses);
+  // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
 
   const removeClass = (classId) => {
-    setClasses(classes.filter((classItem) => classItem.id !== classId));
+    // setClasses(classes.filter((classItem) => classItem.id !== classId));
   };
 
   const addClass = (e) => {
     e.preventDefault();
-    const newClasses = [
-      ...classes,
-      {
+    // const newClasses = [
+    //   ...classes,
+    //   {
+    //     id: getNextId(classes),
+    //     title,
+    //     subClasses: [],
+    //   },
+    // ];
+    classesDispatch({
+      type: ACTION_CLASS_ADD,
+      payload: {
         id: getNextId(classes),
         title,
-        subClasses: [],
+        children: [],
       },
-    ];
-    setClasses(newClasses);
+    });
     setTitle('');
   };
 

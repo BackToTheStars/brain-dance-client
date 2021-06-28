@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SubClassList from './SubClassList';
 
 const ClassComponent = ({ classItem, removeClass }) => {
+  console.log('ClassComponent');
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
 
@@ -53,7 +54,13 @@ const ClassComponent = ({ classItem, removeClass }) => {
           </div>
         </div>
       )}
-      <SubClassList {...{ editSubclassMode, setEditSubclassMode }} />
+      <SubClassList
+        {...{
+          editSubclassMode,
+          setEditSubclassMode,
+          subClasses: classItem.children,
+        }}
+      />
     </div>
   );
 };

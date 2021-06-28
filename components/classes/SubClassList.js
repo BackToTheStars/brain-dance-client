@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { getNextId } from './functions';
 import SubClassComponent from './SubClassComponent';
 
-const SubClassList = ({ editSubclassMode, setEditSubclassMode }) => {
-  const [subClasses, setSubClasses] = useState([]);
+const SubClassList = ({
+  editSubclassMode,
+  setEditSubclassMode,
+  subClasses,
+}) => {
+  // const [subClasses, setSubClasses] = useState(subClassesList);
   const [subClassTitle, setSubClassTitle] = useState('');
 
   const addSubClass = (e) => {
@@ -15,15 +19,15 @@ const SubClassList = ({ editSubclassMode, setEditSubclassMode }) => {
         title: subClassTitle,
       },
     ];
-    setSubClasses(newSubClasses);
+    // setSubClasses(newSubClasses);
     setEditSubclassMode(false);
     setSubClassTitle('');
   };
 
   const removeSubClass = (id) => {
-    const newSubClasses = setSubClasses(
-      subClasses.filter((subClassItem) => subClassItem.id !== id)
-    );
+    // setSubClasses(
+    //   subClasses.filter((subClassItem) => subClassItem.id !== id)
+    // );
   };
 
   return (
