@@ -1,8 +1,31 @@
 import { useState } from 'react';
+import {
+  useClassContext,
+  ACTION_CLASS_DELETE,
+  ACTION_CLASS_UPDATE,
+} from '../contexts/ClassContext';
 
-const SubClassComponent = ({ subClassItem, removeSubClass }) => {
+const SubClassComponent = ({ subClassItem }) => {
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(subClassItem.title);
+
+  const { classesDispatch } = useClassContext();
+
+  const removeSubClass = () => {
+    classesDispatch({
+      type: ACTION_CLASS_DELETE,
+      payload: { id: subClassItem.id },
+    });
+  };
+
+  const updateTitle = (e) => {
+    e.preventDefault();
+    setEditTitleMode(false);
+    classesDispatch({
+      type: ACTION_CLASS_UPDATE,
+      payload: { id: subClassItem.id, title },
+    });
+  };
 
   return (
     <div className="class-item mb-3">
@@ -14,10 +37,7 @@ const SubClassComponent = ({ subClassItem, removeSubClass }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button
-            className="btn btn-success"
-            onClick={(e) => setEditTitleMode(false)}
-          >
+          <button className="btn btn-success" onClick={updateTitle}>
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
         </div>
@@ -37,10 +57,7 @@ const SubClassComponent = ({ subClassItem, removeSubClass }) => {
             >
               <img src="/icons/edit.svg" />
             </button>
-            <button
-              className="btn btn-success"
-              onClick={() => removeSubClass(subClassItem.id)}
-            >
+            <button className="btn btn-success" onClick={removeSubClass}>
               <img src="/icons/delete.svg" />
             </button>
           </div>

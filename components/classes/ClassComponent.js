@@ -1,18 +1,39 @@
 import { useState } from 'react';
 import SubClassList from './SubClassList';
+import {
+  useClassContext,
+  ACTION_CLASS_DELETE,
+  ACTION_CLASS_UPDATE,
+} from '../contexts/ClassContext';
 
-const ClassComponent = ({ classItem, removeClass }) => {
-  console.log('ClassComponent');
+const ClassComponent = ({ classItem }) => {
+  const { classesDispatch } = useClassContext();
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
 
   // для SubClasses
   const [editSubclassMode, setEditSubclassMode] = useState(false);
-  const [subClassTitle, setSubClassTitle] = useState('');
+
+  const updateTitle = (e) => {
+    e.preventDefault();
+    setEditTitleMode(false);
+    classesDispatch({
+      type: ACTION_CLASS_UPDATE,
+      payload: { id: classItem.id, title },
+    });
+  };
 
   const handleAddSubClass = (e) => {
     e.preventDefault();
     setEditSubclassMode(true);
+  };
+
+  const removeClass = () => {
+    classesDispatch({
+      type: ACTION_CLASS_DELETE,
+      payload: { id: classItem.id },
+    });
+    // setClasses(classes.filter((classItem) => classItem.id !== classId));
   };
 
   return (
@@ -25,10 +46,7 @@ const ClassComponent = ({ classItem, removeClass }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button
-            className="btn btn-success"
-            onClick={(e) => setEditTitleMode(false)}
-          >
+          <button className="btn btn-success" onClick={updateTitle}>
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
         </div>
@@ -45,17 +63,18 @@ const ClassComponent = ({ classItem, removeClass }) => {
             >
               <img src="/icons/edit.svg" />
             </button>
-            <button
-              className="btn btn-success"
-              onClick={() => removeClass(classItem.id)}
-            >
-              <img src="/icons/delete.svg" />
-            </button>
+
+            {!classItem.children.length && (
+              <button className="btn btn-success" onClick={removeClass}>
+                <img src="/icons/delete.svg" />
+              </button>
+            )}
           </div>
         </div>
       )}
       <SubClassList
         {...{
+          parentId: classItem.id,
           editSubclassMode,
           setEditSubclassMode,
           subClasses: classItem.children,

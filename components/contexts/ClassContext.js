@@ -1,21 +1,27 @@
+import next from 'next';
 import { useState, useEffect, createContext, useContext } from 'react';
 import { useReducer } from 'reinspect';
+import { getNextId } from '../classes/functions';
 
 const ClassContext = createContext();
 
 export const ACTION_CLASSES_INIT = 'action-classes-init';
 export const ACTION_CLASS_ADD = 'action-class-add';
+export const ACTION_CLASS_UPDATE = 'action-class-update';
+export const ACTION_CLASS_DELETE = 'action-class-delete';
 
 const initialState = { classesTree: [], classesDictionary: {}, classes: [] };
 
 const getTreeDictionary = (classes) => {
   const newClassesDictionary = {};
   const newClassesTree = [];
-  for (let classItem of classes) newClassesDictionary[classItem.id] = classItem;
+  for (let classItem of classes) // классы из БД, которые не нужно менять
+    newClassesDictionary[classItem.id] = { ...classItem, children: [] }; // копии добавлены в словарь
 
-  for (let classItem of classes) {
+  for (let id in newClassesDictionary) {
+    const classItem = newClassesDictionary[id];
     if (!!classItem.parentId) {
-      newClassesDictionary[classItem.parentId].children.push(classItem);
+      newClassesDictionary[classItem.parentId].children.push(classItem); // здесь есть опасность дублирования
     } else {
       newClassesTree.push(classItem); // добавляем корневой класс, у которого могут быть children
     }
@@ -37,8 +43,38 @@ const reducer = (state, action) => {
       };
     }
     case ACTION_CLASS_ADD: {
+      const nextId = getNextId(state.classes);
       // const { parentId } = action.payload;
-      const newClasses = [...state.classes, action.payload];
+      const newClasses = [...state.classes, { ...action.payload, id: nextId }];
+      const { newClassesTree, newClassesDictionary } =
+        getTreeDictionary(newClasses);
+      return {
+        ...state,
+        classes: newClasses,
+        classesTree: newClassesTree,
+        classesDictionary: newClassesDictionary,
+      };
+    }
+    case ACTION_CLASS_UPDATE: {
+      const newClasses = state.classes.map((classItem) => {
+        if (classItem.id === action.payload.id) {
+          return { ...classItem, ...action.payload };
+        } else return { ...classItem };
+      });
+      const { newClassesTree, newClassesDictionary } =
+        getTreeDictionary(newClasses);
+      return {
+        ...state,
+        classes: newClasses,
+        classesTree: newClassesTree,
+        classesDictionary: newClassesDictionary,
+      };
+    }
+    case ACTION_CLASS_DELETE: {
+      // оптимизировать повторяющийся код
+      const newClasses = state.classes.filter(
+        (classItem) => classItem.id !== action.payload.id
+      );
       const { newClassesTree, newClassesDictionary } =
         getTreeDictionary(newClasses);
       return {
@@ -69,13 +105,6 @@ export const ClassProvider = ({ children }) => {
 
   useEffect(() => {
     const gotClasses = [
-      {
-        id: 3,
-        title: 'Child Class 3',
-        name: 'child-class-3',
-        parentId: 2,
-        children: [],
-      },
       {
         id: 1,
         title: 'Empty Class',
