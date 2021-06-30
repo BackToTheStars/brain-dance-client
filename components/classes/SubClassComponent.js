@@ -28,22 +28,22 @@ const SubClassComponent = ({ subClassItem }) => {
   };
 
   return (
-    <div className="class-item mb-3">
+    <div className="class-item ml-3">
       {editTitleMode ? (
-        <div className="d-flex pt-2 class-title-row">
+        <div className="d-flex pt-1 class-title-row">
           <input
             className="mr-2 flex-grow-1"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button className="btn btn-success" onClick={updateTitle}>
+          <button className="btn btn-success btn-sm" onClick={updateTitle}>
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
         </div>
       ) : (
         <div className="d-flex class-title-row">
-          <div className="mr-3">
+          <div className="mr-3 pt-1">
             {'- '}
             {title}
           </div>
@@ -52,12 +52,12 @@ const SubClassComponent = ({ subClassItem }) => {
               <img src="/icons/add.svg" />
             </button> */}
             <button
-              className="btn btn-success"
+              className="btn btn-success btn-sm"
               onClick={(e) => setEditTitleMode(true)}
             >
               <img src="/icons/edit.svg" />
             </button>
-            <button className="btn btn-success" onClick={removeSubClass}>
+            <button className="btn btn-success btn-sm" onClick={removeSubClass}>
               <img src="/icons/delete.svg" />
             </button>
           </div>

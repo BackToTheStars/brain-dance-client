@@ -37,7 +37,7 @@ const ClassComponent = ({ classItem }) => {
   };
 
   return (
-    <div className="class-item mb-3">
+    <div className="class-item mb-2">
       {editTitleMode ? (
         <div className="d-flex class-title-row">
           <input
@@ -51,21 +51,24 @@ const ClassComponent = ({ classItem }) => {
           </button>
         </div>
       ) : (
-        <div className="d-flex pt-2 class-title-row">
-          <div className="mr-3">{title}</div>
+        <div className="d-flex class-title-row">
+          <div className="mr-3 pt-1 ">{title}</div>
           <div className="btn-group classes-btn-group">
-            <button className="btn btn-success" onClick={handleAddSubClass}>
+            <button
+              className="btn btn-success btn-sm"
+              onClick={handleAddSubClass}
+            >
               <img src="/icons/add.svg" />
             </button>
             <button
-              className="btn btn-success"
+              className="btn btn-success btn-sm"
               onClick={(e) => setEditTitleMode(true)}
             >
               <img src="/icons/edit.svg" />
             </button>
 
             {!classItem.children.length && (
-              <button className="btn btn-success" onClick={removeClass}>
+              <button className="btn btn-success btn-sm" onClick={removeClass}>
                 <img src="/icons/delete.svg" />
               </button>
             )}

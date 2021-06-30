@@ -1,7 +1,9 @@
 import next from 'next';
 import { useState, useEffect, createContext, useContext } from 'react';
+import { useUserContext } from './UserContext';
 import { useReducer } from 'reinspect';
 import { getNextId } from '../classes/functions';
+import { createClass } from './api/classRequests';
 
 const ClassContext = createContext();
 
@@ -11,6 +13,9 @@ export const ACTION_CLASS_UPDATE = 'action-class-update';
 export const ACTION_CLASS_DELETE = 'action-class-delete';
 
 const initialState = { classesTree: [], classesDictionary: {}, classes: [] };
+
+// @todo: replace multiple -- with -
+const getNameAlias = (title) => title.toLowerCase().replace(/\s/g, '-');
 
 const getTreeDictionary = (classes) => {
   const newClassesDictionary = {};
@@ -45,7 +50,14 @@ const reducer = (state, action) => {
     case ACTION_CLASS_ADD: {
       const nextId = getNextId(state.classes);
       // const { parentId } = action.payload;
-      const newClasses = [...state.classes, { ...action.payload, id: nextId }];
+      let name = getNameAlias(action.payload.title);
+      if (state.classes.find((classItem) => classItem.name === name)) {
+        name = name + `_${nextId}`;
+      }
+      const newClasses = [
+        ...state.classes,
+        { ...action.payload, id: nextId, name },
+      ];
       const { newClassesTree, newClassesDictionary } =
         getTreeDictionary(newClasses);
       return {
@@ -58,7 +70,17 @@ const reducer = (state, action) => {
     case ACTION_CLASS_UPDATE: {
       const newClasses = state.classes.map((classItem) => {
         if (classItem.id === action.payload.id) {
-          return { ...classItem, ...action.payload };
+          let name = getNameAlias(action.payload.title);
+          if (
+            state.classes.find(
+              (nextClassItem) =>
+                nextClassItem.name === name &&
+                nextClassItem.id !== action.payload.id
+            )
+          ) {
+            name = name + `_${action.payload.id}`;
+          }
+          return { ...classItem, ...action.payload, name };
         } else return { ...classItem };
       });
       const { newClassesTree, newClassesDictionary } =
@@ -90,6 +112,8 @@ const reducer = (state, action) => {
 export const ClassProvider = ({ children }) => {
   // Это другие children
   // создание компонента-обёртки
+
+  const { request } = useUserContext();
 
   const [classesState, classesDispatch] = useReducer(
     reducer,
@@ -126,6 +150,7 @@ export const ClassProvider = ({ children }) => {
     classesDictionary,
     classesTree,
     classesDispatch,
+    createClass: createClass(request),
   };
 
   return (

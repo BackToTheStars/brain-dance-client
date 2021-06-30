@@ -117,7 +117,8 @@ const FlexMinimap = ({ gameBox }) => {
     .map((turn) => turn._id); // отфильтровали какие ходы рендерить на экране
 
   useEffect(() => {
-    // @todo: оптимизировать
+    if (!turns.length) return;
+    // @todo: оптимизировать ?
     minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
   }, [turns]); // массив с id тех ходов, которые нужно render
 

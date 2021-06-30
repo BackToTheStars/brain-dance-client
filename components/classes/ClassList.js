@@ -3,10 +3,32 @@ import ClassComponent from './ClassComponent';
 import { useClassContext, ACTION_CLASS_ADD } from '../contexts/ClassContext';
 
 const ClassList = () => {
-  const { classesTree: classes, classesDispatch } = useClassContext();
+  const {
+    classesTree: classes,
+    classesDispatch,
+    createClass,
+  } = useClassContext();
 
   // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
+
+  createTurn(turnObj, {
+    successCallback: (data) => {
+      // console.log('успешный коллбэк на уровне Попапа');
+      setCreateEditTurnPopupIsHidden(true);
+      dispatch({
+        type: ACTION_TURN_CREATED,
+        payload: {
+          ...data.item,
+          x: data.item.x + zeroPointX,
+          y: data.item.y + zeroPointY,
+        },
+      });
+    },
+    errorCallback: (message) => {
+      setError({ message });
+    },
+  });
 
   const addClass = (e) => {
     e.preventDefault();
