@@ -3,7 +3,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import { useUserContext } from './UserContext';
 import { useReducer } from 'reinspect';
 import { getNextId } from '../classes/functions';
-import { createClass } from './api/classRequests';
+import { createClass, getClasses } from './api/classRequests';
 
 const ClassContext = createContext();
 
@@ -16,6 +16,16 @@ const initialState = { classesTree: [], classesDictionary: {}, classes: [] };
 
 // @todo: replace multiple -- with -
 const getNameAlias = (title) => title.toLowerCase().replace(/\s/g, '-');
+
+const getNewState = (state, classes) => {
+  const { newClassesTree, newClassesDictionary } = getTreeDictionary(classes);
+  return {
+    ...state,
+    classes,
+    classesTree: newClassesTree,
+    classesDictionary: newClassesDictionary,
+  };
+};
 
 const getTreeDictionary = (classes) => {
   const newClassesDictionary = {};
@@ -37,35 +47,10 @@ const getTreeDictionary = (classes) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case ACTION_CLASSES_INIT: {
-      const { newClassesTree, newClassesDictionary } = getTreeDictionary(
-        action.payload
-      );
-      return {
-        ...state,
-        classes: action.payload,
-        classesTree: newClassesTree,
-        classesDictionary: newClassesDictionary,
-      };
+      return getNewState(state, action.payload);
     }
     case ACTION_CLASS_ADD: {
-      const nextId = getNextId(state.classes);
-      // const { parentId } = action.payload;
-      let name = getNameAlias(action.payload.title);
-      if (state.classes.find((classItem) => classItem.name === name)) {
-        name = name + `_${nextId}`;
-      }
-      const newClasses = [
-        ...state.classes,
-        { ...action.payload, id: nextId, name },
-      ];
-      const { newClassesTree, newClassesDictionary } =
-        getTreeDictionary(newClasses);
-      return {
-        ...state,
-        classes: newClasses,
-        classesTree: newClassesTree,
-        classesDictionary: newClassesDictionary,
-      };
+      return getNewState(state, [...state.classes, action.payload]);
     }
     case ACTION_CLASS_UPDATE: {
       const newClasses = state.classes.map((classItem) => {
@@ -83,28 +68,14 @@ const reducer = (state, action) => {
           return { ...classItem, ...action.payload, name };
         } else return { ...classItem };
       });
-      const { newClassesTree, newClassesDictionary } =
-        getTreeDictionary(newClasses);
-      return {
-        ...state,
-        classes: newClasses,
-        classesTree: newClassesTree,
-        classesDictionary: newClassesDictionary,
-      };
+      return getNewState(state, newClasses);
     }
     case ACTION_CLASS_DELETE: {
       // оптимизировать повторяющийся код
       const newClasses = state.classes.filter(
         (classItem) => classItem.id !== action.payload.id
       );
-      const { newClassesTree, newClassesDictionary } =
-        getTreeDictionary(newClasses);
-      return {
-        ...state,
-        classes: newClasses,
-        classesTree: newClassesTree,
-        classesDictionary: newClassesDictionary,
-      };
+      return getNewState(state, newClasses);
     }
   }
 };
@@ -113,7 +84,10 @@ export const ClassProvider = ({ children }) => {
   // Это другие children
   // создание компонента-обёртки
 
-  const { request } = useUserContext();
+  const {
+    request,
+    info: { hash },
+  } = useUserContext();
 
   const [classesState, classesDispatch] = useReducer(
     reducer,
@@ -127,30 +101,37 @@ export const ClassProvider = ({ children }) => {
   // const [classesTree, setClassesTree] = useState([]);
   const { classes, classesDictionary, classesTree } = classesState;
 
+  const reloadClasses = () => {
+    // data fetch
+    getClasses(request, hash)(
+      {},
+      {
+        successCallback: (data) => {
+          classesDispatch({ type: ACTION_CLASSES_INIT, payload: data.items });
+          console.log(data);
+        },
+      }
+    );
+  };
+
   useEffect(() => {
-    const gotClasses = [
-      {
-        id: 1,
-        title: 'Empty Class',
-        name: 'empty-class',
-        children: [],
-      },
-      {
-        id: 2,
-        title: 'Child Class',
-        name: 'child-class',
-        parentId: 1,
-        children: [],
-      },
-    ];
-    classesDispatch({ type: ACTION_CLASSES_INIT, payload: gotClasses });
+    reloadClasses();
   }, []);
 
   const value = {
+    reloadClasses,
     classesDictionary,
     classesTree,
     classesDispatch,
-    createClass: createClass(request),
+    createClass: createClass(request, hash),
+    getNextId: () => getNextId(classes),
+    getNameAlias: (title, nextId) => {
+      let name = getNameAlias(title);
+      if (classes.find((classItem) => classItem.name === name)) {
+        name = name + `_${nextId}`;
+      }
+      return name;
+    },
   };
 
   return (

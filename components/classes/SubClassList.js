@@ -8,17 +8,23 @@ const SubClassList = ({
   subClasses = [],
   parentId,
 }) => {
-  const { classesDispatch } = useClassContext();
+  const { classesDispatch, getNextId, getNameAlias } = useClassContext();
 
   // const [subClasses, setSubClasses] = useState(subClassesList);
   const [subClassTitle, setSubClassTitle] = useState('');
 
   const addSubClass = (e) => {
     e.preventDefault();
-
+    const nextId = getNextId();
+    const payload = {
+      id: nextId,
+      parentId,
+      title: subClassTitle,
+      name: getNameAlias(subClassTitle, nextId),
+    };
     classesDispatch({
       type: ACTION_CLASS_ADD,
-      payload: { parentId, title: subClassTitle },
+      payload,
     });
 
     // const newSubClasses = [

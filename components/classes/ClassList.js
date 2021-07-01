@@ -7,34 +7,28 @@ const ClassList = () => {
     classesTree: classes,
     classesDispatch,
     createClass,
+    getNextId,
+    getNameAlias,
+    reloadClasses,
   } = useClassContext();
 
   // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
 
-  createTurn(turnObj, {
-    successCallback: (data) => {
-      // console.log('успешный коллбэк на уровне Попапа');
-      setCreateEditTurnPopupIsHidden(true);
-      dispatch({
-        type: ACTION_TURN_CREATED,
-        payload: {
-          ...data.item,
-          x: data.item.x + zeroPointX,
-          y: data.item.y + zeroPointY,
-        },
-      });
-    },
-    errorCallback: (message) => {
-      setError({ message });
-    },
-  });
-
   const addClass = (e) => {
     e.preventDefault();
+    // подготовить данные для payload
+    const nextId = getNextId();
+    const payload = { id: nextId, title, name: getNameAlias(title, nextId) };
     classesDispatch({
       type: ACTION_CLASS_ADD,
-      payload: { title },
+      payload,
+    });
+    createClass(payload, {
+      successCallback: (data) => {},
+      errorCallback: (message) => {
+        reloadClasses();
+      },
     });
     setTitle('');
   };
