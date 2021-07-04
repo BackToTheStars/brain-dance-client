@@ -21,6 +21,48 @@ export const createClass =
       }
     );
   };
+
+export const editClass =
+  (request, hash) =>
+  (id, body, callbacks = {}) => {
+    request(
+      `classes/${id}?hash=${hash}`,
+      {
+        method: 'PUT',
+        tokenFlag: true,
+        body: body,
+      },
+      {
+        successCallback: (data) => {
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
+export const deleteClass =
+  (request, hash) =>
+  (id, callbacks = {}) => {
+    request(
+      `classes/${id}?hash=${hash}`,
+      {
+        method: 'DELETE',
+        tokenFlag: true,
+      },
+      {
+        successCallback: (data) => {
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
 export const getClasses =
   (request, hash) =>
   (body, callbacks = {}) => {

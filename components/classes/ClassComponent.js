@@ -1,13 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SubClassList from './SubClassList';
-import {
-  useClassContext,
-  ACTION_CLASS_DELETE,
-  ACTION_CLASS_UPDATE,
-} from '../contexts/ClassContext';
+import { useClassContext } from '../contexts/ClassContext';
 
 const ClassComponent = ({ classItem }) => {
-  const { classesDispatch } = useClassContext();
+  const { removeClass, updateClass } = useClassContext();
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
 
@@ -17,10 +13,11 @@ const ClassComponent = ({ classItem }) => {
   const updateTitle = (e) => {
     e.preventDefault();
     setEditTitleMode(false);
-    classesDispatch({
-      type: ACTION_CLASS_UPDATE,
-      payload: { id: classItem.id, title },
-    });
+    updateClass({ id: classItem.id, title });
+    // classesDispatch({
+    //   type: ACTION_CLASS_UPDATE,
+    //   payload: { id: classItem.id, title },
+    // });
   };
 
   const handleAddSubClass = (e) => {
@@ -28,13 +25,17 @@ const ClassComponent = ({ classItem }) => {
     setEditSubclassMode(true);
   };
 
-  const removeClass = () => {
-    classesDispatch({
-      type: ACTION_CLASS_DELETE,
-      payload: { id: classItem.id },
-    });
-    // setClasses(classes.filter((classItem) => classItem.id !== classId));
-  };
+  // const removeClass = () => {
+  //   classesDispatch({
+  //     type: ACTION_CLASS_DELETE,
+  //     payload: { id: classItem.id },
+  //   });
+  //   // setClasses(classes.filter((classItem) => classItem.id !== classId));
+  // };
+
+  useEffect(() => {
+    setTitle(classItem.title);
+  }, [classItem]);
 
   return (
     <div className="class-item mb-2">
@@ -68,7 +69,10 @@ const ClassComponent = ({ classItem }) => {
             </button>
 
             {!classItem.children.length && (
-              <button className="btn btn-success btn-sm" onClick={removeClass}>
+              <button
+                className="btn btn-success btn-sm"
+                onClick={() => removeClass(classItem.id)}
+              >
                 <img src="/icons/delete.svg" />
               </button>
             )}

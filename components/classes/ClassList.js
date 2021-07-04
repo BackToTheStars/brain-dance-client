@@ -1,35 +1,17 @@
 import { useState } from 'react';
 import ClassComponent from './ClassComponent';
-import { useClassContext, ACTION_CLASS_ADD } from '../contexts/ClassContext';
+import { useClassContext } from '../contexts/ClassContext';
 
 const ClassList = () => {
-  const {
-    classesTree: classes,
-    classesDispatch,
-    createClass,
-    getNextId,
-    getNameAlias,
-    reloadClasses,
-  } = useClassContext();
+  const { classesTree: classes, addClass } = useClassContext();
 
   // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
 
-  const addClass = (e) => {
+  const submitAddClass = (e) => {
     e.preventDefault();
     // подготовить данные для payload
-    const nextId = getNextId();
-    const payload = { id: nextId, title, name: getNameAlias(title, nextId) };
-    classesDispatch({
-      type: ACTION_CLASS_ADD,
-      payload,
-    });
-    createClass(payload, {
-      successCallback: (data) => {},
-      errorCallback: (message) => {
-        reloadClasses();
-      },
-    });
+    addClass(title);
     setTitle('');
   };
 
@@ -39,7 +21,7 @@ const ClassList = () => {
         <ClassComponent key={classItem.id} classItem={classItem} />
       ))}
       <div className="flex-grow-1"></div>
-      <form className="form-inline d-flex" onSubmit={addClass}>
+      <form className="form-inline d-flex" onSubmit={submitAddClass}>
         <input
           type="text"
           value={title}

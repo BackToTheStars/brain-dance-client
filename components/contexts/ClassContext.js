@@ -1,9 +1,13 @@
-import next from 'next';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useEffect, createContext, useContext } from 'react';
 import { useUserContext } from './UserContext';
 import { useReducer } from 'reinspect';
 import { getNextId } from '../classes/functions';
-import { createClass, getClasses } from './api/classRequests';
+import {
+  createClass,
+  editClass,
+  deleteClass,
+  getClasses,
+} from './api/classRequests';
 
 const ClassContext = createContext();
 
@@ -114,6 +118,65 @@ export const ClassProvider = ({ children }) => {
     );
   };
 
+  const getAlias = (title, nextId) => {
+    let name = getNameAlias(title);
+    if (classes.find((classItem) => classItem.name === name)) {
+      name = name + `_${nextId}`;
+    }
+    return name;
+  };
+
+  const addClass = (title, parentId = null) => {
+    const nextId = getNextId(classes);
+    const payload = {
+      id: nextId,
+      title,
+      parentId,
+      name: getAlias(title, nextId),
+    };
+    classesDispatch({
+      type: ACTION_CLASS_ADD,
+      payload,
+    });
+    createClass(request, hash)(payload, {
+      successCallback: (data) => {},
+      errorCallback: (message) => {
+        reloadClasses();
+      },
+    });
+  };
+
+  const updateClass = ({ id, title }) => {
+    const payload = {
+      id,
+      title,
+      name: getAlias(title, id),
+    };
+    classesDispatch({
+      type: ACTION_CLASS_UPDATE,
+      payload,
+    });
+    editClass(request, hash)(id, payload, {
+      successCallback: (data) => {},
+      errorCallback: (message) => {
+        reloadClasses();
+      },
+    });
+  };
+
+  const removeClass = (id) => {
+    classesDispatch({
+      type: ACTION_CLASS_DELETE,
+      payload: { id },
+    });
+    deleteClass(request, hash)(id, {
+      successCallback: (data) => {},
+      errorCallback: (message) => {
+        reloadClasses();
+      },
+    });
+  };
+
   useEffect(() => {
     reloadClasses();
   }, []);
@@ -123,15 +186,12 @@ export const ClassProvider = ({ children }) => {
     classesDictionary,
     classesTree,
     classesDispatch,
-    createClass: createClass(request, hash),
-    getNextId: () => getNextId(classes),
-    getNameAlias: (title, nextId) => {
-      let name = getNameAlias(title);
-      if (classes.find((classItem) => classItem.name === name)) {
-        name = name + `_${nextId}`;
-      }
-      return name;
-    },
+    addClass,
+    removeClass,
+    updateClass,
+    // createClass: createClass(request, hash),
+    // getNextId: () => getNextId(classes),
+    // getNameAlias: getNextGameAlias,
   };
 
   return (

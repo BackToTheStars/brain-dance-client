@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import SubClassComponent from './SubClassComponent';
-import { useClassContext, ACTION_CLASS_ADD } from '../contexts/ClassContext';
+import { useClassContext } from '../contexts/ClassContext';
 
 const SubClassList = ({
   editSubclassMode,
@@ -8,33 +8,13 @@ const SubClassList = ({
   subClasses = [],
   parentId,
 }) => {
-  const { classesDispatch, getNextId, getNameAlias } = useClassContext();
+  const { addClass } = useClassContext();
 
-  // const [subClasses, setSubClasses] = useState(subClassesList);
   const [subClassTitle, setSubClassTitle] = useState('');
 
   const addSubClass = (e) => {
     e.preventDefault();
-    const nextId = getNextId();
-    const payload = {
-      id: nextId,
-      parentId,
-      title: subClassTitle,
-      name: getNameAlias(subClassTitle, nextId),
-    };
-    classesDispatch({
-      type: ACTION_CLASS_ADD,
-      payload,
-    });
-
-    // const newSubClasses = [
-    //   ...subClasses,
-    //   {
-    //     id: getNextId(subClasses),
-    //     title: subClassTitle,
-    //   },
-    // ];
-    // setSubClasses(newSubClasses);
+    addClass(subClassTitle, parentId);
     setEditSubclassMode(false);
     setSubClassTitle('');
   };
