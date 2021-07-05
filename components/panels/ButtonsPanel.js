@@ -4,7 +4,7 @@ import useUser from '../hooks/user'; // export default useUser
 import { useUserContext } from '../contexts/UserContext';
 import { useTurnContext } from '../contexts/TurnContext';
 
-import { RULE_VIEW, RULE_TURNS_CRUD, RULE_GAME_EDIT } from '../config';
+import { RULE_VIEW, RULE_TURNS_CRUD } from '../config';
 
 const ButtonsPanel = () => {
   const {

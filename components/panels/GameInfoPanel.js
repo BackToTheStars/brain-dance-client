@@ -15,7 +15,8 @@ const getUrl = ({ hash }) => {
 };
 
 const GameInfoPanel = ({ game, setGame }) => {
-  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden } = useUiContext();
+  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden, addNotification } =
+    useUiContext();
   const { info, can, token } = useUserContext();
   const { code, addCode } = useGamePlayerCode(token);
   const { game: editedGame, editGame } = useEditGame(token);
@@ -30,6 +31,10 @@ const GameInfoPanel = ({ game, setGame }) => {
       setViewMode(true);
     }
   }, [editedGame]);
+
+  useEffect(() => {
+    addNotification({ title: 'Info:', text: `User ${nickname} logged in.` });
+  }, []);
 
   if (!game)
     return (

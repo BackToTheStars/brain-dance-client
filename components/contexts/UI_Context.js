@@ -1,5 +1,7 @@
 import { useState, useContext, createContext } from 'react';
 import { useReducer } from 'reinspect';
+
+export const NOTIFICATION_TRANSITION = 500;
 export const UI_Context = createContext();
 const initialState = {
   classesPanelIsHidden: true,
@@ -83,6 +85,9 @@ const minimapReducer = (state, action) => {
 };
 
 export const UI_Provider = ({ children }) => {
+  // массив уведомлений в консоль событий
+  const [notifications, setNotifications] = useState([]);
+
   const [state, dispatch] = useReducer(
     reducer,
     initialState,
@@ -101,12 +106,32 @@ export const UI_Provider = ({ children }) => {
     'minimap'
   );
 
+  const addNotification = ({ title, text }) => {
+    const newNotifications = [...notifications, { title, text, status: 'new' }];
+    setNotifications(newNotifications);
+    setTimeout(() => {
+      setNotifications((notifications) => {
+        const newNotifications = [...notifications];
+        newNotifications[0] = {
+          ...newNotifications[0],
+          status: 'old',
+        };
+        return newNotifications;
+      });
+    }, 3000);
+
+    setTimeout(() => {
+      setNotifications((notifications) => {
+        const newNotifications = [...notifications];
+        newNotifications.shift();
+        return newNotifications;
+      });
+    }, 3000 + NOTIFICATION_TRANSITION);
+  };
+
   return (
     <UI_Context.Provider
       value={{
-        // classesPanelIsHidden,
-        // setClassesPanelIsHidden,
-
         gameInfoPanelIsHidden,
         setGameInfoPanelIsHidden,
 
@@ -118,6 +143,9 @@ export const UI_Provider = ({ children }) => {
 
         minimapState,
         minimapDispatch,
+
+        notifications,
+        addNotification,
       }}
     >
       {children}

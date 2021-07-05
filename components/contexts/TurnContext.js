@@ -305,6 +305,7 @@ export const TurnProvider = ({ children }) => {
   const {
     minimapDispatch,
     minimapState: { turnsToRender },
+    addNotification,
   } = useUiContext();
   // const [originalTurns, setOriginalTurns] = useState([]);
   // const [turns, setTurns] = useState([]);
@@ -425,6 +426,7 @@ export const TurnProvider = ({ children }) => {
       },
     }).then((data) => {
       turnsDispatch({ type: ACTION_TURNS_SYNC_DONE });
+      addNotification({ title: 'Info:', text: 'Field has been saved.' });
     });
   };
 
