@@ -322,6 +322,23 @@ const AddEditTurnPopup = () => {
   );
 };
 
+const ColorPicker = ({ value, changeHandler }) => {
+  const colors = ['#ff0000', '#00ff00', '#0000ff', '#eced9a'];
+
+  return (
+    <div className="color-picker-widget">
+      {colors.map((color, index) => (
+        <div
+          key={index}
+          className={`color-picker-square ${value === color ? 'active' : ''}`}
+          style={{ backgroundColor: color }}
+          onClick={() => changeHandler(color)}
+        />
+      ))}
+    </div>
+  );
+};
+
 const FormInput = ({
   label,
   prefixClass,
@@ -333,12 +350,16 @@ const FormInput = ({
     <div className={`form-group row ${prefixClass}-row`}>
       <label className="col-sm-3 col-form-label">{label}</label>
       <div className="col-sm-9">
-        <input
-          type={inputType}
-          className="form-control"
-          value={value}
-          onChange={(e) => changeHandler(e.target.value)}
-        />
+        {inputType === 'color-picker' ? (
+          <ColorPicker value={value} changeHandler={changeHandler} />
+        ) : (
+          <input
+            type={inputType}
+            className="form-control"
+            value={value}
+            onChange={(e) => changeHandler(e.target.value)}
+          />
+        )}
       </div>
     </div>
   );

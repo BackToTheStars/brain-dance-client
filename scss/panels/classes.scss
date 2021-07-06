@@ -10,6 +10,15 @@
     transform: translateY(-120%);
     top: 0;
   }
+  .add-class {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding: $panels-spacer;
+    background: $dark-grey;
+    margin-left: -8px;
+    margin-right: -8px;
+  }
 }
 
 .class-item {

@@ -39,6 +39,8 @@ const Turn = ({
     scrollPosition, // @todo
     quotes,
     contentType,
+    backgroundColor,
+    fontColor,
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -237,7 +239,11 @@ const Turn = ({
       className={`${contentType} react-turn`}
       style={styles.wrapper}
     >
-      <h5 className="headerText" ref={headerEl}>
+      <h5
+        className="headerText"
+        ref={headerEl}
+        style={contentType === 'comment' ? { backgroundColor } : {}}
+      >
         <div className="headerTextTitle">{header}</div>
         <div className="headerTextActions">
           {can(RULE_TURNS_CRUD) && (
@@ -282,7 +288,11 @@ const Turn = ({
           </div>
         )}
         {isParagraphExist && (
-          <p className="paragraphText" ref={paragraphEl}>
+          <p
+            className="paragraphText"
+            ref={paragraphEl}
+            style={contentType === 'comment' ? { backgroundColor } : {}}
+          >
             {getParagraphText(
               paragraph || [],
               setQuotesWithCoords,

@@ -21,7 +21,7 @@ const ClassList = () => {
         <ClassComponent key={classItem.id} classItem={classItem} />
       ))}
       <div className="flex-grow-1"></div>
-      <form className="form-inline d-flex" onSubmit={submitAddClass}>
+      <form className="add-class form-inline d-flex" onSubmit={submitAddClass}>
         <input
           type="text"
           value={title}

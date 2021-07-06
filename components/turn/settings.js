@@ -14,6 +14,8 @@ const FIELD_PICTURE = 'imageUrl';
 const FIELD_VIDEO = 'videoUrl';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
+const FIELD_BACKGROUND_COLOR = 'backgroundColor';
+const FIELD_FONT_COLOR = 'fontColor';
 
 // по умолчанию виджет текста присутствует
 const settings = {
@@ -36,7 +38,7 @@ const settings = {
     requiredFields: [FIELD_VIDEO],
   },
   [TEMPLATE_COMMENT]: {
-    availableFields: [],
+    availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
     value: 'comment',
     label: 'Comment',
     requiredParagraph: true,
@@ -49,6 +51,18 @@ const fieldSettings = {
   [FIELD_HEADER]: {
     label: 'Header',
     prefixClass: 'header',
+  },
+  [FIELD_BACKGROUND_COLOR]: {
+    label: 'Background Color',
+    prefixClass: 'background-color',
+    inputType: 'color-picker',
+    special: true,
+  },
+  [FIELD_FONT_COLOR]: {
+    label: 'Font Color',
+    prefixClass: 'font-color',
+    inputType: 'color-picker',
+    special: true,
   },
   [FIELD_PICTURE]: {
     label: 'Image Url',
