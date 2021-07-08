@@ -14,6 +14,7 @@ export const ACTION_DELETE_TURN = 'action_delete_turn';
 export const ACTION_TURN_WAS_CHANGED = 'action_turn_was_changed';
 export const ACTION_TURN_CREATED = 'action_turn_created';
 export const ACTION_TURNS_SYNC_DONE = 'action_turns_sync_done';
+export const ACTION_RESET_TURN_EDIT_MODE = 'action_reset_turn_edit_mode';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
@@ -26,22 +27,10 @@ export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
 export const ACTION_LINE_CREATED = 'action_line_created';
 export const ACTION_RECALCULATE_LINES = 'action_recalculate_lines';
 
-// const linesInitialState = { lines: [] };
-// const linesReducer = (state, action) => {
-//   switch (action.type) {
-//     case ACTION_LINES_INIT: {
-//       return {
-//         ...state,
-//         lines: action.payload,
-//       };
-//     }
-//   }
-// };
-
 const turnsInitialState = {
   turnToEdit: null,
   turns: [],
-  originalTurns: [],
+  // originalTurns: [],
   left: 0,
   top: 0,
   activeQuote: null,
@@ -56,7 +45,7 @@ const turnsReducer = (state, action) => {
     case ACTION_SET_ORIGINAL_TURNS: {
       return {
         ...state,
-        originalTurns: action.payload,
+        // originalTurns: action.payload,
         turns: action.payload,
       };
     }
@@ -102,7 +91,13 @@ const turnsReducer = (state, action) => {
       return {
         ...state,
         turns: [...state.turns, action.payload],
-        originalTurns: [...state.originalTurns, action.payload],
+        // originalTurns: [...state.originalTurns, action.payload],
+      };
+    }
+    case ACTION_RESET_TURN_EDIT_MODE: {
+      return {
+        ...state,
+        turnToEdit: null,
       };
     }
     case ACTION_SET_TURN_TO_EDIT_MODE: {
@@ -115,7 +110,7 @@ const turnsReducer = (state, action) => {
       const { _id } = action.payload;
       return {
         ...state,
-        originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
+        // originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
         turns: state.turns.filter((turn) => turn._id !== _id),
       };
     }

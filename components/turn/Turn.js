@@ -1,4 +1,4 @@
-import { getParagraphText } from './functions';
+import { ParagraphTextWrapper } from './functions';
 import { RULE_TURNS_CRUD } from '../config';
 import { dateFormatter } from '../helpers/formatters/dateFormatter';
 import { getShortLink } from '../helpers/formatters/urlFormatter';
@@ -11,6 +11,9 @@ import {
   ACTION_QUOTE_CLICKED,
   ACTION_QUOTE_COORDS_UPDATED,
 } from '../contexts/TurnContext';
+import YouTube from 'react-youtube';
+
+let timerId = null;
 
 const Turn = ({
   turn,
@@ -52,6 +55,7 @@ const Turn = ({
 
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
+  const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -116,6 +120,14 @@ const Turn = ({
       $(videoEl.current).height(
         Math.floor((9 * $(wrapper.current).width()) / 16)
       );
+      // @tmp start
+      $(videoEl.current)
+        .find('iframe')
+        .width($(wrapper.current).width() - 3);
+      $(videoEl.current)
+        .find('iframe')
+        .height(Math.floor((9 * $(wrapper.current).width()) / 16));
+      // @tmp end
       minMediaHeight += $(videoEl.current).height();
       maxMediaHeight += $(videoEl.current).height();
       $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
@@ -143,6 +155,16 @@ const Turn = ({
     if (!(maxMediaHeight + $(headerEl.current).height() - 2)) {
       console.log('Необходимо выполнить проверку максимальной высоты шага');
     }
+
+    if (timerId) {
+      // замедляем на 200мс update линий между цитатами
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      setQuotesLoaded(false);
+      setQuotesWithCoords([]);
+      setUpdateSizeTime(new Date().getTime());
+    }, 200);
   };
 
   useEffect(() => {
@@ -209,6 +231,8 @@ const Turn = ({
     });
   }, []);
 
+  useEffect(handleResize, [turn]);
+
   useEffect(() => {
     if (!wrapper) return;
     wrapper.current.onresize = handleResize;
@@ -251,6 +275,7 @@ const Turn = ({
               <a key="edit" className="edit-btn" onClick={handleEdit}>
                 <i className="fas fa-pen-square"></i>
               </a>
+
               <a key="delete" className="delete-btn" onClick={handleDelete}>
                 <i className="fas fa-trash-alt"></i>
               </a>
@@ -274,12 +299,20 @@ const Turn = ({
         {!!(videoUrl && videoUrl.trim()) && (
           <div className="video" ref={videoEl}>
             <div className="iframe-overlay" />
-            <iframe
+            <YouTube
+              videoId={`${videoUrl}`}
+              onReady={() => handleResize()}
+              width="100%"
+              height="100%"
+            ></YouTube>
+
+            {/* <iframe
               src={`https://www.youtube.com/embed/${videoUrl}`}
               allow="accelerometer; fullscreen; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen="allowFullScreen"
               frameBorder="0"
-            ></iframe>
+              ref={iframeEl}
+            ></iframe> */}
           </div>
         )}
         {!!(imageUrl && imageUrl.trim()) && ( // карусель в будущем
@@ -293,11 +326,17 @@ const Turn = ({
             ref={paragraphEl}
             style={contentType === 'comment' ? { backgroundColor } : {}}
           >
-            {getParagraphText(
+            <ParagraphTextWrapper
+              arrText={paragraph || []}
+              updateSizeTime={updateSizeTime}
+              setQuotes={setQuotesWithCoords}
+              onQuoteClick={onQuoteClick}
+            />
+            {/* {getParagraphText(
               paragraph || [],
               setQuotesWithCoords,
               onQuoteClick
-            )}
+            )} */}
           </p>
         )}
       </div>

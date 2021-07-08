@@ -2,7 +2,12 @@ import { useEffect, useRef } from 'react';
 
 let incId = Math.floor(new Date().getTime() / 1000);
 
-export const getParagraphText = (arrText, setQuotes, onQuoteClick) => {
+export const ParagraphTextWrapper = ({
+  arrText,
+  setQuotes,
+  onQuoteClick,
+  updateSizeTime,
+}) => {
   return (
     <>
       {arrText.map((textItem, i) => {
@@ -17,7 +22,13 @@ export const getParagraphText = (arrText, setQuotes, onQuoteClick) => {
         return (
           <SpanTextPiece
             key={i}
-            {...{ textItem, newInserts, setQuotes, onQuoteClick }}
+            {...{
+              textItem,
+              newInserts,
+              setQuotes,
+              onQuoteClick,
+              updateSizeTime,
+            }}
           />
         );
       })}
@@ -30,6 +41,7 @@ export const SpanTextPiece = ({
   newInserts,
   setQuotes,
   onQuoteClick,
+  updateSizeTime,
 }) => {
   const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
@@ -45,6 +57,7 @@ export const SpanTextPiece = ({
       const rect = spanFragment.current.getBoundingClientRect();
       const turnEl =
         spanFragment.current.parentElement.parentElement.parentElement;
+
       const left = rect.left - turnEl.offsetLeft;
       const top = rect.top - turnEl.offsetTop;
 
@@ -63,7 +76,7 @@ export const SpanTextPiece = ({
     });
     // console.log(spanFragment.current.getBoundingClientRect());
     // console.log({ newInserts });
-  }, []);
+  }, [updateSizeTime]);
 
   return (
     <span

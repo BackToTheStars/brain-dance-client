@@ -28,9 +28,6 @@ const AddEditTurnPopup = () => {
   const [form, setForm] = useState({});
   const { createTurn, turns, dispatch, turnToEdit, updateTurn } =
     useTurnContext();
-  // console.log('AddEditTurnPopup');
-  // console.log({ turns });
-
   const {
     minimapState: { left, top },
     createEditTurnPopupIsHidden,
@@ -39,6 +36,7 @@ const AddEditTurnPopup = () => {
 
   useEffect(() => {
     if (!!turnToEdit) {
+      setActiveTemplate(turnToEdit.contentType);
       const newForm = {};
       for (let fieldToShow of fieldsToShow) {
         if (!!turnToEdit[fieldToShow]) {
@@ -54,21 +52,7 @@ const AddEditTurnPopup = () => {
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
         // quill.setContents(turnToEdit.paragraph);
-        quill.setContents(
-          turnToEdit.paragraph
-          // .map((insert) => ({
-          //   ...insert,
-          //   attributes: insert.attributes
-          //     ? {
-          //         ...insert.attributes,
-          //         border: '1px solid black',
-          //         // color: `#${insert.attributes.id}`,
-          //         color: '#cccccc',
-          //       }
-          //     : {},
-          // })
-          // )
-        );
+        quill.setContents(turnToEdit.paragraph);
         setTimeout(() => {
           const spans = document.querySelectorAll('.ql-editor span');
           let i = 1;
@@ -77,7 +61,13 @@ const AddEditTurnPopup = () => {
           }
         }, 300);
       }
-    } else setForm({});
+    } else {
+      setForm({});
+      const { quill } = quillConstants;
+      if (!!quill) {
+        quill.setContents([]);
+      }
+    }
   }, [turnToEdit]);
 
   useEffect(() => {
@@ -88,9 +78,7 @@ const AddEditTurnPopup = () => {
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
-    console.log(form);
     const textArr = quillConstants.getQuillTextArr();
-    console.log({ textArr });
     const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
     const { x: zeroPointX, y: zeroPointY } = zeroPoint;
 
@@ -144,6 +132,8 @@ const AddEditTurnPopup = () => {
         availableFields.includes(fieldToShow)
       ) {
         preparedForm[fieldToShow] = form[fieldToShow];
+      } else {
+        preparedForm[fieldToShow] = null;
       }
     }
 
@@ -166,8 +156,7 @@ const AddEditTurnPopup = () => {
       ...preparedForm,
       height: 500,
       width: 500,
-      x: -zeroPointX + Math.floor(window.innerWidth / 2) - 250,
-      y: -zeroPointY + Math.floor(window.innerHeight / 2) - 250,
+
       // x: -left + freeSpaceLeftRight + 50,
       // y: -top + freeSpaceTopBottom + 50,
       paragraph: resTextArr,
@@ -176,6 +165,8 @@ const AddEditTurnPopup = () => {
     };
 
     if (!!turnToEdit) {
+      turnObj.x = -zeroPointX + turnToEdit.x;
+      turnObj.y = -zeroPointY + turnToEdit.y;
       const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
 
       if (prevQuotes.length > quotes.length) {
@@ -207,6 +198,8 @@ const AddEditTurnPopup = () => {
         },
       });
     } else {
+      turnObj.x = -zeroPointX + Math.floor(window.innerWidth / 2) - 250;
+      turnObj.y = -zeroPointY + Math.floor(window.innerHeight / 2) - 250;
       // создать шаг, закрыть модальное окно
       createTurn(turnObj, {
         successCallback: (data) => {
@@ -266,7 +259,7 @@ const AddEditTurnPopup = () => {
                       type="radio"
                       name="template"
                       value={templateSettings.value}
-                      defaultChecked={activeTemplate === el}
+                      checked={activeTemplate === el}
                       onChange={(e) => {
                         setActiveTemplate(el);
                         setError(null);

@@ -2,8 +2,10 @@ import { useRouter } from 'next/router';
 import { useUiContext } from '../contexts/UI_Context'; // export const useUiContext
 import useUser from '../hooks/user'; // export default useUser
 import { useUserContext } from '../contexts/UserContext';
-import { useTurnContext } from '../contexts/TurnContext';
-
+import {
+  useTurnContext,
+  ACTION_RESET_TURN_EDIT_MODE,
+} from '../contexts/TurnContext';
 import { RULE_VIEW, RULE_TURNS_CRUD } from '../config';
 
 const ButtonsPanel = () => {
@@ -14,7 +16,7 @@ const ButtonsPanel = () => {
     minimapDispatch,
     setCreateEditTurnPopupIsHidden,
   } = useUiContext();
-  const { saveField } = useTurnContext();
+  const { saveField, dispatch: turnDispatch } = useTurnContext();
   const router = useRouter();
   const { info, can } = useUserContext();
 
@@ -25,7 +27,10 @@ const ButtonsPanel = () => {
           <button
             id="add-new-box-to-game-btn"
             className="btn  btn-primary"
-            onClick={(e) => setCreateEditTurnPopupIsHidden(false)}
+            onClick={(e) => {
+              turnDispatch({ type: ACTION_RESET_TURN_EDIT_MODE });
+              setCreateEditTurnPopupIsHidden(false);
+            }}
           >
             Add Turn
           </button>
