@@ -350,7 +350,12 @@ const FormInput = ({
             type={inputType}
             className="form-control"
             value={value}
-            onChange={(e) => changeHandler(e.target.value)}
+            onChange={(e) =>
+              changeHandler(
+                inputType === 'checkbox' ? e.target.checked : e.target.value
+              )
+            }
+            checked={inputType === 'checkbox' && value}
           />
         )}
       </div>

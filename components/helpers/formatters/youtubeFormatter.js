@@ -10,7 +10,7 @@
     https://youtu.be/SB1W4il3eH8?t=49    
 */
 
-function youtubeFormatter(videoAddress) {
+function youtubeFormatterOld(videoAddress) {
   let videoHash;
   let startTime;
   let endTime;
@@ -71,6 +71,15 @@ function youtubeFormatter(videoAddress) {
   // const address = videoAddress.slice(videoAddress.lastIndexOf('?v=') + 3);
 
   // return address;
+}
+
+/*
+ *  Варианты адресов:
+    https://www.youtube.com/watch?v=Lo9SOZr5aQU
+ */
+function youtubeFormatter(videoAddress) {
+  const splited = videoAddress.split('=');
+  return splited[1];
 }
 
 export { youtubeFormatter };

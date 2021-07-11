@@ -10,6 +10,7 @@ const TEMPLATE_CAROUSEL = 'carousel';
 const TEMPLATE_NEWS = 'news';
 
 const FIELD_HEADER = 'header';
+const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
 const FIELD_PICTURE = 'imageUrl';
 const FIELD_VIDEO = 'videoUrl';
 const FIELD_DATE = 'date';
@@ -51,6 +52,11 @@ const fieldSettings = {
   [FIELD_HEADER]: {
     label: 'Header',
     prefixClass: 'header',
+  },
+  [FIELD_DONT_SHOW_HEADER]: {
+    label: "Don't show header",
+    prefixClass: 'dont-show-header',
+    inputType: 'checkbox',
   },
   [FIELD_BACKGROUND_COLOR]: {
     label: 'Background Color',

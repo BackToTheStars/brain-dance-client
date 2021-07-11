@@ -266,7 +266,11 @@ const Turn = ({
       <h5
         className="headerText"
         ref={headerEl}
-        style={contentType === 'comment' ? { backgroundColor } : {}}
+        style={
+          contentType === 'comment'
+            ? { backgroundColor, color: fontColor || 'black' }
+            : {}
+        }
       >
         <div className="headerTextTitle">{header}</div>
         <div className="headerTextActions">
@@ -300,8 +304,13 @@ const Turn = ({
           <div className="video" ref={videoEl}>
             <div className="iframe-overlay" />
             <YouTube
-              videoId={`${videoUrl}`}
-              onReady={() => handleResize()}
+              videoId={videoUrl}
+              onReady={() =>
+                setTimeout(() => {
+                  // @todo: убедиться, что iframe не только "готов", но и отрисован
+                  handleResize();
+                }, 1000)
+              }
               width="100%"
               height="100%"
             ></YouTube>
@@ -324,7 +333,11 @@ const Turn = ({
           <p
             className="paragraphText"
             ref={paragraphEl}
-            style={contentType === 'comment' ? { backgroundColor } : {}}
+            style={
+              contentType === 'comment'
+                ? { backgroundColor, color: fontColor || 'black' }
+                : {}
+            }
           >
             <ParagraphTextWrapper
               arrText={paragraph || []}
