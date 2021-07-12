@@ -59,15 +59,23 @@ const fieldSettings = {
     inputType: 'checkbox',
   },
   [FIELD_BACKGROUND_COLOR]: {
-    label: 'Background Color',
+    label: 'Background',
     prefixClass: 'background-color',
     inputType: 'color-picker',
+    widgetSettings: {
+      colors: ['#bfcef5', '#afe3df', '#d5f0d1', '#eced9a', '#f0dbd1'],
+      defaultColor: '#eced9a',
+    },
     special: true,
   },
   [FIELD_FONT_COLOR]: {
     label: 'Font Color',
     prefixClass: 'font-color',
     inputType: 'color-picker',
+    widgetSettings: {
+      colors: ['#0a0a0a', '#17165c', '#0d360e', '#36330d', '#360e0d'],
+      defaultColor: '#0a0a0a',
+    },
     special: true,
   },
   [FIELD_PICTURE]: {

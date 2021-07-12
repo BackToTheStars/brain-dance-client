@@ -6,6 +6,28 @@ $black-color: rgb(0, 0, 0);
   position: absolute;
   /* border: 2px solid blue; */
   z-index: 2;
+  &.dont-show-header {
+    &:hover {
+      .headerTextActions {
+        transform: translateY(15%);
+      }
+    }
+    .headerText {
+      position: absolute;
+      top: 0;
+      background-color: rgba(255, 255, 255, 0);
+      // transform: translateY(-100%);
+      justify-content: flex-end;
+    }
+    .headerTextTitle {
+      display: none;
+    }
+    .headerTextActions {
+      transition: 0.25s;
+      transform: translateY(-150%);
+    }
+  }
+
   &.zero-point {
     visibility: hidden;
   }

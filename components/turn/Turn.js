@@ -44,6 +44,7 @@ const Turn = ({
     contentType,
     backgroundColor,
     fontColor,
+    dontShowHeader,
   } = turn;
   const wrapper = useRef(null);
   const paragraphEl = useRef(null);
@@ -102,6 +103,8 @@ const Turn = ({
     // this.wasChanged = true;
     let minMediaHeight = 15; // @todo
 
+    const headerHeight = dontShowHeader ? 0 : $(headerEl.current).height();
+
     let maxMediaHeight = isParagraphExist
       ? paragraphEl.current.scrollHeight + 15
       : 15; // 15 это снизу появляется нестыковка
@@ -136,23 +139,23 @@ const Turn = ({
 
     $(wrapper.current).css(
       'min-height',
-      `${minMediaHeight + $(headerEl.current).height() + paragraphExtraPx}px`
+      `${minMediaHeight + headerHeight + paragraphExtraPx}px`
     );
     $(wrapper.current).css(
       'max-height',
-      `${maxMediaHeight + $(headerEl.current).height() - 2}px`
+      `${maxMediaHeight + headerHeight - 2}px`
     );
     // получить высоту el, вычесть высоту header, сохранить в media wrapper
 
     $(mediaWrapperEl.current).height(
       // @fixme: 1px
-      $(wrapper.current).height() + 1 - $(headerEl.current).height()
+      $(wrapper.current).height() + 1 - headerHeight
     );
 
-    if (!(minMediaHeight + $(headerEl.current).height() + paragraphExtraPx)) {
+    if (!(minMediaHeight + headerHeight + paragraphExtraPx)) {
       console.log('Необходимо выполнить проверку минимальной высоты шага');
     }
-    if (!(maxMediaHeight + $(headerEl.current).height() - 2)) {
+    if (!(maxMediaHeight + headerHeight - 2)) {
       console.log('Необходимо выполнить проверку максимальной высоты шага');
     }
 
@@ -260,14 +263,16 @@ const Turn = ({
   return (
     <div
       ref={wrapper}
-      className={`${contentType} react-turn`}
+      className={`${contentType} react-turn ${
+        dontShowHeader ? 'dont-show-header' : ''
+      }`}
       style={styles.wrapper}
     >
       <h5
         className="headerText"
         ref={headerEl}
         style={
-          contentType === 'comment'
+          contentType === 'comment' && !dontShowHeader
             ? { backgroundColor, color: fontColor || 'black' }
             : {}
         }

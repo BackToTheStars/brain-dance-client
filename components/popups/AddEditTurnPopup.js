@@ -291,6 +291,7 @@ const AddEditTurnPopup = () => {
                     inputType={fieldSettings[field].inputType}
                     key={field}
                     value={form[field] || ''}
+                    widgetSettings={fieldSettings[field].widgetSettings}
                   />
                 );
               })}
@@ -315,12 +316,19 @@ const AddEditTurnPopup = () => {
   );
 };
 
-const ColorPicker = ({ value, changeHandler }) => {
-  const colors = ['#ff0000', '#00ff00', '#0000ff', '#eced9a'];
+const ColorPicker = ({ value, changeHandler, widgetSettings }) => {
+  // @todo: проверить, почему настройки по умолчанию устанавливаются только
+  // для последнего ColorPicker
+  useEffect(() => {
+    if (!!widgetSettings.defaultColor && !value) {
+      console.log(widgetSettings.defaultColor);
+      changeHandler(widgetSettings.defaultColor);
+    }
+  }, [widgetSettings.defaultColor]);
 
   return (
     <div className="color-picker-widget">
-      {colors.map((color, index) => (
+      {widgetSettings.colors.map((color, index) => (
         <div
           key={index}
           className={`color-picker-square ${value === color ? 'active' : ''}`}
@@ -338,13 +346,18 @@ const FormInput = ({
   inputType = 'text',
   changeHandler = () => {},
   value,
+  widgetSettings = {},
 }) => {
   return (
     <div className={`form-group row ${prefixClass}-row`}>
       <label className="col-sm-3 col-form-label">{label}</label>
       <div className="col-sm-9">
         {inputType === 'color-picker' ? (
-          <ColorPicker value={value} changeHandler={changeHandler} />
+          <ColorPicker
+            value={value}
+            changeHandler={changeHandler}
+            widgetSettings={widgetSettings}
+          />
         ) : (
           <input
             type={inputType}
