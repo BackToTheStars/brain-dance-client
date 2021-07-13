@@ -45,8 +45,8 @@ body {
 
 .headerText {
   background-color: lightgrey;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: $corners-radius;
+  border-top-right-radius: $corners-radius;
   margin-bottom: 0;
   min-height: 0;
   /* max-height: 30%;  */
@@ -100,8 +100,6 @@ body {
 .p0 {
   padding: 0;
 }
-
-
 
 /* #minimap {
   position: fixed;

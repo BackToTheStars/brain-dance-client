@@ -12,6 +12,10 @@ $black-color: rgb(0, 0, 0);
         transform: translateY(15%);
       }
     }
+    .paragraphText {
+      border-top-left-radius: $corners-radius;
+      border-top-right-radius: $corners-radius;
+    }
     .headerText {
       position: absolute;
       top: 0;
@@ -25,6 +29,7 @@ $black-color: rgb(0, 0, 0);
     .headerTextActions {
       transition: 0.25s;
       transform: translateY(-150%);
+      margin-right: 20px;
     }
   }
 

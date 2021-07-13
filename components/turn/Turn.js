@@ -105,9 +105,12 @@ const Turn = ({
 
     const headerHeight = dontShowHeader ? 0 : $(headerEl.current).height();
 
+    // let maxMediaHeight = isParagraphExist
+    //   ? paragraphEl.current.scrollHeight + 15
+    //   : 15; // 15 это снизу появляется нестыковка
     let maxMediaHeight = isParagraphExist
-      ? paragraphEl.current.scrollHeight + 15
-      : 15; // 15 это снизу появляется нестыковка
+      ? paragraphEl.current.scrollHeight
+      : minMediaHeight;
     if (imgEl && imgEl.current) {
       const newImgHeight = Math.floor(
         (imgEl.current.naturalHeight * $(wrapper.current).width()) /
@@ -119,14 +122,16 @@ const Turn = ({
       maxMediaHeight += newImgHeight;
       $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
     } else if (videoEl && videoEl.current) {
-      $(videoEl.current).width($(wrapper.current).width() - 3); // можно использовать в дизайне
+      // $(videoEl.current).width($(wrapper.current).width() - 3); // можно использовать в дизайне
+      $(videoEl.current).width($(wrapper.current).width());
       $(videoEl.current).height(
         Math.floor((9 * $(wrapper.current).width()) / 16)
       );
       // @tmp start
-      $(videoEl.current)
-        .find('iframe')
-        .width($(wrapper.current).width() - 3);
+      // $(videoEl.current)
+      //   .find('iframe')
+      //   .width($(wrapper.current).width() - 3);
+      $(videoEl.current).find('iframe').width($(wrapper.current).width());
       $(videoEl.current)
         .find('iframe')
         .height(Math.floor((9 * $(wrapper.current).width()) / 16));
@@ -135,29 +140,35 @@ const Turn = ({
       maxMediaHeight += $(videoEl.current).height();
       $(mediaWrapperEl.current).css('min-height', `${minMediaHeight}px`);
     }
-    const paragraphExtraPx = isParagraphExist ? 50 : 0;
+    // const paragraphExtraPx = isParagraphExist ? 50 : 0;
 
-    $(wrapper.current).css(
-      'min-height',
-      `${minMediaHeight + headerHeight + paragraphExtraPx}px`
-    );
-    $(wrapper.current).css(
-      'max-height',
-      `${maxMediaHeight + headerHeight - 2}px`
-    );
+    // $(wrapper.current).css(
+    //   'min-height',
+    //   `${minMediaHeight + headerHeight + paragraphExtraPx}px`
+    // );
+
+    $(wrapper.current).css('min-height', `${minMediaHeight + headerHeight}px`);
+    // $(wrapper.current).css(
+    //   'max-height',
+    //   `${maxMediaHeight + headerHeight - 2}px`
+    // );
+    $(wrapper.current).css('max-height', `${maxMediaHeight + headerHeight}px`);
     // получить высоту el, вычесть высоту header, сохранить в media wrapper
 
+    // $(mediaWrapperEl.current).height(
+    //   // @fixme: 1px
+    //   $(wrapper.current).height() + 1 - headerHeight
+    // );
     $(mediaWrapperEl.current).height(
-      // @fixme: 1px
-      $(wrapper.current).height() + 1 - headerHeight
+      $(wrapper.current).height() - headerHeight
     );
 
-    if (!(minMediaHeight + headerHeight + paragraphExtraPx)) {
-      console.log('Необходимо выполнить проверку минимальной высоты шага');
-    }
-    if (!(maxMediaHeight + headerHeight - 2)) {
-      console.log('Необходимо выполнить проверку максимальной высоты шага');
-    }
+    // if (!(minMediaHeight + headerHeight + paragraphExtraPx)) {
+    //   console.log('Необходимо выполнить проверку минимальной высоты шага');
+    // }
+    // if (!(maxMediaHeight + headerHeight - 2)) {
+    //   console.log('Необходимо выполнить проверку максимальной высоты шага');
+    // }
 
     if (timerId) {
       // замедляем на 200мс update линий между цитатами
