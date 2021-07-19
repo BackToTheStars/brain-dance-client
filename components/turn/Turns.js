@@ -30,6 +30,19 @@ const TurnsComponent = () => {
           return turnsToRender.includes(turn._id);
         })
         .map((turn) => {
+          const turnLineEnds = {};
+          for (let quoteId in lineEnds) {
+            const lines = lineEnds[quoteId].lines.filter(
+              (line) =>
+                (line.sourceTurnId === turn._id &&
+                  line.sourceMarker === +quoteId) ||
+                (line.targetTurnId === turn._id &&
+                  line.targetMarker === +quoteId)
+            );
+            if (lines.length) {
+              turnLineEnds[quoteId] = lines;
+            }
+          }
           return (
             <Turn
               key={turn._id}
@@ -42,7 +55,7 @@ const TurnsComponent = () => {
                 deleteTurn,
                 setCreateEditTurnPopupIsHidden,
                 tempMiddlewareFn,
-                lineEnds,
+                lineEnds: turnLineEnds,
                 activeQuote, // активная цитата, на которую кликнули мышкой
               }}
             />

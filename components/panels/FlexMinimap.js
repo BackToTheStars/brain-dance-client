@@ -220,6 +220,14 @@ const SVGMiniMap = ({
   lines,
   onMapClick,
 }) => {
+  const k = width / minimapWidth;
+  // 75 -> 1.5 (x1, y1)
+  // 6 -> 4 (x2, y2)
+  const tg = (1.5 - 4) / (75 - 6);
+  const c = 1.5 - 75 * tg;
+  const y = c + tg * k;
+  const lineWidth = Math.floor(y * k);
+
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -252,7 +260,7 @@ const SVGMiniMap = ({
             {...{ x1, y1, x2, y2 }}
             key={id}
             stroke="red"
-            strokeWidth="75"
+            strokeWidth={lineWidth}
           />
         );
       })}
