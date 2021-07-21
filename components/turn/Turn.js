@@ -108,9 +108,10 @@ const Turn = ({
     // let maxMediaHeight = isParagraphExist
     //   ? paragraphEl.current.scrollHeight + 15
     //   : 15; // 15 это снизу появляется нестыковка
-    let maxMediaHeight = isParagraphExist
-      ? paragraphEl.current.scrollHeight
-      : minMediaHeight;
+    let maxMediaHeight =
+      isParagraphExist && paragraphEl.current
+        ? paragraphEl.current.scrollHeight
+        : minMediaHeight;
     if (imgEl && imgEl.current) {
       const newImgHeight = Math.floor(
         (imgEl.current.naturalHeight * $(wrapper.current).width()) /
@@ -243,6 +244,14 @@ const Turn = ({
         });
       },
     });
+    if (!!paragraphEl.current) {
+      paragraphEl.current.addEventListener('scroll', () => {
+        // setQuotesLoaded(false);
+        // setQuotesWithCoords([]);
+        // setUpdateSizeTime(new Date().getTime());
+        handleResize();
+      });
+    }
   }, []);
 
   useEffect(handleResize, [turn]);
@@ -260,6 +269,9 @@ const Turn = ({
   useEffect(() => {
     if (!imgEl || !imgEl.current) return;
     imgEl.current.onload = handleResize;
+    return () => {
+      // @todo: remove event handler
+    };
   }, [imgEl]);
 
   const styles = {

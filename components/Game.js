@@ -27,6 +27,8 @@ import QuotesPanel from './panels/QuotesPanel';
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
+  const [turnsLoaded, setTurnsLoaded] = useState(false); // @todo: refactoring
+
   const gameBox = useRef();
   const { token, info, can, timecode } = useUserContext();
   // const {
@@ -36,7 +38,7 @@ const GameComponent = () => {
   // minimapDispatch,
   // } = useUiContext();
 
-  const { dispatch: turnsDispatch } = useTurnContext();
+  const { dispatch: turnsDispatch, turns } = useTurnContext();
 
   //   const notificationAlert = (note) => {
   //     setNotes((notes) => {
@@ -45,6 +47,10 @@ const GameComponent = () => {
   //   };
 
   useEffect(() => {
+    if (!turns.length) return;
+    if (turnsLoaded) return;
+    setTurnsLoaded(true);
+
     fetch(`${API_URL}/game?hash=${info.hash}`, {
       method: 'GET',
       headers: {
@@ -99,7 +105,7 @@ const GameComponent = () => {
         $(gameBox.current).css('top', 0);
       },
     });
-  }, []);
+  }, [turns]);
 
   //   useEffect(() => {
   //     globalGame = new Game({

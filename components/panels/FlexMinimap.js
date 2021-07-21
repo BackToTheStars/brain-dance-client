@@ -1,5 +1,5 @@
 import { useUiContext } from '../contexts/UI_Context';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   useTurnContext,
   ACTION_FIELD_WAS_MOVED,
@@ -8,7 +8,8 @@ import { panelSpacer } from './сonst';
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
-  const { dispatch: turnsDispatch, lines } = useTurnContext();
+  const { dispatch: turnsDispatch, lines: uiLines } = useTurnContext();
+  const [lines, setLines] = useState([]);
   const {
     left,
     right,
@@ -150,6 +151,22 @@ const FlexMinimap = ({ gameBox }) => {
     }
     // }, 250);
   }, [isHidden, left, right, top, bottom]); // подумать ещё, при изменениях самой миникарты, ширины и проч.
+
+  // if (!lines.length || !value.turns.length) {
+  //   return 'Loading...';
+  // }
+
+  // useEffect(() => {
+  //   console.log({
+  //     lines,
+  //     valueTurns: value.turns,
+  //   });
+  // }, [lines, value.turns]);
+  useEffect(() => {
+    if (turns.length && uiLines.length) {
+      setLines(uiLines);
+    }
+  }, [uiLines, turns]);
 
   value.lines = getLinesByTurns(value.turns, lines);
   const style = { transform: `translateY(${isHidden ? '120%' : '0%'})` }; // контролируем стиль из компонента
