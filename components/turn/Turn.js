@@ -14,6 +14,7 @@ import {
 import YouTube from 'react-youtube';
 
 let timerId = null;
+let timerScroll = null;
 
 const Turn = ({
   turn,
@@ -39,7 +40,7 @@ const Turn = ({
     imageUrl,
     paragraph,
     wasChanged = false,
-    scrollPosition, // @todo
+    scrollPosition,
     quotes,
     contentType,
     backgroundColor,
@@ -57,6 +58,7 @@ const Turn = ({
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -250,11 +252,25 @@ const Turn = ({
         // setQuotesWithCoords([]);
         // setUpdateSizeTime(new Date().getTime());
         handleResize();
+        if (timerScroll) {
+          clearTimeout(timerScroll);
+        }
+        timerScroll = setTimeout(() => {
+          // console.log(Math.floor(paragraphEl.current.scrollTop));
+          dispatch({
+            type: ACTION_TURN_WAS_CHANGED,
+            payload: {
+              _id: _id,
+              wasChanged: true,
+              scrollPosition: paragraphEl.current.scrollTop,
+            },
+          });
+        }, 150);
       });
     }
   }, []);
 
-  useEffect(handleResize, [turn]);
+  useEffect(handleResize, [turn, imageLoaded]);
 
   useEffect(() => {
     if (!wrapper) return;
@@ -267,8 +283,31 @@ const Turn = ({
   }, [wrapper]);
 
   useEffect(() => {
+    if (!paragraph || !paragraphEl.current || !scrollPosition) return;
+    if (!!imgEl && !!imgEl.current && !imageLoaded) return;
+
+    paragraphEl.current.scrollTop = scrollPosition;
+  }, [
+    paragraphEl,
+    scrollPosition,
+    imageLoaded,
+    // , imgEl
+  ]);
+
+  useEffect(() => {
     if (!imgEl || !imgEl.current) return;
-    imgEl.current.onload = handleResize;
+    imgEl.current.onload = () => {
+      handleResize();
+      setImageLoaded(true);
+      // setTimeout(() => {
+      //   dispatch({
+      //     type: ACTION_TURN_WAS_CHANGED,
+      //     payload: {
+      //       _id: _id,
+      //     },
+      //   });
+      // }, 500);
+    };
     return () => {
       // @todo: remove event handler
     };
