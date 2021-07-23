@@ -1,4 +1,9 @@
-const Line = ({ sourceCoords, targetCoords }) => {
+const Line = ({
+  sourceCoords,
+  targetCoords,
+  stroke = 'red',
+  strokeWidth = 2,
+}) => {
   //   const sourceCoords = this.sourceQuote.getCoords();
   //   const targetCoords = this.targetQuote.getCoords();
   const sideBarWidth = 0; // @todo: change the layout
@@ -21,7 +26,6 @@ const Line = ({ sourceCoords, targetCoords }) => {
 
   // ГЛОБАЛЬНЫЕ НАСТРОЙКИ ВНЕШНЕГО ВИДА ЛИНИЙ
   const k = 0.3; // - константа внешнего вида кривых
-  const thickness = 2;
 
   return (
     <path
@@ -30,8 +34,8 @@ const Line = ({ sourceCoords, targetCoords }) => {
       }, ${line.x2 - k * (line.x2 - line.x1)} ${line.y2}, ${line.x2} ${
         line.y2
       }`}
-      stroke="red"
-      strokeWidth={thickness}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
       fill="transparent"
     />
   );

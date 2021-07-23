@@ -27,6 +27,7 @@ const Turn = ({
   tempMiddlewareFn,
   lineEnds,
   activeQuote,
+  windowSize,
 }) => {
   const {
     _id,
@@ -183,6 +184,10 @@ const Turn = ({
       setUpdateSizeTime(new Date().getTime());
     }, 200);
   };
+
+  useEffect(() => {
+    handleResize();
+  }, [windowSize]);
 
   useEffect(() => {
     if (quotesLoaded) return;

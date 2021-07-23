@@ -35,7 +35,7 @@ const QuotesLinesLayer = () => {
         })}
       </svg>
       {!svgLayerZIndex && (
-        <div>
+        <div className="rec-rectangle">
           <div className="rec-label"></div>
           <div className="rec-text">
             <h2>EDIT</h2>

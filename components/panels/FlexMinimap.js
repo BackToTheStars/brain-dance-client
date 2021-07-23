@@ -5,6 +5,7 @@ import {
   ACTION_FIELD_WAS_MOVED,
 } from '../contexts/TurnContext';
 import { panelSpacer } from './сonst';
+import Line from '../line/line';
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
@@ -273,8 +274,9 @@ const SVGMiniMap = ({
       })}
       {lines.map(({ x1, y1, x2, y2, id }) => {
         return (
-          <line
-            {...{ x1, y1, x2, y2 }}
+          <Line
+            sourceCoords={{ left: x1, top: y1, height: 0, width: 0 }}
+            targetCoords={{ left: x2, top: y2, height: 0, width: 0 }}
             key={id}
             stroke="red"
             strokeWidth={lineWidth}

@@ -4,6 +4,7 @@ $black-color: rgb(0, 0, 0);
 
 .react-turn {
   position: absolute;
+  cursor: move;
   /* border: 2px solid blue; */
   z-index: 2;
   &.dont-show-header {
@@ -62,9 +63,9 @@ $black-color: rgb(0, 0, 0);
   width: 100%;
   display: flex;
 
-  #modalBackground {
-    /* display: block; */
-  }
+  // #modalBackground {
+  /* display: block; */
+  // }
 }
 
 .turn-overlay {
@@ -120,9 +121,9 @@ $black-color: rgb(0, 0, 0);
 //   align-items: center;
 // }
 
-.video {
-  position: relative;
-}
+// .video {
+//   position: relative;
+// }
 
 .iframe-overlay {
   position: absolute;

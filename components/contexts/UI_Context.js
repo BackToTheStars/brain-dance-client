@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from 'react';
+import { useState, useContext, createContext, useEffect } from 'react';
 import { useReducer } from 'reinspect';
 
 export const NOTIFICATION_TRANSITION = 500;
@@ -87,6 +87,10 @@ const minimapReducer = (state, action) => {
 export const UI_Provider = ({ children }) => {
   // массив уведомлений в консоль событий
   const [notifications, setNotifications] = useState([]);
+  const [windowSize, setWindowSize] = useState({
+    innerHeight: 600,
+    innerWidth: 800,
+  });
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -129,6 +133,16 @@ export const UI_Provider = ({ children }) => {
     }, 3000 + NOTIFICATION_TRANSITION);
   };
 
+  useEffect(() => {
+    if (!window) return;
+    window.addEventListener('resize', () => {
+      setWindowSize({
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+      });
+    });
+  }, []);
+
   return (
     <UI_Context.Provider
       value={{
@@ -146,6 +160,8 @@ export const UI_Provider = ({ children }) => {
 
         notifications,
         addNotification,
+
+        windowSize,
       }}
     >
       {children}

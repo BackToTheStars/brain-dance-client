@@ -154,25 +154,37 @@ body {
 /* Николай - пока скрыл кнопку Refresh */
 /* } */
 
-.rec-label {
+.rec-rectangle {
   position: fixed;
   background: rgba(255, 0, 0, 0.8);
+  transform: translateX(-50%);
+  left: 50%;
+  width: 140px;
+  height: 60px;
+  z-index: 4;
+  top: 10px;
+  border-radius: $corners-radius;
+}
+
+.rec-label {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
   width: 30px;
   height: 30px;
-  top: 26px;
-  right: 103px;
+  top: 15px;
+  right: 94px;
   z-index: 5;
 }
 
 .rec-text {
-  position: fixed;
-  color: rgba(255, 0, 0, 0.8);
+  position: absolute;
+  color: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   width: 30px;
   height: 30px;
-  top: 20px;
-  right: 65px;
+  top: 9px;
+  right: 56px;
   z-index: 5;
   font-size: 1.4rem;
 

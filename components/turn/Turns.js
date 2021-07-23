@@ -18,6 +18,7 @@ const TurnsComponent = () => {
   const {
     minimapState: { turnsToRender },
     setCreateEditTurnPopupIsHidden,
+    windowSize,
   } = useUiContext();
 
   // console.log('turns component', { turns }, ' turnsToRender: ', {
@@ -57,6 +58,7 @@ const TurnsComponent = () => {
                 tempMiddlewareFn,
                 lineEnds: turnLineEnds,
                 activeQuote, // активная цитата, на которую кликнули мышкой
+                windowSize,
               }}
             />
           );
