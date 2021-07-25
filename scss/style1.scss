@@ -68,16 +68,18 @@ body {
   top: 0;
   left: 0;
   z-index: 0;
+  &.front-elements {
+    z-index: 3;
+  }
+  path {
+    transition: 0.3s;
+  }
 }
 
 .red-border-to-quote {
   outline: 3px solid red;
   padding-left: 3px;
   padding-right: 3px;
-}
-
-#lines.front-elements {
-  z-index: 3;
 }
 
 #gameInfoPanel {

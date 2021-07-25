@@ -14,7 +14,10 @@ import {
 import YouTube from 'react-youtube';
 
 let timerId = null;
+const delayRenderTurn = 10;
+
 let timerScroll = null;
+const delayRenderScroll = 5;
 
 const Turn = ({
   turn,
@@ -182,7 +185,7 @@ const Turn = ({
       setQuotesLoaded(false);
       setQuotesWithCoords([]);
       setUpdateSizeTime(new Date().getTime());
-    }, 200);
+    }, delayRenderTurn);
   };
 
   useEffect(() => {
@@ -270,7 +273,7 @@ const Turn = ({
               scrollPosition: paragraphEl.current.scrollTop,
             },
           });
-        }, 150);
+        }, delayRenderScroll);
       });
     }
   }, []);
@@ -416,6 +419,21 @@ const Turn = ({
               updateSizeTime={updateSizeTime}
               setQuotes={setQuotesWithCoords}
               onQuoteClick={onQuoteClick}
+              paragraphHeight={
+                !!paragraphEl && !!paragraphEl.current
+                  ? $(paragraphEl.current).height()
+                  : 0
+              }
+              paragraphWidth={
+                !!paragraphEl && !!paragraphEl.current
+                  ? $(paragraphEl.current).width()
+                  : 0
+              }
+              paragraphScroll={
+                !!paragraphEl && !!paragraphEl.current
+                  ? paragraphEl.current.scrollTop
+                  : 0
+              }
             />
             {/* {getParagraphText(
               paragraph || [],
@@ -438,12 +456,11 @@ const Turn = ({
           }
           return (
             <div
-              key={i}
+              className="quote-rectangle"
+              key={quote.id}
               style={{
                 ...quote,
-                position: 'absolute',
                 outline: bordered ? '2px solid red' : '0px solid transparent',
-                cursor: 'pointer',
               }}
               onClick={() => onQuoteClick(quote.id)}
             ></div>

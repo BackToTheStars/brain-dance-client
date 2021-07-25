@@ -7,6 +7,9 @@ export const ParagraphTextWrapper = ({
   setQuotes,
   onQuoteClick,
   updateSizeTime,
+  paragraphHeight,
+  paragraphWidth,
+  paragraphScroll,
 }) => {
   return (
     <>
@@ -28,6 +31,9 @@ export const ParagraphTextWrapper = ({
               setQuotes,
               onQuoteClick,
               updateSizeTime,
+              paragraphHeight,
+              paragraphWidth,
+              paragraphScroll,
             }}
           />
         );
@@ -42,6 +48,9 @@ export const SpanTextPiece = ({
   setQuotes,
   onQuoteClick,
   updateSizeTime,
+  paragraphHeight,
+  paragraphWidth,
+  paragraphScroll,
 }) => {
   const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
@@ -57,6 +66,18 @@ export const SpanTextPiece = ({
       const rect = spanFragment.current.getBoundingClientRect();
       const turnEl =
         spanFragment.current.parentElement.parentElement.parentElement;
+      let isQuoteVisible = true;
+
+      console.log(rect.top, rect.height / 2, paragraphScroll, paragraphHeight);
+
+      if (rect.top + rect.height / 2 < paragraphScroll) {
+        console.log('quote hidden up');
+      } else if (
+        rect.top + rect.height / 2 >
+        paragraphScroll + paragraphHeight
+      ) {
+        console.log('quote hidden down');
+      }
 
       const left = rect.left - turnEl.offsetLeft;
       const top = rect.top - turnEl.offsetTop;
