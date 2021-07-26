@@ -158,6 +158,8 @@ $black-color: rgb(0, 0, 0);
 
 .ql-container {
   font-size: 1.35rem;
+  overflow-y: auto;
+  max-height: 65vh;
 }
 
 /* подписи для ссылки и для даты */

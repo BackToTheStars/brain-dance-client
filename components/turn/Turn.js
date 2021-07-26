@@ -434,6 +434,11 @@ const Turn = ({
                   ? paragraphEl.current.scrollTop
                   : 0
               }
+              paragraphTop={
+                !!paragraphEl && !!paragraphEl.current
+                  ? paragraphEl.current.getBoundingClientRect()
+                  : 0
+              }
             />
             {/* {getParagraphText(
               paragraph || [],
