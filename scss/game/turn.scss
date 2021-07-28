@@ -47,10 +47,12 @@ $black-color: rgb(0, 0, 0);
   .video iframe {
     width: 100%;
     height: 100%;
+    z-index: 1;
   }
 
   .picture-content {
     width: 100%;
+    z-index: 1;
     /* height: 100%; */
     background: $black-color;
     img {
@@ -113,6 +115,17 @@ $black-color: rgb(0, 0, 0);
   a.delete-btn:hover {
     color: rgb(255, 92, 92);
   }
+}
+.paragraphText {
+  background-color: whitesmoke;
+  min-height: 0;
+  width: 100%;
+  max-height: 100%;
+  overflow-x: auto;
+  overflow-y: scroll;
+  padding: 5px 15px 15px 15px;
+  font-size: 1.15rem;
+  // border-bottom-left-radius: 10px;
 }
 
 // .react-turn .media-wrapper { вместо нестинга CSS сделали нестинг SASS

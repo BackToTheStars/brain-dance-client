@@ -419,25 +419,25 @@ const Turn = ({
               updateSizeTime={updateSizeTime}
               setQuotes={setQuotesWithCoords}
               onQuoteClick={onQuoteClick}
-              paragraphHeight={
-                !!paragraphEl && !!paragraphEl.current
-                  ? $(paragraphEl.current).height()
-                  : 0
-              }
-              paragraphWidth={
-                !!paragraphEl && !!paragraphEl.current
-                  ? $(paragraphEl.current).width()
-                  : 0
-              }
-              paragraphScroll={
-                !!paragraphEl && !!paragraphEl.current
-                  ? paragraphEl.current.scrollTop
-                  : 0
-              }
-              paragraphTop={
+              // paragraphHeight={
+              //   !!paragraphEl && !!paragraphEl.current
+              //     ? $(paragraphEl.current).height()
+              //     : 0
+              // }
+              // paragraphWidth={
+              //   !!paragraphEl && !!paragraphEl.current
+              //     ? $(paragraphEl.current).width()
+              //     : 0
+              // }
+              // paragraphScroll={
+              //   !!paragraphEl && !!paragraphEl.current
+              //     ? paragraphEl.current.scrollTop
+              //     : 0
+              // }
+              paragraphRect={
                 !!paragraphEl && !!paragraphEl.current
                   ? paragraphEl.current.getBoundingClientRect()
-                  : 0
+                  : {}
               }
             />
             {/* {getParagraphText(
@@ -452,6 +452,7 @@ const Turn = ({
       <>
         {quotesWithCoords.map((quote, i) => {
           let bordered = !!lineEnds[quote.id]; // проверка нужно показывать рамку или нет
+          let outline = '0px solid transparent';
           if (
             activeQuote &&
             activeQuote.turnId === _id &&
@@ -459,13 +460,20 @@ const Turn = ({
           ) {
             bordered = true;
           }
+          if (bordered) {
+            outline = '2px solid red';
+            if (quote.position === 'top' || quote.position === 'bottom') {
+              outline = '2px solid red';
+            }
+          }
+
           return (
             <div
               className="quote-rectangle"
               key={quote.id}
               style={{
                 ...quote,
-                outline: bordered ? '2px solid red' : '0px solid transparent',
+                outline,
               }}
               onClick={() => onQuoteClick(quote.id)}
             ></div>

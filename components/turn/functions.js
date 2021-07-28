@@ -7,10 +7,10 @@ export const ParagraphTextWrapper = ({
   setQuotes,
   onQuoteClick,
   updateSizeTime,
-  paragraphHeight,
-  paragraphWidth,
-  paragraphScroll,
-  paragraphTop,
+  // paragraphHeight,
+  // paragraphWidth,
+  // paragraphScroll,
+  paragraphRect,
 }) => {
   return (
     <>
@@ -32,10 +32,10 @@ export const ParagraphTextWrapper = ({
               setQuotes,
               onQuoteClick,
               updateSizeTime,
-              paragraphHeight,
-              paragraphWidth,
-              paragraphScroll,
-              paragraphTop,
+              // paragraphHeight,
+              // paragraphWidth,
+              // paragraphScroll,
+              paragraphRect,
             }}
           />
         );
@@ -50,10 +50,10 @@ export const SpanTextPiece = ({
   setQuotes,
   onQuoteClick,
   updateSizeTime,
-  paragraphHeight,
-  paragraphWidth,
-  paragraphScroll,
-  paragraphTop,
+  // paragraphHeight,
+  // paragraphWidth,
+  // paragraphScroll,
+  paragraphRect,
 }) => {
   const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
@@ -71,38 +71,61 @@ export const SpanTextPiece = ({
         spanFragment.current.parentElement.parentElement.parentElement;
       let isQuoteVisible = true;
 
-      console.log(
-        { rect, par: paragraphTop }
-        // paragraphTop - rect.top,
-        // rect.height / 2,
-        // paragraphScroll,
-        // paragraphHeight,
-        // paragraphTop + paragraphScroll,
-        // rect.top
-      );
-
-      if (rect.top + rect.height / 2 < paragraphScroll) {
-        // console.log('quote hidden up');
-      } else if (
-        rect.top + rect.height / 2 >
-        paragraphScroll + paragraphHeight
-      ) {
-        // console.log('quote hidden down');
+      if (paragraphRect) {
+        console.log(
+          // paragraphRect.top - rect.top
+          { rect, paragraphRect }
+          // paragraphTop - rect.top,
+          // rect.height / 2,
+          // paragraphScroll,
+          // paragraphHeight,
+          // paragraphTop + paragraphScroll,
+          // rect.top
+        );
       }
 
-      const left = rect.left - turnEl.offsetLeft;
-      const top = rect.top - turnEl.offsetTop;
+      let left = rect.left - turnEl.offsetLeft;
+      let top = rect.top - turnEl.offsetTop;
+      let width = rect.width;
+      let height = rect.height;
+      let position = 'default';
+      const outlineWidth = 2; // ещё в Turn.js строчка 466
+
+      if (rect.top + rect.height / 2 < paragraphRect.top) {
+        console.log('quote hidden up');
+        //
+        height = 0;
+        width = paragraphRect.width - outlineWidth; // 2 ширины рамки
+        left = paragraphRect.left - turnEl.offsetLeft + outlineWidth;
+        top = paragraphRect.top - turnEl.offsetTop + outlineWidth;
+        position = 'top';
+        //
+      } else if (
+        rect.top + rect.height / 2 >
+        paragraphRect.top + paragraphRect.height
+      ) {
+        height = 0;
+        width = paragraphRect.width - outlineWidth;
+        left = paragraphRect.left - turnEl.offsetLeft + outlineWidth;
+        top =
+          paragraphRect.top +
+          paragraphRect.height -
+          turnEl.offsetTop +
+          outlineWidth;
+        position = 'bottom';
+      }
 
       return [
         ...quotes,
         {
           id: textItem.attributes.id || new Date().getTime(),
           // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
-          width: rect.width,
-          height: rect.height,
+          width,
+          height,
           left,
           top,
           text: textItem.insert.trim(),
+          position,
         },
       ];
     });
