@@ -330,6 +330,13 @@ const Turn = ({
     },
   };
 
+  const topQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.id] && quote.position === 'top';
+  }).length;
+  const bottomQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.id] && quote.position === 'bottom';
+  }).length;
+
   return (
     <div
       ref={wrapper}
@@ -414,32 +421,23 @@ const Turn = ({
                 : {}
             }
           >
+            {!!topQuotesCount && (
+              <div className="top-quotes-counter">{topQuotesCount}</div>
+            )}
             <ParagraphTextWrapper
               arrText={paragraph || []}
               updateSizeTime={updateSizeTime}
               setQuotes={setQuotesWithCoords}
               onQuoteClick={onQuoteClick}
-              // paragraphHeight={
-              //   !!paragraphEl && !!paragraphEl.current
-              //     ? $(paragraphEl.current).height()
-              //     : 0
-              // }
-              // paragraphWidth={
-              //   !!paragraphEl && !!paragraphEl.current
-              //     ? $(paragraphEl.current).width()
-              //     : 0
-              // }
-              // paragraphScroll={
-              //   !!paragraphEl && !!paragraphEl.current
-              //     ? paragraphEl.current.scrollTop
-              //     : 0
-              // }
               paragraphRect={
                 !!paragraphEl && !!paragraphEl.current
                   ? paragraphEl.current.getBoundingClientRect()
                   : {}
               }
             />
+            {!!bottomQuotesCount && (
+              <div className="bottom-quotes-counter">{bottomQuotesCount}</div>
+            )}
             {/* {getParagraphText(
               paragraph || [],
               setQuotesWithCoords,

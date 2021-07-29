@@ -3,9 +3,8 @@ import { useRef, useState } from 'react';
 import Line from '../line/line';
 import { useUiContext } from '../contexts/UI_Context';
 
-const QuotesLinesLayer = () => {
+const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const svgLayer = useRef();
-  const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
@@ -21,7 +20,6 @@ const QuotesLinesLayer = () => {
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
         className={svgLayerZIndex ? 'front-elements' : ''}
-        onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
         ref={svgLayer}
       >
         {linesWithEndCoords.map((line, i) => {

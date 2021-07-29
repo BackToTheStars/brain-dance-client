@@ -64,6 +64,14 @@ body {
   }
 }
 
+.remove-line-transition {
+  #lines {
+    path {
+      transition: 0s;
+    }
+  }
+}
+
 .red-border-to-quote {
   outline: 3px solid red;
   padding-left: 3px;

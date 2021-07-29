@@ -72,16 +72,16 @@ export const SpanTextPiece = ({
       let isQuoteVisible = true;
 
       if (paragraphRect) {
-        console.log(
-          // paragraphRect.top - rect.top
-          { rect, paragraphRect }
-          // paragraphTop - rect.top,
-          // rect.height / 2,
-          // paragraphScroll,
-          // paragraphHeight,
-          // paragraphTop + paragraphScroll,
-          // rect.top
-        );
+        // console.log(
+        // paragraphRect.top - rect.top
+        // { rect, paragraphRect }
+        // paragraphTop - rect.top,
+        // rect.height / 2,
+        // paragraphScroll,
+        // paragraphHeight,
+        // paragraphTop + paragraphScroll,
+        // rect.top
+        // );
       }
 
       let left = rect.left - turnEl.offsetLeft;
@@ -142,7 +142,7 @@ export const SpanTextPiece = ({
           onQuoteClick(textItem.attributes.id);
           // alert(`Мой id: ${textItem.attributes.id}`);
         }
-        console.log(isItQuote);
+        // console.log(isItQuote);
       }}
       ref={spanFragment}
     >

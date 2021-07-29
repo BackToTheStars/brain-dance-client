@@ -28,6 +28,7 @@ const GameComponent = () => {
   const [notes, setNotes] = useState([]);
   const [game, setGame] = useState(null);
   const [turnsLoaded, setTurnsLoaded] = useState(false); // @todo: refactoring
+  const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
 
   const gameBox = useRef();
   const { token, info, can, timecode } = useUserContext();
@@ -94,6 +95,7 @@ const GameComponent = () => {
         //   });
         //   this.triggers.dispatch('RECALCULATE_FIELD');
         //   this.triggers.dispatch('DRAW_LINES');
+        $(gameBox.current).addClass('remove-line-transition');
         turnsDispatch({
           type: ACTION_FIELD_WAS_MOVED,
           payload: {
@@ -103,6 +105,9 @@ const GameComponent = () => {
         });
         $(gameBox.current).css('left', 0);
         $(gameBox.current).css('top', 0);
+        setTimeout(() => {
+          $(gameBox.current).removeClass('remove-line-transition');
+        }, 100);
       },
     });
   }, [turns]);
@@ -130,10 +135,15 @@ const GameComponent = () => {
       <GameInfoPanel game={game} setGame={setGame} />
       <div className="col p0">
         <div className="gameFieldWrapper">
-          <div id="gameBox" className="ui-widget-content" ref={gameBox}>
+          <div
+            id="gameBox"
+            className="ui-widget-content"
+            ref={gameBox}
+            onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
+          >
             {/* <div className="doodlePic"></div> */}
             <TurnsComponent />
-            <QuotesLinesLayer />
+            <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
           </div>
         </div>
 

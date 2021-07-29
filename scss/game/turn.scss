@@ -204,3 +204,22 @@ $black-color: rgb(0, 0, 0);
   cursor: pointer;
   transition: 1s;
 }
+
+.top-quotes-counter,
+.bottom-quotes-counter {
+  position: absolute;
+  right: 0px;
+  background-color: red;
+  color: white;
+  font-size: 1.1rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.top-quotes-counter {
+  transform: translate(100%, -50%);
+}
+.bottom-quotes-counter {
+  bottom: 0px;
+  transform: translate(100%, 50%);
+}
