@@ -1,7 +1,8 @@
 import { useTurnContext } from '../contexts/TurnContext';
 import { useUserContext } from '../contexts/UserContext';
 import { useUiContext } from '../contexts/UI_Context';
-import Turn from './Turn';
+// import Turn from './Turn';
+import Turn from './TurnNew';
 
 const TurnsComponent = () => {
   const {
