@@ -345,6 +345,7 @@ const Turn = ({
       }`}
       style={styles.wrapper}
     >
+      '{' '}
       <h5
         className="headerText"
         ref={headerEl}
@@ -369,7 +370,7 @@ const Turn = ({
           )}
         </div>
       </h5>
-
+      '
       {!!sourceUrl && (
         <div className="left-bottom-label">
           <a target="_blank" href={sourceUrl}>
@@ -380,7 +381,6 @@ const Turn = ({
       {!!date && (
         <div className="right-bottom-label">{dateFormatter(date)}</div>
       )}
-
       <div className="media-wrapper" ref={mediaWrapperEl}>
         {!!(videoUrl && videoUrl.trim()) && (
           <div className="video" ref={videoEl}>
@@ -446,7 +446,6 @@ const Turn = ({
           </p>
         )}
       </div>
-
       <>
         {quotesWithCoords.map((quote, i) => {
           let bordered = !!lineEnds[quote.id]; // проверка нужно показывать рамку или нет
