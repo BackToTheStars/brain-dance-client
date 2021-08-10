@@ -1,8 +1,28 @@
 import { useEffect, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
 
-const Header = ({ style, can, header, handleDelete, handleEdit }) => {
+const Header = ({
+  style,
+  can,
+  header,
+  handleDelete,
+  handleEdit,
+  registerHandleResize,
+}) => {
   const headerEl = useRef(null);
+
+  useEffect(() => {
+    registerHandleResize({
+      type: 'header',
+      id: 'header',
+      minWidthCallback: () => {
+        return 300;
+      },
+      minHeightCallback: () => {
+        return 24;
+      },
+    });
+  }, []);
 
   return (
     <h5 className="headerText" ref={headerEl} style={style}>
