@@ -1,13 +1,20 @@
 import { useEffect, useState, useRef } from 'react';
 import Header from './Header';
+import Picture from './Picture';
 import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnContext';
 
 let handleResize = () => {}; // @todo: refactor
 
 const TurnNewComponent = ({ turn, can, dispatch }) => {
   const { _id, x, y, width, height } = turn;
-  const { contentType, header, backgroundColor, fontColor, dontShowHeader } =
-    turn;
+  const {
+    contentType,
+    header,
+    backgroundColor,
+    fontColor,
+    dontShowHeader,
+    imageUrl,
+  } = turn;
 
   const wrapperStyles = {
     left: `${x}px`,
@@ -26,20 +33,32 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
   };
 
   handleResize = (newTurnWidth, newTurnHeight) => {
-    let minWidth = Infinity;
+    let minWidth = 0;
     let minHeight = 0;
+    let maxHeight = 0;
+
     for (let widget of widgets) {
-      if (minWidth > widget.minWidthCallback()) {
+      if (minWidth < widget.minWidthCallback()) {
         minWidth = widget.minWidthCallback();
       }
-      minHeight = minHeight + widget.minHeightCallback();
     }
+
     if (newTurnWidth < minWidth) {
       newTurnWidth = minWidth;
     }
+
+    for (let widget of widgets) {
+      minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
+      maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+    }
+
     if (newTurnHeight < minHeight) {
       newTurnHeight = minHeight;
     }
+    if (newTurnHeight > maxHeight) {
+      newTurnHeight = maxHeight;
+    }
+
     console.log({ newTurnWidth, newTurnHeight });
     $(wrapper.current).css({ width: newTurnWidth, height: newTurnHeight });
     dispatch({
@@ -76,7 +95,12 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
         handleDelete={null}
         registerHandleResize={registerHandleResize}
       />
-      TurnNewComponent
+      {!!imageUrl && (
+        <Picture
+          imageUrl={imageUrl}
+          registerHandleResize={registerHandleResize}
+        />
+      )}
     </div>
   );
 };

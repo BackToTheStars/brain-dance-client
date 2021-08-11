@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
 
+const HEADER_HEIGHT = 40;
+
 const Header = ({
   style,
   can,
@@ -19,10 +21,16 @@ const Header = ({
         return 300;
       },
       minHeightCallback: () => {
-        return 24;
+        return HEADER_HEIGHT;
+      },
+      maxHeightCallback: () => {
+        return HEADER_HEIGHT;
       },
     });
   }, []);
+
+  // @todo: update styles
+  style.height = `${HEADER_HEIGHT}px`;
 
   return (
     <h5 className="headerText" ref={headerEl} style={style}>

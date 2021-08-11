@@ -31,6 +31,12 @@ body {
   display: none;
 }
 
+.headerTextTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .headerText {
   background-color: lightgrey;
   border-top-left-radius: $corners-radius;
@@ -41,7 +47,7 @@ body {
   overflow-y: auto;
   overflow-x: auto;
   width: 100%;
-  padding: 7px 15px 7px 15px;
+  padding: 6px 15px 6px 15px;
   font-size: 1.45rem;
 }
 
