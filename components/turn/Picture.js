@@ -8,10 +8,11 @@ const Picture = ({ imageUrl, registerHandleResize }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    if (!imgEl || !imgEl.current) return;
-    imgEl.current.onload = () => {
+    if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
+    const loadImage = () => {
       setImageLoaded(true);
     };
+    imgEl.current.addEventListener('load', loadImage);
   }, [imgEl]);
 
   useEffect(() => {

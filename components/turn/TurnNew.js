@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import Header from './Header';
 import Picture from './Picture';
 import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnContext';
+import Paragraph from './Paragraph';
 
 let handleResize = () => {}; // @todo: refactor
 
@@ -14,6 +15,7 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
     fontColor,
     dontShowHeader,
     imageUrl,
+    paragraph,
   } = turn;
 
   const wrapperStyles = {
@@ -27,6 +29,7 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
   const wrapper = useRef(null);
 
   const [widgets, setWidgets] = useState([]);
+  const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
 
   const registerHandleResize = (widget) => {
     setWidgets([...widgets, widget]);
@@ -101,6 +104,16 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
           registerHandleResize={registerHandleResize}
         />
       )}
+      <Paragraph
+        {...{
+          contentType,
+          backgroundColor,
+          fontColor,
+          paragraph,
+          updateSizeTime,
+          registerHandleResize,
+        }}
+      />
     </div>
   );
 };
