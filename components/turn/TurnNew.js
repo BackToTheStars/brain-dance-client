@@ -1,10 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import Header from './Header';
 import Picture from './Picture';
+import Video from './Video';
 import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnContext';
 import Paragraph from './Paragraph';
-
-let handleResize = () => {}; // @todo: refactor
 
 const TurnNewComponent = ({ turn, can, dispatch }) => {
   const { _id, x, y, width, height } = turn;
@@ -15,6 +14,7 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
     fontColor,
     dontShowHeader,
     imageUrl,
+    videoUrl,
     paragraph,
   } = turn;
 
@@ -30,15 +30,24 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
 
   const [widgets, setWidgets] = useState([]);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
+  const [variableHeight, setVariableHeight] = useState(0);
+
+  const isParagraphExist = !!paragraph
+    .map((item) => item.insert)
+    .join('')
+    .trim(); // @todo: remove after quill fix
 
   const registerHandleResize = (widget) => {
-    setWidgets([...widgets, widget]);
+    setWidgets((widgets) => {
+      return [...widgets, widget];
+    });
   };
 
-  handleResize = (newTurnWidth, newTurnHeight) => {
+  const handleResize = (newTurnWidth, newTurnHeight) => {
     let minWidth = 0;
     let minHeight = 0;
     let maxHeight = 0;
+    let minHeightBasic = 0;
 
     for (let widget of widgets) {
       if (minWidth < widget.minWidthCallback()) {
@@ -53,6 +62,10 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
     for (let widget of widgets) {
       minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
       maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+      if (!widget.variableHeight) {
+        minHeightBasic =
+          minHeightBasic + widget.minHeightCallback(newTurnWidth);
+      }
     }
 
     if (newTurnHeight < minHeight) {
@@ -62,8 +75,11 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
       newTurnHeight = maxHeight;
     }
 
-    console.log({ newTurnWidth, newTurnHeight });
-    $(wrapper.current).css({ width: newTurnWidth, height: newTurnHeight });
+    $(wrapper.current).css({
+      width: newTurnWidth,
+      height: newTurnHeight,
+    });
+    setVariableHeight(newTurnHeight - minHeightBasic);
     dispatch({
       type: ACTION_TURN_WAS_CHANGED,
       payload: {
@@ -77,12 +93,19 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
 
   useEffect(() => {
     $(wrapper.current).resizable({
-      stop: (event, ui) => {
+      // stop: (event, ui) => {
+      resize: (event, ui) => {
         handleResize(ui.size.width, ui.size.height);
       },
     });
     return () => $(wrapper.current).resizable('destroy');
-  }, []);
+  }, [widgets]);
+
+  useEffect(() => {
+    if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
+      handleResize(width, height);
+    }
+  }, [widgets]);
 
   return (
     <div ref={wrapper} className="react-turn-new" style={wrapperStyles}>
@@ -104,16 +127,26 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
           registerHandleResize={registerHandleResize}
         />
       )}
-      <Paragraph
-        {...{
-          contentType,
-          backgroundColor,
-          fontColor,
-          paragraph,
-          updateSizeTime,
-          registerHandleResize,
-        }}
-      />
+      {!!videoUrl && (
+        <Video
+          videoUrl={videoUrl}
+          registerHandleResize={registerHandleResize}
+          width={width}
+        />
+      )}
+      {isParagraphExist && (
+        <Paragraph
+          {...{
+            contentType,
+            backgroundColor,
+            fontColor,
+            paragraph,
+            updateSizeTime,
+            registerHandleResize,
+            variableHeight,
+          }}
+        />
+      )}
     </div>
   );
 };

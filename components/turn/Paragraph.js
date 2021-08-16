@@ -8,6 +8,7 @@ const Paragraph = ({
   paragraph,
   updateSizeTime,
   registerHandleResize,
+  variableHeight,
 }) => {
   // topQuotesCount,
   const topQuotesCount = 0;
@@ -19,31 +20,36 @@ const Paragraph = ({
   const paragraphEl = useRef(null);
 
   useEffect(() => {
+    if (!paragraphEl.current) return;
     registerHandleResize({
       type: 'paragraph',
       id: 'paragraph',
+      // этот виджет является гибким
+      variableHeight: true,
       minWidthCallback: () => {
         return 300;
       },
       minHeightCallback: () => {
-        return 50;
+        return 40;
       },
       maxHeightCallback: () => {
-        return 1000;
+        return paragraphEl.current.scrollHeight;
       },
     });
-  }, []);
+  }, [paragraphEl]);
+
+  const style = {};
+
+  if (contentType === 'comment') {
+    style.backgroundColor = backgroundColor;
+    style.color = fontColor || 'black';
+  }
+  if (!!variableHeight) {
+    style.height = `${variableHeight}px`;
+  }
 
   return (
-    <p
-      className="paragraphText"
-      ref={paragraphEl}
-      style={
-        contentType === 'comment'
-          ? { backgroundColor, color: fontColor || 'black' }
-          : {}
-      }
-    >
+    <p className="paragraphText" ref={paragraphEl} style={style}>
       {!!topQuotesCount && (
         <div className="top-quotes-counter">{topQuotesCount}</div>
       )}

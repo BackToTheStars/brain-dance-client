@@ -421,7 +421,7 @@ export const TurnProvider = ({ children }) => {
       },
     }).then((data) => {
       turnsDispatch({ type: ACTION_TURNS_SYNC_DONE });
-      addNotification({ title: 'Info:', text: 'Field has been saved.' });
+      addNotification({ title: 'Info:', text: 'Field has been saved' });
     });
   };
 

@@ -112,7 +112,6 @@ export const ClassProvider = ({ children }) => {
       {
         successCallback: (data) => {
           classesDispatch({ type: ACTION_CLASSES_INIT, payload: data.items });
-          console.log(data);
         },
       }
     );
