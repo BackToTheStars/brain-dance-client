@@ -4,8 +4,12 @@ import Picture from './Picture';
 import Video from './Video';
 import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnContext';
 import Paragraph from './Paragraph';
+import BottomLabels from './BottomLabels';
 
-const TurnNewComponent = ({ turn, can, dispatch }) => {
+let timerId = null;
+const delayRenderTurn = 100; // сколько времени ждём для анимации линий и цитат
+
+const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
   const { _id, x, y, width, height } = turn;
   const {
     contentType,
@@ -16,6 +20,9 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
     imageUrl,
     videoUrl,
     paragraph,
+    sourceUrl,
+    date,
+    quotes,
   } = turn;
 
   const wrapperStyles = {
@@ -89,6 +96,15 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
         height: newTurnHeight,
       },
     });
+    if (timerId) {
+      // замедляем на 200мс update линий между цитатами
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      // setQuotesLoaded(false);
+      // setQuotesWithCoords([]);
+      setUpdateSizeTime(new Date().getTime());
+    }, delayRenderTurn);
   };
 
   useEffect(() => {
@@ -100,6 +116,24 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
     });
     return () => $(wrapper.current).resizable('destroy');
   }, [widgets]);
+
+  useEffect(() => {
+    $(wrapper.current).draggable({
+      // start: (event, ui) => {},
+      stop: (event, ui) => {
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            x: ui.position.left, // x - left - ui.position.left,
+            y: ui.position.top, // y - top - ui.position.top,
+          },
+        });
+      },
+      // drag: (event, ui) => {},
+    });
+  }, []);
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
@@ -144,9 +178,20 @@ const TurnNewComponent = ({ turn, can, dispatch }) => {
             updateSizeTime,
             registerHandleResize,
             variableHeight,
+            quotes,
+            dispatch,
+            _id,
+            lineEnds,
+            activeQuote,
           }}
         />
       )}
+      <BottomLabels
+        {...{
+          sourceUrl,
+          date,
+        }}
+      />
     </div>
   );
 };

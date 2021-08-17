@@ -67,8 +67,8 @@ export const SpanTextPiece = ({
 
     setQuotes((quotes) => {
       const rect = spanFragment.current.getBoundingClientRect();
-      const turnEl =
-        spanFragment.current.parentElement.parentElement.parentElement;
+      // @todo: refactoring
+      const turnEl = spanFragment.current.parentElement.parentElement;
       let isQuoteVisible = true;
 
       if (paragraphRect) {
