@@ -23,6 +23,7 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
     sourceUrl,
     date,
     quotes,
+    scrollPosition,
   } = turn;
 
   const wrapperStyles = {
@@ -38,6 +39,8 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
   const [widgets, setWidgets] = useState([]);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
   const [variableHeight, setVariableHeight] = useState(0);
+  const [quotesWithCoords, setQuotesWithCoords] = useState([]);
+  const [quotesLoaded, setQuotesLoaded] = useState(false);
 
   const isParagraphExist = !!paragraph
     .map((item) => item.insert)
@@ -48,6 +51,18 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
     setWidgets((widgets) => {
       return [...widgets, widget];
     });
+  };
+
+  const recalculateQuotes = () => {
+    if (timerId) {
+      // замедляем на 200мс update линий между цитатами
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      setQuotesLoaded(false);
+      setQuotesWithCoords([]);
+      setUpdateSizeTime(new Date().getTime());
+    }, delayRenderTurn);
   };
 
   const handleResize = (newTurnWidth, newTurnHeight) => {
@@ -96,15 +111,8 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
         height: newTurnHeight,
       },
     });
-    if (timerId) {
-      // замедляем на 200мс update линий между цитатами
-      clearTimeout(timerId);
-    }
-    timerId = setTimeout(() => {
-      // setQuotesLoaded(false);
-      // setQuotesWithCoords([]);
-      setUpdateSizeTime(new Date().getTime());
-    }, delayRenderTurn);
+    recalculateQuotes();
+    console.log({ widgets });
   };
 
   useEffect(() => {
@@ -137,7 +145,9 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
-      handleResize(width, height);
+      setTimeout(() => {
+        handleResize(width, height);
+      }, 100);
     }
   }, [widgets]);
 
@@ -183,6 +193,12 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
             _id,
             lineEnds,
             activeQuote,
+            quotesWithCoords,
+            setQuotesWithCoords,
+            quotesLoaded,
+            setQuotesLoaded,
+            scrollPosition,
+            recalculateQuotes,
           }}
         />
       )}

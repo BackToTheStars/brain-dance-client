@@ -3,7 +3,11 @@ import { ParagraphTextWrapper } from './functions';
 import {
   ACTION_QUOTE_COORDS_UPDATED,
   ACTION_QUOTE_CLICKED,
+  ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnContext';
+
+const delayRenderScroll = 5;
+let timerScroll = null;
 
 const Paragraph = ({
   contentType,
@@ -18,19 +22,28 @@ const Paragraph = ({
   _id,
   lineEnds,
   activeQuote,
+  quotesWithCoords,
+  setQuotesWithCoords,
+  quotesLoaded,
+  setQuotesLoaded,
+  scrollPosition,
+  recalculateQuotes,
 }) => {
-  // topQuotesCount,
-  const topQuotesCount = 0;
-  // bottomQuotesCount,
-  const bottomQuotesCount = 0;
+  const topQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.id] && quote.position === 'top';
+  }).length;
+  const bottomQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.id] && quote.position === 'bottom';
+  }).length;
+
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId: _id, quoteId } });
   };
 
   const paragraphEl = useRef(null);
 
-  const [quotesWithCoords, setQuotesWithCoords] = useState([]);
-  const [quotesLoaded, setQuotesLoaded] = useState(false);
+  // const [quotesWithCoords, setQuotesWithCoords] = useState([]);
+  // const [quotesLoaded, setQuotesLoaded] = useState(false);
 
   useEffect(() => {
     if (!paragraphEl.current) return;
@@ -51,13 +64,12 @@ const Paragraph = ({
     });
   }, [paragraphEl]);
 
-  useEffect(() => {
-    setQuotesLoaded(false);
-    setQuotesWithCoords([]);
-  }, [updateSizeTime]);
+  // useEffect(() => {
+  //   setQuotesLoaded(false);
+  //   setQuotesWithCoords([]);
+  // }, [updateSizeTime]);
 
   useEffect(() => {
-    console.log({ quotesWithCoords });
     if (quotesLoaded) return;
     if (quotesWithCoords.length === quotes.length) {
       setQuotesLoaded(true);
@@ -67,6 +79,32 @@ const Paragraph = ({
       });
     }
   }, [quotesWithCoords]);
+
+  useEffect(() => {
+    if (!paragraphEl || !paragraphEl.current) return;
+    paragraphEl.current.scrollTop = scrollPosition;
+    recalculateQuotes();
+  }, [paragraphEl, scrollPosition]);
+
+  useEffect(() => {
+    if (!paragraphEl || !paragraphEl.current) return;
+    paragraphEl.current.addEventListener('scroll', () => {
+      // handleResize();
+      if (timerScroll) {
+        clearTimeout(timerScroll);
+      }
+      timerScroll = setTimeout(() => {
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            scrollPosition: paragraphEl.current.scrollTop,
+          },
+        });
+      }, delayRenderScroll);
+    });
+  }, [paragraphEl]);
 
   const style = {};
 
@@ -82,7 +120,7 @@ const Paragraph = ({
     <>
       <p className="paragraphText" ref={paragraphEl} style={style}>
         {!!topQuotesCount && (
-          <div className="top-quotes-counter">{topQuotesCount}</div>
+          <span className="top-quotes-counter">{topQuotesCount}</span>
         )}
         <ParagraphTextWrapper
           arrText={paragraph || []}
@@ -96,7 +134,7 @@ const Paragraph = ({
           }
         />
         {!!bottomQuotesCount && (
-          <div className="bottom-quotes-counter">{bottomQuotesCount}</div>
+          <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
         )}
       </p>
 
