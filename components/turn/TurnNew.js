@@ -2,14 +2,26 @@ import { useEffect, useState, useRef } from 'react';
 import Header from './Header';
 import Picture from './Picture';
 import Video from './Video';
-import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnContext';
+import {
+  ACTION_TURN_WAS_CHANGED,
+  ACTION_SET_TURN_TO_EDIT_MODE,
+  ACTION_DELETE_TURN,
+} from '../contexts/TurnContext';
 import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 
 let timerId = null;
 const delayRenderTurn = 100; // сколько времени ждём для анимации линий и цитат
 
-const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
+const TurnNewComponent = ({
+  turn,
+  can,
+  dispatch,
+  lineEnds,
+  activeQuote,
+  setCreateEditTurnPopupIsHidden,
+  deleteTurn,
+}) => {
   const { _id, x, y, width, height } = turn;
   const {
     contentType,
@@ -48,8 +60,27 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
     .trim(); // @todo: remove after quill fix
 
   const registerHandleResize = (widget) => {
+    console.log({ widget });
     setWidgets((widgets) => {
-      return [...widgets, widget];
+      const newWidgets = [...widgets];
+      const index = newWidgets.findIndex(
+        (newWidget) => newWidget.id === widget.id
+      );
+      if (index === -1) {
+        newWidgets.push(widget);
+      } else {
+        newWidgets[index] = widget;
+      }
+      console.log({ newWidgets });
+      return newWidgets;
+    });
+  };
+
+  const unregisterHandleResize = (widget) => {
+    setWidgets((widgets) => {
+      return widgets.filter(
+        (widgetToReturn) => widget.id !== widgetToReturn.id
+      );
     });
   };
 
@@ -63,6 +94,28 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
       setQuotesWithCoords([]);
       setUpdateSizeTime(new Date().getTime());
     }, delayRenderTurn);
+  };
+
+  const handleEdit = (e) => {
+    e.preventDefault();
+    dispatch({ type: ACTION_SET_TURN_TO_EDIT_MODE, payload: { _id } });
+    setCreateEditTurnPopupIsHidden(false);
+    // alert('button_edit_clicked');
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    if (confirm('Точно удалить?')) {
+      // confirm - глобальная функция браузера
+      deleteTurn(_id, {
+        successCallback: () => {
+          dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+          tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { _id } });
+        },
+      });
+
+      //alert('button_delete_clicked');
+    }
   };
 
   const handleResize = (newTurnWidth, newTurnHeight) => {
@@ -112,7 +165,6 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
       },
     });
     recalculateQuotes();
-    console.log({ widgets });
   };
 
   useEffect(() => {
@@ -144,15 +196,29 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
   }, []);
 
   useEffect(() => {
+    console.log({
+      header,
+      length: widgets.length,
+      number: 1 + !!imageUrl + !!videoUrl + isParagraphExist,
+      widgets,
+      imageUrl,
+    });
+
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
       setTimeout(() => {
         handleResize(width, height);
-      }, 100);
+      }, 5000);
     }
   }, [widgets]);
 
   return (
-    <div ref={wrapper} className="react-turn-new" style={wrapperStyles}>
+    <div
+      ref={wrapper}
+      className={`${contentType} react-turn-new ${
+        dontShowHeader ? 'dont-show-header' : ''
+      }`}
+      style={wrapperStyles}
+    >
       <Header
         style={
           contentType === 'comment' && !dontShowHeader
@@ -161,14 +227,16 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
         }
         can={can}
         header={header}
-        handleEdit={null}
-        handleDelete={null}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
         registerHandleResize={registerHandleResize}
+        dontShowHeader={dontShowHeader}
       />
       {!!imageUrl && (
         <Picture
           imageUrl={imageUrl}
           registerHandleResize={registerHandleResize}
+          unregisterHandleResize={unregisterHandleResize}
         />
       )}
       {!!videoUrl && (
@@ -199,6 +267,7 @@ const TurnNewComponent = ({ turn, can, dispatch, lineEnds, activeQuote }) => {
             setQuotesLoaded,
             scrollPosition,
             recalculateQuotes,
+            unregisterHandleResize,
           }}
         />
       )}

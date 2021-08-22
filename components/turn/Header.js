@@ -10,6 +10,7 @@ const Header = ({
   handleDelete,
   handleEdit,
   registerHandleResize,
+  dontShowHeader,
 }) => {
   const headerEl = useRef(null);
 
@@ -17,17 +18,11 @@ const Header = ({
     registerHandleResize({
       type: 'header',
       id: 'header',
-      minWidthCallback: () => {
-        return 300;
-      },
-      minHeightCallback: () => {
-        return HEADER_HEIGHT;
-      },
-      maxHeightCallback: () => {
-        return HEADER_HEIGHT;
-      },
+      minWidthCallback: () => 300,
+      minHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),
+      maxHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),
     });
-  }, []);
+  }, [dontShowHeader]);
 
   // @todo: update styles
   style.height = `${HEADER_HEIGHT}px`;

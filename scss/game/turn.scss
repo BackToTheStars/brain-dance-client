@@ -9,6 +9,33 @@ $black-color: rgb(0, 0, 0);
   background-color: rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
+  &.dont-show-header {
+    &:hover {
+      .headerTextActions {
+        transform: translateY(15%);
+      }
+    }
+    .paragraphText {
+      border-top-left-radius: $corners-radius;
+      border-top-right-radius: $corners-radius;
+    }
+    .headerText {
+      position: absolute;
+      top: 0;
+      background-color: rgba(255, 255, 255, 0);
+      // transform: translateY(-100%);
+      justify-content: flex-end;
+      z-index: 2;
+    }
+    .headerTextTitle {
+      display: none;
+    }
+    .headerTextActions {
+      transition: 0.25s;
+      transform: translateY(-150%);
+      margin-right: 20px;
+    }
+  }
   .picture-content {
     z-index: 1;
     img {

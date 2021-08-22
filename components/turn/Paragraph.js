@@ -16,6 +16,7 @@ const Paragraph = ({
   paragraph,
   updateSizeTime,
   registerHandleResize,
+  unregisterHandleResize,
   variableHeight,
   quotes,
   dispatch,
@@ -59,9 +60,14 @@ const Paragraph = ({
         return 40;
       },
       maxHeightCallback: () => {
+        if (!paragraphEl.current) {
+          console.log(paragraph);
+          return 0;
+        }
         return paragraphEl.current.scrollHeight;
       },
     });
+    return unregisterHandleResize({ id: 'paragraph' });
   }, [paragraphEl]);
 
   // useEffect(() => {

@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
 
-const Picture = ({ imageUrl, registerHandleResize }) => {
+const Picture = ({
+  imageUrl,
+  registerHandleResize,
+  unregisterHandleResize,
+}) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
 
@@ -17,6 +21,7 @@ const Picture = ({ imageUrl, registerHandleResize }) => {
 
   useEffect(() => {
     if (imageLoaded) {
+      console.log('image widget resize');
       registerHandleResize({
         type: 'picture',
         id: 'picture',
@@ -41,6 +46,7 @@ const Picture = ({ imageUrl, registerHandleResize }) => {
     } else {
       // @todo: default handler
     }
+    unregisterHandleResize({ id: 'picture' });
   }, [imageLoaded]);
 
   return (
