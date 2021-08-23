@@ -14,14 +14,15 @@ const Picture = ({
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
     const loadImage = () => {
-      setImageLoaded(true);
+      if (imgEl.current) {
+        setImageLoaded(true);
+      }
     };
     imgEl.current.addEventListener('load', loadImage);
   }, [imgEl]);
 
   useEffect(() => {
     if (imageLoaded) {
-      console.log('image widget resize');
       registerHandleResize({
         type: 'picture',
         id: 'picture',
@@ -29,6 +30,7 @@ const Picture = ({
           return 0;
         },
         minHeightCallback: (newWidth) => {
+          if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
           const newImgHeight = Math.floor(
             (imgEl.current.naturalHeight * newWidth) /
               imgEl.current.naturalWidth
@@ -36,6 +38,7 @@ const Picture = ({
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
+          if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
           const newImgHeight = Math.floor(
             (imgEl.current.naturalHeight * newWidth) /
               imgEl.current.naturalWidth
@@ -44,9 +47,23 @@ const Picture = ({
         },
       });
     } else {
-      // @todo: default handler
+      // registerHandleResize({
+      //   type: 'picture',
+      //   id: 'picture',
+      //   minWidthCallback: () => {
+      //     return 0;
+      //   },
+      //   minHeightCallback: (newWidth) => {
+      //     const newImgHeight = Math.floor((400 * newWidth) / 700);
+      //     return newImgHeight;
+      //   },
+      //   maxHeightCallback: (newWidth) => {
+      //     const newImgHeight = Math.floor((400 * newWidth) / 700);
+      //     return newImgHeight;
+      //   },
+      // });
     }
-    unregisterHandleResize({ id: 'picture' });
+    return () => unregisterHandleResize({ id: 'picture' }); // будет вызван в момент unmountComponent()
   }, [imageLoaded]);
 
   return (

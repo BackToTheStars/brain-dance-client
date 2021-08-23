@@ -110,6 +110,8 @@ const GameComponent = () => {
         }, 100);
       },
     });
+    // @todo:
+    // return () => $(gameBox.current).draggable('destroy');
   }, [turns]);
 
   //   useEffect(() => {

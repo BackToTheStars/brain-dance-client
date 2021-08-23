@@ -60,7 +60,6 @@ const TurnNewComponent = ({
     .trim(); // @todo: remove after quill fix
 
   const registerHandleResize = (widget) => {
-    console.log({ widget });
     setWidgets((widgets) => {
       const newWidgets = [...widgets];
       const index = newWidgets.findIndex(
@@ -71,7 +70,6 @@ const TurnNewComponent = ({
       } else {
         newWidgets[index] = widget;
       }
-      console.log({ newWidgets });
       return newWidgets;
     });
   };
@@ -193,21 +191,14 @@ const TurnNewComponent = ({
       },
       // drag: (event, ui) => {},
     });
+    return () => $(wrapper.current).draggable('destroy');
   }, []);
 
   useEffect(() => {
-    console.log({
-      header,
-      length: widgets.length,
-      number: 1 + !!imageUrl + !!videoUrl + isParagraphExist,
-      widgets,
-      imageUrl,
-    });
-
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
       setTimeout(() => {
         handleResize(width, height);
-      }, 5000);
+      }, 100);
     }
   }, [widgets]);
 

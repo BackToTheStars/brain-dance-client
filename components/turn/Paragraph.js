@@ -61,13 +61,12 @@ const Paragraph = ({
       },
       maxHeightCallback: () => {
         if (!paragraphEl.current) {
-          console.log(paragraph);
           return 0;
         }
         return paragraphEl.current.scrollHeight;
       },
     });
-    return unregisterHandleResize({ id: 'paragraph' });
+    return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
   }, [paragraphEl]);
 
   // useEffect(() => {
