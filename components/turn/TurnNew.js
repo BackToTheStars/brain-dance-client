@@ -11,7 +11,7 @@ import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 
 let timerId = null;
-const delayRenderTurn = 100; // сколько времени ждём для анимации линий и цитат
+const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
 
 const TurnNewComponent = ({
   turn,
@@ -83,15 +83,15 @@ const TurnNewComponent = ({
   };
 
   const recalculateQuotes = () => {
-    if (timerId) {
-      // замедляем на 200мс update линий между цитатами
-      clearTimeout(timerId);
-    }
-    timerId = setTimeout(() => {
-      setQuotesLoaded(false);
-      setQuotesWithCoords([]);
-      setUpdateSizeTime(new Date().getTime());
-    }, delayRenderTurn);
+    // if (timerId) {
+    //   // замедляем на 200мс update линий между цитатами
+    //   clearTimeout(timerId);
+    // }
+    // timerId = setTimeout(() => {
+    setQuotesLoaded(false);
+    setQuotesWithCoords([]);
+    setUpdateSizeTime(new Date().getTime());
+    // }, delayRenderTurn);
   };
 
   const handleEdit = (e) => {
@@ -116,7 +116,7 @@ const TurnNewComponent = ({
     }
   };
 
-  const handleResize = (newTurnWidth, newTurnHeight) => {
+  const handleResize = (newTurnWidth, newTurnHeight, delay = 0) => {
     let minWidth = 0;
     let minHeight = 0;
     let maxHeight = 0;
@@ -162,7 +162,9 @@ const TurnNewComponent = ({
         height: newTurnHeight,
       },
     });
-    recalculateQuotes();
+    setTimeout(() => {
+      recalculateQuotes();
+    }, delay);
   };
 
   useEffect(() => {
@@ -196,9 +198,22 @@ const TurnNewComponent = ({
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
-      setTimeout(() => {
-        handleResize(width, height);
-      }, 100);
+      // setTimeout(() => {
+      handleResize(width, height);
+      // setTimeout(() => {
+      //   recalculateQuotes();
+      // }, 1000);
+      // setTimeout(() => {
+      //   recalculateQuotes();
+      // }, 2000);
+      // setTimeout(() => {
+      //   recalculateQuotes();
+      // }, 4000);
+      // handleResize(width, height, 1000);
+      // handleResize(width, height, 2000);
+      // handleResize(width, height, 4000);
+
+      // }, 100);
     }
   }, [widgets]);
 
