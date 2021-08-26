@@ -92,7 +92,7 @@ export const SpanTextPiece = ({
       const outlineWidth = 2; // ещё в Turn.js строчка 466
 
       if (rect.top + rect.height / 2 < paragraphRect.top) {
-        console.log('quote hidden up');
+        // console.log('quote hidden up');
         //
         height = 0;
         width = paragraphRect.width - outlineWidth; // 2 ширины рамки

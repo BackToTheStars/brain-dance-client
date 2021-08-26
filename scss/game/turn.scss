@@ -51,6 +51,9 @@ $black-color: rgb(0, 0, 0);
     // flex: 1;
     margin-bottom: 0;
   }
+  &.zero-point {
+    visibility: hidden;
+  }
 }
 
 .react-turn {

@@ -199,6 +199,7 @@ const TurnNewComponent = ({
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
       // setTimeout(() => {
+      console.log(header, 'handle resize');
       handleResize(width, height);
       // setTimeout(() => {
       //   recalculateQuotes();

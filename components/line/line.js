@@ -1,8 +1,10 @@
+import { lineThickness } from '../сonst';
+
 const Line = ({
   sourceCoords,
   targetCoords,
   stroke = 'red',
-  strokeWidth = 2,
+  strokeWidth = lineThickness,
 }) => {
   //   const sourceCoords = this.sourceQuote.getCoords();
   //   const targetCoords = this.targetQuote.getCoords();

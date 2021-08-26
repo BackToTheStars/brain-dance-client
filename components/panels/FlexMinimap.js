@@ -4,7 +4,7 @@ import {
   useTurnContext,
   ACTION_FIELD_WAS_MOVED,
 } from '../contexts/TurnContext';
-import { panelSpacer } from './сonst';
+import { panelSpacer } from '../сonst';
 import Line from '../line/line';
 
 const FlexMinimap = ({ gameBox }) => {
@@ -111,7 +111,8 @@ const FlexMinimap = ({ gameBox }) => {
           ...turn,
           isTurnInsideViewport,
         };
-      }),
+      })
+      .filter((turn) => turn.contentType !== 'zero-point'),
   };
 
   const turnsToRender = value.turns

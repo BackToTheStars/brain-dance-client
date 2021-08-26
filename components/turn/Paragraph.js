@@ -5,9 +5,10 @@ import {
   ACTION_QUOTE_CLICKED,
   ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnContext';
+import { quoteRectangleThickness } from '../сonst';
 
-const delayRenderScroll = 5;
-let timerScroll = null;
+// const delayRenderScroll = 5;
+// let timerScroll = null;
 
 const Paragraph = ({
   contentType,
@@ -95,20 +96,21 @@ const Paragraph = ({
     if (!paragraphEl || !paragraphEl.current) return;
     paragraphEl.current.addEventListener('scroll', () => {
       // handleResize();
-      if (timerScroll) {
-        clearTimeout(timerScroll);
-      }
-      timerScroll = setTimeout(() => {
-        dispatch({
-          type: ACTION_TURN_WAS_CHANGED,
-          payload: {
-            _id: _id,
-            wasChanged: true,
-            scrollPosition: paragraphEl.current.scrollTop,
-          },
-        });
-      }, delayRenderScroll);
+      // if (timerScroll) {
+      //   clearTimeout(timerScroll);
+      // }
+      // timerScroll = setTimeout(() => {
+      dispatch({
+        type: ACTION_TURN_WAS_CHANGED,
+        payload: {
+          _id: _id,
+          wasChanged: true,
+          scrollPosition: paragraphEl.current.scrollTop,
+        },
+      });
+      // }, delayRenderScroll);
     });
+    // @todo: removeEventListener scroll
   }, [paragraphEl]);
 
   const style = {};
@@ -154,9 +156,9 @@ const Paragraph = ({
           bordered = true;
         }
         if (bordered) {
-          outline = '2px solid red';
+          outline = `${quoteRectangleThickness}px solid red`;
           if (quote.position === 'top' || quote.position === 'bottom') {
-            outline = '2px solid red';
+            outline = `${quoteRectangleThickness}px solid red`;
           }
         }
 
