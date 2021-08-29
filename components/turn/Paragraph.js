@@ -30,6 +30,7 @@ const Paragraph = ({
   setQuotesLoaded,
   scrollPosition,
   recalculateQuotes,
+  turnId,
 }) => {
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.id] && quote.position === 'top';
@@ -134,6 +135,7 @@ const Paragraph = ({
           updateSizeTime={updateSizeTime}
           setQuotes={setQuotesWithCoords}
           onQuoteClick={onQuoteClick}
+          turnId={turnId}
           paragraphRect={
             !!paragraphEl && !!paragraphEl.current
               ? paragraphEl.current.getBoundingClientRect()
@@ -146,7 +148,7 @@ const Paragraph = ({
       </p>
 
       {quotesWithCoords.map((quote, i) => {
-        let bordered = !!lineEnds[quote.id]; // проверка нужно показывать рамку или нет
+        let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
         let outline = '0px solid transparent';
         if (
           activeQuote &&

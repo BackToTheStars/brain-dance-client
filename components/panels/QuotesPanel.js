@@ -22,7 +22,8 @@ const QuotesPanel = () => {
     }
   };
 
-  const clickedQuoteInfo = lineEnds[activeQuote.quoteId];
+  const clickedQuoteInfo =
+    lineEnds[`${activeQuote.turnId}_${activeQuote.quoteId}`];
   const lines = clickedQuoteInfo ? clickedQuoteInfo.lines : [];
 
   return (

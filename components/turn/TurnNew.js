@@ -270,6 +270,7 @@ const TurnNewComponent = ({
             activeQuote,
             quotesWithCoords,
             setQuotesWithCoords,
+            turnId: _id,
             quotesLoaded,
             setQuotesLoaded,
             scrollPosition,

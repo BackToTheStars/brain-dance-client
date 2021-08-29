@@ -11,6 +11,7 @@ export const ParagraphTextWrapper = ({
   // paragraphWidth,
   // paragraphScroll,
   paragraphRect,
+  turnId,
 }) => {
   return (
     <>
@@ -36,6 +37,7 @@ export const ParagraphTextWrapper = ({
               // paragraphWidth,
               // paragraphScroll,
               paragraphRect,
+              turnId,
             }}
           />
         );
@@ -54,6 +56,7 @@ export const SpanTextPiece = ({
   // paragraphWidth,
   // paragraphScroll,
   paragraphRect,
+  turnId,
 }) => {
   const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
@@ -67,6 +70,9 @@ export const SpanTextPiece = ({
 
     setQuotes((quotes) => {
       const rect = spanFragment.current.getBoundingClientRect();
+      if (turnId === '6100ca06b1871a48ccce1849') {
+        console.log({ rect });
+      }
       // @todo: refactoring
       const turnEl = spanFragment.current.parentElement.parentElement;
       let isQuoteVisible = true;
@@ -115,10 +121,31 @@ export const SpanTextPiece = ({
         position = 'bottom';
       }
 
+      if (turnId === '6100ca06b1871a48ccce1849') {
+        console.log([
+          ...quotes,
+          {
+            quoteId,
+            quoteKey: `${turnId}_${quoteId}`,
+            turnId,
+            // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
+            width,
+            height,
+            left,
+            top,
+            text: textItem.insert.trim(),
+            position,
+          },
+        ]);
+      }
+
+      const quoteId = textItem.attributes.id || new Date().getTime();
       return [
         ...quotes,
         {
-          id: textItem.attributes.id || new Date().getTime(),
+          quoteId,
+          quoteKey: `${turnId}_${quoteId}`,
+          turnId,
           // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
           width,
           height,

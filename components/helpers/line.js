@@ -76,22 +76,28 @@ export const getLineEnds = (resLines) => {
   for (const resLine of resLines) {
     const { line } = resLine;
     if (line.sourceMarker) {
-      if (!lineEnds[line.sourceMarker]) {
-        lineEnds[line.sourceMarker] = {
+      const quoteKey = `${line.sourceTurnId}_${line.sourceMarker}`;
+      if (!lineEnds[quoteKey]) {
+        lineEnds[quoteKey] = {
+          quoteKey,
+          turnId: line.sourceTurnId,
           quoteId: line.sourceMarker,
           lines: [],
         };
       }
-      lineEnds[line.sourceMarker].lines.push(line);
+      lineEnds[quoteKey].lines.push(line);
     }
     if (line.targetMarker) {
-      if (!lineEnds[line.targetMarker]) {
-        lineEnds[line.targetMarker] = {
+      const quoteKey = `${line.targetTurnId}_${line.targetMarker}`; // действует с тем же именем только до {} фигурных скобок - const vs. var !!!
+      if (!lineEnds[quoteKey]) {
+        lineEnds[quoteKey] = {
+          quoteKey,
+          turnId: line.targetTurnId,
           quoteId: line.targetMarker,
           lines: [],
         };
       }
-      lineEnds[line.targetMarker].lines.push(line);
+      lineEnds[quoteKey].lines.push(line);
     }
   }
   return lineEnds;
