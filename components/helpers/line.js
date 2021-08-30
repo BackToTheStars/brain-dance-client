@@ -34,7 +34,7 @@ export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
     };
     if (line.sourceMarker && quotesInfo[line.sourceTurnId]) {
       const sourceQuoteCoords = quotesInfo[line.sourceTurnId].find(
-        (quote) => quote.id == line.sourceMarker
+        (quote) => quote.quoteId == line.sourceMarker
       );
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
@@ -48,7 +48,7 @@ export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
     }
     if (line.targetMarker && quotesInfo[line.targetTurnId]) {
       const targetQuoteCoords = quotesInfo[line.targetTurnId].find(
-        (quote) => quote.id == line.targetMarker
+        (quote) => quote.quoteId == line.targetMarker
       );
       if (targetQuoteCoords) {
         targetCoords = {

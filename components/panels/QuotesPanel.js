@@ -45,10 +45,10 @@ const QuotesPanel = () => {
           <tbody>
             {lines.map((line, index) => {
               const sourceQuoteInfo = quotesInfo[line.sourceTurnId].find(
-                (quoteInfo) => line.sourceMarker === quoteInfo.id
+                (quoteInfo) => line.sourceMarker === quoteInfo.quoteId
               );
               const targetQuoteInfo = quotesInfo[line.targetTurnId].find(
-                (quoteInfo) => line.targetMarker === quoteInfo.id
+                (quoteInfo) => line.targetMarker === quoteInfo.quoteId
               );
               return (
                 <tr key={index}>

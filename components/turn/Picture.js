@@ -10,6 +10,7 @@ const Picture = ({
   const imgWrapperEl = useRef(null);
 
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
 
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
@@ -19,6 +20,10 @@ const Picture = ({
       }
     };
     imgEl.current.addEventListener('load', loadImage);
+    imgEl.current.addEventListener('error', () => {
+      console.log('on image error');
+      setImageUrlToRender('/img/404.jpg');
+    });
   }, [imgEl]);
 
   useEffect(() => {
@@ -68,7 +73,7 @@ const Picture = ({
 
   return (
     <div className="picture-content" ref={imgWrapperEl}>
-      <img src={imageUrl} ref={imgEl} />
+      <img src={imageUrlToRender} ref={imgEl} />
     </div>
   );
 };

@@ -54,6 +54,13 @@ $black-color: rgb(0, 0, 0);
   &.zero-point {
     visibility: hidden;
   }
+  .telemetry {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(120%);
+    background-color: rgb(206, 206, 206);
+    padding: 20px;
+  }
 }
 
 .react-turn {

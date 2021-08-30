@@ -9,6 +9,7 @@ import {
 } from '../contexts/TurnContext';
 import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
+import Telemetry from './Telemetry';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -210,7 +211,7 @@ const TurnNewComponent = ({
       // setTimeout(() => {
       //   recalculateQuotes();
       // }, 4000);
-      // handleResize(width, height, 1000);
+      handleResize(width, height, 1000);
       // handleResize(width, height, 2000);
       // handleResize(width, height, 4000);
 
@@ -285,6 +286,7 @@ const TurnNewComponent = ({
           date,
         }}
       />
+      <Telemetry widgets={widgets} />
     </div>
   );
 };

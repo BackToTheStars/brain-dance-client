@@ -29,20 +29,20 @@ const TurnsComponent = () => {
     <>
       {turns
         .filter((turn) => {
-          return turnsToRender.includes(turn._id);
+          return turnsToRender.includes(turn._id); // оставляем только те, которые рендерятся
         })
         .map((turn) => {
           const turnLineEnds = {};
-          for (let quoteId in lineEnds) {
-            const lines = lineEnds[quoteId].lines.filter(
+          for (let quoteKey in lineEnds) {
+            const lines = lineEnds[quoteKey].lines.filter(
               (line) =>
                 (line.sourceTurnId === turn._id &&
-                  line.sourceMarker === +quoteId) ||
+                  line.sourceMarker === +lineEnds[quoteKey].quoteId) ||
                 (line.targetTurnId === turn._id &&
-                  line.targetMarker === +quoteId)
+                  line.targetMarker === +lineEnds[quoteKey].quoteId)
             );
             if (lines.length) {
-              turnLineEnds[quoteId] = lines;
+              turnLineEnds[quoteKey] = lines;
             }
           }
           return (

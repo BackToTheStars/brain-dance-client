@@ -146,14 +146,13 @@ const Paragraph = ({
           <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
         )}
       </p>
-
       {quotesWithCoords.map((quote, i) => {
         let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
         let outline = '0px solid transparent';
         if (
           activeQuote &&
           activeQuote.turnId === _id &&
-          activeQuote.quoteId === quote.id
+          activeQuote.quoteId === quote.quoteId
         ) {
           bordered = true;
         }
@@ -167,12 +166,12 @@ const Paragraph = ({
         return (
           <div
             className="quote-rectangle"
-            key={quote.id}
+            key={quote.quoteId}
             style={{
               ...quote,
               outline,
             }}
-            onClick={() => onQuoteClick(quote.id)}
+            onClick={() => onQuoteClick(quote.quoteId)}
           ></div>
         );
       })}
