@@ -25,7 +25,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         {linesWithEndCoords.map((line, i) => {
           return (
             <Line
-              key={i}
+              key={line.line._id}
               sourceCoords={line.sourceCoords}
               targetCoords={line.targetCoords}
             />

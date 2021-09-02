@@ -117,7 +117,7 @@ const TurnNewComponent = ({
     }
   };
 
-  const handleResize = (newTurnWidth, newTurnHeight, delay = 0) => {
+  const handleResize = (newTurnWidth, newTurnHeight, delay = 400) => {
     let minWidth = 0;
     let minHeight = 0;
     let maxHeight = 0;
@@ -199,23 +199,13 @@ const TurnNewComponent = ({
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
-      // setTimeout(() => {
-      console.log(header, 'handle resize');
+      setTimeout(() => {
+        // console.log(header, 'handle resize');
+        handleResize(width, height);
+        // handleResize(width, height, 2000);
+        // handleResize(width, height, 4000);
+      }, 400);
       handleResize(width, height);
-      // setTimeout(() => {
-      //   recalculateQuotes();
-      // }, 1000);
-      // setTimeout(() => {
-      //   recalculateQuotes();
-      // }, 2000);
-      // setTimeout(() => {
-      //   recalculateQuotes();
-      // }, 4000);
-      handleResize(width, height, 1000);
-      // handleResize(width, height, 2000);
-      // handleResize(width, height, 4000);
-
-      // }, 100);
     }
   }, [widgets]);
 

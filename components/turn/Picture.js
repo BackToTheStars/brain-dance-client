@@ -15,15 +15,27 @@ const Picture = ({
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
     const loadImage = () => {
-      if (imgEl.current) {
+      if (imgEl && imgEl.current) {
         setImageLoaded(true);
       }
     };
-    imgEl.current.addEventListener('load', loadImage);
-    imgEl.current.addEventListener('error', () => {
+
+    const errorPicture = () => {
       console.log('on image error');
       setImageUrlToRender('/img/404.jpg');
-    });
+    };
+
+    imgEl.current.addEventListener('load', loadImage);
+    imgEl.current.addEventListener('error', errorPicture);
+
+    // @todo: проверить
+    return () => {
+      // в момент когда мы удаляем компонент, unMount
+      if (imgEl.current) {
+        imgEl.current.removeEventListener('load', loadImage);
+        imgEl.current.removeEventListener('error', errorPicture);
+      }
+    };
   }, [imgEl]);
 
   useEffect(() => {

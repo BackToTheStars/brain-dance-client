@@ -71,6 +71,7 @@ const FlexMinimap = ({ gameBox }) => {
       const left = viewport.x - targetXMap + Math.floor(viewport.width / 2);
       const top = viewport.y - targetYMap + Math.floor(viewport.height / 2);
 
+      $(gameBox.current).addClass('remove-line-transition');
       $(gameBox.current).animate(
         {
           left: `${left}px`,
@@ -89,6 +90,9 @@ const FlexMinimap = ({ gameBox }) => {
           });
           $(gameBox.current).css('left', 0);
           $(gameBox.current).css('top', 0);
+          setTimeout(() => {
+            $(gameBox.current).removeClass('remove-line-transition');
+          }, 100);
         }
       );
     },
