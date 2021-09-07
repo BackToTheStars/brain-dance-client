@@ -199,12 +199,12 @@ const TurnNewComponent = ({
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
-      setTimeout(() => {
-        // console.log(header, 'handle resize');
-        handleResize(width, height);
-        // handleResize(width, height, 2000);
-        // handleResize(width, height, 4000);
-      }, 400);
+      // setTimeout(() => {
+      //   // console.log(header, 'handle resize');
+      //   handleResize(width, height);
+      //   // handleResize(width, height, 2000);
+      //   // handleResize(width, height, 4000);
+      // }, 400);
       handleResize(width, height);
     }
   }, [widgets]);
@@ -276,7 +276,7 @@ const TurnNewComponent = ({
           date,
         }}
       />
-      <Telemetry widgets={widgets} />
+      <Telemetry id={_id} widgets={widgets} />
     </div>
   );
 };

@@ -70,11 +70,16 @@ export const SpanTextPiece = ({
 
     setQuotes((quotes) => {
       const rect = spanFragment.current.getBoundingClientRect();
-      if (turnId === '6100ca06b1871a48ccce1849') {
-        console.log({ rect });
-      }
       // @todo: refactoring
       const turnEl = spanFragment.current.parentElement.parentElement;
+      const turnElRect = turnEl.getBoundingClientRect();
+      // const paragraphEl = spanFragment.current.parentElement;
+      // const paragraphElRect = paragraphEl.getBoundingClientRect();
+
+      // if (turnElRect.left !== paragraphElRect.left) {
+      //   console.log({ turnId }, turnElRect.left - paragraphElRect.left);
+      // }
+
       let isQuoteVisible = true;
 
       if (paragraphRect) {
@@ -90,8 +95,8 @@ export const SpanTextPiece = ({
         // );
       }
 
-      let left = rect.left - turnEl.offsetLeft;
-      let top = rect.top - turnEl.offsetTop;
+      let left = rect.left - turnElRect.left;
+      let top = rect.top - turnElRect.top;
       let width = rect.width;
       let height = rect.height;
       let position = 'default';
@@ -102,8 +107,8 @@ export const SpanTextPiece = ({
         //
         height = 0;
         width = paragraphRect.width - outlineWidth; // 2 ширины рамки
-        left = paragraphRect.left - turnEl.offsetLeft + outlineWidth;
-        top = paragraphRect.top - turnEl.offsetTop + outlineWidth;
+        left = paragraphRect.left - turnElRect.left + outlineWidth;
+        top = paragraphRect.top - turnElRect.top + outlineWidth;
         position = 'top';
         //
       } else if (
@@ -112,11 +117,11 @@ export const SpanTextPiece = ({
       ) {
         height = 0;
         width = paragraphRect.width - outlineWidth;
-        left = paragraphRect.left - turnEl.offsetLeft + outlineWidth;
+        left = paragraphRect.left - turnElRect.left + outlineWidth;
         top =
           paragraphRect.top +
           paragraphRect.height -
-          turnEl.offsetTop +
+          turnElRect.top +
           outlineWidth;
         position = 'bottom';
       }

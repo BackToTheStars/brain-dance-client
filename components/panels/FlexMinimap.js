@@ -106,6 +106,10 @@ const FlexMinimap = ({ gameBox }) => {
       }))
       .map((turn) => {
         const isTurnInsideViewport = areRectanglesIntersect(turn, {
+          // x: viewport.x,
+          // width: viewport.width,
+          // y: viewport.y,
+          // height: viewport.height,
           x: viewport.x - viewport.width,
           width: 3 * viewport.width,
           y: viewport.y - viewport.height,
@@ -250,6 +254,10 @@ const SVGMiniMap = ({
   const c = 1.5 - 75 * tg;
   const y = c + tg * k;
   const lineWidth = Math.floor(y * k);
+
+  // for (let turn of turns) {
+  //   if (turn.height < 50) console.log({ id: turn._id, h: turn.height });
+  // }
 
   return (
     <svg
