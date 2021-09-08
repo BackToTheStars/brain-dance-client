@@ -64,6 +64,10 @@ const Picture = ({
         },
       });
     } else {
+      if (!!imgEl.current && !!imgEl.current.complete) {
+        console.log('setImageLoaded(true)');
+        setImageLoaded(true);
+      }
       // registerHandleResize({
       //   type: 'picture',
       //   id: 'picture',
@@ -80,7 +84,7 @@ const Picture = ({
       //   },
       // });
     }
-    return () => unregisterHandleResize({ id: 'picture' }); // будет вызван в момент unmountComponent()
+    return () => unregisterHandleResize({ id: 'picture' }); // return callback будет вызван в момент unmountComponent()
   }, [imageLoaded]);
 
   return (

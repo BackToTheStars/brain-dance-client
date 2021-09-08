@@ -73,6 +73,9 @@ export const SpanTextPiece = ({
       // @todo: refactoring
       const turnEl = spanFragment.current.parentElement.parentElement;
       const turnElRect = turnEl.getBoundingClientRect();
+      // turnEl.offsetLeft -> turnElRect.left
+      // turnEl.offsetTop -> turnElRect.top
+
       // const paragraphEl = spanFragment.current.parentElement;
       // const paragraphElRect = paragraphEl.getBoundingClientRect();
 

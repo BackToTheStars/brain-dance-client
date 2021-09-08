@@ -7,7 +7,7 @@ import {
 } from '../contexts/TurnContext';
 import { quoteRectangleThickness } from '../сonst';
 
-// const delayRenderScroll = 5;
+const delayRenderScroll = 100;
 // let timerScroll = null;
 
 const Paragraph = ({
@@ -32,6 +32,8 @@ const Paragraph = ({
   recalculateQuotes,
   turnId,
 }) => {
+  const [timerScroll, setTimerScroll] = useState(null);
+
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.id] && quote.position === 'top';
   }).length;
@@ -97,19 +99,22 @@ const Paragraph = ({
     if (!paragraphEl || !paragraphEl.current) return;
     paragraphEl.current.addEventListener('scroll', () => {
       // handleResize();
-      // if (timerScroll) {
-      //   clearTimeout(timerScroll);
-      // }
-      // timerScroll = setTimeout(() => {
-      dispatch({
-        type: ACTION_TURN_WAS_CHANGED,
-        payload: {
-          _id: _id,
-          wasChanged: true,
-          scrollPosition: paragraphEl.current.scrollTop,
-        },
-      });
-      // }, delayRenderScroll);
+      if (timerScroll) {
+        clearTimeout(timerScroll);
+        setTimerScroll(null);
+      }
+      setTimerScroll(
+        setTimeout(() => {
+          dispatch({
+            type: ACTION_TURN_WAS_CHANGED,
+            payload: {
+              _id: _id,
+              wasChanged: true,
+              scrollPosition: paragraphEl.current.scrollTop,
+            },
+          });
+        }, delayRenderScroll)
+      );
     });
     // @todo: removeEventListener scroll
   }, [paragraphEl]);
@@ -147,6 +152,7 @@ const Paragraph = ({
         )}
       </p>
       {quotesWithCoords.map((quote, i) => {
+        // все цитаты
         let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
         let outline = '0px solid transparent';
         if (
@@ -166,7 +172,7 @@ const Paragraph = ({
         return (
           <div
             className="quote-rectangle"
-            key={quote.quoteId}
+            key={quote.quoteKey}
             style={{
               ...quote,
               outline,
