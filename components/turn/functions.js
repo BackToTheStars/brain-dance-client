@@ -129,24 +129,6 @@ export const SpanTextPiece = ({
         position = 'bottom';
       }
 
-      if (turnId === '6100ca06b1871a48ccce1849') {
-        console.log([
-          ...quotes,
-          {
-            quoteId,
-            quoteKey: `${turnId}_${quoteId}`,
-            turnId,
-            // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
-            width,
-            height,
-            left,
-            top,
-            text: textItem.insert.trim(),
-            position,
-          },
-        ]);
-      }
-
       const quoteId = textItem.attributes.id || new Date().getTime();
       return [
         ...quotes,

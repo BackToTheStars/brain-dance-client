@@ -39,6 +39,13 @@ const TurnNewComponent = ({
     scrollPosition,
   } = turn;
 
+  if (
+    _id === '606c8c8253ab6a0017377983' ||
+    _id === '6100ca06b1871a48ccce1849'
+  ) {
+    console.log({ scrollPosition, header: header });
+  }
+
   const wrapperStyles = {
     left: `${x}px`,
     top: `${y}px`,
@@ -276,7 +283,7 @@ const TurnNewComponent = ({
           date,
         }}
       />
-      <Telemetry id={_id} widgets={widgets} />
+      {/* <Telemetry id={_id} widgets={widgets} /> */}
     </div>
   );
 };

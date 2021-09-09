@@ -92,31 +92,49 @@ const Paragraph = ({
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
     paragraphEl.current.scrollTop = scrollPosition;
+    if (
+      turnId === '606c8c8253ab6a0017377983' ||
+      turnId === '6100ca06b1871a48ccce1849'
+    ) {
+      console.log({ turnId, scrollPosition });
+    }
     recalculateQuotes();
   }, [paragraphEl, scrollPosition]);
 
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
-    paragraphEl.current.addEventListener('scroll', () => {
+
+    const scrollHandler = () => {
       // handleResize();
       if (timerScroll) {
         clearTimeout(timerScroll);
         setTimerScroll(null);
       }
+
       setTimerScroll(
         setTimeout(() => {
-          dispatch({
-            type: ACTION_TURN_WAS_CHANGED,
-            payload: {
-              _id: _id,
-              wasChanged: true,
-              scrollPosition: paragraphEl.current.scrollTop,
-            },
-          });
+          if (!!paragraphEl.current) {
+            dispatch({
+              type: ACTION_TURN_WAS_CHANGED,
+              payload: {
+                _id: _id,
+                wasChanged: true,
+                scrollPosition: Math.floor(paragraphEl.current.scrollTop),
+              },
+            });
+          } else {
+            console.log(`!!paragraphEl.current turnId: ${turnId}`);
+          }
         }, delayRenderScroll)
       );
-    });
+    };
+
+    paragraphEl.current.addEventListener('scroll', scrollHandler);
     // @todo: removeEventListener scroll
+    return () => {
+      if (!!paragraphEl.current)
+        paragraphEl.current.removeEventListener('scroll', scrollHandler);
+    };
   }, [paragraphEl]);
 
   const style = {};

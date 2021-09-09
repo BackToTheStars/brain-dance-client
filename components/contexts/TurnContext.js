@@ -389,6 +389,7 @@ export const TurnProvider = ({ children }) => {
   const saveField = () => {
     const changedTurns = turns
       .filter((turn) => turn.wasChanged === true)
+      .filter((turn) => turn.height !== 40) // @todo этот фильтр нужно удалить
       .map((turn) => {
         const { _id, x, y, height, width, contentType, scrollPosition } = turn;
         return {
