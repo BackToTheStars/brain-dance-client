@@ -10,7 +10,7 @@ export const ParagraphTextWrapper = ({
   // paragraphHeight,
   // paragraphWidth,
   // paragraphScroll,
-  paragraphRect,
+  // paragraphRect,
   turnId,
 }) => {
   return (
@@ -36,7 +36,7 @@ export const ParagraphTextWrapper = ({
               // paragraphHeight,
               // paragraphWidth,
               // paragraphScroll,
-              paragraphRect,
+              // paragraphRect,
               turnId,
             }}
           />
@@ -55,7 +55,7 @@ export const SpanTextPiece = ({
   // paragraphHeight,
   // paragraphWidth,
   // paragraphScroll,
-  paragraphRect,
+  // paragraphRect,
   turnId,
 }) => {
   const spanFragment = useRef(null);
@@ -71,8 +71,11 @@ export const SpanTextPiece = ({
     setQuotes((quotes) => {
       const rect = spanFragment.current.getBoundingClientRect();
       // @todo: refactoring
-      const turnEl = spanFragment.current.parentElement.parentElement;
-      const turnElRect = turnEl.getBoundingClientRect();
+      const turnElRect =
+        spanFragment.current.parentElement.parentElement.getBoundingClientRect();
+      const paragraphRect =
+        spanFragment.current.parentElement.getBoundingClientRect();
+
       // turnEl.offsetLeft -> turnElRect.left
       // turnEl.offsetTop -> turnElRect.top
 

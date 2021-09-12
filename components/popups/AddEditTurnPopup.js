@@ -154,8 +154,8 @@ const AddEditTurnPopup = () => {
 
     let turnObj = {
       ...preparedForm,
-      height: 500,
-      width: 500,
+      // height: 500,
+      // width: 500,
 
       // x: -left + freeSpaceLeftRight + 50,
       // y: -top + freeSpaceTopBottom + 50,
@@ -163,6 +163,11 @@ const AddEditTurnPopup = () => {
       contentType: activeTemplate,
       quotes,
     };
+
+    if (!turnToEdit) {
+      turnObj.height = 600;
+      turnObj.width = 800;
+    }
 
     if (!!turnToEdit) {
       turnObj.x = -zeroPointX + turnToEdit.x;

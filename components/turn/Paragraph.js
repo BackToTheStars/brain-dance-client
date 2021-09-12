@@ -35,10 +35,10 @@ const Paragraph = ({
   const [timerScroll, setTimerScroll] = useState(null);
 
   const topQuotesCount = quotesWithCoords.filter((quote) => {
-    return !!lineEnds[quote.id] && quote.position === 'top';
+    return !!lineEnds[quote.quoteKey] && quote.position === 'top';
   }).length;
   const bottomQuotesCount = quotesWithCoords.filter((quote) => {
-    return !!lineEnds[quote.id] && quote.position === 'bottom';
+    return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
   }).length;
 
   const onQuoteClick = (quoteId) => {
@@ -159,11 +159,11 @@ const Paragraph = ({
           setQuotes={setQuotesWithCoords}
           onQuoteClick={onQuoteClick}
           turnId={turnId}
-          paragraphRect={
-            !!paragraphEl && !!paragraphEl.current
-              ? paragraphEl.current.getBoundingClientRect()
-              : {}
-          }
+          // paragraphRect={
+          //   !!paragraphEl && !!paragraphEl.current
+          //     ? paragraphEl.current.getBoundingClientRect()
+          //     : {}
+          // }
         />
         {!!bottomQuotesCount && (
           <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
