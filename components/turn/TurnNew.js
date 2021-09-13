@@ -43,7 +43,7 @@ const TurnNewComponent = ({
     _id === '606c8c8253ab6a0017377983' ||
     _id === '6100ca06b1871a48ccce1849'
   ) {
-    console.log({ scrollPosition, header: header });
+    // console.log({ scrollPosition, header: header });
   }
 
   const wrapperStyles = {

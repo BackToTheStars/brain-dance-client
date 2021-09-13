@@ -92,12 +92,6 @@ const Paragraph = ({
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
     paragraphEl.current.scrollTop = scrollPosition;
-    if (
-      turnId === '606c8c8253ab6a0017377983' ||
-      turnId === '6100ca06b1871a48ccce1849'
-    ) {
-      console.log({ turnId, scrollPosition });
-    }
     recalculateQuotes();
   }, [paragraphEl, scrollPosition]);
 
@@ -123,7 +117,7 @@ const Paragraph = ({
               },
             });
           } else {
-            console.log(`!!paragraphEl.current turnId: ${turnId}`);
+            // console.log(`!!paragraphEl.current turnId: ${turnId}`);
           }
         }, delayRenderScroll)
       );

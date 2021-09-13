@@ -15,7 +15,7 @@ $black-color: rgb(0, 0, 0);
         transform: translateY(15%);
       }
     }
-    .paragraphText {
+    .paragraphText:nth-child(2) {
       border-top-left-radius: $corners-radius;
       border-top-right-radius: $corners-radius;
     }
@@ -50,6 +50,9 @@ $black-color: rgb(0, 0, 0);
   .paragraphText {
     // flex: 1;
     margin-bottom: 0;
+    span {
+      word-wrap: break-word;
+    }
   }
   &.zero-point {
     visibility: hidden;

@@ -30,7 +30,7 @@ const settings = {
     availableFields: [FIELD_PICTURE],
     value: 'picture',
     label: 'Text / picture',
-    requiredFields: [FIELD_PICTURE],
+    requiredFields: [],
   },
   [TEMPLATE_VIDEO]: {
     availableFields: [FIELD_VIDEO],

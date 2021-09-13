@@ -156,7 +156,7 @@ const turnsReducer = (state, action) => {
 
       return {
         ...state,
-        activeQuote: { turnId, quoteId },
+        activeQuote: null,
         lineToAdd: {
           sourceTurnId: state.activeQuote.turnId,
           targetTurnId: turnId,
@@ -187,6 +187,7 @@ const turnsReducer = (state, action) => {
       }
       return {
         ...state,
+        activeQuote: null,
         lines: state.lines.filter((line) => !lineIds[line._id]),
       };
     }
