@@ -44,7 +44,14 @@ body {
   width: 430px;
   padding: 20px;
 }
-
-.games-list__item {
-  cursor: pointer;
+.games-list {
+  &__item {
+    cursor: pointer;
+  }
+  &__turns-count {
+    width: 12%;
+  }
+  &__visibility {
+    width: 15%;
+  }
 }
