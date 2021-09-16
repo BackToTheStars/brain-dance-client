@@ -7,8 +7,7 @@ import {
 } from '../contexts/TurnContext';
 import { quoteRectangleThickness } from '../сonst';
 
-const delayRenderScroll = 100;
-// let timerScroll = null;
+const delayRenderScroll = 20;
 
 const Paragraph = ({
   contentType,
@@ -32,8 +31,6 @@ const Paragraph = ({
   recalculateQuotes,
   turnId,
 }) => {
-  const [timerScroll, setTimerScroll] = useState(null);
-
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'top';
   }).length;
@@ -90,37 +87,38 @@ const Paragraph = ({
   }, [quotesWithCoords]);
 
   useEffect(() => {
-    if (!paragraphEl || !paragraphEl.current) return;
-    paragraphEl.current.scrollTop = scrollPosition;
-    recalculateQuotes();
+    setTimeout(() => {
+      if (!paragraphEl || !paragraphEl.current) return;
+      if (
+        Math.floor(paragraphEl.current.scrollTop) === Math.floor(scrollPosition)
+      )
+        return;
+      console.log(scrollPosition, 2);
+      recalculateQuotes();
+    }, 50);
   }, [paragraphEl, scrollPosition]);
+
+  useEffect(() => {
+    paragraphEl.current.scrollTop = scrollPosition;
+  }, []);
 
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
 
     const scrollHandler = () => {
-      // handleResize();
-      if (timerScroll) {
-        clearTimeout(timerScroll);
-        setTimerScroll(null);
+      if (!!paragraphEl.current) {
+        console.log(Math.floor(paragraphEl.current.scrollTop), 3);
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            scrollPosition: Math.floor(paragraphEl.current.scrollTop),
+          },
+        });
+      } else {
+        // console.log(`!!paragraphEl.current turnId: ${turnId}`);
       }
-
-      setTimerScroll(
-        setTimeout(() => {
-          if (!!paragraphEl.current) {
-            dispatch({
-              type: ACTION_TURN_WAS_CHANGED,
-              payload: {
-                _id: _id,
-                wasChanged: true,
-                scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-              },
-            });
-          } else {
-            // console.log(`!!paragraphEl.current turnId: ${turnId}`);
-          }
-        }, delayRenderScroll)
-      );
     };
 
     paragraphEl.current.addEventListener('scroll', scrollHandler);

@@ -187,8 +187,10 @@ const TurnNewComponent = ({
 
   useEffect(() => {
     $(wrapper.current).draggable({
-      // start: (event, ui) => {},
-      stop: (event, ui) => {
+      start: (event, ui) => {
+        $('#gameBox').addClass('remove-line-transition');
+      },
+      drag: (event, ui) => {
         dispatch({
           type: ACTION_TURN_WAS_CHANGED,
           payload: {
@@ -199,7 +201,9 @@ const TurnNewComponent = ({
           },
         });
       },
-      // drag: (event, ui) => {},
+      stop: (event, ui) => {
+        $('#gameBox').removeClass('remove-line-transition');
+      },
     });
     return () => $(wrapper.current).draggable('destroy');
   }, []);

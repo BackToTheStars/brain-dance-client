@@ -1,16 +1,21 @@
 .quotes-panel {
   position: absolute;
-  left: 570px;
-  bottom: 30px;
-  background-color: white;
-  min-width: 300px;
-  z-index: 4;
-  border-radius: 3px;
-  overflow: hidden;
+  left: 50vw;
+  transform: translateX(-50%);
+  width: 50vw;
+  bottom: $panels-spacer;
+
   table {
-    width: 100%;
+    color: $white;
+    border-radius: $corners-radius;
+
     &.table th {
-      padding: 0.4rem;
+      border-top: none;
+    }
+    &.table th,
+    &.table td {
+      border-top: none;
+      padding: 0.5rem 0.5rem;
     }
   }
 }

@@ -1,4 +1,7 @@
-$dark-grey: rgba(49, 51, 51, 1);
+// $dark-grey: rgba(49, 51, 51, 1); // original
+$dark-grey: rgba(37, 41, 46, 1); // подогнал под bootstrap table-dark
+// $dark-grey: rgb(8, 103, 158);
+// $dark-table-color: $dark-grey;
 $light-grey: rgba(180, 180, 180, 0.705);
 $white: rgba(255, 255, 255, 0.842);
 $panels-spacer: 10px;
