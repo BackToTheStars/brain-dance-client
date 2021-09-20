@@ -1,9 +1,15 @@
 .quotes-panel {
-  position: absolute;
+  // position: fixed;
   left: 50vw;
-  transform: translateX(-50%);
+  // transform: translateX(-50%);
   width: 50vw;
   bottom: $panels-spacer;
+  font-size: 1.25rem;
+  transform: translateY(0%) translateX(-50%);
+  &.hidden {
+    transform: translateY(140%) translateX(-50%);
+    min-height: 100px;
+  }
 
   table {
     color: $white;
@@ -15,7 +21,7 @@
     &.table th,
     &.table td {
       border-top: none;
-      padding: 0.5rem 0.5rem;
+      padding: 0.38rem 0.5rem;
     }
   }
 }
