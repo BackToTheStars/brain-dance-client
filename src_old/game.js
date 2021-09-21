@@ -170,7 +170,7 @@ class Game {
           this.notificationPanel.alert({
             msgTitle: 'Info:',
             msgText: 'Field has been saved',
-            timespan: 1500,
+            timespan: 3000,
           });
           console.log('Positions of all turns re-saved.');
           break;
@@ -179,10 +179,9 @@ class Game {
           // двигает все ходы при отпускании draggable() поля
           const turns = await this.turnCollection.getTurns();
           this.gameField.recalculate(turns);
-          const {
-            x: left,
-            y: top,
-          } = this.turnCollection.getZeroPointTurn().getPositionInfo();
+          const { x: left, y: top } = this.turnCollection
+            .getZeroPointTurn()
+            .getPositionInfo();
           this.dispatchers.turnsDispatch({
             type: ACTION_FIELD_WAS_MOVED,
             payload: {
@@ -352,7 +351,7 @@ class Game {
     this.notificationPanel.alert({
       msgTitle: 'Info:',
       msgText: `User ${this.userInfo.nickname} logged in`,
-      timespan: 1500,
+      timespan: 3000,
     });
   }
   addEventListeners() {}

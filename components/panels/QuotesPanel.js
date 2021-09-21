@@ -77,8 +77,8 @@ const QuotesPanel = () => {
         setPreparedLines(
           preparedLines.map((line) => {
             if (!!line.turnIdOutOfScreen) {
-              // загружаем цитаты хода который не видно в области видимости
               debugger;
+              // загружаем цитаты хода который не видно в области видимости
               const turnOutOfScreen = data.items.find(
                 (turn) => turn._id === line.turnIdOutOfScreen
               );
@@ -86,7 +86,7 @@ const QuotesPanel = () => {
                 return {
                   ...line,
                   sourceQuoteInfo: turnOutOfScreen.quotes.find(
-                    (quote) => line.sourceMarker === quote.quoteId
+                    (quote) => line.sourceMarker === quote.id
                   ),
                 };
               }
@@ -94,7 +94,7 @@ const QuotesPanel = () => {
                 return {
                   ...line,
                   targetQuoteInfo: turnOutOfScreen.quotes.find(
-                    (quote) => line.targetMarker === quote.quoteId
+                    (quote) => line.targetMarker === quote.id
                   ),
                 };
               }

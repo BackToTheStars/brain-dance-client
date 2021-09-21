@@ -117,10 +117,13 @@ const AddEditTurnPopup = () => {
 
     const quotes = [];
 
+    console.log(resTextArr);
+
     for (let textItem of resTextArr) {
       if (textItem.attributes && textItem.attributes.id) {
         quotes.push({
           id: textItem.attributes.id,
+          text: textItem.insert,
         });
       }
     }

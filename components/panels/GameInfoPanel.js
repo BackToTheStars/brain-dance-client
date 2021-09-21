@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 // может быть, потом переделаем на Redux или Redux Saga
-import { ROLES, RULE_GAME_EDIT } from '../config';
+import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '../config';
 import { useUiContext } from '../contexts/UI_Context';
 import { UserContext, useUserContext } from '../contexts/UserContext';
 import AccessCodesTable from '../widgets/AccessCodeTable';
 import useGamePlayerCode from '../hooks/edit-game-code';
 import EditGameForm from '../forms/EditGameForm';
 import useEditGame from '../hooks/edit-game';
+import useEditCodeWarningPopup from '../hooks/edit-code-warning-popup';
 
 const getUrl = ({ hash }) => {
   return typeof window === 'undefined' // SSR
@@ -22,8 +23,23 @@ const GameInfoPanel = ({ game, setGame }) => {
   const { game: editedGame, editGame } = useEditGame(token);
 
   const [viewMode, setViewMode] = useState(true);
+  const [accessCode, setAccessCode] = useState('');
+  const [userNickname, setUserNickname] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { role, nickname } = info;
+
+  const { enterGame } = useEditCodeWarningPopup();
+
+  const accessHandler = (event) => {
+    if (event.key === 'Enter') {
+      if (!accessCode) setErrorMessage('enter access code');
+      else if (!userNickname) setErrorMessage('enter your nickname');
+      else enterGame(accessCode, userNickname);
+    } else if (!!errorMessage) {
+      setErrorMessage('');
+    }
+  };
 
   useEffect(() => {
     if (editedGame) {
@@ -129,6 +145,31 @@ const GameInfoPanel = ({ game, setGame }) => {
             <td>Your role:</td>
             <td>
               <h4>{ROLES[role].name}</h4>
+              {role === ROLE_GAME_VISITOR && (
+                <>
+                  <div className="row">
+                    <input
+                      className="mr-3 form-control col-4"
+                      type="text"
+                      placeholder="Enter code..."
+                      onChange={(e) => setAccessCode(e.target.value)}
+                      value={accessCode}
+                      onKeyDown={accessHandler}
+                    />
+                    <input
+                      className="form-control col-6"
+                      type="text"
+                      placeholder="Enter nickname..."
+                      onChange={(e) => setUserNickname(e.target.value)}
+                      value={userNickname}
+                      onKeyDown={accessHandler}
+                    />
+                  </div>
+                  {!!errorMessage && (
+                    <div className="text-danger">{errorMessage}</div>
+                  )}
+                </>
+              )}
             </td>
           </tr>
         </tbody>
