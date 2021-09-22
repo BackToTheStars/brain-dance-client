@@ -2,11 +2,11 @@ import { ROLES } from '../config';
 
 const AccessCodesTable = ({ codes = [] }) => {
   return (
-    <table className="table table-striped">
+    <table className="table table-striped table-dark mb-0">
       <thead>
-        <tr>
-          <td>Role</td>
-          <td>Code</td>
+        <tr className="th-no-borders">
+          <th>Role</th>
+          <th>Code</th>
         </tr>
       </thead>
       <tbody>

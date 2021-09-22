@@ -1,17 +1,31 @@
-// import { useRouter } from 'next/router';
+import { useState } from 'react';
 import useEditCodeWarningPopup from '../hooks/edit-code-warning-popup';
 
 const CodeEnterForm = () => {
-  // const router = useRouter();
   const { enterGame } = useEditCodeWarningPopup();
+
+  const [accessCode, setAccessCode] = useState('');
+  const [userNickname, setUserNickname] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    enterGame(e.target.code.value, e.target.nickname.value);
+    if (!accessCode) setErrorMessage('Enter access code');
+    else if (!userNickname) setErrorMessage('Enter your nickname');
+    else enterGame(accessCode, userNickname);
   };
+
+  const accessHandler = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit(event);
+    } else if (!!errorMessage) {
+      setErrorMessage('');
+    }
+  };
+
   return (
     <form className="form-inline" onSubmit={handleSubmit}>
-      <div className="form-group mx-sm-3 mb-2">
+      <div className="form-group mb-2 mr-3">
         <label htmlFor="code" className="sr-only">
           Enter Code
         </label>
@@ -19,18 +33,25 @@ const CodeEnterForm = () => {
           name="code"
           type="text"
           className="form-control mr-3"
-          placeholder="Code"
+          placeholder="Enter code..."
+          onChange={(e) => setAccessCode(e.target.value)}
+          value={accessCode}
+          onKeyDown={accessHandler}
         />
         <input
           name="nickname"
           type="text"
           className="form-control"
-          placeholder="Nickname"
+          placeholder="Enter nickname..."
+          onChange={(e) => setUserNickname(e.target.value)}
+          value={userNickname}
+          onKeyDown={accessHandler}
         />
       </div>
       <button type="submit" className="btn btn-primary mb-2">
         Enter Game
       </button>
+      {!!errorMessage && <div className="ml-3 text-danger">{errorMessage}</div>}
     </form>
   );
 };

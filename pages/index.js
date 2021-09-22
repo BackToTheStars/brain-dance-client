@@ -81,7 +81,9 @@ const IndexPage = () => {
       )}
       {mode === 'admin' && <h4>User mode: {mode}</h4>}
       <div className="row">
-        <CodeEnterForm />
+        <div className="col-12">
+          <CodeEnterForm />
+        </div>
       </div>
       <div className="row">
         <div className="col-8">

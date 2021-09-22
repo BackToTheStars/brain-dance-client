@@ -18,7 +18,7 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
   };
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)}>
+    <form className="mt-3" onSubmit={(e) => handleSubmit(e)}>
       <div className="form-group">
         <div className="form-check">
           <input
@@ -73,11 +73,11 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
           defaultValue={description}
         ></textarea>
       </div>
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn btn-primary mr-3">
         Save
       </button>
       <button
-        className="btn btn-link"
+        className="btn btn-danger"
         onClick={() => {
           setToggleEditForm(false);
         }}

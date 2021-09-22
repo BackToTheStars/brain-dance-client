@@ -2,6 +2,15 @@
 
 $black-color: rgb(0, 0, 0);
 
+.translucent-field {
+  .react-turn-new {
+    opacity: 0.4;
+    &.ui-draggable-dragging {
+      opacity: 1;
+    }
+  }
+}
+
 .react-turn-new {
   position: absolute;
   cursor: move;

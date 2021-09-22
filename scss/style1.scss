@@ -84,23 +84,6 @@ body {
   padding-right: 3px;
 }
 
-#gameInfoPanel {
-  transition: 0.3s;
-  position: absolute;
-  top: 0;
-  transform: translate(-50%, 0);
-  left: 50%;
-  z-index: 4;
-  background: #fff;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  padding: 15px;
-}
-
-#gameInfoPanel.hidden {
-  transform: translate(-50%, -100%);
-}
-
 .p0 {
   padding: 0;
 }
@@ -197,4 +180,9 @@ body {
   z-index: 5;
   margin-left: 30px;
   margin-top: -20px; */
+}
+
+.th-no-borders th,
+.td-no-borders td {
+  border-top: none;
 }

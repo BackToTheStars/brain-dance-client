@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import CodeEnterForm from '../forms/CodeEnterForm';
 // может быть, потом переделаем на Redux или Redux Saga
 import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '../config';
 import { useUiContext } from '../contexts/UI_Context';
@@ -7,7 +8,6 @@ import AccessCodesTable from '../widgets/AccessCodeTable';
 import useGamePlayerCode from '../hooks/edit-game-code';
 import EditGameForm from '../forms/EditGameForm';
 import useEditGame from '../hooks/edit-game';
-import useEditCodeWarningPopup from '../hooks/edit-code-warning-popup';
 
 const getUrl = ({ hash }) => {
   return typeof window === 'undefined' // SSR
@@ -23,23 +23,8 @@ const GameInfoPanel = ({ game, setGame }) => {
   const { game: editedGame, editGame } = useEditGame(token);
 
   const [viewMode, setViewMode] = useState(true);
-  const [accessCode, setAccessCode] = useState('');
-  const [userNickname, setUserNickname] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
   const { role, nickname } = info;
-
-  const { enterGame } = useEditCodeWarningPopup();
-
-  const accessHandler = (event) => {
-    if (event.key === 'Enter') {
-      if (!accessCode) setErrorMessage('enter access code');
-      else if (!userNickname) setErrorMessage('enter your nickname');
-      else enterGame(accessCode, userNickname);
-    } else if (!!errorMessage) {
-      setErrorMessage('');
-    }
-  };
 
   useEffect(() => {
     if (editedGame) {
@@ -66,7 +51,7 @@ const GameInfoPanel = ({ game, setGame }) => {
 
   return (
     <div
-      className={['p0', gameInfoPanelIsHidden ? 'hidden' : ''].join(' ')}
+      className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''} panel`}
       id="gameInfoPanel"
     >
       {!viewMode && (
@@ -76,11 +61,11 @@ const GameInfoPanel = ({ game, setGame }) => {
           editGame={editGame}
         />
       )}
-      <table className="table game-info-table">
+      <table className="table game-info-table table-dark">
         <tbody>
           {viewMode && (
             <>
-              <tr>
+              <tr className="td-no-borders">
                 <td>Game name:</td>
                 <td>
                   <h4>
@@ -100,7 +85,7 @@ const GameInfoPanel = ({ game, setGame }) => {
                 </td>
               </tr>
               <tr>
-                <td></td>
+                <td>Game type:</td>
                 <td>
                   {publicStatus
                     ? 'This game is public'
@@ -131,13 +116,13 @@ const GameInfoPanel = ({ game, setGame }) => {
                   Get player code
                 </a>
               </td>
-              <td>
+              <td className="pt-0 pb-0">
                 {!!code && <span>{code}</span>}
                 <AccessCodesTable codes={codes} />
               </td>
             </tr>
           )}
-          <tr>
+          <tr className="td-no-borders">
             <td>Your nickname:</td>
             <td>{nickname}</td>
           </tr>
@@ -145,31 +130,7 @@ const GameInfoPanel = ({ game, setGame }) => {
             <td>Your role:</td>
             <td>
               <h4>{ROLES[role].name}</h4>
-              {role === ROLE_GAME_VISITOR && (
-                <>
-                  <div className="row">
-                    <input
-                      className="mr-3 form-control col-4"
-                      type="text"
-                      placeholder="Enter code..."
-                      onChange={(e) => setAccessCode(e.target.value)}
-                      value={accessCode}
-                      onKeyDown={accessHandler}
-                    />
-                    <input
-                      className="form-control col-6"
-                      type="text"
-                      placeholder="Enter nickname..."
-                      onChange={(e) => setUserNickname(e.target.value)}
-                      value={userNickname}
-                      onKeyDown={accessHandler}
-                    />
-                  </div>
-                  {!!errorMessage && (
-                    <div className="text-danger">{errorMessage}</div>
-                  )}
-                </>
-              )}
+              {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
             </td>
           </tr>
         </tbody>
@@ -177,7 +138,7 @@ const GameInfoPanel = ({ game, setGame }) => {
       <a
         href="#"
         onClick={() => setGameInfoPanelIsHidden(true)}
-        className="btn btn-secondary ml-12px"
+        className="btn btn-secondary"
       >
         Close
       </a>
