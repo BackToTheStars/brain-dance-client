@@ -10,8 +10,8 @@ import useEditCodeWarningPopup from '../components/hooks/edit-code-warning-popup
 import useEditGame from '../components/hooks/edit-game';
 import NewGameWarningPopup from '../components/popups/NewGameWarningPopup';
 
-import { API_URL } from '../src/config';
-import { getToken } from '../src/lib/token';
+import { API_URL } from '../components/config';
+import { getToken } from '../components/lib/token';
 
 const IndexPage = () => {
   const {
@@ -81,7 +81,9 @@ const IndexPage = () => {
       )}
       {mode === 'admin' && <h4>User mode: {mode}</h4>}
       <div className="row">
-        <CodeEnterForm />
+        <div className="col-12">
+          <CodeEnterForm />
+        </div>
       </div>
       <div className="row">
         <div className="col-8">

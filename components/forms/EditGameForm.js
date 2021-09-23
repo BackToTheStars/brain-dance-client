@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
+const EditGameForm = ({ game, editGame }) => {
   const [name, setName] = useState(game.name);
   const [image, setImage] = useState(game.image);
   const [gameIsPublic, setGameIsPublic] = useState(game.public);
@@ -18,7 +18,7 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
   };
 
   return (
-    <form onSubmit={(e) => handleSubmit(e)}>
+    <form className="mt-3" onSubmit={(e) => handleSubmit(e)}>
       <div className="form-group">
         <div className="form-check">
           <input
@@ -73,16 +73,12 @@ const EditGameForm = ({ setToggleEditForm, game, editGame }) => {
           defaultValue={description}
         ></textarea>
       </div>
-      <button type="submit" className="btn btn-primary">
-        Save
-      </button>
       <button
-        className="btn btn-link"
-        onClick={() => {
-          setToggleEditForm(false);
-        }}
+        style={{ minWidth: '75px' }}
+        type="submit"
+        className="btn btn-primary mr-3"
       >
-        Cancel
+        Save
       </button>
     </form>
   );

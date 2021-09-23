@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { API_URL } from '../../src/config';
-import { getToken } from '../../src/lib/token';
+import { API_URL } from '../config';
+import { getToken } from '../lib/token';
 
 const useEditGame = (gameToken) => {
   const [game, setGame] = useState();

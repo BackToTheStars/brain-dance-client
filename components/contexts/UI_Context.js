@@ -1,5 +1,7 @@
-import { useState, useContext, useReducer, createContext } from 'react';
+import { useState, useContext, createContext, useEffect } from 'react';
+import { useReducer } from 'reinspect';
 
+export const NOTIFICATION_TRANSITION = 500;
 export const UI_Context = createContext();
 const initialState = {
   classesPanelIsHidden: true,
@@ -16,44 +18,39 @@ const reducer = (state, action) => {
 
 const minimapInitialState = {
   isHidden: false, // true
-
-  initLeft: 0,
-  initTop: 0,
-  initRight: 0,
-  initBottom: 0,
   left: 0,
   top: 0,
   bottom: 0,
   right: 0,
-  initZeroX: 0,
-  initZeroY: 0,
   zeroX: 0,
   zeroY: 0,
+  turnsToRender: [],
+  minimapSize: { left: 0, top: 0, width: 0, height: 0 }, // размеры миникарты приходят из DOM (из компонента миникарты)
 };
 
 const minimapReducer = (state, action) => {
   switch (action.type) {
     case 'MAP_INIT': {
-      const { left, top, right, bottom } = action.payload;
+      const { left, right, top, bottom, zeroX, zeroY, turns } = action.payload;
       return {
         ...state,
-        initLeft: left,
-        initTop: top,
-        initRight: right,
-        initBottom: bottom,
-        ...action.payload,
-        initZeroX: action.payload.zeroX,
-        initZeroY: action.payload.zeroY,
+        left,
+        right,
+        top,
+        bottom,
+        zeroX,
+        zeroY,
+        turns,
       };
     }
     case 'VIEWPORT_MOVED_ON_FIELD': {
+      const { turns, zeroX, zeroY } = action.payload;
       return {
         ...state,
-        ...action.payload,
-        // left: action.payload.left,
-        // top: action.payload.top,
-        // bottom: action.payload.bottom,
-        // right: action.payload.right,
+        // ...action.payload,
+        zeroX,
+        zeroY,
+        turns,
       };
     }
     case 'MINIMAP_SHOW_HIDE': {
@@ -62,67 +59,98 @@ const minimapReducer = (state, action) => {
         isHidden: !state.isHidden,
       };
     }
+    case 'TURNS_WERE_CHANGED': {
+      const { turns } = action.payload;
+      return {
+        ...state,
+        turns,
+      };
+    }
+    case 'TURNS_TO_RENDER': {
+      return {
+        ...state,
+        turnsToRender: action.payload,
+      };
+    }
+    case 'MINIMAP_SIZE_UPDATED': {
+      return {
+        ...state,
+        minimapSize: action.payload,
+      };
+    }
     default: {
       throw new Error(`unknown type of minimapReducer "${action.type}"`);
     }
   }
 };
 
-const recPanelInitialState = {
-  isHidden: true,
-};
-
-function recPanelReducer(state, action) {
-  switch (action.type) {
-    case 'SHOW_RECPANEL': {
-      return {
-        isHidden: false,
-      };
-    }
-    case 'HIDE_RECPANEL': {
-      return {
-        isHidden: true,
-      };
-    }
-    case 'TOGGLE_RECPANEL': {
-      return {
-        isHidden: !state.isHidden,
-      };
-    }
-    default: {
-      console.error(
-        `recPanelReducer: unknown type ${JSON.stringify(action.type)}`
-      );
-      throw new Error(
-        `recPanelReducer: unknown type ${JSON.stringify(action.type)}`
-      );
-    }
-  }
-}
-
 export const UI_Provider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // массив уведомлений в консоль событий
+  const [notifications, setNotifications] = useState([]);
+  const [windowSize, setWindowSize] = useState({
+    innerHeight: 600,
+    innerWidth: 800,
+  });
+
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialState,
+    (store) => store,
+    'ui'
+  );
   // const [classesPanelIsHidden, setClassesPanelIsHidden] = useState(true);
   const [gameInfoPanelIsHidden, setGameInfoPanelIsHidden] = useState(true);
+  const [createEditTurnPopupIsHidden, setCreateEditTurnPopupIsHidden] =
+    useState(true);
 
   const [minimapState, minimapDispatch] = useReducer(
     minimapReducer,
-    minimapInitialState
+    minimapInitialState,
+    (store) => store,
+    'minimap'
   );
 
-  const [recPanelState, recPanelDispatch] = useReducer(
-    recPanelReducer,
-    recPanelInitialState
-  );
+  const addNotification = ({ title, text }) => {
+    const newNotifications = [...notifications, { title, text, status: 'new' }];
+    setNotifications(newNotifications);
+    setTimeout(() => {
+      setNotifications((notifications) => {
+        const newNotifications = [...notifications];
+        newNotifications[0] = {
+          ...newNotifications[0],
+          status: 'old',
+        };
+        return newNotifications;
+      });
+    }, 3000);
+
+    setTimeout(() => {
+      setNotifications((notifications) => {
+        const newNotifications = [...notifications];
+        newNotifications.shift();
+        return newNotifications;
+      });
+    }, 3000 + NOTIFICATION_TRANSITION);
+  };
+
+  useEffect(() => {
+    if (!window) return;
+    window.addEventListener('resize', () => {
+      setWindowSize({
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+      });
+    });
+  }, []);
 
   return (
     <UI_Context.Provider
       value={{
-        // classesPanelIsHidden,
-        // setClassesPanelIsHidden,
-
         gameInfoPanelIsHidden,
         setGameInfoPanelIsHidden,
+
+        createEditTurnPopupIsHidden,
+        setCreateEditTurnPopupIsHidden,
 
         state,
         dispatch,
@@ -130,8 +158,10 @@ export const UI_Provider = ({ children }) => {
         minimapState,
         minimapDispatch,
 
-        recPanelState,
-        recPanelDispatch,
+        notifications,
+        addNotification,
+
+        windowSize,
       }}
     >
       {children}

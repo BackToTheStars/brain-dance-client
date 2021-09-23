@@ -1,0 +1,14 @@
+.actions.panel {
+  bottom: $panels-spacer;
+  right: $panels-spacer;
+  width: 360px;
+  padding: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  button {
+    width: 105px;
+    text-align: center;
+    margin: 5px;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import CodeEnterForm from '../forms/CodeEnterForm';
 // может быть, потом переделаем на Redux или Redux Saga
-import { ROLES, RULE_GAME_EDIT } from '../config';
+import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '../config';
 import { useUiContext } from '../contexts/UI_Context';
 import { UserContext, useUserContext } from '../contexts/UserContext';
 import AccessCodesTable from '../widgets/AccessCodeTable';
@@ -15,7 +16,8 @@ const getUrl = ({ hash }) => {
 };
 
 const GameInfoPanel = ({ game, setGame }) => {
-  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden } = useUiContext();
+  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden, addNotification } =
+    useUiContext();
   const { info, can, token } = useUserContext();
   const { code, addCode } = useGamePlayerCode(token);
   const { game: editedGame, editGame } = useEditGame(token);
@@ -31,27 +33,33 @@ const GameInfoPanel = ({ game, setGame }) => {
     }
   }, [editedGame]);
 
-  if (!game) return 'Loading...';
+  useEffect(() => {
+    addNotification({ title: 'Info:', text: `User ${nickname} logged in.` });
+  }, []);
+
+  if (!game)
+    return (
+      <div
+        className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''}`}
+        id="gameInfoPanel"
+      >
+        Loading...
+      </div>
+    );
 
   const { name, description, image, public: publicStatus, codes = [] } = game;
 
   return (
     <div
-      className={['p0', gameInfoPanelIsHidden ? 'hidden' : ''].join(' ')}
+      className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''} panel`}
       id="gameInfoPanel"
     >
-      {!viewMode && (
-        <EditGameForm
-          setToggleEditForm={() => setViewMode(true)}
-          game={game}
-          editGame={editGame}
-        />
-      )}
-      <table className="table game-info-table">
+      {!viewMode && <EditGameForm game={game} editGame={editGame} />}
+      <table className="table game-info-table table-dark">
         <tbody>
           {viewMode && (
             <>
-              <tr>
+              <tr className="td-no-borders">
                 <td>Game name:</td>
                 <td>
                   <h4>
@@ -71,7 +79,7 @@ const GameInfoPanel = ({ game, setGame }) => {
                 </td>
               </tr>
               <tr>
-                <td></td>
+                <td>Game type:</td>
                 <td>
                   {publicStatus
                     ? 'This game is public'
@@ -102,13 +110,13 @@ const GameInfoPanel = ({ game, setGame }) => {
                   Get player code
                 </a>
               </td>
-              <td>
+              <td className="pt-0 pb-0">
                 {!!code && <span>{code}</span>}
                 <AccessCodesTable codes={codes} />
               </td>
             </tr>
           )}
-          <tr>
+          <tr className="td-no-borders">
             <td>Your nickname:</td>
             <td>{nickname}</td>
           </tr>
@@ -116,17 +124,29 @@ const GameInfoPanel = ({ game, setGame }) => {
             <td>Your role:</td>
             <td>
               <h4>{ROLES[role].name}</h4>
+              {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
             </td>
           </tr>
         </tbody>
       </table>
-      <a
-        href="#"
-        onClick={() => setGameInfoPanelIsHidden(true)}
-        className="btn btn-secondary ml-12px"
-      >
-        Close
-      </a>
+      {viewMode ? (
+        <button
+          onClick={() => setGameInfoPanelIsHidden(true)}
+          className="btn btn-secondary"
+        >
+          Close
+        </button>
+      ) : (
+        <button
+          style={{ minWidth: '75px' }}
+          className="btn btn-danger"
+          onClick={() => {
+            setViewMode(true);
+          }}
+        >
+          Cancel
+        </button>
+      )}
     </div>
   );
 };

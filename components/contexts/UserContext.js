@@ -1,6 +1,7 @@
 import { useState, useContext, useReducer, createContext } from 'react';
-import { getGameInfo } from '../../src/lib/gameToken';
+import { getGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
+import { API_URL } from '../config';
 
 const guestUser = {
   info: {
@@ -20,12 +21,63 @@ export const UserProvider = ({ children, hash, timecode }) => {
     return checkRuleByRole(rule, info.role);
   };
 
+  // classes
+  // получение классов
+  const request = async (
+    path,
+    { body = null, tokenFlag = false, method = 'GET' } = {},
+    { errorMessage, errorCallback, successCallback } = {}
+  ) => {
+    let defaultMessage = errorMessage || `Произошла ошибка, метод ${method}`;
+    const params = {
+      method,
+      headers: {
+        'content-type': 'application/json',
+      },
+    };
+    if (tokenFlag) {
+      params.headers['game-token'] = token;
+    }
+    if (body) {
+      params.body = JSON.stringify(body);
+    }
+
+    return new Promise((resolve, reject) => {
+      fetch(`${API_URL}/${path}`, params)
+        .then((data) => {
+          return data.json();
+        })
+        .then((res) => {
+          const { message = defaultMessage, item, items } = res;
+          // @todo: более гибкая обработка
+          if (item || items) {
+            resolve(res);
+            if (successCallback) {
+              successCallback(res);
+            }
+          } else {
+            if (errorCallback) {
+              errorCallback(message);
+            } else {
+              alert(message);
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          reject('Request error');
+        });
+    });
+  };
+
   const value = {
     info,
     token,
     can,
     timecode,
+    request,
   };
+
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
