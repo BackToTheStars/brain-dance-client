@@ -54,13 +54,7 @@ const GameInfoPanel = ({ game, setGame }) => {
       className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''} panel`}
       id="gameInfoPanel"
     >
-      {!viewMode && (
-        <EditGameForm
-          setToggleEditForm={() => setViewMode(true)}
-          game={game}
-          editGame={editGame}
-        />
-      )}
+      {!viewMode && <EditGameForm game={game} editGame={editGame} />}
       <table className="table game-info-table table-dark">
         <tbody>
           {viewMode && (
@@ -135,13 +129,24 @@ const GameInfoPanel = ({ game, setGame }) => {
           </tr>
         </tbody>
       </table>
-      <a
-        href="#"
-        onClick={() => setGameInfoPanelIsHidden(true)}
-        className="btn btn-secondary"
-      >
-        Close
-      </a>
+      {viewMode ? (
+        <button
+          onClick={() => setGameInfoPanelIsHidden(true)}
+          className="btn btn-secondary"
+        >
+          Close
+        </button>
+      ) : (
+        <button
+          style={{ minWidth: '75px' }}
+          className="btn btn-danger"
+          onClick={() => {
+            setViewMode(true);
+          }}
+        >
+          Cancel
+        </button>
+      )}
     </div>
   );
 };

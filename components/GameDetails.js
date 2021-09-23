@@ -53,7 +53,9 @@ const GameDetails = ({
                 Delete Game
               </button>
               <hr />
-              {!!codes.length && <AccessCodesTable codes={codes} />}
+              {!!codes.length && (
+                <AccessCodesTable mode="light" codes={codes} />
+              )}
               <button onClick={() => addCode(game)} className="btn btn-success">
                 Get edit code
               </button>

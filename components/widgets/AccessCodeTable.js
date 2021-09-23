@@ -1,13 +1,11 @@
 import { ROLES } from '../config';
 
-const AccessCodesTable = ({ codes = [] }) => {
+const AccessCodesTable = ({ mode = 'dark', codes = [] }) => {
   return (
     // <table className="table table-striped table-dark mb-0">
-    <table className="table table-striped mb-0">
-
+    <table className={`table table-striped table-${mode} mb-0`}>
       <thead>
         <tr className="th-no-borders">
-
           <th>Role</th>
           <th>Code</th>
         </tr>
