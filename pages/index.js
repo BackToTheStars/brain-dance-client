@@ -80,16 +80,14 @@ const IndexPage = () => {
         <NewGameWarningPopup code={popupCode} enterGame={enterGame} />
       )}
       {mode === 'admin' && <h4>User mode: {mode}</h4>}
-      <div className="row">
-        <div className="col-12">
-          <CodeEnterForm />
-        </div>
-      </div>
+      <div className="row"></div>
       <div className="row">
         <div className="col-8">
-          <GameTable games={games} onItemClick={onItemClick} />
           <div className="row">
-            <div className="col-6">
+            <div className="col-9">
+              <CodeEnterForm />
+            </div>
+            <div className="col-3 text-right">
               {!toggleCreateForm && !toggleEditForm && (
                 <button
                   className="btn btn-success"
@@ -100,28 +98,38 @@ const IndexPage = () => {
                   Create New Game
                 </button>
               )}
-              <hr />
-              {toggleCreateForm && (
+            </div>
+            <hr />
+
+            {toggleCreateForm && (
+              <div className="col-12">
                 <CreateGameForm
                   setToggleCreateForm={setToggleCreateForm}
                   createGame={createGame}
                 />
-              )}
-              {toggleEditForm && (
-                <EditGameForm
-                  setToggleEditForm={setToggleEditForm}
-                  game={gameClicked}
-                  editGame={editGame}
-                />
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        </div>
-        <div className="col-4">
-          <GameDetails
-            game={gameClicked}
-            {...{ mode, deleteGame, openEditGameForm, addCode, code }}
+          <GameTable
+            gameClicked={gameClicked}
+            games={games}
+            onItemClick={onItemClick}
           />
+        </div>
+        <div className="col-4 ">
+          <div className="game-details">
+            <GameDetails
+              game={gameClicked}
+              {...{ mode, deleteGame, openEditGameForm, addCode, code }}
+            />
+            {toggleEditForm && (
+              <EditGameForm
+                setToggleEditForm={setToggleEditForm}
+                game={gameClicked}
+                editGame={editGame}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
 const PREV_FRONT_URL = 'http://localhost:3000';
-const GameTable = ({ games, onItemClick }) => {
+const GameTable = ({ games, onItemClick, gameClicked }) => {
   // for(let game of games) {
   //   const gameEl = document.createElement('li');
   //   gameEl.innerHTML = `<a href="/?hash=${game.hash}">${game.name}</a>`;
   //   gamesList.appendChild(gameEl);
   // }
+  // console.log({ games, gameClicked });
 
   return (
     <table className="table table-striped games-list">
@@ -19,7 +20,11 @@ const GameTable = ({ games, onItemClick }) => {
         {games.map((el) => {
           return (
             <tr
-              className="games-list__item"
+              className={`games-list__item ${
+                !!gameClicked && gameClicked.hash === el.hash
+                  ? 'table-primary'
+                  : ''
+              }`}
               key={el.hash}
               onClick={(e) => {
                 // e.preventDefault(); // не даёт нажать на # и улететь наверх страницы
@@ -27,7 +32,7 @@ const GameTable = ({ games, onItemClick }) => {
               }}
             >
               <td>{el.name}</td>
-              <td className="text-center">{el.turnsCount - 1}</td>
+              <td className="text-center">{el.turnsCount}</td>
               <td className="text-center">
                 {el.public ? 'Public' : 'Private'}
               </td>
