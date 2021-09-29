@@ -167,6 +167,7 @@ $black-color: rgb(0, 0, 0);
   justify-content: space-between;
   align-items: center;
 
+  .clone-btn,
   .edit-btn,
   .delete-btn {
     transition: 0.2s;
@@ -177,13 +178,17 @@ $black-color: rgb(0, 0, 0);
   }
 
   a.delete-btn,
-  a.edit-btn {
+  a.edit-btn,
+  a.clone-btn {
     font-size: 21px;
     position: relative;
     top: -0.5px;
 
     color: rgb(160, 160, 160);
     margin-top: 0px;
+  }
+  a.clone-btn:hover {
+    color: rgb(58, 58, 58);
   }
   a.edit-btn:hover {
     color: rgb(58, 58, 58);

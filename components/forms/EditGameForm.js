@@ -18,8 +18,8 @@ const EditGameForm = ({ game, editGame }) => {
   };
 
   return (
-    <form className="mt-3 card" onSubmit={(e) => handleSubmit(e)}>
-      <div className="card-body">
+    <form className="card mt-3" onSubmit={(e) => handleSubmit(e)}>
+      <div className="card-body ">
         <div className="form-group">
           <div className="form-check form-check-inline">
             <input

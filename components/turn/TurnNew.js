@@ -10,6 +10,7 @@ import {
 import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
+import { dataCopy } from '../helpers/formatters/dataCopier';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -100,6 +101,12 @@ const TurnNewComponent = ({
     setQuotesWithCoords([]);
     setUpdateSizeTime(new Date().getTime());
     // }, delayRenderTurn);
+  };
+
+  const handleClone = async (e) => {
+    e.preventDefault();
+    const copiedTurn = dataCopy(turn);
+    console.log(copiedTurn);
   };
 
   const handleEdit = (e) => {
@@ -240,6 +247,7 @@ const TurnNewComponent = ({
         }
         can={can}
         header={header}
+        handleClone={handleClone}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         registerHandleResize={registerHandleResize}
