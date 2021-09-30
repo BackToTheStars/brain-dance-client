@@ -10,7 +10,7 @@ import {
 import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
-import { dataCopy } from '../helpers/formatters/dataCopier';
+import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -23,6 +23,8 @@ const TurnNewComponent = ({
   activeQuote,
   setCreateEditTurnPopupIsHidden,
   deleteTurn,
+  saveTurnInBuffer,
+  getTurnFromBufferAndRemove,
 }) => {
   const { _id, x, y, width, height } = turn;
   const {
@@ -103,10 +105,51 @@ const TurnNewComponent = ({
     // }, delayRenderTurn);
   };
 
+  // backgroundColor: null
+  // contentType: "picture"
+  // createdAt: "2021-09-14T04:47:01.089Z"
+  // dontShowHeader: false
+  // fontColor: null
+  // gameId: "603bb95d8d996a07c82f2f4d"
+  // header: "Новая цитата"
+  // height: 86
+  // paragraph: [{…}]
+  // quotes: []
+  // updatedAt: "2021-09-22T05:04:00.568Z"
+  // videoUrl: null
+  // wasChanged: true
+  // width: 423.976
+  // x: 1096.85546875
+  // y: 537.890625
+
   const handleClone = async (e) => {
     e.preventDefault();
     const copiedTurn = dataCopy(turn);
-    console.log(copiedTurn);
+    // @todo: проверить, откуда появляется _id в quotes
+    copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
+      id: quote.id,
+      type: quote.type,
+      text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+    }));
+    const fieldsToKeep = [
+      'header',
+      'dontShowHeader',
+      'imageUrl',
+      'videoUrl',
+      'date',
+      'sourceUrl',
+      'backgroundColor',
+      'fontColor',
+
+      'contentType',
+      'paragraph',
+      'quotes', // @todo: check
+      'scrollPosition',
+      'height',
+      'width',
+    ];
+    fieldRemover(copiedTurn, fieldsToKeep); // передали {ход} и [сохраняемые поля]
+    saveTurnInBuffer(copiedTurn); // сохранили turn в LocalStorage
   };
 
   const handleEdit = (e) => {

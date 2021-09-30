@@ -12,6 +12,20 @@ const guestUser = {
 
 export const UserContext = createContext();
 
+const saveIntoLocalStorage = (value, field) => {
+  localStorage.setItem(field, JSON.stringify(value));
+};
+
+const loadFromLocalStorage = (field) => {
+  return localStorage.getItem(field)
+    ? JSON.parse(localStorage.getItem(field))
+    : null;
+};
+
+const removeFromLocalStorage = (field) => {
+  localStorage.removeItem(field);
+};
+
 export const UserProvider = ({ children, hash, timecode }) => {
   // info (hash, nickname, role)
   // token
@@ -19,6 +33,16 @@ export const UserProvider = ({ children, hash, timecode }) => {
   const { info, token } = getGameInfo(hash) || guestUser;
   const can = function (rule) {
     return checkRuleByRole(rule, info.role);
+  };
+
+  const saveTurnInBuffer = (turn) => {
+    saveIntoLocalStorage(turn, 'saved_turn');
+  };
+
+  const getTurnFromBufferAndRemove = (turn) => {
+    const res = loadFromLocalStorage('saved_turn');
+    removeFromLocalStorage('saved_turn');
+    return res;
   };
 
   // classes
@@ -74,8 +98,10 @@ export const UserProvider = ({ children, hash, timecode }) => {
     info,
     token,
     can,
-    timecode,
+    timecode, // @todo: проверить, нужен ли
     request,
+    saveTurnInBuffer,
+    getTurnFromBufferAndRemove,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
