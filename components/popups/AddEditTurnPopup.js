@@ -167,10 +167,10 @@ const AddEditTurnPopup = () => {
       quotes,
     };
 
-    if (!turnToEdit) {
-      turnObj.height = 600;
-      turnObj.width = 800;
-    }
+    // if (!turnToEdit) {
+    //   turnObj.height = 600;
+    //   turnObj.width = 800;
+    // }
 
     if (!!turnToEdit) {
       turnObj.x = -zeroPointX + turnToEdit.x;
@@ -206,26 +206,38 @@ const AddEditTurnPopup = () => {
         },
       });
     } else {
-      turnObj.x = -zeroPointX + Math.floor(window.innerWidth / 2) - 250;
-      turnObj.y = -zeroPointY + Math.floor(window.innerHeight / 2) - 250;
-      // создать шаг, закрыть модальное окно
+      turnObj.height = 600;
+      turnObj.width = 800;
       createTurn(turnObj, {
-        successCallback: (data) => {
-          // console.log('успешный коллбэк на уровне Попапа');
+        successCallback: () => {
           setCreateEditTurnPopupIsHidden(true);
-          dispatch({
-            type: ACTION_TURN_CREATED,
-            payload: {
-              ...data.item,
-              x: data.item.x + zeroPointX,
-              y: data.item.y + zeroPointY,
-            },
-          });
         },
         errorCallback: (message) => {
           setError({ message });
         },
       });
+      // turnObj.height = 600;
+      // turnObj.width = 800;
+      // turnObj.x = -zeroPointX + Math.floor(window.innerWidth / 2) - 250;
+      // turnObj.y = -zeroPointY + Math.floor(window.innerHeight / 2) - 250;
+      // // создать шаг, закрыть модальное окно
+      // createTurn(turnObj, {
+      //   successCallback: (data) => {
+      //     // console.log('успешный коллбэк на уровне Попапа');
+      //     setCreateEditTurnPopupIsHidden(true);
+      //     dispatch({
+      //       type: ACTION_TURN_CREATED,
+      //       payload: {
+      //         ...data.item,
+      //         x: data.item.x + zeroPointX,
+      //         y: data.item.y + zeroPointY,
+      //       },
+      //     });
+      //   },
+      //   errorCallback: (message) => {
+      //     setError({ message });
+      //   },
+      // });
     }
   };
 

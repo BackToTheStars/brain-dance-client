@@ -25,6 +25,7 @@ const TurnNewComponent = ({
   deleteTurn,
   saveTurnInBuffer,
   getTurnFromBufferAndRemove,
+  addNotification,
 }) => {
   const { _id, x, y, width, height } = turn;
   const {
@@ -150,6 +151,7 @@ const TurnNewComponent = ({
     ];
     fieldRemover(copiedTurn, fieldsToKeep); // передали {ход} и [сохраняемые поля]
     saveTurnInBuffer(copiedTurn); // сохранили turn в LocalStorage
+    addNotification('Info:', 'Turn was copied, ready to paste');
   };
 
   const handleEdit = (e) => {

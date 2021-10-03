@@ -297,16 +297,48 @@ export const TurnProvider = ({ children }) => {
   const {
     request,
     info: { hash },
+    getTurnFromBufferAndRemove,
   } = useUserContext();
   const {
     minimapDispatch,
     minimapState: { turnsToRender },
     addNotification,
   } = useUiContext();
-  // const [originalTurns, setOriginalTurns] = useState([]);
-  // const [turns, setTurns] = useState([]);
 
-  const createTurn = (body, callbacks = {}) => {
+  const insertTurnFromBuffer = ({ successCallback, errorCallback }) => {
+    const turn = getTurnFromBufferAndRemove();
+    if (!turn) {
+      errorCallback('No turn in buffer');
+      return false;
+    }
+    createTurn(turn, { successCallback, errorCallback });
+  };
+
+  const createTurn = (turn, { successCallback, errorCallback }) => {
+    const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
+    const { x: zeroPointX, y: zeroPointY } = zeroPoint;
+    turn.x = -zeroPointX + Math.floor(window.innerWidth / 2) - 250;
+    turn.y = -zeroPointY + Math.floor(window.innerHeight / 2) - 250;
+
+    // создать шаг, закрыть модальное окно
+    createTurnRequest(turn, {
+      successCallback: (data) => {
+        // setCreateEditTurnPopupIsHidden(true);
+        successCallback(data);
+        turnsDispatch({
+          type: ACTION_TURN_CREATED,
+          payload: {
+            ...data.item,
+            x: data.item.x + zeroPointX,
+            y: data.item.y + zeroPointY,
+          },
+        });
+      },
+      errorCallback,
+    });
+  };
+
+  const createTurnRequest = (body, callbacks = {}) => {
     request(
       `turns?hash=${hash}`,
       {
@@ -551,6 +583,7 @@ export const TurnProvider = ({ children }) => {
     top: viewPort.top,
     lines: turnsState.lines,
     tempMiddlewareFn,
+    insertTurnFromBuffer,
     // linesState,
     // linesDispatch,
   };

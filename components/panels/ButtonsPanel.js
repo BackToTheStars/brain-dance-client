@@ -16,7 +16,11 @@ const ButtonsPanel = () => {
     minimapDispatch,
     setCreateEditTurnPopupIsHidden,
   } = useUiContext();
-  const { saveField, dispatch: turnDispatch } = useTurnContext();
+  const {
+    saveField,
+    dispatch: turnDispatch,
+    insertTurnFromBuffer,
+  } = useTurnContext();
   const router = useRouter();
   const { info, can } = useUserContext();
 
@@ -24,6 +28,22 @@ const ButtonsPanel = () => {
     <div className="actions panel">
       {can(RULE_TURNS_CRUD) && (
         <>
+          <button
+            // id="add-new-box-to-game-btn"
+            className="btn  btn-primary"
+            onClick={(e) => {
+              insertTurnFromBuffer({
+                successCallback: () => {
+                  console.log('success inserted turn from buffer');
+                },
+                errorCallback: (message) => {
+                  console.log(message);
+                },
+              });
+            }}
+          >
+            fromBuffer
+          </button>
           <button
             id="add-new-box-to-game-btn"
             className="btn  btn-primary"

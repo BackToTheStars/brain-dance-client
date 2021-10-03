@@ -21,6 +21,7 @@ const TurnsComponent = () => {
     minimapState: { turnsToRender },
     setCreateEditTurnPopupIsHidden,
     windowSize,
+    addNotification,
   } = useUiContext();
 
   // console.log('turns component', { turns }, ' turnsToRender: ', {
@@ -63,6 +64,7 @@ const TurnsComponent = () => {
                 windowSize,
                 saveTurnInBuffer,
                 getTurnFromBufferAndRemove,
+                addNotification,
               }}
             />
           );
