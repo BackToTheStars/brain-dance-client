@@ -29,9 +29,10 @@ const GameComponent = () => {
   const [game, setGame] = useState(null);
   const [turnsLoaded, setTurnsLoaded] = useState(false); // @todo: refactoring
   const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
+  const [authInGame, setAuthInGame] = useState(null);
 
   const gameBox = useRef();
-  const { token, info, can, timecode } = useUserContext();
+  const { token, info, can, timecode, logOut } = useUserContext();
   // const {
   // minimapState: {
   // turnsToRender
@@ -48,6 +49,12 @@ const GameComponent = () => {
   //   };
 
   useEffect(() => {
+    if (!!token && authInGame === false) {
+      logOut();
+    }
+  }, [authInGame, token]);
+
+  useEffect(() => {
     if (!turns.length) return;
     if (turnsLoaded) return;
     setTurnsLoaded(true);
@@ -62,6 +69,7 @@ const GameComponent = () => {
       .then((data) => data.json())
       .then(({ item }) => {
         setGame(item);
+        setAuthInGame(item.auth);
         // linesDispatch({ type: ACTION_LINES_INIT, payload: item.redLogicLines });
         turnsDispatch({ type: ACTION_LINES_INIT, payload: item.lines });
 

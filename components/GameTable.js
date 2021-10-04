@@ -8,7 +8,7 @@ const GameTable = ({ games, onItemClick, gameClicked }) => {
   // console.log({ games, gameClicked });
 
   return (
-    <table className="table table-striped games-list">
+    <table className="table table-striped games-list mt-3">
       <thead>
         <tr className="games-list__header">
           <th>Name</th>

@@ -1,5 +1,9 @@
 const GAME_KEY_PREFIX = 'game_';
 
+const removeGameInfo = (hash) => {
+  return localStorage.removeItem(`${GAME_KEY_PREFIX}${hash}`);
+};
+
 const getGameInfo = (hash) => {
   if (typeof window === 'undefined') {
     return null; // get guest info
@@ -17,4 +21,5 @@ const setGameInfo = (hash, info) => {
 module.exports = {
   getGameInfo,
   setGameInfo,
+  removeGameInfo,
 };
