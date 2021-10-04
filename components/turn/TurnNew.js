@@ -151,7 +151,11 @@ const TurnNewComponent = ({
     ];
     fieldRemover(copiedTurn, fieldsToKeep); // передали {ход} и [сохраняемые поля]
     saveTurnInBuffer(copiedTurn); // сохранили turn в LocalStorage
-    addNotification('Info:', 'Turn was copied, ready to paste');
+    addNotification({
+      title: 'Info:',
+      text: 'Turn was copied, ready to paste',
+    });
+    // { title: 'Info:', text: 'Field has been saved' }
   };
 
   const handleEdit = (e) => {

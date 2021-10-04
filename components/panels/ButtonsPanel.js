@@ -22,28 +22,30 @@ const ButtonsPanel = () => {
     insertTurnFromBuffer,
   } = useTurnContext();
   const router = useRouter();
-  const { info, can } = useUserContext();
+  const { info, can, isTurnInBuffer } = useUserContext();
 
   return (
     <div className="actions panel">
       {can(RULE_TURNS_CRUD) && (
         <>
-          <button
-            // id="add-new-box-to-game-btn"
-            className="btn  btn-primary"
-            onClick={(e) => {
-              insertTurnFromBuffer({
-                successCallback: () => {
-                  console.log('success inserted turn from buffer');
-                },
-                errorCallback: (message) => {
-                  console.log(message);
-                },
-              });
-            }}
-          >
-            fromBuffer
-          </button>
+          {isTurnInBuffer && (
+            <button
+              // id="add-new-box-to-game-btn"
+              className="btn  btn-primary"
+              onClick={(e) => {
+                insertTurnFromBuffer({
+                  successCallback: () => {
+                    console.log('success inserted turn from buffer');
+                  },
+                  errorCallback: (message) => {
+                    console.log(message);
+                  },
+                });
+              }}
+            >
+              Paste Turn
+            </button>
+          )}
           <button
             id="add-new-box-to-game-btn"
             className="btn  btn-primary"

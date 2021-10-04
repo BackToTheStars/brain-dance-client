@@ -1,5 +1,5 @@
 import { useState, useContext, useReducer, createContext } from 'react';
-import { getGameInfo } from '../lib/gameToken';
+import { getGameInfo, removeGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
 import { API_URL } from '../config';
 
@@ -17,6 +17,7 @@ const saveIntoLocalStorage = (value, field) => {
 };
 
 const loadFromLocalStorage = (field) => {
+  // может быть вызвана на стороне Server Side rendering SSR
   return localStorage.getItem(field)
     ? JSON.parse(localStorage.getItem(field))
     : null;
@@ -35,13 +36,24 @@ export const UserProvider = ({ children, hash, timecode }) => {
     return checkRuleByRole(rule, info.role);
   };
 
+  const logOut = () => {
+    removeGameInfo(hash); // стираем token из LocalStorage
+    window.location.reload(); // перезагружаем игру по тому же адресу
+  };
+
+  const [isTurnInBuffer, setIsTurnInBuffer] = useState(
+    !!loadFromLocalStorage('saved_turn')
+  );
+
   const saveTurnInBuffer = (turn) => {
     saveIntoLocalStorage(turn, 'saved_turn');
+    setIsTurnInBuffer(true);
   };
 
   const getTurnFromBufferAndRemove = (turn) => {
     const res = loadFromLocalStorage('saved_turn');
     removeFromLocalStorage('saved_turn');
+    setIsTurnInBuffer(false);
     return res;
   };
 
@@ -102,6 +114,8 @@ export const UserProvider = ({ children, hash, timecode }) => {
     request,
     saveTurnInBuffer,
     getTurnFromBufferAndRemove,
+    isTurnInBuffer,
+    logOut,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

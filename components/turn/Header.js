@@ -32,11 +32,11 @@ const Header = ({
     <h5 className="headerText" ref={headerEl} style={style}>
       <div className="headerTextTitle">{header}</div>
       <div className="headerTextActions">
+        <a key="clone" className="clone-btn" onClick={handleClone}>
+          <i className="fas fa-clone"></i>
+        </a>
         {can(RULE_TURNS_CRUD) && (
           <>
-            <a key="clone" className="clone-btn" onClick={handleClone}>
-              <i className="fas fa-clone"></i>
-            </a>
             <a key="edit" className="edit-btn" onClick={handleEdit}>
               <i className="fas fa-pen-square"></i>
             </a>
