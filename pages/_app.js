@@ -1,10 +1,13 @@
 import '../scss/main.scss';
 import { StateInspector } from 'reinspect'; // connects Redux Dev Tools
+import { MainProvider } from '../components/contexts/MainContext';
 
 export const App = ({ Component, pageProps }) => {
   return (
     <StateInspector>
-      <Component {...pageProps} />
+      <MainProvider>
+        <Component {...pageProps} />
+      </MainProvider>
     </StateInspector>
   );
 };

@@ -1,20 +1,32 @@
 import { useState } from 'react';
+import { useMainContext } from '../contexts/MainContext';
 
 const EditGameForm = ({ game, editGame }) => {
   const [name, setName] = useState(game.name);
   const [image, setImage] = useState(game.image);
   const [gameIsPublic, setGameIsPublic] = useState(game.public);
   const [description, setDescription] = useState(game.description);
+  const { showConfirmDialog } = useMainContext();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    editGame({
+    const data = {
       name,
       gameIsPublic,
       hash: game.hash,
       description,
       image,
-    });
+    };
+    if (!gameIsPublic) {
+      showConfirmDialog({
+        text: 'You will NEVER see this game again, if you will not save its access code right now!!!',
+        okCallback: () => {
+          editGame(data);
+        },
+      });
+    } else {
+      editGame(data);
+    }
   };
 
   return (
@@ -40,7 +52,6 @@ const EditGameForm = ({ game, editGame }) => {
               type="radio"
               className="form-check-input"
               checked={!gameIsPublic}
-              disabled={true}
             />
             <label className="form-check-label ">Private</label>
           </div>

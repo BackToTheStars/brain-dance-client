@@ -29,7 +29,6 @@ const CreateGameForm = ({ setToggleCreateForm, createGame }) => {
                 value="false"
                 type="radio"
                 className="form-check-input"
-                disabled={true}
               />
               <label className="form-check-label">Private</label>
             </div>
