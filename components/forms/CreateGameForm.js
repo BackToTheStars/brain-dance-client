@@ -35,8 +35,8 @@ const CreateGameForm = ({ setToggleCreateForm, createGame }) => {
           </div>
           <div className="col-6">
             <div className=" row">
-              <label className="col-2">Name:</label>
-              <input className="form-control col-10" name="name" type="text" />
+              <label className="col-3">Name:</label>
+              <input className="form-control col-9" name="name" type="text" />
             </div>
           </div>
           <div className="col-3">

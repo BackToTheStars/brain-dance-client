@@ -19,7 +19,7 @@ const GameInfoPanel = ({ game, setGame }) => {
   const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden, addNotification } =
     useUiContext();
   const { info, can, token } = useUserContext();
-  const { code, addCode } = useGamePlayerCode(token);
+  const { code, addCode, codes: newGameAccessCodes } = useGamePlayerCode(token);
   const { game: editedGame, editGame } = useEditGame(token);
 
   const [viewMode, setViewMode] = useState(true);
@@ -111,8 +111,11 @@ const GameInfoPanel = ({ game, setGame }) => {
                 </a>
               </td>
               <td className="pt-0 pb-0">
-                {!!code && <span>{code}</span>}
-                <AccessCodesTable codes={codes} />
+                {/* {!!code && <span>{code}</span>} */}
+                <AccessCodesTable
+                  newAccessCode={code}
+                  codes={newGameAccessCodes.length ? newGameAccessCodes : codes}
+                />
               </td>
             </tr>
           )}

@@ -93,31 +93,33 @@ const GameComponent = () => {
         );
       });
 
-    $(gameBox.current).draggable({
-      stop: (event, ui) => {
-        //   this.saveFieldSettings({
-        //     left: ui.position.left,
-        //     top: ui.position.top,
-        //     height: 1000,
-        //     width: 1000,
-        //   });
-        //   this.triggers.dispatch('RECALCULATE_FIELD');
-        //   this.triggers.dispatch('DRAW_LINES');
-        $(gameBox.current).addClass('remove-line-transition');
-        turnsDispatch({
-          type: ACTION_FIELD_WAS_MOVED,
-          payload: {
-            left: ui.position.left,
-            top: ui.position.top,
-          },
-        });
-        $(gameBox.current).css('left', 0);
-        $(gameBox.current).css('top', 0);
-        setTimeout(() => {
-          $(gameBox.current).removeClass('remove-line-transition');
-        }, 100);
-      },
-    });
+    !!gameBox &&
+      !!gameBox.current &&
+      $(gameBox.current).draggable({
+        stop: (event, ui) => {
+          //   this.saveFieldSettings({
+          //     left: ui.position.left,
+          //     top: ui.position.top,
+          //     height: 1000,
+          //     width: 1000,
+          //   });
+          //   this.triggers.dispatch('RECALCULATE_FIELD');
+          //   this.triggers.dispatch('DRAW_LINES');
+          $(gameBox.current).addClass('remove-line-transition');
+          turnsDispatch({
+            type: ACTION_FIELD_WAS_MOVED,
+            payload: {
+              left: ui.position.left,
+              top: ui.position.top,
+            },
+          });
+          $(gameBox.current).css('left', 0);
+          $(gameBox.current).css('top', 0);
+          setTimeout(() => {
+            $(gameBox.current).removeClass('remove-line-transition');
+          }, 100);
+        },
+      });
     // @todo:
     // return () => $(gameBox.current).draggable('destroy');
   }, [turns]);

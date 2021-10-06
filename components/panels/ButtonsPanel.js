@@ -78,7 +78,7 @@ const ButtonsPanel = () => {
       <button
         id="go-to-lobby"
         className="btn  btn-primary"
-        onClick={() => window.location.replace('/')}
+        onClick={() => router.push('/')}
       >
         Lobby
       </button>

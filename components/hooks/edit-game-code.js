@@ -4,6 +4,8 @@ import { getToken } from '../lib/token';
 
 const useGamePlayerCode = (gameToken) => {
   const [code, setCode] = useState('');
+  const [codes, setCodes] = useState([]);
+
   const headers = {
     'content-type': 'application/json',
   };
@@ -20,9 +22,10 @@ const useGamePlayerCode = (gameToken) => {
     })
       .then((res) => res.json()) // вернёт Promise
       .then((data) => {
-        const { item, message } = data;
+        const { item, message, codes } = data;
         if (item) {
           setCode(item.hash);
+          setCodes(codes);
         } else {
           console.log({ message });
         }
@@ -34,6 +37,7 @@ const useGamePlayerCode = (gameToken) => {
 
   return {
     code,
+    codes,
     addCode,
   };
 };

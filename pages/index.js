@@ -28,7 +28,12 @@ const IndexPage = () => {
   } = useGameControl();
 
   const { code, addCode } = useGamePlayerCode();
-  const { code: popupCode, createGame, enterGame } = useEditCodeWarningPopup();
+  const {
+    code: popupCode,
+    createGame,
+    enterGame,
+    gameIsPublic,
+  } = useEditCodeWarningPopup();
 
   const [mode, setMode] = useState('visitor');
 
@@ -77,7 +82,11 @@ const IndexPage = () => {
   return (
     <div className="container-fluid col-10 mt-4">
       {!!popupCode && (
-        <NewGameWarningPopup code={popupCode} enterGame={enterGame} />
+        <NewGameWarningPopup
+          code={popupCode}
+          enterGame={enterGame}
+          gameIsPublic={gameIsPublic}
+        />
       )}
       {mode === 'admin' && <h4>User mode: {mode}</h4>}
       <div className="row"></div>

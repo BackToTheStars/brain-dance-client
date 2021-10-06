@@ -1,7 +1,7 @@
 // import { useState } from 'react';
 
-const NewGameWarningPopup = ({ code, enterGame }) => {
-  console.log({ code });
+const NewGameWarningPopup = ({ code, enterGame, gameIsPublic }) => {
+  console.log({ gameIsPublic });
   const handleSubmit = (e) => {
     e.preventDefault();
     enterGame(e.target.code.value, e.target.nickname.value);
@@ -17,6 +17,12 @@ const NewGameWarningPopup = ({ code, enterGame }) => {
           <p>
             Please, save the code <b>{code.hash}</b>
           </p>
+          {!gameIsPublic && (
+            <p className="alert alert-danger">
+              If you will not save this code, you will never see this game field
+              again!
+            </p>
+          )}
           <p>Type the nickname below.</p>
         </div>
         <form className="form-inline" onSubmit={handleSubmit}>
