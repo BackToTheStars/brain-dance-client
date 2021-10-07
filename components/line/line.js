@@ -1,11 +1,53 @@
-import { lineThickness } from '../сonst';
+import { lineThickness, lineOffset } from '../сonst';
+import { SIDE_RIGHT, SIDE_LEFT, SIDE_TOP, SIDE_BOTTOM } from './settings';
+
+const getFromToQuoteSettingsX = (source, target) => {
+  if (source.left > target.right + lineOffset) {
+    return [SIDE_LEFT, SIDE_RIGHT];
+  }
+  if (source.left - lineOffset > target.centerX) {
+    if (source.centerY < target.centerY) {
+      return [SIDE_LEFT, SIDE_TOP];
+    } else {
+      return [SIDE_LEFT, SIDE_BOTTOM];
+    }
+  }
+  if (target.centerX < source.right + lineOffset) {
+    if (source.centerY < target.centerY) {
+      return [SIDE_RIGHT, SIDE_TOP];
+    } else {
+      return [SIDE_RIGHT, SIDE_BOTTOM];
+    }
+  }
+  return [SIDE_RIGHT, SIDE_LEFT];
+};
 
 const Line = ({
-  sourceCoords,
-  targetCoords,
+  sourceCoords: prevSourceCoords,
+  targetCoords: prevTargetCoords,
   stroke = 'red',
   strokeWidth = lineThickness,
 }) => {
+  const sourceCoords = {
+    ...prevSourceCoords,
+    right: prevSourceCoords.left + prevSourceCoords.width,
+    bottom: prevSourceCoords.top + prevSourceCoords.height,
+    centerX: Math.floor(prevSourceCoords.left + prevSourceCoords.width / 2),
+    centerY: Math.floor(prevSourceCoords.top + prevSourceCoords.height / 2),
+  };
+  const targetCoords = {
+    ...prevTargetCoords,
+    right: prevTargetCoords.left + prevTargetCoords.width,
+    bottom: prevTargetCoords.top + prevTargetCoords.height,
+    centerX: Math.floor(prevTargetCoords.left + prevTargetCoords.width / 2),
+    centerY: Math.floor(prevTargetCoords.top + prevTargetCoords.height / 2),
+  };
+
+  const [sourceSide, targetSide] = getFromToQuoteSettingsX(
+    sourceCoords,
+    targetCoords
+  );
+
   //   const sourceCoords = this.sourceQuote.getCoords();
   //   const targetCoords = this.targetQuote.getCoords();
   const sideBarWidth = 0; // @todo: change the layout
