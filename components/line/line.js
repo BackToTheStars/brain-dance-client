@@ -1,25 +1,55 @@
 import { lineThickness, lineOffset } from '../сonst';
-import { SIDE_RIGHT, SIDE_LEFT, SIDE_TOP, SIDE_BOTTOM } from './settings';
+import {
+  SIDE_RIGHT,
+  SIDE_LEFT,
+  SIDE_TOP,
+  SIDE_BOTTOM,
+  CURVE_VERTICAL,
+  CURVE_HORIZONTAL,
+  CURVE_ROMBUS_P_P,
+  CURVE_ROMBUS_M_M,
+  CURVE_ROMBUS_P_M,
+  CURVE_ROMBUS_M_P,
+} from './settings';
 
 const getFromToQuoteSettingsX = (source, target) => {
   if (source.left > target.right + lineOffset) {
-    return [SIDE_LEFT, SIDE_RIGHT];
+    return [SIDE_LEFT, SIDE_RIGHT, CURVE_VERTICAL];
   }
   if (source.left - lineOffset > target.centerX) {
     if (source.centerY < target.centerY) {
-      return [SIDE_LEFT, SIDE_TOP];
+      return [SIDE_LEFT, SIDE_TOP, CURVE_ROMBUS_M_P];
     } else {
-      return [SIDE_LEFT, SIDE_BOTTOM];
+      return [SIDE_LEFT, SIDE_BOTTOM, CURVE_ROMBUS_M_M];
     }
   }
   if (target.centerX < source.right + lineOffset) {
     if (source.centerY < target.centerY) {
-      return [SIDE_RIGHT, SIDE_TOP];
+      return [SIDE_BOTTOM, SIDE_TOP, CURVE_HORIZONTAL];
     } else {
-      return [SIDE_RIGHT, SIDE_BOTTOM];
+      return [SIDE_TOP, SIDE_BOTTOM, CURVE_HORIZONTAL];
     }
   }
-  return [SIDE_RIGHT, SIDE_LEFT];
+
+  if (target.left < source.right + lineOffset) {
+    if (source.centerY < target.centerY) {
+      return [SIDE_RIGHT, SIDE_TOP, CURVE_ROMBUS_P_P];
+    } else {
+      return [SIDE_RIGHT, SIDE_BOTTOM, CURVE_ROMBUS_P_M];
+    }
+  }
+  return [SIDE_RIGHT, SIDE_LEFT, CURVE_VERTICAL];
+};
+
+const findXY = (coords, side) => {
+  // const SIDE_TOP = 'top';
+  const settings = {
+    [SIDE_TOP]: [coords.centerX, coords.top],
+    [SIDE_BOTTOM]: [coords.centerX, coords.bottom],
+    [SIDE_LEFT]: [coords.left, coords.centerY],
+    [SIDE_RIGHT]: [coords.right, coords.centerY],
+  };
+  return settings[side];
 };
 
 const Line = ({
@@ -50,34 +80,51 @@ const Line = ({
 
   //   const sourceCoords = this.sourceQuote.getCoords();
   //   const targetCoords = this.targetQuote.getCoords();
-  const sideBarWidth = 0; // @todo: change the layout
+  // const sideBarWidth = 0; // @todo: change the layout
   // $('#classMenu').width(); // + 45;
 
   // фрагмент 3
-  const sourceFirst = sourceCoords.left < targetCoords.left;
-  const line = {
-    x1: Math.round(
-      sourceCoords.left + (sourceFirst ? sourceCoords.width : 0) - sideBarWidth
-    ),
-    // + (sourceFirst ? 7 : -1), // + 3,
-    y1: Math.round(sourceCoords.top + Math.floor(sourceCoords.height / 2)),
-    x2: Math.round(
-      targetCoords.left + (sourceFirst ? 0 : targetCoords.width) - sideBarWidth
-    ),
-    // + (sourceFirst ? -1 : 7), // - 5,
-    y2: Math.round(targetCoords.top + Math.floor(targetCoords.height / 2)),
-  };
+  // const sourceFirst = sourceCoords.left < targetCoords.left;
+  // const line = {
+  //   x1: Math.round(
+  //     sourceCoords.left + (sourceFirst ? sourceCoords.width : 0) - sideBarWidth
+  //   ),
+  //   // + (sourceFirst ? 7 : -1), // + 3,
+  //   y1: Math.round(sourceCoords.top + Math.floor(sourceCoords.height / 2)),
+  //   x2: Math.round(
+  //     targetCoords.left + (sourceFirst ? 0 : targetCoords.width) - sideBarWidth
+  //   ),
+  //   // + (sourceFirst ? -1 : 7), // - 5,
+  //   y2: Math.round(targetCoords.top + Math.floor(targetCoords.height / 2)),
+  // };
 
   // ГЛОБАЛЬНЫЕ НАСТРОЙКИ ВНЕШНЕГО ВИДА ЛИНИЙ
   const k = 0.3; // - константа внешнего вида кривых
 
+  const [x1, y1] = findXY(sourceCoords, sourceSide);
+  const [x2, y2] = findXY(targetCoords, targetSide);
+
+  // x1 + k * (x2 - x1) y1
+  // x2 - k * (x2 - x1) y2
+
+  // return (
+  // <path
+  //   d={`M${line.x1} ${line.y1} C ${line.x1 + k * (line.x2 - line.x1)} ${
+  //     line.y1
+  //   }, ${line.x2 - k * (line.x2 - line.x1)} ${line.y2}, ${line.x2} ${
+  //     line.y2
+  //   }`}
+  //   stroke={stroke}
+  //   strokeWidth={strokeWidth}
+  //   fill="transparent"
+  // />
+  // );
   return (
-    <path
-      d={`M${line.x1} ${line.y1} C ${line.x1 + k * (line.x2 - line.x1)} ${
-        line.y1
-      }, ${line.x2 - k * (line.x2 - line.x1)} ${line.y2}, ${line.x2} ${
-        line.y2
-      }`}
+    <line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
       stroke={stroke}
       strokeWidth={strokeWidth}
       fill="transparent"
