@@ -124,13 +124,13 @@ const Line = ({
         strokeWidth={strokeWidth}
         fill="transparent"
       />
-      <text
+      {/* <text
         x={Math.floor((x2 + x1) / 2)}
         y={Math.floor((y2 + y1) / 2)}
         fill="white"
       >
         {curveType}
-      </text>
+      </text> */}
       {/* <circle cx={x1b} cy={y1b} fill="red" r="10" />
       <circle cx={x2b} cy={y2b} fill="blue" r="10" />
       <circle cx={x1} cy={y1} fill="red" r="20" />
