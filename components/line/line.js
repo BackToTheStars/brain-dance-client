@@ -17,14 +17,18 @@ const getFromToQuoteSettingsX = (source, target) => {
     return [SIDE_LEFT, SIDE_RIGHT, CURVE_HORIZONTAL];
   }
   if (source.left - lineOffset > target.centerX) {
-    if (source.centerY < target.centerY) {
+    if (source.centerY >= target.top && source.centerY <= target.bottom) {
+      return [SIDE_LEFT, SIDE_RIGHT, CURVE_HORIZONTAL];
+    } else if (source.centerY < target.centerY) {
       return [SIDE_LEFT, SIDE_TOP, CURVE_ROMBUS_M_P];
     } else {
       return [SIDE_LEFT, SIDE_BOTTOM, CURVE_ROMBUS_M_M];
     }
   }
   if (target.centerX < source.right + lineOffset) {
-    if (source.centerY < target.centerY) {
+    if (source.centerY >= target.top && source.centerY <= target.bottom) {
+      return [SIDE_RIGHT, SIDE_LEFT, CURVE_HORIZONTAL];
+    } else if (source.centerY < target.centerY) {
       return [SIDE_BOTTOM, SIDE_TOP, CURVE_VERTICAL];
     } else {
       return [SIDE_TOP, SIDE_BOTTOM, CURVE_VERTICAL];
@@ -32,7 +36,9 @@ const getFromToQuoteSettingsX = (source, target) => {
   }
 
   if (target.left < source.right + lineOffset) {
-    if (source.centerY < target.centerY) {
+    if (source.centerY >= target.top && source.centerY <= target.bottom) {
+      return [SIDE_RIGHT, SIDE_LEFT, CURVE_HORIZONTAL];
+    } else if (source.centerY < target.centerY) {
       return [SIDE_RIGHT, SIDE_TOP, CURVE_ROMBUS_P_P];
     } else {
       return [SIDE_RIGHT, SIDE_BOTTOM, CURVE_ROMBUS_P_M];
@@ -124,17 +130,18 @@ const Line = ({
         strokeWidth={strokeWidth}
         fill="transparent"
       />
+
       {/* <text
         x={Math.floor((x2 + x1) / 2)}
         y={Math.floor((y2 + y1) / 2)}
-        fill="white"
+        fill="black"
       >
         {curveType}
-      </text> */}
-      {/* <circle cx={x1b} cy={y1b} fill="red" r="10" />
-      <circle cx={x2b} cy={y2b} fill="blue" r="10" />
-      <circle cx={x1} cy={y1} fill="red" r="20" />
-      <circle cx={x2} cy={y2} fill="blue" r="20" /> */}
+      </text>
+      <circle cx={x1b} cy={y1b} fill="red" r="5" />
+      <circle cx={x2b} cy={y2b} fill="blue" r="5" />
+      <circle cx={x1} cy={y1} fill="red" r="5" />
+      <circle cx={x2} cy={y2} fill="blue" r="5" /> */}
     </>
   );
 };
