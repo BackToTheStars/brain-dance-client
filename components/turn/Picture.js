@@ -5,12 +5,18 @@ const Picture = ({
   imageUrl,
   registerHandleResize,
   unregisterHandleResize,
+  widgetId,
+  widgetType,
+  makeWidgetActive,
+  isActive,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
+
+  const handleOnMouseOver = () => {};
 
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
@@ -41,8 +47,8 @@ const Picture = ({
   useEffect(() => {
     if (imageLoaded) {
       registerHandleResize({
-        type: 'picture',
-        id: 'picture',
+        type: widgetType,
+        id: widgetId,
         minWidthCallback: () => {
           return 0;
         },
@@ -88,8 +94,21 @@ const Picture = ({
   }, [imageLoaded]);
 
   return (
-    <div className="picture-content" ref={imgWrapperEl}>
-      <img src={imageUrlToRender} ref={imgEl} />
+    <div
+      className={`${isActive && 'active'} picture-content`}
+      ref={imgWrapperEl}
+    >
+      <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
+      <a
+        className="widget-button"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          makeWidgetActive();
+        }}
+      >
+        <i class="fas fa-highlighter"></i>
+      </a>
     </div>
   );
 };

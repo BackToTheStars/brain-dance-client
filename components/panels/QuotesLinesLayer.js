@@ -1,3 +1,4 @@
+import { useMainContext } from '../contexts/MainContext';
 import { useTurnContext } from '../contexts/TurnContext';
 import { useRef, useState } from 'react';
 import Line from '../line/line';
@@ -9,6 +10,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
   const { linesWithEndCoords } = useTurnContext();
+  const { makeWidgetActive } = useMainContext();
 
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
@@ -21,6 +23,9 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         id="lines"
         className={svgLayerZIndex ? 'front-elements' : ''}
         ref={svgLayer}
+        onClick={(e) => {
+          makeWidgetActive(null);
+        }}
       >
         {linesWithEndCoords.map((line, i) => {
           return (

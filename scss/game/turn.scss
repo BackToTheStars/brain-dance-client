@@ -47,8 +47,30 @@ $black-color: rgb(0, 0, 0);
   }
   .picture-content {
     z-index: 1;
+    position: relative;
     img {
       width: 100%;
+    }
+    &.active {
+      outline: 4px solid blue;
+    }
+    /* height: 100%; */
+    background: $black-color;
+    img {
+      width: 100%;
+    }
+    .widget-button {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      color: white;
+      opacity: 0;
+      transition: 0.3s;
+    }
+    &:hover {
+      .widget-button {
+        opacity: 1;
+      }
     }
   }
   .video > div {
@@ -129,11 +151,6 @@ $black-color: rgb(0, 0, 0);
   .picture-content {
     width: 100%;
     z-index: 1;
-    /* height: 100%; */
-    background: $black-color;
-    img {
-      width: 100%;
-    }
   }
 }
 
