@@ -93,7 +93,7 @@ const Paragraph = ({
         Math.floor(paragraphEl.current.scrollTop) === Math.floor(scrollPosition)
       )
         return;
-      console.log(scrollPosition, 2);
+      // console.log(scrollPosition, 2);
       recalculateQuotes();
     }, 50);
   }, [paragraphEl, scrollPosition]);
@@ -107,7 +107,7 @@ const Paragraph = ({
 
     const scrollHandler = () => {
       if (!!paragraphEl.current) {
-        console.log(Math.floor(paragraphEl.current.scrollTop), 3);
+        // console.log(Math.floor(paragraphEl.current.scrollTop), 3);
         dispatch({
           type: ACTION_TURN_WAS_CHANGED,
           payload: {

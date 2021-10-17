@@ -2,11 +2,13 @@ import { useRouter } from 'next/router';
 import { useUiContext } from '../contexts/UI_Context'; // export const useUiContext
 import useUser from '../hooks/user'; // export default useUser
 import { useUserContext } from '../contexts/UserContext';
+import { useMainContext } from '../contexts/MainContext';
 import {
   useTurnContext,
   ACTION_RESET_TURN_EDIT_MODE,
 } from '../contexts/TurnContext';
 import { RULE_VIEW, RULE_TURNS_CRUD } from '../config';
+import { WIDGET_PICTURE, INTERACTION_ADD_QUOTE } from '../turn/settings';
 
 const ButtonsPanel = () => {
   const {
@@ -21,8 +23,26 @@ const ButtonsPanel = () => {
     dispatch: turnDispatch,
     insertTurnFromBuffer,
   } = useTurnContext();
+  const { activeWidget, interactWithWidget } = useMainContext();
+  const widgetType = activeWidget ? activeWidget.widgetType : null;
+
   const router = useRouter();
   const { info, can, isTurnInBuffer } = useUserContext();
+
+  if (widgetType === WIDGET_PICTURE)
+    return (
+      <div className="actions panel">
+        <button
+          className="btn  btn-primary"
+          onClick={(e) => {
+            console.log({ widgetType, WIDGET_PICTURE, INTERACTION_ADD_QUOTE });
+            interactWithWidget(INTERACTION_ADD_QUOTE);
+          }}
+        >
+          Red Area
+        </button>
+      </div>
+    );
 
   return (
     <div className="actions panel">

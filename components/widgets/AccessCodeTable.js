@@ -12,7 +12,7 @@ const AccessCodesTable = ({ mode = 'dark', codes = [], newAccessCode }) => {
       </thead>
       <tbody>
         {codes.map((code) => {
-          console.log({ newAccessCode, code });
+          // console.log({ newAccessCode, code });
           return (
             <tr
               key={code.hash}

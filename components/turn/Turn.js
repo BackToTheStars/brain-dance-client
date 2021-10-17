@@ -12,6 +12,7 @@ import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
+import { WIDGET_PICTURE } from './settings';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -67,7 +68,7 @@ const TurnNewComponent = ({
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
 
-  const { activeWidget, makeWidgetActive } = useMainContext();
+  const { activeWidget, makeWidgetActive, interactionType } = useMainContext();
 
   const isWidgetActive = (widgetId) => {
     if (!activeWidget) return false;
@@ -318,10 +319,11 @@ const TurnNewComponent = ({
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
           widgetId="picture1"
-          widgetType="picture"
+          widgetType={WIDGET_PICTURE}
           isActive={isWidgetActive('picture1')} // (widgetId)
+          interactionType={interactionType}
           makeWidgetActive={() => {
-            makeWidgetActive(_id, 'picture', 'picture1'); // (turnId, widgetType, widgetId)
+            makeWidgetActive(_id, WIDGET_PICTURE, 'picture1'); // (turnId, widgetType, widgetId)
           }}
         />
       )}

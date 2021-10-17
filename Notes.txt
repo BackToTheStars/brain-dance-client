@@ -1,2 +1,3 @@
 Настройка background поля: field.scss => свойства .gameFieldWrapper
     
+https://github.com/DominicTobias/react-image-crop

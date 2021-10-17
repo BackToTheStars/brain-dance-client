@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
+import { INTERACTION_ADD_QUOTE } from './settings';
 
 const Picture = ({
   imageUrl,
@@ -9,6 +10,7 @@ const Picture = ({
   widgetType,
   makeWidgetActive,
   isActive,
+  interactionType,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
@@ -98,6 +100,11 @@ const Picture = ({
       className={`${isActive && 'active'} picture-content`}
       ref={imgWrapperEl}
     >
+      {isActive && interactionType === INTERACTION_ADD_QUOTE && (
+        <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
+          Режим добавления цитаты
+        </div>
+      )}
       <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
       <a
         className="widget-button"
@@ -107,7 +114,7 @@ const Picture = ({
           makeWidgetActive();
         }}
       >
-        <i class="fas fa-highlighter"></i>
+        <i className="fas fa-highlighter"></i>
       </a>
     </div>
   );
