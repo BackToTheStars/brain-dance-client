@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
 import { INTERACTION_ADD_QUOTE } from './settings';
+import ReactCrop from 'react-image-crop';
 
 const Picture = ({
   imageUrl,
@@ -17,6 +18,10 @@ const Picture = ({
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
+  const [crop, setCrop] = useState({
+    unit: '%',
+  });
+  // { aspect: 16 / 9 });
 
   const handleOnMouseOver = () => {};
 
@@ -101,9 +106,17 @@ const Picture = ({
       ref={imgWrapperEl}
     >
       {isActive && interactionType === INTERACTION_ADD_QUOTE && (
-        <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
-          Режим добавления цитаты
-        </div>
+        <>
+          {/* <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
+            Режим добавления цитаты
+          </div> */}
+          <ReactCrop
+            src={imageUrl}
+            className="picture-react-crop"
+            crop={crop}
+            onChange={(newCrop) => setCrop(newCrop)}
+          />
+        </>
       )}
       <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
       <a
