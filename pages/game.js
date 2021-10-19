@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic'; // позволяет динамически
 import Head from 'next/head'; // в head засовываем всё что было в head index.html
 import { UI_Provider } from '../components/contexts/UI_Context';
 import { UserProvider } from '../components/contexts/UserContext';
+import { InteractionProvider } from '../components/contexts/InteractionContext';
 import { TurnProvider } from '../components/contexts/TurnContext';
 import { useRouter } from 'next/router';
 import { Fragment } from 'react';
@@ -47,7 +48,9 @@ const GamePage = () => {
         <UserProvider hash={hash} timecode={router.query.timecode}>
           <UI_Provider>
             <TurnProvider>
-              <Game />
+              <InteractionProvider>
+                <Game />
+              </InteractionProvider>
             </TurnProvider>
           </UI_Provider>
         </UserProvider>

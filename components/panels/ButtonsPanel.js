@@ -1,8 +1,11 @@
 import { useRouter } from 'next/router';
 import { useUiContext } from '../contexts/UI_Context'; // export const useUiContext
-import useUser from '../hooks/user'; // export default useUser
 import { useUserContext } from '../contexts/UserContext';
 import { useMainContext } from '../contexts/MainContext';
+import {
+  useInteractionContext,
+  useInteractionContexts,
+} from '../contexts/InteractionContext';
 import {
   useTurnContext,
   ACTION_RESET_TURN_EDIT_MODE,
@@ -11,6 +14,9 @@ import { RULE_VIEW, RULE_TURNS_CRUD } from '../config';
 import { WIDGET_PICTURE, INTERACTION_ADD_QUOTE } from '../turn/settings';
 
 const ButtonsPanel = () => {
+  const { buttons } = useInteractionContext();
+  console.log(buttons);
+
   const {
     setGameInfoPanelIsHidden,
     state: { classesPanelIsHidden },
