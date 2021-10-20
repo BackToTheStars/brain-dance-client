@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { useUiContext } from '../UI_Context'; // export const useUiContext
 import { useUserContext } from '../UserContext';
-import { useMainContext } from '../MainContext';
 import { useTurnContext } from '../TurnContext';
 import { RULE_TURNS_CRUD } from '../../config';
 
@@ -21,7 +20,6 @@ export const useGameModeSettings = () => {
     dispatch: turnDispatch,
     insertTurnFromBuffer,
   } = useTurnContext();
-  const { activeWidget, interactWithWidget } = useMainContext();
 
   return [
     {

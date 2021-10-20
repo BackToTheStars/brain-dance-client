@@ -1,5 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { useMainContext } from '../contexts/MainContext';
+import {
+  MODE_WIDGET_PICTURE,
+  useInteractionContext,
+} from '../contexts/InteractionContext';
 import Header from './Header';
 import Picture from './Picture';
 import Video from './Video';
@@ -68,7 +71,12 @@ const TurnNewComponent = ({
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
 
-  const { activeWidget, makeWidgetActive, interactionType } = useMainContext();
+  const {
+    activeWidget,
+    makeWidgetActive,
+    interactionType,
+    setInteractionMode,
+  } = useInteractionContext();
 
   const isWidgetActive = (widgetId) => {
     if (!activeWidget) return false;
@@ -323,7 +331,9 @@ const TurnNewComponent = ({
           isActive={isWidgetActive('picture1')} // (widgetId)
           interactionType={interactionType}
           makeWidgetActive={() => {
+            setInteractionMode(MODE_WIDGET_PICTURE); // говорим набор кнопок для панели справа
             makeWidgetActive(_id, WIDGET_PICTURE, 'picture1'); // (turnId, widgetType, widgetId)
+            // делаем синюю рамку у картинки
           }}
         />
       )}
