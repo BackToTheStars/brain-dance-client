@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import { useUiContext } from '../UI_Context'; // export const useUiContext
 import { useUserContext } from '../UserContext';
-import { useTurnContext } from '../TurnContext';
+import { useTurnContext, ACTION_RESET_TURN_EDIT_MODE } from '../TurnContext';
 import { RULE_TURNS_CRUD } from '../../config';
 
-export const useGameModeSettings = () => {
+export const useGameMode = () => {
   const router = useRouter();
   const { info, can, isTurnInBuffer } = useUserContext();
 

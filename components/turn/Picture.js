@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
 import { INTERACTION_ADD_QUOTE } from './settings';
 import ReactCrop from 'react-image-crop';
+import { useInteractionContext } from '../contexts/InteractionContext';
 
 const Picture = ({
   imageUrl,
@@ -15,6 +16,7 @@ const Picture = ({
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
+  const { actionsCallback } = useInteractionContext();
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
@@ -24,6 +26,23 @@ const Picture = ({
   // { aspect: 16 / 9 });
 
   const handleOnMouseOver = () => {};
+
+  useEffect(() => {
+    if (!isActive) return;
+    if (interactionType === INTERACTION_ADD_QUOTE) {
+      console.log('crop saved! ', crop);
+      // actionsCallback();
+      console.log({ actionsCallback });
+    }
+  }, [actionsCallback]);
+
+  useEffect(() => {
+    if (isActive && interactionType === INTERACTION_ADD_QUOTE) {
+      setCrop({
+        unit: '%',
+      });
+    }
+  }, [isActive, interactionType]);
 
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component

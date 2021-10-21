@@ -3,7 +3,7 @@ import { WIDGET_PICTURE, INTERACTION_ADD_QUOTE } from '../turn/settings';
 
 const ButtonsPanel = () => {
   const { buttons } = useInteractionContext();
-  console.log(buttons);
+  // console.log(buttons);
 
   return (
     <div className="actions panel">

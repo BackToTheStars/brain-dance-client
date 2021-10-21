@@ -1,6 +1,7 @@
 import { useState, useContext, createContext } from 'react';
-import { useGameModeSettings } from './interaction-hooks/useGameModeSettings';
-import { usePictureModeSettings } from './interaction-hooks/usePictureModeSettings';
+import { useGameMode } from './interaction-hooks/useGameMode';
+import { usePictureMode } from './interaction-hooks/usePictureMode';
+import { usePictureQuoteAdd } from './interaction-hooks/usePictureQuoteAdd';
 
 export const InteractionContext = createContext();
 
@@ -10,11 +11,16 @@ export const MODE_WIDGET_PICTURE_QUOTE_ADD = 'widget-picture-quote-add';
 
 //
 export const InteractionProvider = ({ children }) => {
-  //
-  const [interactionMode, setInteractionMode] = useState(MODE_GAME);
+  // ветка, по которой далее работаем (шаг, тип виджета, id виджета)
   const [activeWidget, setActiveWidget] = useState(null);
+  // активный набор кнопок
+  const [interactionMode, setInteractionMode] = useState(MODE_GAME);
+  // действие внутри виджета
   const [interactionType, setInteractionType] = useState(null);
 
+  const [actionsCallback, setActionsCallback] = useState(null);
+
+  // указываем конкретную ветку, по которой далее работаем (шаг, тип виджета, id виджета)
   const makeWidgetActive = (turnId, widgetType, widgetId) => {
     setActiveWidget({ turnId, widgetType, widgetId });
     setInteractionType(null);
@@ -24,12 +30,22 @@ export const InteractionProvider = ({ children }) => {
     setInteractionType(newInteractionType);
   };
 
+  // подтверждение действия внутри виджета
+  const performActions = (callback) => {
+    setActionsCallback(callback);
+  };
+
   const buttonSettings = {
-    [MODE_GAME]: useGameModeSettings(), // @learn 'game': ...
-    [MODE_WIDGET_PICTURE]: usePictureModeSettings({
+    [MODE_GAME]: useGameMode(), // @learn 'game': ...
+    [MODE_WIDGET_PICTURE]: usePictureMode({
       interactWithWidget,
       setInteractionMode,
       makeWidgetActive,
+    }),
+    [MODE_WIDGET_PICTURE_QUOTE_ADD]: usePictureQuoteAdd({
+      setInteractionMode,
+      interactWithWidget,
+      performActions,
     }),
   };
 
@@ -40,6 +56,7 @@ export const InteractionProvider = ({ children }) => {
     interactWithWidget,
     interactionType,
     setInteractionMode,
+    actionsCallback,
   };
 
   return (
