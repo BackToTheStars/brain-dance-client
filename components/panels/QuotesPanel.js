@@ -103,7 +103,7 @@ const QuotesPanel = () => {
         );
       });
     }
-    console.log(turnIdsOutOfScreen);
+    // console.log(turnIdsOutOfScreen);
   }, [activeQuote]);
 
   return (

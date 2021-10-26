@@ -17,9 +17,9 @@ const AccessCodesTable = ({ mode = 'dark', codes = [], newAccessCode }) => {
             <tr
               key={code.hash}
               className={
-                !!newAccessCode &&
-                newAccessCode === code.hash &&
-                'table-primary text-dark'
+                !!newAccessCode && newAccessCode === code.hash
+                  ? 'table-primary text-dark'
+                  : ''
               }
             >
               <td>{ROLES[code.role].name}</td>

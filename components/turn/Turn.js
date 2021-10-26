@@ -27,6 +27,7 @@ const TurnNewComponent = ({
   lineEnds,
   activeQuote,
   setCreateEditTurnPopupIsHidden,
+  updateTurn,
   deleteTurn,
   saveTurnInBuffer,
   getTurnFromBufferAndRemove,
@@ -47,13 +48,6 @@ const TurnNewComponent = ({
     quotes,
     scrollPosition,
   } = turn;
-
-  if (
-    _id === '606c8c8253ab6a0017377983' ||
-    _id === '6100ca06b1871a48ccce1849'
-  ) {
-    // console.log({ scrollPosition, header: header });
-  }
 
   const wrapperStyles = {
     left: `${x}px`,
@@ -323,6 +317,7 @@ const TurnNewComponent = ({
       />
       {!!imageUrl && (
         <Picture
+          quotes={quotes.filter((quote) => quote.type === 'picture')} // поправить на переменную
           imageUrl={imageUrl}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
@@ -330,6 +325,23 @@ const TurnNewComponent = ({
           widgetType={WIDGET_PICTURE}
           isActive={isWidgetActive('picture1')} // (widgetId)
           interactionType={interactionType}
+          savePictureQuote={(pictureQuote, successCallback) => {
+            const turnBody = {
+              quotes: [...quotes, pictureQuote],
+            };
+            updateTurn(_id, turnBody, {
+              successCallback: (data) => {
+                dispatch({
+                  type: ACTION_TURN_WAS_CHANGED,
+                  payload: {
+                    ...data.item,
+                    quotes: turnBody.quotes,
+                  },
+                });
+                successCallback();
+              },
+            });
+          }}
           makeWidgetActive={() => {
             setInteractionMode(MODE_WIDGET_PICTURE); // говорим набор кнопок для панели справа
             makeWidgetActive(_id, WIDGET_PICTURE, 'picture1'); // (turnId, widgetType, widgetId)

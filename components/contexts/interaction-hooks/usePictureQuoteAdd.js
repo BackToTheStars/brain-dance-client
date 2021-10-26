@@ -14,9 +14,12 @@ export const usePictureQuoteAdd = ({
     {
       text: 'Save Area',
       callback: () => {
-        performActions(() => {
-          // setInteractionMode(MODE_GAME);
-          // interactWithWidget(null); // что мы делаем с виджетом,
+        performActions({
+          info: 'Save Area request to server',
+          func: () => {
+            setInteractionMode(MODE_GAME); // переходим в общий режим игры для панели кнопок
+            interactWithWidget(null); // говорим, что никакой виджет теперь не активен
+          },
         });
         // savePictureCrop();
       },

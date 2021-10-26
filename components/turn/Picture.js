@@ -1,10 +1,17 @@
 import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
-import { INTERACTION_ADD_QUOTE } from './settings';
+import turnSettings, { INTERACTION_ADD_QUOTE } from './settings';
 import ReactCrop from 'react-image-crop';
 import { useInteractionContext } from '../contexts/InteractionContext';
+import { quoteRectangleThickness } from '../сonst';
+
+const getPercentage = (a, b) => {
+  // выдаёт 4-й знак после запятой в процентах
+  return Math.round((a * 1000000) / b) / 10000;
+};
 
 const Picture = ({
+  quotes,
   imageUrl,
   registerHandleResize,
   unregisterHandleResize,
@@ -13,6 +20,7 @@ const Picture = ({
   makeWidgetActive,
   isActive,
   interactionType,
+  savePictureQuote,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
@@ -31,8 +39,23 @@ const Picture = ({
     if (!isActive) return;
     if (interactionType === INTERACTION_ADD_QUOTE) {
       console.log('crop saved! ', crop);
-      // actionsCallback();
-      console.log({ actionsCallback });
+      if (!crop.width || !crop.height) return;
+      const width = getPercentage(crop.width, imgEl.current.width);
+      const height = getPercentage(crop.height, imgEl.current.height);
+      const x = getPercentage(crop.x, imgEl.current.width);
+      const y = getPercentage(crop.y, imgEl.current.height);
+
+      savePictureQuote(
+        {
+          id: Math.floor(new Date().getTime() / 1000),
+          type: 'picture',
+          x,
+          y,
+          height,
+          width,
+        },
+        actionsCallback.func
+      );
     }
   }, [actionsCallback]);
 
@@ -121,7 +144,7 @@ const Picture = ({
 
   return (
     <div
-      className={`${isActive && 'active'} picture-content`}
+      className={`${isActive ? 'active' : ''} picture-content`}
       ref={imgWrapperEl}
     >
       {isActive && interactionType === INTERACTION_ADD_QUOTE && (
@@ -137,6 +160,22 @@ const Picture = ({
           />
         </>
       )}
+      <div>
+        {quotes.map((quote) => (
+          <div
+            className="quote-rectangle"
+            key={quote.id}
+            style={{
+              left: `${quote.x}%`,
+              top: `${quote.y}%`,
+              height: `${quote.height}%`,
+              width: `${quote.width}%`,
+              outline: `${quoteRectangleThickness}px solid red`,
+            }}
+            // onClick={() => onQuoteClick(quote.quoteId)}
+          />
+        ))}
+      </div>
       <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
       <a
         className="widget-button"
