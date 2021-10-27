@@ -317,6 +317,7 @@ const TurnNewComponent = ({
       />
       {!!imageUrl && (
         <Picture
+          lineEnds={lineEnds}
           quotes={quotes.filter((quote) => quote.type === 'picture')} // поправить на переменную
           imageUrl={imageUrl}
           registerHandleResize={registerHandleResize}
@@ -325,6 +326,9 @@ const TurnNewComponent = ({
           widgetType={WIDGET_PICTURE}
           isActive={isWidgetActive('picture1')} // (widgetId)
           interactionType={interactionType}
+          dispatch={dispatch}
+          turnId={_id}
+          activeQuote={activeQuote}
           savePictureQuote={(pictureQuote, successCallback) => {
             const turnBody = {
               quotes: [...quotes, pictureQuote],

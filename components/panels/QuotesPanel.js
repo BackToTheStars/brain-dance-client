@@ -77,7 +77,6 @@ const QuotesPanel = () => {
         setPreparedLines(
           preparedLines.map((line) => {
             if (!!line.turnIdOutOfScreen) {
-              debugger;
               // загружаем цитаты хода который не видно в области видимости
               const turnOutOfScreen = data.items.find(
                 (turn) => turn._id === line.turnIdOutOfScreen

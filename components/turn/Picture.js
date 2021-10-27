@@ -3,7 +3,8 @@ import { RULE_TURNS_CRUD } from '../config';
 import turnSettings, { INTERACTION_ADD_QUOTE } from './settings';
 import ReactCrop from 'react-image-crop';
 import { useInteractionContext } from '../contexts/InteractionContext';
-import { quoteRectangleThickness } from '../сonst';
+import PictureQuotes from './picture/Quotes';
+import { lineOffset } from '../сonst';
 
 const getPercentage = (a, b) => {
   // выдаёт 4-й знак после запятой в процентах
@@ -11,6 +12,7 @@ const getPercentage = (a, b) => {
 };
 
 const Picture = ({
+  turnId,
   quotes,
   imageUrl,
   registerHandleResize,
@@ -21,6 +23,9 @@ const Picture = ({
   isActive,
   interactionType,
   savePictureQuote,
+  dispatch,
+  activeQuote,
+  lineEnds,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
@@ -160,22 +165,15 @@ const Picture = ({
           />
         </>
       )}
-      <div>
-        {quotes.map((quote) => (
-          <div
-            className="quote-rectangle"
-            key={quote.id}
-            style={{
-              left: `${quote.x}%`,
-              top: `${quote.y}%`,
-              height: `${quote.height}%`,
-              width: `${quote.width}%`,
-              outline: `${quoteRectangleThickness}px solid red`,
-            }}
-            // onClick={() => onQuoteClick(quote.quoteId)}
-          />
-        ))}
-      </div>
+
+      <PictureQuotes
+        turnId={turnId}
+        quotes={quotes}
+        dispatch={dispatch}
+        activeQuote={activeQuote}
+        lineEnds={lineEnds}
+      />
+
       <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
       <a
         className="widget-button"
