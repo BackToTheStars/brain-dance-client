@@ -19,6 +19,9 @@ export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
 export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
+export const ACTION_PICTURE_QUOTE_COORDS_UPDATED =
+  'action_picture_quote_coords_updated';
+
 export const ACTION_UPDATE_LINE_ENDS = 'action_update_line_ends';
 
 export const ACTION_LINES_INIT = 'action_lines_init';
@@ -36,7 +39,10 @@ const turnsInitialState = {
   activeQuote: null,
   lines: [],
   lineToAdd: null,
-  quotesInfo: {},
+
+  quotesInfo: {}, // для текстовых цитат
+  pictureQuotesInfo: {}, // для цитат на картинках
+
   linesWithEndCoords: [],
   lineEnds: {},
 };
@@ -174,6 +180,17 @@ const turnsReducer = (state, action) => {
       };
     }
 
+    case ACTION_PICTURE_QUOTE_COORDS_UPDATED: {
+      const { turnId, pictureQuotesInfo } = action.payload;
+      return {
+        ...state,
+        pictureQuotesInfo: {
+          ...state.pictureQuotesInfo,
+          [turnId]: pictureQuotesInfo,
+        },
+      };
+    }
+
     case ACTION_LINES_INIT: {
       return {
         ...state,
@@ -279,6 +296,7 @@ export const TurnProvider = ({ children }) => {
     turnToEdit,
     activeQuote,
     quotesInfo,
+    pictureQuotesInfo,
     linesWithEndCoords,
     left,
     top,
@@ -514,7 +532,8 @@ export const TurnProvider = ({ children }) => {
       lines,
       turns,
       turnsToRender,
-      quotesInfo
+      quotesInfo,
+      pictureQuotesInfo
     );
     turnsDispatch({
       type: ACTION_RECALCULATE_LINES,
@@ -524,7 +543,7 @@ export const TurnProvider = ({ children }) => {
       type: ACTION_UPDATE_LINE_ENDS,
       payload: getLineEnds(linesWithEndCoords),
     });
-  }, [lines, turns, turnsToRender, quotesInfo]);
+  }, [lines, turns, turnsToRender, quotesInfo, pictureQuotesInfo]);
 
   useEffect(() => {
     setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
@@ -572,6 +591,7 @@ export const TurnProvider = ({ children }) => {
     turnToEdit,
     activeQuote,
     quotesInfo,
+    pictureQuotesInfo,
     linesWithEndCoords,
     lineEnds, // концы линий с цитатами
     dispatch: turnsDispatch,

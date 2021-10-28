@@ -1,4 +1,10 @@
-export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
+export const getLinesCoords = (
+  lines,
+  turns,
+  turnsToRender,
+  quotesInfo,
+  pictureQuotesInfo
+) => {
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, targetTurnId}
 
@@ -32,10 +38,19 @@ export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
       width: 10,
       height: 10,
     };
-    if (line.sourceMarker && quotesInfo[line.sourceTurnId]) {
-      const sourceQuoteCoords = quotesInfo[line.sourceTurnId].find(
-        (quote) => quote.quoteId == line.sourceMarker
-      );
+    if (line.sourceMarker) {
+      let sourceQuoteCoords = null;
+      if (quotesInfo[line.sourceTurnId]) {
+        sourceQuoteCoords = quotesInfo[line.sourceTurnId].find(
+          (quote) => quote.quoteId == line.sourceMarker
+        );
+      }
+      if (!sourceQuoteCoords && pictureQuotesInfo[line.sourceTurnId]) {
+        sourceQuoteCoords = pictureQuotesInfo[line.sourceTurnId].find(
+          (quote) => quote.quoteId == line.sourceMarker
+        );
+      }
+
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
         sourceCoords = {
@@ -46,10 +61,19 @@ export const getLinesCoords = (lines, turns, turnsToRender, quotesInfo) => {
         };
       }
     }
-    if (line.targetMarker && quotesInfo[line.targetTurnId]) {
-      const targetQuoteCoords = quotesInfo[line.targetTurnId].find(
-        (quote) => quote.quoteId == line.targetMarker
-      );
+    if (line.targetMarker) {
+      let targetQuoteCoords = null;
+      if (quotesInfo[line.targetTurnId]) {
+        targetQuoteCoords = quotesInfo[line.targetTurnId].find(
+          (quote) => quote.quoteId == line.targetMarker
+        );
+      }
+
+      if (!targetQuoteCoords && pictureQuotesInfo[line.targetTurnId]) {
+        targetQuoteCoords = pictureQuotesInfo[line.targetTurnId].find(
+          (quote) => quote.quoteId == line.targetMarker
+        );
+      }
       if (targetQuoteCoords) {
         targetCoords = {
           left: turnsDictionary[line.targetTurnId].x + targetQuoteCoords.left,

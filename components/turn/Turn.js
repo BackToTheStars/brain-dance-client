@@ -370,7 +370,7 @@ const TurnNewComponent = ({
             updateSizeTime,
             registerHandleResize,
             variableHeight,
-            quotes,
+            quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
             dispatch,
             _id,
             lineEnds,

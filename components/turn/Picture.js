@@ -3,6 +3,7 @@ import { RULE_TURNS_CRUD } from '../config';
 import turnSettings, { INTERACTION_ADD_QUOTE } from './settings';
 import ReactCrop from 'react-image-crop';
 import { useInteractionContext } from '../contexts/InteractionContext';
+import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnContext';
 import PictureQuotes from './picture/Quotes';
 import { lineOffset } from '../сonst';
 
@@ -38,7 +39,28 @@ const Picture = ({
   });
   // { aspect: 16 / 9 });
 
-  const handleOnMouseOver = () => {};
+  const quoteCoordinatesChanged = () => {
+    if (!quotes.length) return;
+    if (!imgEl) return;
+    const newQuotes = quotes.map((quote) => {
+      return {
+        quoteId: quote.id,
+        quoteKey: `${turnId}_${quote.id}`,
+        turnId,
+        width: Math.round((quote.width * imgEl.current.width) / 100),
+        height: Math.round((quote.height * imgEl.current.height) / 100),
+        left: Math.round((quote.x * imgEl.current.width) / 100),
+        top: Math.round((quote.y * imgEl.current.height) / 100),
+        text: 'picture quote',
+        position: 'default',
+      };
+    });
+
+    dispatch({
+      type: ACTION_PICTURE_QUOTE_COORDS_UPDATED,
+      payload: { turnId, pictureQuotesInfo: newQuotes },
+    });
+  };
 
   useEffect(() => {
     if (!isActive) return;
@@ -123,6 +145,7 @@ const Picture = ({
           return newImgHeight;
         },
       });
+      quoteCoordinatesChanged();
     } else {
       if (!!imgEl.current && !!imgEl.current.complete) {
         console.log('setImageLoaded(true)');
@@ -174,7 +197,7 @@ const Picture = ({
         lineEnds={lineEnds}
       />
 
-      <img src={imageUrlToRender} ref={imgEl} onMouseOver={handleOnMouseOver} />
+      <img src={imageUrlToRender} ref={imgEl} />
       <a
         className="widget-button"
         href="#"
