@@ -241,6 +241,9 @@ const TurnNewComponent = ({
     });
     setTimeout(() => {
       recalculateQuotes();
+      widgets.forEach(
+        (widget) => !!widget.resizeCallback && widget.resizeCallback()
+      );
     }, delay);
   };
 

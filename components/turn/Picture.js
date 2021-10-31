@@ -51,7 +51,7 @@ const Picture = ({
         height: Math.round((quote.height * imgEl.current.height) / 100),
         left: Math.round((quote.x * imgEl.current.width) / 100),
         top: Math.round((quote.y * imgEl.current.height) / 100),
-        text: 'picture quote',
+        text: 'picture crop',
         position: 'default',
       };
     });
@@ -144,30 +144,23 @@ const Picture = ({
           );
           return newImgHeight;
         },
+        resizeCallback: () => {
+          quoteCoordinatesChanged();
+        },
       });
       quoteCoordinatesChanged();
+      // imgEl.current.addEventListener('resize', quoteCoordinCatesChanged);
     } else {
       if (!!imgEl.current && !!imgEl.current.complete) {
-        console.log('setImageLoaded(true)');
+        // console.log('setImageLoaded(true)');
         setImageLoaded(true);
       }
-      // registerHandleResize({
-      //   type: 'picture',
-      //   id: 'picture',
-      //   minWidthCallback: () => {
-      //     return 0;
-      //   },
-      //   minHeightCallback: (newWidth) => {
-      //     const newImgHeight = Math.floor((400 * newWidth) / 700);
-      //     return newImgHeight;
-      //   },
-      //   maxHeightCallback: (newWidth) => {
-      //     const newImgHeight = Math.floor((400 * newWidth) / 700);
-      //     return newImgHeight;
-      //   },
-      // });
     }
-    return () => unregisterHandleResize({ id: 'picture' }); // return callback будет вызван в момент unmountComponent()
+    return () => {
+      unregisterHandleResize({ id: 'picture' });
+      // !!imgEl.current &&
+      //   imgEl.current.removeEventListener('resize', quoteCoordinatesChanged);
+    }; // return callback будет вызван в момент unmountComponent()
   }, [imageLoaded]);
 
   return (

@@ -10,8 +10,14 @@ const cutTextToSize = (text, size) => {
 };
 
 const QuotesPanel = () => {
-  const { dispatch, activeQuote, lineEnds, quotesInfo, deleteLines } =
-    useTurnContext();
+  const {
+    dispatch,
+    activeQuote,
+    lineEnds,
+    quotesInfo,
+    deleteLines,
+    pictureQuotesInfo,
+  } = useTurnContext();
   const [quotesOutOfScreenInfo, setQuotesOutOfScreenInfo] = useState({});
   const [preparedLines, setPreparedLines] = useState([]);
   const {
@@ -44,13 +50,20 @@ const QuotesPanel = () => {
     const lines = clickedQuoteInfo ? clickedQuoteInfo.lines : [];
     const preparedLines = lines.map((line) => {
       let turnIdOutOfScreen = null;
-      let sourceQuoteInfo = {};
+      let sourceQuoteInfo = null;
       let targetQuoteInfo = {};
       if (!!quotesInfo[line.sourceTurnId]) {
         sourceQuoteInfo = quotesInfo[line.sourceTurnId].find(
           (quoteInfo) => line.sourceMarker === quoteInfo.quoteId
         );
-      } else {
+      }
+      if (!!pictureQuotesInfo[line.sourceTurnId] && !sourceQuoteInfo) {
+        sourceQuoteInfo = pictureQuotesInfo[line.sourceTurnId].find(
+          (pictureQuotesInfo) => line.sourceMarker === pictureQuotesInfo.quoteId
+        );
+      }
+      if (!sourceQuoteInfo) {
+        sourceQuoteInfo = {};
         turnIdOutOfScreen = line.sourceTurnId;
       }
 
@@ -104,6 +117,8 @@ const QuotesPanel = () => {
     }
     // console.log(turnIdsOutOfScreen);
   }, [activeQuote]);
+
+  console.log(preparedLines);
 
   return (
     <div
