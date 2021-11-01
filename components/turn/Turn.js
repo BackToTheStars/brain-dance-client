@@ -329,6 +329,7 @@ const TurnNewComponent = ({
           widgetType={WIDGET_PICTURE}
           isActive={isWidgetActive('picture1')} // (widgetId)
           interactionType={interactionType}
+          setInteractionMode={setInteractionMode}
           dispatch={dispatch}
           turnId={_id}
           activeQuote={activeQuote}

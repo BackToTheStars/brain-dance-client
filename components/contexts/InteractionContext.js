@@ -2,12 +2,15 @@ import { useState, useContext, createContext } from 'react';
 import { useGameMode } from './interaction-hooks/useGameMode';
 import { usePictureMode } from './interaction-hooks/usePictureMode';
 import { usePictureQuoteAdd } from './interaction-hooks/usePictureQuoteAdd';
+import { usePictureQuoteActive } from './interaction-hooks/usePictureQuoteActive';
+import { useTurnContext } from './TurnContext';
 
 export const InteractionContext = createContext();
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
 export const MODE_WIDGET_PICTURE_QUOTE_ADD = 'widget-picture-quote-add';
+export const MODE_WIDGET_PICTURE_QUOTE_ACTIVE = 'widget-picture-quote-active';
 
 //
 export const InteractionProvider = ({ children }) => {
@@ -19,6 +22,8 @@ export const InteractionProvider = ({ children }) => {
   const [interactionType, setInteractionType] = useState(null);
 
   const [actionsCallback, setActionsCallback] = useState(null);
+
+  const { dispatch } = useTurnContext();
 
   // указываем конкретную ветку, по которой далее работаем (шаг, тип виджета, id виджета)
   const makeWidgetActive = (turnId, widgetType, widgetId) => {
@@ -46,6 +51,12 @@ export const InteractionProvider = ({ children }) => {
       setInteractionMode,
       interactWithWidget,
       performActions,
+    }),
+    [MODE_WIDGET_PICTURE_QUOTE_ACTIVE]: usePictureQuoteActive({
+      setInteractionMode,
+      interactWithWidget,
+      performActions,
+      dispatch,
     }),
   };
 

@@ -1,7 +1,15 @@
 import { quoteRectangleThickness } from '../../сonst';
 import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnContext';
+import { MODE_WIDGET_PICTURE_QUOTE_ACTIVE } from '../../contexts/InteractionContext';
 
-const PictureQuotes = ({ turnId, quotes, dispatch, activeQuote, lineEnds }) => {
+const PictureQuotes = ({
+  turnId,
+  quotes,
+  dispatch,
+  activeQuote,
+  lineEnds,
+  setInteractionMode,
+}) => {
   //
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
@@ -42,7 +50,10 @@ const PictureQuotes = ({ turnId, quotes, dispatch, activeQuote, lineEnds }) => {
               width: `${quote.width}%`,
               outline,
             }}
-            onClick={() => onQuoteClick(quote.id)}
+            onClick={() => {
+              onQuoteClick(quote.id);
+              setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ACTIVE);
+            }}
           />
         );
       })}

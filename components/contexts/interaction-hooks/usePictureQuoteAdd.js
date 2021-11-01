@@ -32,7 +32,6 @@ export const usePictureQuoteAdd = ({
     null,
     null,
     null,
-    null,
     {
       text: 'Cancel',
       callback: () => {

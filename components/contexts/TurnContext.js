@@ -18,6 +18,7 @@ export const ACTION_RESET_TURN_EDIT_MODE = 'action_reset_turn_edit_mode';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
+export const ACTION_QUOTE_CANCEL = 'action_quote_cancel';
 export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
 export const ACTION_PICTURE_QUOTE_COORDS_UPDATED =
   'action_picture_quote_coords_updated';
@@ -118,6 +119,12 @@ const turnsReducer = (state, action) => {
         ...state,
         // originalTurns: state.originalTurns.filter((turn) => turn._id !== _id), // @todo: проверить, нужны ли originalTurns
         turns: state.turns.filter((turn) => turn._id !== _id),
+      };
+    }
+    case ACTION_QUOTE_CANCEL: {
+      return {
+        ...state,
+        activeQuote: null,
       };
     }
     case ACTION_QUOTE_CLICKED: {

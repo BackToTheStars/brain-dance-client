@@ -23,6 +23,7 @@ const Picture = ({
   makeWidgetActive,
   isActive,
   interactionType,
+  setInteractionMode,
   savePictureQuote,
   dispatch,
   activeQuote,
@@ -188,6 +189,7 @@ const Picture = ({
         dispatch={dispatch}
         activeQuote={activeQuote}
         lineEnds={lineEnds}
+        setInteractionMode={setInteractionMode}
       />
 
       <img src={imageUrlToRender} ref={imgEl} />

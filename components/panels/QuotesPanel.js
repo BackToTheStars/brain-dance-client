@@ -48,10 +48,12 @@ const QuotesPanel = () => {
       ? lineEnds[`${activeQuote.turnId}_${activeQuote.quoteId}`]
       : null;
     const lines = clickedQuoteInfo ? clickedQuoteInfo.lines : [];
+
     const preparedLines = lines.map((line) => {
       let turnIdOutOfScreen = null;
       let sourceQuoteInfo = null;
-      let targetQuoteInfo = {};
+      let targetQuoteInfo = null;
+
       if (!!quotesInfo[line.sourceTurnId]) {
         sourceQuoteInfo = quotesInfo[line.sourceTurnId].find(
           (quoteInfo) => line.sourceMarker === quoteInfo.quoteId
@@ -71,7 +73,14 @@ const QuotesPanel = () => {
         targetQuoteInfo = quotesInfo[line.targetTurnId].find(
           (quoteInfo) => line.targetMarker === quoteInfo.quoteId
         );
-      } else {
+      }
+      if (!!pictureQuotesInfo[line.targetTurnId] && !targetQuoteInfo) {
+        targetQuoteInfo = pictureQuotesInfo[line.targetTurnId].find(
+          (pictureQuotesInfo) => line.targetMarker === pictureQuotesInfo.quoteId
+        );
+      }
+      if (!targetQuoteInfo) {
+        targetQuoteInfo = {};
         turnIdOutOfScreen = line.targetTurnId;
       }
 
@@ -118,7 +127,7 @@ const QuotesPanel = () => {
     // console.log(turnIdsOutOfScreen);
   }, [activeQuote]);
 
-  console.log(preparedLines);
+  // console.log(preparedLines);
 
   return (
     <div
