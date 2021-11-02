@@ -1,5 +1,7 @@
 import { INTERACTION_ADD_QUOTE } from '../../turn/settings';
 import { useUserContext } from '../UserContext';
+import { useTurnContext } from '../TurnContext';
+
 import { RULE_TURNS_CRUD } from '../../config';
 import { MODE_GAME } from '../InteractionContext';
 import { ACTION_QUOTE_CANCEL } from '../TurnContext';
@@ -11,6 +13,7 @@ export const usePictureQuoteActive = ({
   dispatch,
 }) => {
   const { can } = useUserContext();
+  const { activeQuote, deleteQuote } = useTurnContext();
 
   return [
     {
@@ -30,6 +33,21 @@ export const usePictureQuoteActive = ({
     {
       text: 'Delete',
       callback: () => {
+        if (!activeQuote) return;
+        const { quoteId, turnId } = activeQuote;
+
+        deleteQuote(
+          { turnId, quoteId },
+          {
+            successCallback: () => {
+              dispatch({
+                type: ACTION_PICTURE_QUOTE_DELETE,
+                payload: { quoteId, turnId },
+              });
+              // tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { quoteId } });
+            },
+          }
+        );
         // performActions({
         //   info: 'Save Area request to server',
         //   func: () => {

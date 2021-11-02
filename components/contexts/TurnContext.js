@@ -19,6 +19,7 @@ export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
 export const ACTION_QUOTE_CANCEL = 'action_quote_cancel';
+export const ACTION_PICTURE_QUOTE_DELETE = 'action_picture_quote_delete';
 export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
 export const ACTION_PICTURE_QUOTE_COORDS_UPDATED =
   'action_picture_quote_coords_updated';
@@ -125,6 +126,19 @@ const turnsReducer = (state, action) => {
       return {
         ...state,
         activeQuote: null,
+      };
+    }
+    case ACTION_PICTURE_QUOTE_DELETE: {
+      const { quoteId, turnId } = action.payload;
+      return {
+        ...state,
+        turns: state.turns.map((turn) => {
+          if (turn._id !== turnId) return turn;
+          return {
+            ...turn,
+            quotes: turn.quotes.filter((quote) => quoteId !== quote.id),
+          };
+        }),
       };
     }
     case ACTION_QUOTE_CLICKED: {
@@ -425,6 +439,24 @@ export const TurnProvider = ({ children }) => {
     );
   };
 
+  const deleteQuote = ({ turnId, quoteId }, callbacks = {}) => {
+    request(
+      `turns/${turnId}/quote/${quoteId}?hash=${hash}`,
+      {
+        method: 'DELETE',
+        tokenFlag: true,
+      },
+      {
+        successCallback: (data) => {
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
   const deleteLines = (ids, callbacks = {}) => {
     request(
       `lines?hash=${hash}`,
@@ -605,6 +637,7 @@ export const TurnProvider = ({ children }) => {
     createTurn,
     deleteTurn,
     updateTurn,
+    deleteQuote,
     deleteLines,
     left: viewPort.left,
     top: viewPort.top,
