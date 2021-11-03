@@ -4,7 +4,11 @@ import { useTurnContext } from '../TurnContext';
 
 import { RULE_TURNS_CRUD } from '../../config';
 import { MODE_GAME } from '../InteractionContext';
-import { ACTION_QUOTE_CANCEL } from '../TurnContext';
+import {
+  ACTION_QUOTE_CANCEL,
+  ACTION_PICTURE_QUOTE_DELETE,
+  ACTION_LINES_DELETE,
+} from '../TurnContext';
 
 export const usePictureQuoteActive = ({
   setInteractionMode,
@@ -13,7 +17,8 @@ export const usePictureQuoteActive = ({
   dispatch,
 }) => {
   const { can } = useUserContext();
-  const { activeQuote, deleteQuote } = useTurnContext();
+  const { activeQuote, deleteQuote, lineEnds, lines, deleteLines } =
+    useTurnContext();
 
   return [
     {
@@ -36,26 +41,50 @@ export const usePictureQuoteActive = ({
         if (!activeQuote) return;
         const { quoteId, turnId } = activeQuote;
 
-        deleteQuote(
-          { turnId, quoteId },
-          {
-            successCallback: () => {
-              dispatch({
-                type: ACTION_PICTURE_QUOTE_DELETE,
-                payload: { quoteId, turnId },
+        const quoteKey = `${turnId}_${quoteId}`;
+
+        const deleteFunc = () =>
+          deleteQuote(
+            { turnId, quoteId },
+            {
+              successCallback: () => {
+                dispatch({
+                  type: ACTION_PICTURE_QUOTE_DELETE,
+                  payload: { quoteId, turnId },
+                });
+                // tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { quoteId } });
+              },
+            }
+          );
+
+        if (!!lineEnds[quoteKey]) {
+          if (confirm('Confirm: Delete picture fragment with red lines?')) {
+            const linesToDelete = lines
+              .filter(
+                (line) =>
+                  (line.sourceTurnId === turnId &&
+                    line.sourceMarker === quoteId) ||
+                  (line.targetTurnId === turnId &&
+                    line.targetMarker === quoteId)
+              )
+              .map((line) => line._id);
+            if (!!linesToDelete.length) {
+              deleteLines(linesToDelete, {
+                successCallback: () => {
+                  dispatch({
+                    type: ACTION_LINES_DELETE,
+                    payload: linesToDelete,
+                  });
+                  deleteFunc();
+                },
               });
-              // tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { quoteId } });
-            },
+            }
           }
-        );
-        // performActions({
-        //   info: 'Save Area request to server',
-        //   func: () => {
-        //     setInteractionMode(MODE_GAME); // переходим в общий режим игры для панели кнопок
-        //     interactWithWidget(null); // говорим, что никакой виджет теперь не активен
-        //   },
-        // });
-        // // savePictureCrop();
+          return;
+        }
+
+        if (!confirm('Confirm: Delete picture fragment?')) return;
+        deleteFunc();
       },
       show: () => can(RULE_TURNS_CRUD),
     },

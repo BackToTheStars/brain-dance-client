@@ -618,7 +618,17 @@ export const TurnProvider = ({ children }) => {
             line.targetTurnId === action.payload._id
         );
         if (!!linesToDelete.length) {
-          turnsDispatch({ type: ACTION_LINES_DELETE, payload: linesToDelete });
+          deleteLines(
+            linesToDelete.map((line) => line._id),
+            {
+              successCallback: () => {
+                turnsDispatch({
+                  type: ACTION_LINES_DELETE,
+                  payload: linesToDelete,
+                });
+              },
+            }
+          );
         }
         break;
     }
