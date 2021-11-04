@@ -7,6 +7,7 @@ import Turn from './Turn';
 const TurnsComponent = () => {
   const {
     turns,
+    zeroPoint,
     dispatch,
     left,
     top,
@@ -53,6 +54,7 @@ const TurnsComponent = () => {
               key={turn._id}
               {...{
                 turn,
+                zeroPoint,
                 can,
                 dispatch,
                 left,

@@ -51,7 +51,10 @@ const Picture = ({
         width: Math.round((quote.width * imgEl.current.width) / 100),
         height: Math.round((quote.height * imgEl.current.height) / 100),
         left: Math.round((quote.x * imgEl.current.width) / 100),
-        top: Math.round((quote.y * imgEl.current.height) / 100),
+        top: Math.round(
+          (quote.y * imgEl.current.height) / 100 +
+            imgEl.current.parentElement.offsetTop // компенсация для header
+        ),
         text: 'picture crop',
         position: 'default',
       };

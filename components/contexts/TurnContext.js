@@ -344,6 +344,8 @@ export const TurnProvider = ({ children }) => {
     addNotification,
   } = useUiContext();
 
+  const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
+
   const insertTurnFromBuffer = ({ successCallback, errorCallback }) => {
     const turn = getTurnFromBufferAndRemove();
     if (!turn) {
@@ -637,6 +639,7 @@ export const TurnProvider = ({ children }) => {
   const value = {
     saveField,
     turns,
+    zeroPoint,
     turnToEdit,
     activeQuote,
     quotesInfo,

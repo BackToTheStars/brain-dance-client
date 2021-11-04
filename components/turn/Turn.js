@@ -22,6 +22,7 @@ const delayRenderTurn = 20; // сколько времени ждём для а�
 
 const TurnNewComponent = ({
   turn,
+  zeroPoint,
   can,
   dispatch,
   lineEnds,
@@ -334,6 +335,7 @@ const TurnNewComponent = ({
           turnId={_id}
           activeQuote={activeQuote}
           savePictureQuote={(pictureQuote, successCallback) => {
+            const { x: zeroPointX, y: zeroPointY } = zeroPoint;
             const turnBody = {
               quotes: [...quotes, pictureQuote],
             };
@@ -343,6 +345,8 @@ const TurnNewComponent = ({
                   type: ACTION_TURN_WAS_CHANGED,
                   payload: {
                     ...data.item,
+                    x: data.item.x + zeroPointX,
+                    y: data.item.y + zeroPointY,
                     quotes: turnBody.quotes,
                   },
                 });
