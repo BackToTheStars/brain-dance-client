@@ -47,6 +47,7 @@ const Picture = ({
       return {
         quoteId: quote.id,
         quoteKey: `${turnId}_${quote.id}`,
+        type: quote.type,
         turnId,
         width: Math.round((quote.width * imgEl.current.width) / 100),
         height: Math.round((quote.height * imgEl.current.height) / 100),
@@ -67,6 +68,10 @@ const Picture = ({
   };
 
   useEffect(() => {
+    quoteCoordinatesChanged();
+  }, [quotes]);
+
+  useEffect(() => {
     if (!isActive) return;
     if (interactionType === INTERACTION_ADD_QUOTE) {
       console.log('crop saved! ', crop);
@@ -85,7 +90,10 @@ const Picture = ({
           height,
           width,
         },
-        actionsCallback.func
+        (...args) => {
+          actionsCallback.func(...args);
+          quoteCoordinatesChanged();
+        }
       );
     }
   }, [actionsCallback]);

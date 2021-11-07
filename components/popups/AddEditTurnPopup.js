@@ -94,9 +94,10 @@ const AddEditTurnPopup = () => {
 
     const resTextArr = [];
     let i = 0;
-    const paragraphQuotes = turnToEdit.quotes
-      ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-      : [];
+    const paragraphQuotes =
+      turnToEdit && turnToEdit.quotes
+        ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+        : [];
     for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
         resTextArr.push(textItem);
@@ -159,7 +160,7 @@ const AddEditTurnPopup = () => {
       return setError({ message: 'Need text body' });
     }
 
-    const prevQuotes = turnToEdit.quotes || [];
+    const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
 
     let turnObj = {
       ...preparedForm,

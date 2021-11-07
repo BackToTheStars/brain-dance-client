@@ -347,7 +347,7 @@ const TurnNewComponent = ({
                     ...data.item,
                     x: data.item.x + zeroPointX,
                     y: data.item.y + zeroPointY,
-                    quotes: turnBody.quotes,
+                    quotes: data.item.quotes,
                   },
                 });
                 successCallback();
