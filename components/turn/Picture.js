@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { RULE_TURNS_CRUD } from '../config';
-import turnSettings, { INTERACTION_ADD_QUOTE } from './settings';
+import turnSettings from './settings';
 import ReactCrop from 'react-image-crop';
-import { useInteractionContext } from '../contexts/InteractionContext';
+import {
+  useInteractionContext,
+  INTERACTION_ADD_QUOTE,
+} from '../contexts/InteractionContext';
 import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnContext';
 import PictureQuotes from './picture/Quotes';
 import { lineOffset } from '../сonst';
@@ -14,6 +17,7 @@ const getPercentage = (a, b) => {
 
 const Picture = ({
   turnId,
+  allTurnQuotes,
   quotes,
   imageUrl,
   registerHandleResize,
@@ -40,7 +44,7 @@ const Picture = ({
   });
   // { aspect: 16 / 9 });
 
-  const quoteCoordinatesChanged = () => {
+  const quoteCoordinatesChanged = (quotes) => {
     if (!quotes.length) return;
     if (!imgEl) return;
     const newQuotes = quotes.map((quote) => {
@@ -68,8 +72,10 @@ const Picture = ({
   };
 
   useEffect(() => {
-    quoteCoordinatesChanged();
-  }, [quotes]);
+    quoteCoordinatesChanged(
+      allTurnQuotes.filter((quote) => quote.type === 'picture')
+    );
+  }, [allTurnQuotes]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -92,9 +98,11 @@ const Picture = ({
         },
         (...args) => {
           actionsCallback.func(...args);
-          quoteCoordinatesChanged();
+          quoteCoordinatesChanged(quotes);
         }
       );
+    }
+    if (interactionType === INTERACTION_ADD_QUOTE) {
     }
   }, [actionsCallback]);
 
@@ -157,10 +165,10 @@ const Picture = ({
           return newImgHeight;
         },
         resizeCallback: () => {
-          quoteCoordinatesChanged();
+          quoteCoordinatesChanged(quotes);
         },
       });
-      quoteCoordinatesChanged();
+      quoteCoordinatesChanged(quotes);
       // imgEl.current.addEventListener('resize', quoteCoordinCatesChanged);
     } else {
       if (!!imgEl.current && !!imgEl.current.complete) {

@@ -323,6 +323,7 @@ const TurnNewComponent = ({
         <Picture
           lineEnds={lineEnds}
           quotes={quotes.filter((quote) => quote.type === 'picture')} // поправить на переменную
+          allTurnQuotes={quotes}
           imageUrl={imageUrl}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}

@@ -1,5 +1,4 @@
 import { useInteractionContext } from '../contexts/InteractionContext';
-import { WIDGET_PICTURE, INTERACTION_ADD_QUOTE } from '../turn/settings';
 
 const ButtonsPanel = () => {
   const { buttons } = useInteractionContext();
@@ -26,24 +25,6 @@ const ButtonsPanel = () => {
       )}
     </div>
   );
-
-  const { activeWidget, interactWithWidget } = useInteractionContext();
-  const widgetType = activeWidget ? activeWidget.widgetType : null;
-
-  if (widgetType === WIDGET_PICTURE)
-    return (
-      <div className="actions panel">
-        <button
-          className="btn  btn-primary"
-          onClick={(e) => {
-            console.log({ widgetType, WIDGET_PICTURE, INTERACTION_ADD_QUOTE });
-            interactWithWidget(INTERACTION_ADD_QUOTE);
-          }}
-        >
-          Red Area
-        </button>
-      </div>
-    );
 };
 
 export default ButtonsPanel;

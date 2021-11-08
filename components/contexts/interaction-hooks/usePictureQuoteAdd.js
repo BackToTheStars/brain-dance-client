@@ -1,11 +1,14 @@
-import { INTERACTION_ADD_QUOTE } from '../../turn/settings';
 import { useUserContext } from '../UserContext';
 import { RULE_TURNS_CRUD } from '../../config';
-import { MODE_WIDGET_PICTURE, MODE_GAME } from '../InteractionContext';
+import {
+  MODE_WIDGET_PICTURE,
+  MODE_GAME,
+  MODE_BUTTON_PICTURE_ADD_AREA,
+} from '../InteractionContext';
 
 export const usePictureQuoteAdd = ({
   setInteractionMode,
-  interactWithWidget,
+  setInteractionType,
   performActions,
 }) => {
   const { can } = useUserContext();
@@ -15,10 +18,10 @@ export const usePictureQuoteAdd = ({
       text: 'Save Area',
       callback: () => {
         performActions({
-          info: 'Save Area request to server',
+          info: MODE_BUTTON_PICTURE_ADD_AREA,
           func: () => {
             setInteractionMode(MODE_GAME); // переходим в общий режим игры для панели кнопок
-            interactWithWidget(null); // говорим, что никакой виджет теперь не активен
+            setInteractionType(null); // говорим, что никакой виджет теперь не активен
           },
         });
         // savePictureCrop();
@@ -36,7 +39,7 @@ export const usePictureQuoteAdd = ({
       text: 'Cancel',
       callback: () => {
         setInteractionMode(MODE_WIDGET_PICTURE); // набор кнопок справа
-        interactWithWidget(null); // что мы делаем с виджетом
+        setInteractionType(null); // что мы делаем с виджетом
       },
       show: () => can(RULE_TURNS_CRUD),
     },
