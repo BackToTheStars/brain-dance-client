@@ -4,7 +4,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
 
 const cutTextToSize = (text, size) => {
-  console.log(text, size);
+  // console.log(text, size);
   if (text.length < size + 3) return text;
   return text.slice(0, size) + '...';
 };

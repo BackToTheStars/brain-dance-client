@@ -4,7 +4,7 @@ import turnSettings from './settings';
 import ReactCrop from 'react-image-crop';
 import {
   useInteractionContext,
-  INTERACTION_ADD_QUOTE,
+  INTERACTION_ADD_OR_EDIT_QUOTE,
 } from '../contexts/InteractionContext';
 import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnContext';
 import PictureQuotes from './picture/Quotes';
@@ -41,7 +41,15 @@ const Picture = ({
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
   const [crop, setCrop] = useState({
     unit: '%',
+    // x: 10,
+    // y: 10,
+    // width: 20,
+    // height: 20,
   });
+
+  // useEffect(() => {
+  //   console.log({ crop });
+  // }, [crop]);
   // { aspect: 16 / 9 });
 
   const quoteCoordinatesChanged = (quotes) => {
@@ -64,7 +72,7 @@ const Picture = ({
         position: 'default',
       };
     });
-
+    console.log({ newQuotes });
     dispatch({
       type: ACTION_PICTURE_QUOTE_COORDS_UPDATED,
       payload: { turnId, pictureQuotesInfo: newQuotes },
@@ -72,6 +80,7 @@ const Picture = ({
   };
 
   useEffect(() => {
+    console.log('1', { allTurnQuotes });
     quoteCoordinatesChanged(
       allTurnQuotes.filter((quote) => quote.type === 'picture')
     );
@@ -79,7 +88,7 @@ const Picture = ({
 
   useEffect(() => {
     if (!isActive) return;
-    if (interactionType === INTERACTION_ADD_QUOTE) {
+    if (interactionType === INTERACTION_ADD_OR_EDIT_QUOTE) {
       console.log('crop saved! ', crop);
       if (!crop.width || !crop.height) return;
       const width = getPercentage(crop.width, imgEl.current.width);
@@ -98,19 +107,26 @@ const Picture = ({
         },
         (...args) => {
           actionsCallback.func(...args);
-          quoteCoordinatesChanged(quotes);
+          // console.log('2');
+          // quoteCoordinatesChanged(
+          //   allTurnQuotes.filter((quote) => quote.type === 'picture')
+          // );
         }
       );
     }
-    if (interactionType === INTERACTION_ADD_QUOTE) {
+    if (interactionType === INTERACTION_ADD_OR_EDIT_QUOTE) {
     }
   }, [actionsCallback]);
 
   useEffect(() => {
-    if (isActive && interactionType === INTERACTION_ADD_QUOTE) {
-      setCrop({
-        unit: '%',
-      });
+    if (isActive && interactionType === INTERACTION_ADD_OR_EDIT_QUOTE) {
+      if (!!activeQuote) {
+        setCrop({ unit: '%', x: 10, y: 10, width: 20, height: 20 });
+      } else {
+        setCrop({
+          unit: '%',
+        });
+      }
     }
   }, [isActive, interactionType]);
 
@@ -165,9 +181,12 @@ const Picture = ({
           return newImgHeight;
         },
         resizeCallback: () => {
+          console.log('3');
           quoteCoordinatesChanged(quotes);
         },
       });
+      console.log('4');
+
       quoteCoordinatesChanged(quotes);
       // imgEl.current.addEventListener('resize', quoteCoordinCatesChanged);
     } else {
@@ -188,7 +207,7 @@ const Picture = ({
       className={`${isActive ? 'active' : ''} picture-content`}
       ref={imgWrapperEl}
     >
-      {isActive && interactionType === INTERACTION_ADD_QUOTE && (
+      {isActive && interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && (
         <>
           {/* <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
             Режим добавления цитаты

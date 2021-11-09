@@ -6,7 +6,8 @@ import {
   MODE_GAME,
   MODE_BUTTON_PICTURE_MODIFY_AREA,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
-  INTERACTION_ADD_QUOTE,
+  INTERACTION_ADD_OR_EDIT_QUOTE,
+  WIDGET_PICTURE,
 } from '../InteractionContext';
 import {
   ACTION_QUOTE_CANCEL,
@@ -19,6 +20,7 @@ export const usePictureQuoteActive = ({
   setInteractionType,
   performActions,
   dispatch,
+  makeWidgetActive,
 }) => {
   const { can } = useUserContext();
   const { activeQuote, deleteQuote, lineEnds, lines, deleteLines } =
@@ -28,14 +30,13 @@ export const usePictureQuoteActive = ({
     {
       text: 'Modify',
       callback: () => {
-        performActions({
-          info: MODE_BUTTON_PICTURE_MODIFY_AREA,
-          func: () => {
-            setInteractionType(INTERACTION_ADD_QUOTE);
-            setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ADD);
-          },
-        });
-        savePictureCrop();
+        if (!activeQuote) return;
+        const { quoteId, turnId } = activeQuote;
+        // const quoteKey = `${turnId}_${quoteId}`;
+        makeWidgetActive(turnId, WIDGET_PICTURE, 'picture1'); // (turnId, widgetType, widgetId)
+        // делаем синюю рамку у картинки
+        setInteractionType(INTERACTION_ADD_OR_EDIT_QUOTE);
+        setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ADD);
       },
       show: () => can(RULE_TURNS_CRUD),
     },

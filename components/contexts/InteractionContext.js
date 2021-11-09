@@ -6,7 +6,7 @@ import { usePictureQuoteActive } from './interaction-hooks/usePictureQuoteActive
 import { useTurnContext } from './TurnContext';
 
 export const InteractionContext = createContext();
-export const INTERACTION_ADD_QUOTE = 'addQuote';
+export const INTERACTION_ADD_OR_EDIT_QUOTE = 'add-or-edit-quote';
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
@@ -57,6 +57,7 @@ export const InteractionProvider = ({ children }) => {
       setInteractionMode,
       setInteractionType,
       performActions,
+      makeWidgetActive,
       dispatch,
     }),
   };
