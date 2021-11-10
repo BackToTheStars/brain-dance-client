@@ -18,6 +18,8 @@ const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
 const FIELD_FONT_COLOR = 'fontColor';
 
+export const WIDGET_PICTURE = 'picture';
+
 // по умолчанию виджет текста присутствует
 const settings = {
   // [TEMPLATE_PICTURE_ONLY]: {

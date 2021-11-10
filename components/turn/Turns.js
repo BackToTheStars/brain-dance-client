@@ -2,14 +2,16 @@ import { useTurnContext } from '../contexts/TurnContext';
 import { useUserContext } from '../contexts/UserContext';
 import { useUiContext } from '../contexts/UI_Context';
 // import Turn from './Turn';
-import Turn from './TurnNew';
+import Turn from './Turn';
 
 const TurnsComponent = () => {
   const {
     turns,
+    zeroPoint,
     dispatch,
     left,
     top,
+    updateTurn,
     deleteTurn,
     tempMiddlewareFn,
     lineEnds,
@@ -52,10 +54,12 @@ const TurnsComponent = () => {
               key={turn._id}
               {...{
                 turn,
+                zeroPoint,
                 can,
                 dispatch,
                 left,
                 top,
+                updateTurn,
                 deleteTurn,
                 setCreateEditTurnPopupIsHidden,
                 tempMiddlewareFn,

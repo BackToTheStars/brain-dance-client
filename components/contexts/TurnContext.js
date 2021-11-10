@@ -18,7 +18,12 @@ export const ACTION_RESET_TURN_EDIT_MODE = 'action_reset_turn_edit_mode';
 export const ACTION_SET_TURN_TO_EDIT_MODE = 'action_set_turn_to_edit_mode';
 
 export const ACTION_QUOTE_CLICKED = 'action_quote_clicked';
+export const ACTION_QUOTE_CANCEL = 'action_quote_cancel';
+export const ACTION_PICTURE_QUOTE_DELETE = 'action_picture_quote_delete';
 export const ACTION_QUOTE_COORDS_UPDATED = 'action_quote_coords_updated';
+export const ACTION_PICTURE_QUOTE_COORDS_UPDATED =
+  'action_picture_quote_coords_updated';
+
 export const ACTION_UPDATE_LINE_ENDS = 'action_update_line_ends';
 
 export const ACTION_LINES_INIT = 'action_lines_init';
@@ -36,7 +41,10 @@ const turnsInitialState = {
   activeQuote: null,
   lines: [],
   lineToAdd: null,
-  quotesInfo: {},
+
+  quotesInfo: {}, // для текстовых цитат
+  pictureQuotesInfo: {}, // для цитат на картинках
+
   linesWithEndCoords: [],
   lineEnds: {},
 };
@@ -114,6 +122,25 @@ const turnsReducer = (state, action) => {
         turns: state.turns.filter((turn) => turn._id !== _id),
       };
     }
+    case ACTION_QUOTE_CANCEL: {
+      return {
+        ...state,
+        activeQuote: null,
+      };
+    }
+    case ACTION_PICTURE_QUOTE_DELETE: {
+      const { quoteId, turnId } = action.payload;
+      return {
+        ...state,
+        turns: state.turns.map((turn) => {
+          if (turn._id !== turnId) return turn;
+          return {
+            ...turn,
+            quotes: turn.quotes.filter((quote) => quoteId !== quote.id),
+          };
+        }),
+      };
+    }
     case ACTION_QUOTE_CLICKED: {
       const { turnId, quoteId } = action.payload;
       // активной цитаты не было
@@ -171,6 +198,17 @@ const turnsReducer = (state, action) => {
       return {
         ...state,
         quotesInfo: { ...state.quotesInfo, [turnId]: quotesInfo },
+      };
+    }
+
+    case ACTION_PICTURE_QUOTE_COORDS_UPDATED: {
+      const { turnId, pictureQuotesInfo } = action.payload;
+      return {
+        ...state,
+        pictureQuotesInfo: {
+          ...state.pictureQuotesInfo,
+          [turnId]: pictureQuotesInfo,
+        },
       };
     }
 
@@ -279,6 +317,7 @@ export const TurnProvider = ({ children }) => {
     turnToEdit,
     activeQuote,
     quotesInfo,
+    pictureQuotesInfo,
     linesWithEndCoords,
     left,
     top,
@@ -304,6 +343,8 @@ export const TurnProvider = ({ children }) => {
     minimapState: { turnsToRender },
     addNotification,
   } = useUiContext();
+
+  const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
 
   const insertTurnFromBuffer = ({ successCallback, errorCallback }) => {
     const turn = getTurnFromBufferAndRemove();
@@ -391,6 +432,24 @@ export const TurnProvider = ({ children }) => {
         successCallback: (data) => {
           //   console.log('успешный коллбэк на уровне TurnContext');
           //   console.log({ data });
+          if (callbacks.successCallback) {
+            callbacks.successCallback(data);
+          }
+        },
+        ...callbacks,
+      }
+    );
+  };
+
+  const deleteQuote = ({ turnId, quoteId }, callbacks = {}) => {
+    request(
+      `turns/${turnId}/quote/${quoteId}?hash=${hash}`,
+      {
+        method: 'DELETE',
+        tokenFlag: true,
+      },
+      {
+        successCallback: (data) => {
           if (callbacks.successCallback) {
             callbacks.successCallback(data);
           }
@@ -514,7 +573,8 @@ export const TurnProvider = ({ children }) => {
       lines,
       turns,
       turnsToRender,
-      quotesInfo
+      quotesInfo,
+      pictureQuotesInfo
     );
     turnsDispatch({
       type: ACTION_RECALCULATE_LINES,
@@ -524,7 +584,7 @@ export const TurnProvider = ({ children }) => {
       type: ACTION_UPDATE_LINE_ENDS,
       payload: getLineEnds(linesWithEndCoords),
     });
-  }, [lines, turns, turnsToRender, quotesInfo]);
+  }, [lines, turns, turnsToRender, quotesInfo, pictureQuotesInfo]);
 
   useEffect(() => {
     setViewPort({ left: viewPort.left + left, top: viewPort.top + top });
@@ -560,7 +620,17 @@ export const TurnProvider = ({ children }) => {
             line.targetTurnId === action.payload._id
         );
         if (!!linesToDelete.length) {
-          turnsDispatch({ type: ACTION_LINES_DELETE, payload: linesToDelete });
+          deleteLines(
+            linesToDelete.map((line) => line._id),
+            {
+              successCallback: () => {
+                turnsDispatch({
+                  type: ACTION_LINES_DELETE,
+                  payload: linesToDelete,
+                });
+              },
+            }
+          );
         }
         break;
     }
@@ -569,15 +639,18 @@ export const TurnProvider = ({ children }) => {
   const value = {
     saveField,
     turns,
+    zeroPoint,
     turnToEdit,
     activeQuote,
     quotesInfo,
+    pictureQuotesInfo,
     linesWithEndCoords,
     lineEnds, // концы линий с цитатами
     dispatch: turnsDispatch,
     createTurn,
     deleteTurn,
     updateTurn,
+    deleteQuote,
     deleteLines,
     left: viewPort.left,
     top: viewPort.top,

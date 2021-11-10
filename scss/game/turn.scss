@@ -47,8 +47,30 @@ $black-color: rgb(0, 0, 0);
   }
   .picture-content {
     z-index: 1;
+    position: relative;
     img {
       width: 100%;
+    }
+    &.active {
+      outline: 4px solid blue;
+    }
+    /* height: 100%; */
+    background: $black-color;
+    img {
+      width: 100%;
+    }
+    .widget-button {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      color: white;
+      opacity: 0;
+      transition: 0.3s;
+    }
+    &:hover {
+      .widget-button {
+        opacity: 1;
+      }
     }
   }
   .video > div {
@@ -78,64 +100,72 @@ $black-color: rgb(0, 0, 0);
   }
 }
 
-.react-turn {
+.picture-react-crop {
   position: absolute;
-  cursor: move;
-  /* border: 2px solid blue; */
-  z-index: 2;
-  &.dont-show-header {
-    &:hover {
-      .headerTextActions {
-        transform: translateY(15%);
-      }
-    }
-    .paragraphText {
-      border-top-left-radius: $corners-radius;
-      border-top-right-radius: $corners-radius;
-    }
-    .headerText {
-      position: absolute;
-      top: 0;
-      background-color: rgba(255, 255, 255, 0);
-      // transform: translateY(-100%);
-      justify-content: flex-end;
-    }
-    .headerTextTitle {
-      display: none;
-    }
-    .headerTextActions {
-      transition: 0.25s;
-      transform: translateY(-150%);
-      margin-right: 20px;
-    }
-  }
-
-  &.zero-point {
-    visibility: hidden;
-  }
-
-  .media-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .video iframe {
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
-
-  .picture-content {
-    width: 100%;
-    z-index: 1;
-    /* height: 100%; */
-    background: $black-color;
-    img {
-      width: 100%;
-    }
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  // @learn BEM block element modifier спецификация
+  .ReactCrop__crop-selection {
+    border: none;
+    @include red-border; // @learn mixin
   }
 }
+
+// .react-turn {
+//   position: absolute;
+//   cursor: move;
+//   /* border: 2px solid blue; */
+//   z-index: 2;
+//   &.dont-show-header {
+//     &:hover {
+//       .headerTextActions {
+//         transform: translateY(15%);
+//       }
+//     }
+//     .paragraphText {
+//       border-top-left-radius: $corners-radius;
+//       border-top-right-radius: $corners-radius;
+//     }
+//     .headerText {
+//       position: absolute;
+//       top: 0;
+//       background-color: rgba(255, 255, 255, 0);
+//       // transform: translateY(-100%);
+//       justify-content: flex-end;
+//     }
+//     .headerTextTitle {
+//       display: none;
+//     }
+//     .headerTextActions {
+//       transition: 0.25s;
+//       transform: translateY(-150%);
+//       margin-right: 20px;
+//     }
+//   }
+
+//   &.zero-point {
+//     visibility: hidden;
+//   }
+
+//   .media-wrapper {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//   }
+
+//   .video iframe {
+//     width: 100%;
+//     height: 100%;
+//     z-index: 1;
+//   }
+
+//   .picture-content {
+//     width: 100%;
+//     z-index: 1;
+//   }
+// }
 
 .react-wrapper {
   width: 100%;

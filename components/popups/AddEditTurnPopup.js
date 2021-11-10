@@ -94,14 +94,18 @@ const AddEditTurnPopup = () => {
 
     const resTextArr = [];
     let i = 0;
+    const paragraphQuotes =
+      turnToEdit && turnToEdit.quotes
+        ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+        : [];
     for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
         resTextArr.push(textItem);
         continue;
       }
       const quoteId =
-        !!turnToEdit && turnToEdit.quotes[i]
-          ? turnToEdit.quotes[i].id
+        !!turnToEdit && paragraphQuotes[i]
+          ? paragraphQuotes[i].id
           : (incId += 1);
       i += 1;
       resTextArr.push({
@@ -124,6 +128,7 @@ const AddEditTurnPopup = () => {
         quotes.push({
           id: textItem.attributes.id,
           text: textItem.insert,
+          type: 'text',
         });
       }
     }
@@ -155,22 +160,18 @@ const AddEditTurnPopup = () => {
       return setError({ message: 'Need text body' });
     }
 
+    const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
+
     let turnObj = {
       ...preparedForm,
-      // height: 500,
-      // width: 500,
-
-      // x: -left + freeSpaceLeftRight + 50,
-      // y: -top + freeSpaceTopBottom + 50,
       paragraph: resTextArr,
       contentType: activeTemplate,
-      quotes,
+      quotes: [
+        ...quotes,
+        ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
+      ],
     };
-
-    // if (!turnToEdit) {
-    //   turnObj.height = 600;
-    //   turnObj.width = 800;
-    // }
+    console.log(turnObj);
 
     if (!!turnToEdit) {
       turnObj.x = -zeroPointX + turnToEdit.x;
@@ -181,13 +182,6 @@ const AddEditTurnPopup = () => {
         const deletedQuotes = prevQuotes.slice(quotes.length);
         // @todo: удалить связи, которые содержат эти цитаты
       }
-
-      // const quoteIds = quotes.map((quote) => +quote.id); // map в любом случае возвращает массив
-      // const quoteIdsToDelete = prevQuotes
-      //   .filter((quote) => {
-      //     return !quoteIds.includes(+quote.id); // + это то же самое что parseFloat
-      //   })
-      //   .map((quote) => quote.id);
 
       updateTurn(turnToEdit._id, turnObj, {
         successCallback: (data) => {

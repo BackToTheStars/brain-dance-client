@@ -88,6 +88,7 @@ const Line = ({
   stroke = 'red',
   strokeWidth = lineThickness,
 }) => {
+  // console.log({ prevSourceCoords });
   const sourceCoords = {
     ...prevSourceCoords,
     right: prevSourceCoords.left + prevSourceCoords.width,

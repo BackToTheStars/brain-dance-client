@@ -4,14 +4,20 @@ import { useUserContext } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
 
 const cutTextToSize = (text, size) => {
-  console.log(text, size);
+  // console.log(text, size);
   if (text.length < size + 3) return text;
   return text.slice(0, size) + '...';
 };
 
 const QuotesPanel = () => {
-  const { dispatch, activeQuote, lineEnds, quotesInfo, deleteLines } =
-    useTurnContext();
+  const {
+    dispatch,
+    activeQuote,
+    lineEnds,
+    quotesInfo,
+    deleteLines,
+    pictureQuotesInfo,
+  } = useTurnContext();
   const [quotesOutOfScreenInfo, setQuotesOutOfScreenInfo] = useState({});
   const [preparedLines, setPreparedLines] = useState([]);
   const {
@@ -42,15 +48,24 @@ const QuotesPanel = () => {
       ? lineEnds[`${activeQuote.turnId}_${activeQuote.quoteId}`]
       : null;
     const lines = clickedQuoteInfo ? clickedQuoteInfo.lines : [];
+
     const preparedLines = lines.map((line) => {
       let turnIdOutOfScreen = null;
-      let sourceQuoteInfo = {};
-      let targetQuoteInfo = {};
+      let sourceQuoteInfo = null;
+      let targetQuoteInfo = null;
+
       if (!!quotesInfo[line.sourceTurnId]) {
         sourceQuoteInfo = quotesInfo[line.sourceTurnId].find(
           (quoteInfo) => line.sourceMarker === quoteInfo.quoteId
         );
-      } else {
+      }
+      if (!!pictureQuotesInfo[line.sourceTurnId] && !sourceQuoteInfo) {
+        sourceQuoteInfo = pictureQuotesInfo[line.sourceTurnId].find(
+          (pictureQuotesInfo) => line.sourceMarker === pictureQuotesInfo.quoteId
+        );
+      }
+      if (!sourceQuoteInfo) {
+        sourceQuoteInfo = {};
         turnIdOutOfScreen = line.sourceTurnId;
       }
 
@@ -58,7 +73,14 @@ const QuotesPanel = () => {
         targetQuoteInfo = quotesInfo[line.targetTurnId].find(
           (quoteInfo) => line.targetMarker === quoteInfo.quoteId
         );
-      } else {
+      }
+      if (!!pictureQuotesInfo[line.targetTurnId] && !targetQuoteInfo) {
+        targetQuoteInfo = pictureQuotesInfo[line.targetTurnId].find(
+          (pictureQuotesInfo) => line.targetMarker === pictureQuotesInfo.quoteId
+        );
+      }
+      if (!targetQuoteInfo) {
+        targetQuoteInfo = {};
         turnIdOutOfScreen = line.targetTurnId;
       }
 
@@ -77,7 +99,6 @@ const QuotesPanel = () => {
         setPreparedLines(
           preparedLines.map((line) => {
             if (!!line.turnIdOutOfScreen) {
-              debugger;
               // загружаем цитаты хода который не видно в области видимости
               const turnOutOfScreen = data.items.find(
                 (turn) => turn._id === line.turnIdOutOfScreen
@@ -103,8 +124,10 @@ const QuotesPanel = () => {
         );
       });
     }
-    console.log(turnIdsOutOfScreen);
+    // console.log(turnIdsOutOfScreen);
   }, [activeQuote]);
+
+  // console.log(preparedLines);
 
   return (
     <div

@@ -3,6 +3,8 @@ import { useState, useContext, createContext } from 'react';
 export const MainContext = createContext();
 
 export const MainProvider = ({ children }) => {
+  //
+
   const showConfirmDialog = ({ text, okCallback }) => {
     if (confirm(text)) {
       okCallback();

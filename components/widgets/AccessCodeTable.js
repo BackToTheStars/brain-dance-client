@@ -12,14 +12,14 @@ const AccessCodesTable = ({ mode = 'dark', codes = [], newAccessCode }) => {
       </thead>
       <tbody>
         {codes.map((code) => {
-          console.log({ newAccessCode, code });
+          // console.log({ newAccessCode, code });
           return (
             <tr
               key={code.hash}
               className={
-                !!newAccessCode &&
-                newAccessCode === code.hash &&
-                'table-primary text-dark'
+                !!newAccessCode && newAccessCode === code.hash
+                  ? 'table-primary text-dark'
+                  : ''
               }
             >
               <td>{ROLES[code.role].name}</td>
