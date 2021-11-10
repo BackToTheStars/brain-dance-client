@@ -5,11 +5,13 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
   INTERACTION_ADD_OR_EDIT_QUOTE,
 } from '../InteractionContext';
+import { ACTION_QUOTE_CANCEL } from '../TurnContext';
 
 export const usePictureMode = ({
   setInteractionType,
   setInteractionMode,
   makeWidgetActive,
+  dispatch,
 }) => {
   const { can } = useUserContext();
 
@@ -17,6 +19,7 @@ export const usePictureMode = ({
     {
       text: 'Add Area',
       callback: () => {
+        dispatch({ type: ACTION_QUOTE_CANCEL });
         setInteractionType(INTERACTION_ADD_OR_EDIT_QUOTE);
         setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ADD);
       },

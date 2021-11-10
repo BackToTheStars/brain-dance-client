@@ -47,6 +47,7 @@ export const InteractionProvider = ({ children }) => {
       setInteractionType,
       setInteractionMode,
       makeWidgetActive,
+      dispatch,
     }),
     [MODE_WIDGET_PICTURE_QUOTE_ADD]: usePictureQuoteAdd({
       setInteractionMode,

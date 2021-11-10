@@ -1,6 +1,9 @@
 import { quoteRectangleThickness } from '../../сonst';
 import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnContext';
-import { MODE_WIDGET_PICTURE_QUOTE_ACTIVE } from '../../contexts/InteractionContext';
+import {
+  MODE_GAME,
+  MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
+} from '../../contexts/InteractionContext';
 
 const PictureQuotes = ({
   turnId,
@@ -24,12 +27,12 @@ const PictureQuotes = ({
         //   debugger;
         // }
         // let bordered = false;
-        let outline = `${quoteRectangleThickness}px solid grey`;
-        if (
+        const isQuoteActive =
           activeQuote &&
           activeQuote.turnId === turnId &&
-          activeQuote.quoteId === quote.id
-        ) {
+          activeQuote.quoteId === quote.id;
+        let outline = `${quoteRectangleThickness}px solid grey`;
+        if (isQuoteActive) {
           bordered = true;
         }
         if (bordered) {
@@ -52,7 +55,11 @@ const PictureQuotes = ({
             }}
             onClick={() => {
               onQuoteClick(quote.id);
-              setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ACTIVE);
+              if (isQuoteActive) {
+                setInteractionMode(MODE_GAME);
+              } else {
+                setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ACTIVE);
+              }
             }}
           />
         );

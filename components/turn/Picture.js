@@ -29,6 +29,7 @@ const Picture = ({
   interactionType,
   setInteractionMode,
   savePictureQuote,
+  updatePictureQuote,
   dispatch,
   activeQuote,
   lineEnds,
@@ -96,9 +97,17 @@ const Picture = ({
       const x = getPercentage(crop.x, imgEl.current.width);
       const y = getPercentage(crop.y, imgEl.current.height);
 
-      savePictureQuote(
+      let id = Math.floor(new Date().getTime() / 1000);
+      let updateFunction = savePictureQuote;
+
+      if (!!activeQuote) {
+        id = activeQuote.quoteId;
+        updateFunction = updatePictureQuote;
+      }
+
+      updateFunction(
         {
-          id: Math.floor(new Date().getTime() / 1000),
+          id,
           type: 'picture',
           x,
           y,
@@ -121,7 +130,9 @@ const Picture = ({
   useEffect(() => {
     if (isActive && interactionType === INTERACTION_ADD_OR_EDIT_QUOTE) {
       if (!!activeQuote) {
-        setCrop({ unit: '%', x: 10, y: 10, width: 20, height: 20 });
+        const quote = quotes.find((quote) => quote.id === activeQuote.quoteId);
+        const { x, y, height, width } = quote;
+        setCrop({ unit: '%', x, y, width, height });
       } else {
         setCrop({
           unit: '%',
@@ -223,7 +234,11 @@ const Picture = ({
 
       <PictureQuotes
         turnId={turnId}
-        quotes={quotes}
+        quotes={
+          interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
+            ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
+            : quotes
+        }
         dispatch={dispatch}
         activeQuote={activeQuote}
         lineEnds={lineEnds}

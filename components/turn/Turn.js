@@ -355,6 +355,31 @@ const TurnNewComponent = ({
               },
             });
           }}
+          updatePictureQuote={(pictureQuote, successCallback) => {
+            // @todo: DRY
+            const { x: zeroPointX, y: zeroPointY } = zeroPoint;
+            const turnBody = {
+              quotes: quotes.map((quote) => {
+                if (quote.id === pictureQuote.id) {
+                  return pictureQuote;
+                } else return quote;
+              }),
+            };
+            updateTurn(_id, turnBody, {
+              successCallback: (data) => {
+                dispatch({
+                  type: ACTION_TURN_WAS_CHANGED,
+                  payload: {
+                    ...data.item,
+                    x: data.item.x + zeroPointX,
+                    y: data.item.y + zeroPointY,
+                    quotes: data.item.quotes,
+                  },
+                });
+                successCallback();
+              },
+            });
+          }}
           makeWidgetActive={() => {
             setInteractionMode(MODE_WIDGET_PICTURE); // говорим набор кнопок для панели справа
             makeWidgetActive(_id, WIDGET_PICTURE, 'picture1'); // (turnId, widgetType, widgetId)
