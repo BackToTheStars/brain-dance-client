@@ -33,6 +33,7 @@ const TurnNewComponent = ({
   saveTurnInBuffer,
   getTurnFromBufferAndRemove,
   addNotification,
+  tempMiddlewareFn,
 }) => {
   const { _id, x, y, width, height } = turn;
   const {
@@ -145,6 +146,10 @@ const TurnNewComponent = ({
       id: quote.id,
       type: quote.type,
       text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+      x: quote.x,
+      y: quote.y,
+      height: quote.height,
+      width: quote.width,
     }));
     const fieldsToKeep = [
       'header',
@@ -182,13 +187,19 @@ const TurnNewComponent = ({
   const handleDelete = (e) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
+      tempMiddlewareFn(
+        { type: ACTION_DELETE_TURN, payload: { _id } },
+        {
+          successCallback: () => {
+            deleteTurn(_id, {
+              successCallback: () => {
+                dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+              },
+            });
+          },
+        }
+      );
       // confirm - глобальная функция браузера
-      deleteTurn(_id, {
-        successCallback: () => {
-          dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
-          tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { _id } });
-        },
-      });
 
       //alert('button_delete_clicked');
     }

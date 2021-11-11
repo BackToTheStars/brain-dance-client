@@ -609,25 +609,32 @@ export const TurnProvider = ({ children }) => {
   //   });
   //   }, [turns]);
 
-  const tempMiddlewareFn = (action) => {
+  const tempMiddlewareFn = (action, { successCallback }) => {
     // @todo move
     switch (action.type) {
       case ACTION_DELETE_TURN:
+        console.log(4, Math.floor(new Date().getTime()) % 10000);
         // найти линии по этому шагу
-        const linesToDelete = turnsState.lines.filter(
-          (line) =>
-            line.sourceTurnId === action.payload._id ||
-            line.targetTurnId === action.payload._id
-        );
+        const linesToDelete = turnsState.lines
+          .filter(
+            (line) =>
+              line.sourceTurnId === action.payload._id ||
+              line.targetTurnId === action.payload._id
+          )
+          .map((line) => line._id);
+
         if (!!linesToDelete.length) {
           deleteLines(
             linesToDelete.map((line) => line._id),
             {
               successCallback: () => {
+                console.log(5, Math.floor(new Date().getTime()) % 10000);
+                console.log({ linesToDelete });
                 turnsDispatch({
                   type: ACTION_LINES_DELETE,
                   payload: linesToDelete,
                 });
+                successCallback();
               },
             }
           );
