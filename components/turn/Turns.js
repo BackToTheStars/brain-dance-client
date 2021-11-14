@@ -16,6 +16,7 @@ const TurnsComponent = () => {
     tempMiddlewareFn,
     lineEnds,
     activeQuote,
+    lines,
   } = useTurnContext();
   const { can, saveTurnInBuffer, getTurnFromBufferAndRemove } =
     useUserContext(); // @todo замерять производительность
@@ -69,6 +70,7 @@ const TurnsComponent = () => {
                 saveTurnInBuffer,
                 getTurnFromBufferAndRemove,
                 addNotification,
+                lines,
               }}
             />
           );

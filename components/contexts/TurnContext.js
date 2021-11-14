@@ -347,12 +347,12 @@ export const TurnProvider = ({ children }) => {
   const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
 
   const insertTurnFromBuffer = ({ successCallback, errorCallback }) => {
-    const turn = getTurnFromBufferAndRemove();
-    if (!turn) {
+    const { copiedTurn, copiedLines } = getTurnFromBufferAndRemove();
+    if (!copiedTurn) {
       errorCallback('No turn in buffer');
       return false;
     }
-    createTurn(turn, { successCallback, errorCallback });
+    createTurn(copiedTurn, { successCallback, errorCallback });
   };
 
   const createTurn = (turn, { successCallback, errorCallback }) => {
@@ -613,7 +613,6 @@ export const TurnProvider = ({ children }) => {
     // @todo move
     switch (action.type) {
       case ACTION_DELETE_TURN:
-        console.log(4, Math.floor(new Date().getTime()) % 10000);
         // найти линии по этому шагу
         const linesToDelete = turnsState.lines
           .filter(
@@ -628,8 +627,6 @@ export const TurnProvider = ({ children }) => {
             linesToDelete.map((line) => line._id),
             {
               successCallback: () => {
-                console.log(5, Math.floor(new Date().getTime()) % 10000);
-                console.log({ linesToDelete });
                 turnsDispatch({
                   type: ACTION_LINES_DELETE,
                   payload: linesToDelete,
@@ -638,7 +635,7 @@ export const TurnProvider = ({ children }) => {
               },
             }
           );
-        }
+        } else successCallback();
         break;
     }
   };

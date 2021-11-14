@@ -10,6 +10,7 @@ const Header = ({
   handleDelete,
   handleEdit,
   handleClone,
+  handleCut,
   registerHandleResize,
   dontShowHeader,
 }) => {
@@ -32,6 +33,14 @@ const Header = ({
     <h5 className="headerText" ref={headerEl} style={style}>
       <div className="headerTextTitle">{header}</div>
       <div className="headerTextActions">
+        {can(RULE_TURNS_CRUD) && (
+          <>
+            <a key="cut" className="cut-btn" onClick={handleCut}>
+              <i className="fas fa-cut"></i>
+            </a>
+          </>
+        )}
+
         <a key="clone" className="clone-btn" onClick={handleClone}>
           <i className="fas fa-clone"></i>
         </a>

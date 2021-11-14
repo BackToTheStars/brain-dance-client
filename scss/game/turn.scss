@@ -199,6 +199,7 @@ $black-color: rgb(0, 0, 0);
 
   .clone-btn,
   .edit-btn,
+  .cut-btn,
   .delete-btn {
     transition: 0.2s;
     font-size: 22px;
@@ -209,6 +210,7 @@ $black-color: rgb(0, 0, 0);
 
   a.delete-btn,
   a.edit-btn,
+  a.cut-btn,
   a.clone-btn {
     font-size: 21px;
     position: relative;
@@ -217,13 +219,13 @@ $black-color: rgb(0, 0, 0);
     color: rgb(160, 160, 160);
     margin-top: 0px;
   }
-  a.clone-btn:hover {
-    color: rgb(58, 58, 58);
-  }
+  a.clone-btn:hover,
   a.edit-btn:hover {
     color: rgb(58, 58, 58);
   }
-  a.delete-btn:hover {
+
+  a.delete-btn:hover,
+  a.cut-btn:hover {
     color: rgb(255, 92, 92);
   }
 }

@@ -34,6 +34,7 @@ const TurnNewComponent = ({
   getTurnFromBufferAndRemove,
   addNotification,
   tempMiddlewareFn,
+  lines,
 }) => {
   const { _id, x, y, width, height } = turn;
   const {
@@ -138,6 +139,15 @@ const TurnNewComponent = ({
   // x: 1096.85546875
   // y: 537.890625
 
+  const handleCut = async (e) => {
+    e.preventDefault();
+    if (confirm('Точно вырезать?')) {
+      handleClone(e);
+      // confirm - глобальная функция браузера
+      _deleteTurnAndLines();
+    }
+  };
+
   const handleClone = async (e) => {
     e.preventDefault();
     const copiedTurn = dataCopy(turn);
@@ -151,7 +161,11 @@ const TurnNewComponent = ({
       height: quote.height,
       width: quote.width,
     }));
+
+    copiedTurn.originalId = copiedTurn._id;
+
     const fieldsToKeep = [
+      'originalId',
       'header',
       'dontShowHeader',
       'imageUrl',
@@ -169,7 +183,25 @@ const TurnNewComponent = ({
       'width',
     ];
     fieldRemover(copiedTurn, fieldsToKeep); // передали {ход} и [сохраняемые поля]
-    saveTurnInBuffer(copiedTurn); // сохранили turn в LocalStorage
+
+    const linesFieldsToKeep = [
+      'sourceMarker',
+      'sourceTurnId',
+      'targetMarker',
+      'targetTurnId',
+      'type',
+    ];
+
+    const copiedLines = dataCopy(
+      lines.filter(
+        (line) =>
+          line.sourceTurnId === copiedTurn.originalId ||
+          line.targetTurnId === copiedTurn.originalId
+      )
+    );
+    copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
+
+    saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
     addNotification({
       title: 'Info:',
       text: 'Turn was copied, ready to paste',
@@ -184,24 +216,26 @@ const TurnNewComponent = ({
     // alert('button_edit_clicked');
   };
 
+  const _deleteTurnAndLines = () => {
+    tempMiddlewareFn(
+      { type: ACTION_DELETE_TURN, payload: { _id } },
+      {
+        successCallback: () => {
+          deleteTurn(_id, {
+            successCallback: () => {
+              dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+            },
+          });
+        },
+      }
+    );
+  };
+
   const handleDelete = (e) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
-      tempMiddlewareFn(
-        { type: ACTION_DELETE_TURN, payload: { _id } },
-        {
-          successCallback: () => {
-            deleteTurn(_id, {
-              successCallback: () => {
-                dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
-              },
-            });
-          },
-        }
-      );
       // confirm - глобальная функция браузера
-
-      //alert('button_delete_clicked');
+      _deleteTurnAndLines();
     }
   };
 
@@ -325,6 +359,7 @@ const TurnNewComponent = ({
         can={can}
         header={header}
         handleClone={handleClone}
+        handleCut={handleCut}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         registerHandleResize={registerHandleResize}
