@@ -41,19 +41,43 @@ export const UserProvider = ({ children, hash, timecode }) => {
     window.location.reload(); // перезагружаем игру по тому же адресу
   };
 
-  const [isTurnInBuffer, setIsTurnInBuffer] = useState(
-    !!loadFromLocalStorage('saved_turn')
+  const [timeStamps, setTimeStamps] = useState(
+    loadFromLocalStorage('timeStamps') || []
   );
 
-  const saveTurnInBuffer = (turn) => {
-    saveIntoLocalStorage(turn, 'saved_turn');
-    setIsTurnInBuffer(true);
+  const addTimeStamp = () => {
+    const timeStamp = new Date().getTime(); // значение в мс после 1 января 1970 года
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    timeStamps.push(timeStamp);
+    saveIntoLocalStorage(timeStamps, 'timeStamps');
+    setTimeStamps(timeStamps);
+    return { timeStamp, timeStamps };
   };
 
-  const getTurnFromBufferAndRemove = (turn) => {
-    const res = loadFromLocalStorage('saved_turn');
-    removeFromLocalStorage('saved_turn');
-    setIsTurnInBuffer(false);
+  const addLinesToStorage = (octopusLines) => {
+    const lines = loadFromLocalStorage('savedLinesToPaste') || {};
+    for (let line of octopusLines) {
+      // @learn: of для массива, in для объекта по ключам, Object.keys и Object.values
+      // создать lineKey
+      // добавить по этому ключу новую запись с expires
+    }
+    // сохранить в localStorage, обновить state
+  };
+
+  const saveTurnInBuffer = ({ copiedTurn, copiedLines }) => {
+    const { timeStamp } = addTimeStamp();
+    saveIntoLocalStorage(copiedTurn, `turn_${timeStamp}`);
+    addLinesToStorage(copiedLines);
+    return timeStamp;
+  };
+
+  const getTurnFromBufferAndRemove = (timeStamp) => {
+    const res = loadFromLocalStorage(`turn_${timeStamp}`);
+    removeFromLocalStorage(`turn_${timeStamp}`);
+    let timeStamps = loadFromLocalStorage('timeStamps') || [];
+    timeStamps = timeStamps.filter((item) => item !== timeStamp);
+    saveIntoLocalStorage(timeStamps, 'timeStamps');
+    setTimeStamps(timeStamps);
     return res;
   };
 
@@ -114,7 +138,8 @@ export const UserProvider = ({ children, hash, timecode }) => {
     request,
     saveTurnInBuffer,
     getTurnFromBufferAndRemove,
-    isTurnInBuffer,
+    isTurnInBuffer: !!timeStamps.length,
+    timeStamps,
     logOut,
   };
 

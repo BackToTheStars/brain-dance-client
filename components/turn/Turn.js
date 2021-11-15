@@ -31,7 +31,6 @@ const TurnNewComponent = ({
   updateTurn,
   deleteTurn,
   saveTurnInBuffer,
-  getTurnFromBufferAndRemove,
   addNotification,
   tempMiddlewareFn,
   lines,
