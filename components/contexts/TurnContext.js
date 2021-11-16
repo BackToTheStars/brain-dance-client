@@ -338,6 +338,7 @@ export const TurnProvider = ({ children }) => {
     info: { hash },
     timeStamps,
     getTurnFromBufferAndRemove,
+    savedLinesToPaste,
   } = useUserContext();
   const {
     minimapDispatch,
@@ -356,7 +357,12 @@ export const TurnProvider = ({ children }) => {
       return false;
     }
     // @todo: get lines, connected with copied turn and display them
-    createTurn(copiedTurn, { successCallback, errorCallback });
+    createTurn(copiedTurn, {
+      successCallback: (turn) => {
+        console.log({ copiedTurn, turn, savedLinesToPaste });
+      },
+      errorCallback,
+    });
   };
 
   const createTurn = (turn, { successCallback, errorCallback }) => {

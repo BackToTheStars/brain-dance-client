@@ -161,7 +161,8 @@ const TurnNewComponent = ({
       width: quote.width,
     }));
 
-    copiedTurn.originalId = copiedTurn._id;
+    copiedTurn.originalId = copiedTurn.originalId || copiedTurn._id;
+    const copiedTurnId = copiedTurn._id;
 
     const fieldsToKeep = [
       'originalId',
@@ -194,8 +195,8 @@ const TurnNewComponent = ({
     const copiedLines = dataCopy(
       lines.filter(
         (line) =>
-          line.sourceTurnId === copiedTurn.originalId ||
-          line.targetTurnId === copiedTurn.originalId
+          line.sourceTurnId === copiedTurnId ||
+          line.targetTurnId === copiedTurnId
       )
     );
     copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));

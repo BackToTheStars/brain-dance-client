@@ -32,6 +32,12 @@ export const UserProvider = ({ children, hash, timecode }) => {
   // token
   guestUser.info.hash = hash;
   const { info, token } = getGameInfo(hash) || guestUser;
+  const [savedLinesToPaste, setSavedLinesToPaste] = useState(
+    typeof window !== 'undefined'
+      ? loadFromLocalStorage('savedLinesToPaste') || {}
+      : {}
+  );
+
   const can = function (rule) {
     return checkRuleByRole(rule, info.role);
   };
@@ -55,13 +61,21 @@ export const UserProvider = ({ children, hash, timecode }) => {
   };
 
   const addLinesToStorage = (octopusLines) => {
-    const lines = loadFromLocalStorage('savedLinesToPaste') || {};
+    const lines = { ...savedLinesToPaste };
     for (let line of octopusLines) {
+      const { sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
       // @learn: of для массива, in для объекта по ключам, Object.keys и Object.values
       // создать lineKey
+      const lineKey = `${sourceTurnId}_${sourceMarker}_${targetTurnId}_${targetMarker}`;
       // добавить по этому ключу новую запись с expires
+      lines[lineKey] = {
+        ...line,
+        expires: Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60, // + неделя
+      };
     }
     // сохранить в localStorage, обновить state
+    saveIntoLocalStorage(lines, 'savedLinesToPaste');
+    setSavedLinesToPaste(lines);
   };
 
   const saveTurnInBuffer = ({ copiedTurn, copiedLines }) => {
@@ -141,6 +155,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
     isTurnInBuffer: !!timeStamps.length,
     timeStamps,
     logOut,
+    savedLinesToPaste,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
