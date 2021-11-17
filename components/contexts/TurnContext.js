@@ -358,8 +358,48 @@ export const TurnProvider = ({ children }) => {
     }
     // @todo: get lines, connected with copied turn and display them
     createTurn(copiedTurn, {
-      successCallback: (turn) => {
+      successCallback: (data) => {
+        const turn = data.item;
         console.log({ copiedTurn, turn, savedLinesToPaste });
+        // оставить только те линии, которые связаны с turn по originalId
+        const sourceLines = [];
+        const targetLines = [];
+        const turnsDict = {};
+        const lineKeys = Object.keys(savedLinesToPaste)
+          .filter((lineKey) => lineKey.indexOf(`${turn.originalId}`) !== -1)
+          .forEach((lineKey) => {
+            console.log(lineKey);
+            // составить набор id из противоположных концов линий
+            const line = savedLinesToPaste[lineKey];
+            if (line.sourceTurnId === turn.originalId) {
+              sourceLines.push(line);
+              turnsDict[line.targetTurnId] = [];
+            } else {
+              targetLines.push(line);
+              turnsDict[line.sourceTurnId] = [];
+            }
+          });
+        console.log({ turnsDict, sourceLines, targetLines });
+        // найти все шаги игры, которые имеют id или originalId из набора
+        // {
+        //   <turnId>: [
+        //     {_id: <turnId>, ...},
+        //     {_id: <turnId2>, originalId: <turnId>...},
+        //     {_id: <turnId3>, originalId: <turnId>...},
+        //     {_id: <turnId4>, originalId: <turnId>...},
+        //   ]
+        // }
+        for (let turn of turns) {
+          if (turnsDict[turn._id]) {
+            turnsDict[turn._id].push(turn);
+          }
+          if (turnsDict[turn.originalId]) {
+            turnsDict[turn.originalId].push(turn);
+          }
+        }
+        console.log({ turnsDict });
+        // ещё раз отфильтровать линии, оставить только те, что с двумя концами
+        // преобразовать sourceTurnId и targetTurnId и вставить линии
       },
       errorCallback,
     });

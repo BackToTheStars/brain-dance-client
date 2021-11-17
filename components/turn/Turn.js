@@ -161,7 +161,7 @@ const TurnNewComponent = ({
       width: quote.width,
     }));
 
-    copiedTurn.originalId = copiedTurn.originalId || copiedTurn._id;
+    copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
     const copiedTurnId = copiedTurn._id;
 
     const fieldsToKeep = [

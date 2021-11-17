@@ -73,7 +73,7 @@ const Picture = ({
         position: 'default',
       };
     });
-    console.log({ newQuotes });
+    // console.log({ newQuotes });
     dispatch({
       type: ACTION_PICTURE_QUOTE_COORDS_UPDATED,
       payload: { turnId, pictureQuotesInfo: newQuotes },
@@ -81,7 +81,7 @@ const Picture = ({
   };
 
   useEffect(() => {
-    console.log('1', { allTurnQuotes });
+    // console.log('1', { allTurnQuotes });
     quoteCoordinatesChanged(
       allTurnQuotes.filter((quote) => quote.type === 'picture')
     );
@@ -192,11 +192,11 @@ const Picture = ({
           return newImgHeight;
         },
         resizeCallback: () => {
-          console.log('3');
+          // console.log('3');
           quoteCoordinatesChanged(quotes);
         },
       });
-      console.log('4');
+      // console.log('4');
 
       quoteCoordinatesChanged(quotes);
       // imgEl.current.addEventListener('resize', quoteCoordinCatesChanged);
