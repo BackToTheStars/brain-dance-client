@@ -30,6 +30,7 @@ export const ACTION_LINES_INIT = 'action_lines_init';
 export const ACTION_LINES_DELETE = 'action_lines_delete';
 export const ACTION_LINE_SENT_TO_BACKEND = 'action_line_sent_to_backend';
 export const ACTION_LINE_CREATED = 'action_line_created';
+export const ACTION_LINES_CREATE = 'action_lines_create';
 export const ACTION_RECALCULATE_LINES = 'action_recalculate_lines';
 
 const turnsInitialState = {
@@ -212,6 +213,13 @@ const turnsReducer = (state, action) => {
       };
     }
 
+    case ACTION_LINES_CREATE: {
+      return {
+        ...state,
+        lines: [...state.lines, ...action.payload],
+      };
+    }
+
     case ACTION_LINES_INIT: {
       return {
         ...state,
@@ -241,6 +249,7 @@ const turnsReducer = (state, action) => {
         lines: [...state.lines, action.payload],
       };
     }
+
     case ACTION_RECALCULATE_LINES: {
       return {
         ...state,
@@ -399,6 +408,39 @@ export const TurnProvider = ({ children }) => {
         }
         console.log({ turnsDict });
         // ещё раз отфильтровать линии, оставить только те, что с двумя концами
+        const lines = [];
+        for (let sourceLine of sourceLines) {
+          if (turnsDict[sourceLine.targetTurnId]?.length) {
+            // @learn массив есть и он не пустой
+            for (let targetTurn of turnsDict[sourceLine.targetTurnId]) {
+              lines.push({
+                ...sourceLine,
+                sourceTurnId: turn._id,
+                targetTurnId: targetTurn._id,
+              });
+            }
+          }
+        }
+
+        for (let targetLine of targetLines) {
+          if (turnsDict[targetLine.sourceTurnId]?.length) {
+            // @learn массив есть и он не пустой
+            for (let sourceTurn of turnsDict[targetLine.sourceTurnId]) {
+              lines.push({
+                ...targetLine,
+                targetTurnId: turn._id,
+                sourceTurnId: sourceTurn._id,
+              });
+            }
+          }
+        }
+        createLines(lines, {
+          successCallback: (data) => {
+            turnsDispatch({ type: ACTION_LINES_CREATE, payload: data.items });
+          },
+        });
+        console.log(lines);
+
         // преобразовать sourceTurnId и targetTurnId и вставить линии
       },
       errorCallback,
@@ -415,7 +457,6 @@ export const TurnProvider = ({ children }) => {
     createTurnRequest(turn, {
       successCallback: (data) => {
         // setCreateEditTurnPopupIsHidden(true);
-        successCallback(data);
         turnsDispatch({
           type: ACTION_TURN_CREATED,
           payload: {
@@ -424,6 +465,7 @@ export const TurnProvider = ({ children }) => {
             y: data.item.y + zeroPointY,
           },
         });
+        successCallback(data);
       },
       errorCallback,
     });
@@ -568,13 +610,13 @@ export const TurnProvider = ({ children }) => {
     });
   };
 
-  const createLine = (lineToAdd, callbacks = {}) => {
+  const createLines = (linesToAdd, callbacks = {}) => {
     request(
       `lines?hash=${hash}`,
       {
         method: 'POST',
         tokenFlag: true,
-        body: lineToAdd,
+        body: { lines: linesToAdd },
       },
       {
         successCallback: (data) => {
@@ -604,9 +646,9 @@ export const TurnProvider = ({ children }) => {
   useEffect(() => {
     if (!lineToAdd) return;
     turnsDispatch({ type: ACTION_LINE_SENT_TO_BACKEND });
-    createLine(lineToAdd, {
+    createLines([lineToAdd], {
       successCallback: (data) => {
-        turnsDispatch({ type: ACTION_LINE_CREATED, payload: data.item });
+        turnsDispatch({ type: ACTION_LINE_CREATED, payload: data.items[0] });
       },
     });
   }, [lineToAdd]);

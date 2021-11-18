@@ -90,7 +90,7 @@ const Picture = ({
   useEffect(() => {
     if (!isActive) return;
     if (interactionType === INTERACTION_ADD_OR_EDIT_QUOTE) {
-      console.log('crop saved! ', crop);
+      // console.log('crop saved! ', crop);
       if (!crop.width || !crop.height) return;
       const width = getPercentage(crop.width, imgEl.current.width);
       const height = getPercentage(crop.height, imgEl.current.height);
