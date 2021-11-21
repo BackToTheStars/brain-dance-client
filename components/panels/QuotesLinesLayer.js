@@ -32,7 +32,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         }}
       >
         {linesWithEndCoords.map((lineWithEndCoords) => {
-          console.log(lineWithEndCoords.line._id);
+          // console.log(lineWithEndCoords.line._id);
           return (
             <Line
               key={lineWithEndCoords.line._id}

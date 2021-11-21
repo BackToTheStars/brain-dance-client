@@ -4,6 +4,7 @@ import { usePictureMode } from './interaction-hooks/usePictureMode';
 import { usePictureQuoteAdd } from './interaction-hooks/usePictureQuoteAdd';
 import { usePictureQuoteActive } from './interaction-hooks/usePictureQuoteActive';
 import { useTurnContext } from './TurnContext';
+import { useQuotes } from './panel-hooks/useQuotes';
 
 export const InteractionContext = createContext();
 export const INTERACTION_ADD_OR_EDIT_QUOTE = 'add-or-edit-quote';
@@ -29,6 +30,8 @@ export const InteractionProvider = ({ children }) => {
   const [actionsCallback, setActionsCallback] = useState(null);
 
   const { dispatch } = useTurnContext();
+
+  const { preparedLines } = useQuotes();
 
   // указываем конкретную ветку, по которой далее работаем (шаг, тип виджета, id виджета)
   const makeWidgetActive = (turnId, widgetType, widgetId) => {
@@ -63,6 +66,13 @@ export const InteractionProvider = ({ children }) => {
     }),
   };
 
+  const bottomPanelSettings = {
+    isHidden: false,
+    setIsHidden: () => {},
+    panelType: 'quotes-panel',
+    preparedLines,
+  };
+
   const value = {
     buttons: buttonSettings[interactionMode],
     activeWidget,
@@ -71,6 +81,7 @@ export const InteractionProvider = ({ children }) => {
     interactionType,
     setInteractionMode,
     actionsCallback,
+    bottomPanelSettings,
   };
 
   return (
