@@ -3,6 +3,8 @@ import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnContext';
 import {
   MODE_GAME,
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
+  PANEL_LINES,
+  useInteractionContext,
 } from '../../contexts/InteractionContext';
 
 const PictureQuotes = ({
@@ -13,6 +15,8 @@ const PictureQuotes = ({
   lineEnds,
   setInteractionMode,
 }) => {
+  const { bottomPanelSettings } = useInteractionContext();
+  const { setPanelType } = bottomPanelSettings;
   //
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
@@ -57,8 +61,10 @@ const PictureQuotes = ({
               onQuoteClick(quote.id);
               if (isQuoteActive) {
                 setInteractionMode(MODE_GAME);
+                setPanelType(null);
               } else {
                 setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ACTIVE);
+                setPanelType(PANEL_LINES);
               }
             }}
           />

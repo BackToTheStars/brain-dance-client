@@ -85,6 +85,14 @@ export const UserProvider = ({ children, hash, timecode }) => {
     return timeStamp;
   };
 
+  const getTurnsFromBuffer = () => {
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    return timeStamps.map((timeStamp) => ({
+      ...loadFromLocalStorage(`turn_${timeStamp}`),
+      timeStamp,
+    }));
+  };
+
   const getTurnFromBufferAndRemove = (timeStamp) => {
     const res = loadFromLocalStorage(`turn_${timeStamp}`);
     removeFromLocalStorage(`turn_${timeStamp}`);
@@ -156,6 +164,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
     timeStamps,
     logOut,
     savedLinesToPaste,
+    getTurnsFromBuffer,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

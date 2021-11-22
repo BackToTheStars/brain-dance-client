@@ -357,9 +357,12 @@ export const TurnProvider = ({ children }) => {
 
   const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
 
-  const insertTurnFromBuffer = ({ successCallback, errorCallback }) => {
+  const insertTurnFromBuffer = (
+    timeStamp,
+    { successCallback, errorCallback }
+  ) => {
     const copiedTurn = getTurnFromBufferAndRemove(
-      timeStamps[timeStamps.length - 1]
+      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
     );
     if (!copiedTurn) {
       errorCallback('No turn in buffer');

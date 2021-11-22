@@ -1,19 +1,22 @@
-import { useInteractionContext } from '../contexts/InteractionContext';
+import {
+  PANEL_LINES,
+  PANEL_PASTE,
+  useInteractionContext,
+} from '../contexts/InteractionContext';
 import QuotesPanel from './QuotesPanel';
 import PasteTurnPanel from './PasteTurnPanel';
 
 const BottomPanelWrapper = () => {
   // обёртка для нижней выезжающей панели
   const { bottomPanelSettings } = useInteractionContext();
-  const { isHidden, setIsHidden, panelType, preparedLines } =
-    bottomPanelSettings;
+  const { panelType, preparedLines } = bottomPanelSettings;
 
   return (
-    <div className={`${isHidden ? 'hidden' : ''} bottom-panel panel`}>
-      {panelType === 'quotes-panel' && (
+    <div className={`${!panelType ? 'hidden' : ''} bottom-panel panel`}>
+      {panelType === PANEL_LINES && (
         <QuotesPanel preparedLines={preparedLines} />
       )}
-      {panelType === 'paste-turn-panel' && <PasteTurnPanel />}
+      {panelType === PANEL_PASTE && <PasteTurnPanel />}
     </div>
   );
 };

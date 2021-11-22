@@ -18,6 +18,9 @@ export const MODE_BUTTON_PICTURE_ADD_AREA = 'widget-picture-add-area';
 export const MODE_WIDGET_PICTURE_QUOTE_ACTIVE = 'widget-picture-quote-active';
 export const MODE_BUTTON_PICTURE_MODIFY_AREA = 'widget-picture-modify-area';
 
+export const PANEL_LINES = 'panel-lines';
+export const PANEL_PASTE = 'panel-paste';
+
 //
 export const InteractionProvider = ({ children }) => {
   // ветка, по которой далее работаем (шаг, тип виджета, id виджета)
@@ -28,6 +31,8 @@ export const InteractionProvider = ({ children }) => {
   const [interactionType, setInteractionType] = useState(null);
 
   const [actionsCallback, setActionsCallback] = useState(null);
+
+  const [panelType, setPanelType] = useState(null);
 
   const { dispatch } = useTurnContext();
 
@@ -45,7 +50,9 @@ export const InteractionProvider = ({ children }) => {
   };
 
   const buttonSettings = {
-    [MODE_GAME]: useGameMode(), // @learn 'game': ...
+    [MODE_GAME]: useGameMode({
+      setPanelType,
+    }), // @learn 'game': ...
     [MODE_WIDGET_PICTURE]: usePictureMode({
       setInteractionType,
       setInteractionMode,
@@ -67,9 +74,8 @@ export const InteractionProvider = ({ children }) => {
   };
 
   const bottomPanelSettings = {
-    isHidden: false,
-    setIsHidden: () => {},
-    panelType: 'quotes-panel',
+    setPanelType,
+    panelType,
     preparedLines,
   };
 
