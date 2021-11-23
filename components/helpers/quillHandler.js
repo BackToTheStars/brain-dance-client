@@ -33,4 +33,20 @@ const getQuill = (containerSelector, toolbarSelector) => {
   };
 };
 
-export { getQuill };
+const checkIfParagraphExists = (paragraph) => {
+  return !!paragraph
+    .map((item) => item.insert)
+    .join('')
+    .trim(); // @todo: remove after quill fix
+};
+
+const paragraphToString = (paragraph, length = 200) => {
+  const text = paragraph
+    .map((item) => item.insert)
+    .join('')
+    .trim();
+
+  return text.length > length ? `${text.slice(0, length)}...` : text;
+};
+
+export { getQuill, checkIfParagraphExists, paragraphToString };

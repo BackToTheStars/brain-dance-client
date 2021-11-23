@@ -7,3 +7,17 @@
   transition: 0.2s;
   color: $white;
 }
+
+.text-cut-to-size {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.max-header {
+  max-width: 20vw;
+}
+
+.max-paragraph {
+  max-width: 20vw;
+}

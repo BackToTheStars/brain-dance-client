@@ -16,6 +16,7 @@ import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
 import { WIDGET_PICTURE } from './settings';
+import { checkIfParagraphExists } from '../helpers/quillHandler';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -81,10 +82,7 @@ const TurnNewComponent = ({
     return true;
   };
 
-  const isParagraphExist = !!paragraph
-    .map((item) => item.insert)
-    .join('')
-    .trim(); // @todo: remove after quill fix
+  const doesParagraphExist = checkIfParagraphExists(paragraph);
 
   const registerHandleResize = (widget) => {
     setWidgets((widgets) => {
@@ -331,7 +329,7 @@ const TurnNewComponent = ({
   }, []);
 
   useEffect(() => {
-    if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
+    if (widgets.length === 1 + !!imageUrl + !!videoUrl + doesParagraphExist) {
       // setTimeout(() => {
       //   // console.log(header, 'handle resize');
       //   handleResize(width, height);
@@ -440,7 +438,7 @@ const TurnNewComponent = ({
           width={width}
         />
       )}
-      {isParagraphExist && (
+      {doesParagraphExist && (
         <Paragraph
           {...{
             contentType,

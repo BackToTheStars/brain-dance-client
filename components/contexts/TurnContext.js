@@ -391,7 +391,7 @@ export const TurnProvider = ({ children }) => {
               turnsDict[line.sourceTurnId] = [];
             }
           });
-        console.log({ turnsDict, sourceLines, targetLines });
+        // console.log({ turnsDict, sourceLines, targetLines });
         // найти все шаги игры, которые имеют id или originalId из набора
         // {
         //   <turnId>: [
@@ -409,7 +409,7 @@ export const TurnProvider = ({ children }) => {
             turnsDict[turn.originalId].push(turn);
           }
         }
-        console.log({ turnsDict });
+        // console.log({ turnsDict });
         // ещё раз отфильтровать линии, оставить только те, что с двумя концами
         const lines = [];
         for (let sourceLine of sourceLines) {
@@ -437,12 +437,13 @@ export const TurnProvider = ({ children }) => {
             }
           }
         }
-        createLines(lines, {
-          successCallback: (data) => {
-            turnsDispatch({ type: ACTION_LINES_CREATE, payload: data.items });
-          },
-        });
-        console.log(lines);
+        !!lines.length &&
+          createLines(lines, {
+            successCallback: (data) => {
+              turnsDispatch({ type: ACTION_LINES_CREATE, payload: data.items });
+            },
+          });
+        // console.log(lines);
 
         // преобразовать sourceTurnId и targetTurnId и вставить линии
       },
