@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   MODE_WIDGET_PICTURE,
+  MODE_GAME,
   useInteractionContext,
 } from '../contexts/InteractionContext';
 import Header from './Header';
@@ -222,6 +223,7 @@ const TurnNewComponent = ({
           deleteTurn(_id, {
             successCallback: () => {
               dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+              setInteractionMode(MODE_GAME);
             },
           });
         },

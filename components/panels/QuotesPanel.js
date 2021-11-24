@@ -1,6 +1,8 @@
 import { useTurnContext, ACTION_LINES_DELETE } from '../contexts/TurnContext';
 import { RULE_TURNS_CRUD } from '../config';
 import { useUserContext } from '../contexts/UserContext';
+import { useEffect, useState } from 'react';
+import { useInteractionContext } from '../contexts/InteractionContext';
 
 const cutTextToSize = (text, size) => {
   // console.log(text, size);
@@ -11,6 +13,13 @@ const cutTextToSize = (text, size) => {
 const QuotesPanel = ({ preparedLines }) => {
   const { dispatch, deleteLines } = useTurnContext();
   const { can } = useUserContext();
+  const {
+    bottomPanelSettings: { setPanelType },
+  } = useInteractionContext();
+
+  const [preparedLinesCount, setPreparedLinesCount] = useState(
+    preparedLines.length
+  );
 
   // if (!activeQuote) return null; // прочитать о разнице с false
 
@@ -27,6 +36,13 @@ const QuotesPanel = ({ preparedLines }) => {
       //alert('button_delete_clicked');
     }
   };
+
+  useEffect(() => {
+    setPreparedLinesCount(preparedLines.length);
+    if (!preparedLines.length && preparedLinesCount > 0) {
+      setPanelType(null);
+    }
+  }, [preparedLines]);
 
   if (!preparedLines.length) {
     return 'no preparedLines';

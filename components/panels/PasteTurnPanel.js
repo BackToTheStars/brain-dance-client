@@ -66,7 +66,9 @@ const PasteTurnPanel = () => {
                     // className="del-btn"
                     className="btn btn-danger"
                     onClick={() => {
-                      getTurnFromBufferAndRemove(timeStamp);
+                      if (confirm('Confirm: Delete turn from buffer?')) {
+                        getTurnFromBufferAndRemove(timeStamp);
+                      }
                     }}
                   >
                     Delete

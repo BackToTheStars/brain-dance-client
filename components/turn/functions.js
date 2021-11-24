@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { PANEL_LINES } from '../contexts/InteractionContext';
 
 let incId = Math.floor(new Date().getTime() / 1000);
 
@@ -12,6 +13,7 @@ export const ParagraphTextWrapper = ({
   // paragraphScroll,
   // paragraphRect,
   turnId,
+  activeQuote,
 }) => {
   return (
     <>
@@ -38,6 +40,7 @@ export const ParagraphTextWrapper = ({
               // paragraphScroll,
               // paragraphRect,
               turnId,
+              activeQuote,
             }}
           />
         );
@@ -52,6 +55,7 @@ export const SpanTextPiece = ({
   setQuotes,
   onQuoteClick,
   updateSizeTime,
+  activeQuote,
   // paragraphHeight,
   // paragraphWidth,
   // paragraphScroll,
@@ -149,8 +153,6 @@ export const SpanTextPiece = ({
         },
       ];
     });
-    // console.log(spanFragment.current.getBoundingClientRect());
-    // console.log({ newInserts });
   }, [updateSizeTime]);
 
   return (
@@ -158,11 +160,21 @@ export const SpanTextPiece = ({
       style={textItem.attributes}
       data-id={isItQuote ? textItem.attributes.id : ''}
       onClick={() => {
-        if (isItQuote && textItem.attributes.id) {
-          onQuoteClick(textItem.attributes.id);
-          // alert(`Мой id: ${textItem.attributes.id}`);
-        }
-        // console.log(isItQuote);
+        // @todo унифицировать чтобы не расходились методы управления панелью цитат
+        // if (isItQuote && textItem.attributes.id) {
+        //   const isQuoteActive =
+        //     activeQuote &&
+        //     activeQuote.turnId === turnId &&
+        //     activeQuote.quoteId === textItem.attributes.id;
+        //   onQuoteClick(textItem.attributes.id);
+        //   if (isQuoteActive) {
+        //     setInteractionMode(MODE_GAME);
+        //     setPanelType(null);
+        //   } else {
+        //     // setInteractionMode(MODE_WIDGET_TEXT_QUOTE_ACTIVE); // @todo
+        //     setPanelType(PANEL_LINES);
+        //   }
+        // }
       }}
       ref={spanFragment}
     >
