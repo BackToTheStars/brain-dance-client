@@ -1,4 +1,10 @@
-import { useState, useContext, useReducer, createContext } from 'react';
+import {
+  useState,
+  useContext,
+  useReducer,
+  createContext,
+  useEffect,
+} from 'react';
 import { getGameInfo, removeGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
 import { API_URL } from '../config';
@@ -8,6 +14,10 @@ const guestUser = {
     nickname: 'Guest',
     role: 1, // @todo: use client constants
   },
+};
+
+const getExpirationTime = () => {
+  return Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60; // + неделя, вынести в config
 };
 
 export const UserContext = createContext();
@@ -28,14 +38,54 @@ const removeFromLocalStorage = (field) => {
 };
 
 export const UserProvider = ({ children, hash, timecode }) => {
+  const getLinesNotExpired = () => {
+    const lines = loadFromLocalStorage('savedLinesToPaste') || {};
+    const linesNotExpired = {};
+    for (const lineKey in lines) {
+      if (lines[lineKey].expires > new Date().getTime() / 1000) {
+        linesNotExpired[lineKey] = lines[lineKey];
+      }
+    }
+    if (Object.keys(linesNotExpired).length < Object.keys(lines).length)
+      saveIntoLocalStorage(linesNotExpired, 'savedLinesToPaste');
+    return linesNotExpired;
+  };
+
+  const getTurnsFromBuffer = () => {
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    return timeStamps.map((timeStamp) => ({
+      ...loadFromLocalStorage(`turn_${timeStamp}`),
+      timeStamp,
+    }));
+  };
+
+  const getTurnFromBufferAndRemove = (timeStamp) => {
+    const res = loadFromLocalStorage(`turn_${timeStamp}`);
+    removeFromLocalStorage(`turn_${timeStamp}`);
+    let timeStamps = loadFromLocalStorage('timeStamps') || [];
+    timeStamps = timeStamps.filter((item) => item !== timeStamp);
+    saveIntoLocalStorage(timeStamps, 'timeStamps');
+    setTimeStamps(timeStamps);
+    return res;
+  };
+
+  const getTimestampsNotExpired = () => {
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    const turns = getTurnsFromBuffer();
+    const timeStampsNotExpired = turns
+      .filter((turn) => {
+        if (turn.expires > new Date().getTime() / 1000) return turn;
+        getTurnFromBufferAndRemove(turn.timeStamp);
+      })
+      .map((turn) => turn.timeStamp);
+    return timeStampsNotExpired;
+  };
   // info (hash, nickname, role)
   // token
   guestUser.info.hash = hash;
   const { info, token } = getGameInfo(hash) || guestUser;
   const [savedLinesToPaste, setSavedLinesToPaste] = useState(
-    typeof window !== 'undefined'
-      ? loadFromLocalStorage('savedLinesToPaste') || {}
-      : {}
+    typeof window !== 'undefined' ? getLinesNotExpired() || {} : {}
   );
 
   const can = function (rule) {
@@ -47,9 +97,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
     window.location.reload(); // перезагружаем игру по тому же адресу
   };
 
-  const [timeStamps, setTimeStamps] = useState(
-    loadFromLocalStorage('timeStamps') || []
-  );
+  const [timeStamps, setTimeStamps] = useState([]);
 
   const addTimeStamp = () => {
     const timeStamp = new Date().getTime(); // значение в мс после 1 января 1970 года
@@ -70,7 +118,7 @@ export const UserProvider = ({ children, hash, timecode }) => {
       // добавить по этому ключу новую запись с expires
       lines[lineKey] = {
         ...line,
-        expires: Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60, // + неделя
+        expires: getExpirationTime(),
       };
     }
     // сохранить в localStorage, обновить state
@@ -80,28 +128,17 @@ export const UserProvider = ({ children, hash, timecode }) => {
 
   const saveTurnInBuffer = ({ copiedTurn, copiedLines }) => {
     const { timeStamp } = addTimeStamp();
-    saveIntoLocalStorage(copiedTurn, `turn_${timeStamp}`);
+    saveIntoLocalStorage(
+      { ...copiedTurn, expires: getExpirationTime() },
+      `turn_${timeStamp}`
+    );
     addLinesToStorage(copiedLines);
     return timeStamp;
   };
 
-  const getTurnsFromBuffer = () => {
-    const timeStamps = loadFromLocalStorage('timeStamps') || [];
-    return timeStamps.map((timeStamp) => ({
-      ...loadFromLocalStorage(`turn_${timeStamp}`),
-      timeStamp,
-    }));
-  };
-
-  const getTurnFromBufferAndRemove = (timeStamp) => {
-    const res = loadFromLocalStorage(`turn_${timeStamp}`);
-    removeFromLocalStorage(`turn_${timeStamp}`);
-    let timeStamps = loadFromLocalStorage('timeStamps') || [];
-    timeStamps = timeStamps.filter((item) => item !== timeStamp);
-    saveIntoLocalStorage(timeStamps, 'timeStamps');
-    setTimeStamps(timeStamps);
-    return res;
-  };
+  useEffect(() => {
+    setTimeStamps(getTimestampsNotExpired());
+  }, []); // выполнится после первого рендера
 
   // classes
   // получение классов
