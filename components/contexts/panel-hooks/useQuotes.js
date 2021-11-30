@@ -96,7 +96,7 @@ export const useQuotes = () => {
       });
     }
     // console.log(turnIdsOutOfScreen);
-  }, [activeQuote]);
+  }, [activeQuote, lineEnds]);
 
   return { preparedLines };
 };

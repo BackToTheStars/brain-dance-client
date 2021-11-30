@@ -209,7 +209,12 @@ const Paragraph = ({
                 setPanelType(null);
               } else {
                 // setInteractionMode(MODE_WIDGET_TEXT_QUOTE_ACTIVE); // @todo
-                setPanelType(PANEL_LINES);
+                if (
+                  lineEnds[`${quote.turnId}_${quote.quoteId}`]
+                  // && !!activeQuote
+                ) {
+                  setPanelType(PANEL_LINES);
+                }
               }
             }}
           ></div>

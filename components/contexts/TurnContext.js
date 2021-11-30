@@ -184,7 +184,7 @@ const turnsReducer = (state, action) => {
 
       return {
         ...state,
-        activeQuote: null,
+        // activeQuote: null,
         lineToAdd: {
           sourceTurnId: state.activeQuote.turnId,
           targetTurnId: turnId,
@@ -233,7 +233,7 @@ const turnsReducer = (state, action) => {
       }
       return {
         ...state,
-        activeQuote: null,
+        // activeQuote: null,
         lines: state.lines.filter((line) => !lineIds[line._id]),
       };
     }
@@ -372,7 +372,7 @@ export const TurnProvider = ({ children }) => {
     createTurn(copiedTurn, {
       successCallback: (data) => {
         const turn = data.item;
-        console.log({ copiedTurn, turn, savedLinesToPaste });
+        // console.log({ copiedTurn,  turn, savedLinesToPaste });
         // оставить только те линии, которые связаны с turn по originalId
         const sourceLines = [];
         const targetLines = [];
@@ -380,7 +380,7 @@ export const TurnProvider = ({ children }) => {
         const lineKeys = Object.keys(savedLinesToPaste)
           .filter((lineKey) => lineKey.indexOf(`${turn.originalId}`) !== -1)
           .forEach((lineKey) => {
-            console.log(lineKey);
+            // console.log(lineKey);
             // составить набор id из противоположных концов линий
             const line = savedLinesToPaste[lineKey];
             if (line.sourceTurnId === turn.originalId) {

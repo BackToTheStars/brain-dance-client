@@ -294,6 +294,10 @@ const TurnNewComponent = ({
   };
 
   useEffect(() => {
+    recalculateQuotes();
+  }, [quotes]);
+
+  useEffect(() => {
     $(wrapper.current).resizable({
       // stop: (event, ui) => {
       resize: (event, ui) => {
