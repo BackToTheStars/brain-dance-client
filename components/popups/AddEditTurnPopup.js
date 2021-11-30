@@ -79,6 +79,7 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
+    console.log({ textArr });
     const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
     const { x: zeroPointX, y: zeroPointY } = zeroPoint;
 
@@ -103,6 +104,12 @@ const AddEditTurnPopup = () => {
         resTextArr.push(textItem);
         continue;
       }
+
+      // const quoteId =
+      //   !!textItem.attributes && !!textItem.attributes.id
+      //     ? textItem.attributes.id
+      //     : (incId += 1);
+
       const quoteId =
         !!turnToEdit && paragraphQuotes[i]
           ? paragraphQuotes[i].id
@@ -171,7 +178,7 @@ const AddEditTurnPopup = () => {
         ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
       ],
     };
-    console.log(turnObj);
+    // console.log(turnObj);
 
     if (!!turnToEdit) {
       turnObj.x = -zeroPointX + turnToEdit.x;

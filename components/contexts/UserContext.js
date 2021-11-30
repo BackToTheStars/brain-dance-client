@@ -1,4 +1,10 @@
-import { useState, useContext, useReducer, createContext } from 'react';
+import {
+  useState,
+  useContext,
+  useReducer,
+  createContext,
+  useEffect,
+} from 'react';
 import { getGameInfo, removeGameInfo } from '../lib/gameToken';
 import { checkRuleByRole } from '../config';
 import { API_URL } from '../config';
@@ -8,6 +14,10 @@ const guestUser = {
     nickname: 'Guest',
     role: 1, // @todo: use client constants
   },
+};
+
+const getExpirationTime = () => {
+  return Math.floor(new Date().getTime() / 1000) + 7 * 24 * 60 * 60; // + неделя, вынести в config
 };
 
 export const UserContext = createContext();
@@ -28,10 +38,56 @@ const removeFromLocalStorage = (field) => {
 };
 
 export const UserProvider = ({ children, hash, timecode }) => {
+  const getLinesNotExpired = () => {
+    const lines = loadFromLocalStorage('savedLinesToPaste') || {};
+    const linesNotExpired = {};
+    for (const lineKey in lines) {
+      if (lines[lineKey].expires > new Date().getTime() / 1000) {
+        linesNotExpired[lineKey] = lines[lineKey];
+      }
+    }
+    if (Object.keys(linesNotExpired).length < Object.keys(lines).length)
+      saveIntoLocalStorage(linesNotExpired, 'savedLinesToPaste');
+    return linesNotExpired;
+  };
+
+  const getTurnsFromBuffer = () => {
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    return timeStamps.map((timeStamp) => ({
+      ...loadFromLocalStorage(`turn_${timeStamp}`),
+      timeStamp,
+    }));
+  };
+
+  const getTurnFromBufferAndRemove = (timeStamp) => {
+    const res = loadFromLocalStorage(`turn_${timeStamp}`);
+    removeFromLocalStorage(`turn_${timeStamp}`);
+    let timeStamps = loadFromLocalStorage('timeStamps') || [];
+    timeStamps = timeStamps.filter((item) => item !== timeStamp);
+    saveIntoLocalStorage(timeStamps, 'timeStamps');
+    setTimeStamps(timeStamps);
+    return res;
+  };
+
+  const getTimestampsNotExpired = () => {
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    const turns = getTurnsFromBuffer();
+    const timeStampsNotExpired = turns
+      .filter((turn) => {
+        if (turn.expires > new Date().getTime() / 1000) return turn;
+        getTurnFromBufferAndRemove(turn.timeStamp);
+      })
+      .map((turn) => turn.timeStamp);
+    return timeStampsNotExpired;
+  };
   // info (hash, nickname, role)
   // token
   guestUser.info.hash = hash;
   const { info, token } = getGameInfo(hash) || guestUser;
+  const [savedLinesToPaste, setSavedLinesToPaste] = useState(
+    typeof window !== 'undefined' ? getLinesNotExpired() || {} : {}
+  );
+
   const can = function (rule) {
     return checkRuleByRole(rule, info.role);
   };
@@ -41,21 +97,48 @@ export const UserProvider = ({ children, hash, timecode }) => {
     window.location.reload(); // перезагружаем игру по тому же адресу
   };
 
-  const [isTurnInBuffer, setIsTurnInBuffer] = useState(
-    !!loadFromLocalStorage('saved_turn')
-  );
+  const [timeStamps, setTimeStamps] = useState([]);
 
-  const saveTurnInBuffer = (turn) => {
-    saveIntoLocalStorage(turn, 'saved_turn');
-    setIsTurnInBuffer(true);
+  const addTimeStamp = () => {
+    const timeStamp = new Date().getTime(); // значение в мс после 1 января 1970 года
+    const timeStamps = loadFromLocalStorage('timeStamps') || [];
+    timeStamps.push(timeStamp);
+    saveIntoLocalStorage(timeStamps, 'timeStamps');
+    setTimeStamps(timeStamps);
+    return { timeStamp, timeStamps };
   };
 
-  const getTurnFromBufferAndRemove = (turn) => {
-    const res = loadFromLocalStorage('saved_turn');
-    removeFromLocalStorage('saved_turn');
-    setIsTurnInBuffer(false);
-    return res;
+  const addLinesToStorage = (octopusLines) => {
+    const lines = { ...savedLinesToPaste };
+    for (let line of octopusLines) {
+      const { sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
+      // @learn: of для массива, in для объекта по ключам, Object.keys и Object.values
+      // создать lineKey
+      const lineKey = `${sourceTurnId}_${sourceMarker}_${targetTurnId}_${targetMarker}`;
+      // добавить по этому ключу новую запись с expires
+      lines[lineKey] = {
+        ...line,
+        expires: getExpirationTime(),
+      };
+    }
+    // сохранить в localStorage, обновить state
+    saveIntoLocalStorage(lines, 'savedLinesToPaste');
+    setSavedLinesToPaste(lines);
   };
+
+  const saveTurnInBuffer = ({ copiedTurn, copiedLines }) => {
+    const { timeStamp } = addTimeStamp();
+    saveIntoLocalStorage(
+      { ...copiedTurn, expires: getExpirationTime() },
+      `turn_${timeStamp}`
+    );
+    addLinesToStorage(copiedLines);
+    return timeStamp;
+  };
+
+  useEffect(() => {
+    setTimeStamps(getTimestampsNotExpired());
+  }, []); // выполнится после первого рендера
 
   // classes
   // получение классов
@@ -114,8 +197,11 @@ export const UserProvider = ({ children, hash, timecode }) => {
     request,
     saveTurnInBuffer,
     getTurnFromBufferAndRemove,
-    isTurnInBuffer,
+    isTurnInBuffer: !!timeStamps.length,
+    timeStamps,
     logOut,
+    savedLinesToPaste,
+    getTurnsFromBuffer,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

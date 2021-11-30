@@ -18,7 +18,7 @@ import { API_URL } from './config';
 import TurnsComponent from './turn/Turns';
 import AddEditTurnPopup from './popups/AddEditTurnPopup';
 import QuotesLinesLayer from './panels/QuotesLinesLayer';
-import QuotesPanel from './panels/QuotesPanel';
+import BottomPanelWrapper from './panels/BottomPanelWrapper';
 
 // import { TurnProvider } from './contexts/TurnContext';
 
@@ -163,7 +163,7 @@ const GameComponent = () => {
         <ButtonsPanel />
         <NotificationPanel notes={notes} />
         <FlexMinimap gameBox={gameBox} />
-        <QuotesPanel />
+        <BottomPanelWrapper />
 
         {/* <div id="minimap"></div> */}
       </div>

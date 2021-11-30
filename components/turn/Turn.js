@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   MODE_WIDGET_PICTURE,
+  MODE_GAME,
   useInteractionContext,
 } from '../contexts/InteractionContext';
 import Header from './Header';
@@ -16,6 +17,7 @@ import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
 import { WIDGET_PICTURE } from './settings';
+import { checkIfParagraphExists } from '../helpers/quillHandler';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -31,8 +33,9 @@ const TurnNewComponent = ({
   updateTurn,
   deleteTurn,
   saveTurnInBuffer,
-  getTurnFromBufferAndRemove,
   addNotification,
+  tempMiddlewareFn,
+  lines,
 }) => {
   const { _id, x, y, width, height } = turn;
   const {
@@ -80,10 +83,7 @@ const TurnNewComponent = ({
     return true;
   };
 
-  const isParagraphExist = !!paragraph
-    .map((item) => item.insert)
-    .join('')
-    .trim(); // @todo: remove after quill fix
+  const doesParagraphExist = checkIfParagraphExists(paragraph);
 
   const registerHandleResize = (widget) => {
     setWidgets((widgets) => {
@@ -137,6 +137,15 @@ const TurnNewComponent = ({
   // x: 1096.85546875
   // y: 537.890625
 
+  const handleCut = async (e) => {
+    e.preventDefault();
+    if (confirm('Точно вырезать?')) {
+      handleClone(e);
+      // confirm - глобальная функция браузера
+      _deleteTurnAndLines();
+    }
+  };
+
   const handleClone = async (e) => {
     e.preventDefault();
     const copiedTurn = dataCopy(turn);
@@ -145,8 +154,17 @@ const TurnNewComponent = ({
       id: quote.id,
       type: quote.type,
       text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+      x: quote.x,
+      y: quote.y,
+      height: quote.height,
+      width: quote.width,
     }));
+
+    copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
+    const copiedTurnId = copiedTurn._id;
+
     const fieldsToKeep = [
+      'originalId',
       'header',
       'dontShowHeader',
       'imageUrl',
@@ -164,7 +182,25 @@ const TurnNewComponent = ({
       'width',
     ];
     fieldRemover(copiedTurn, fieldsToKeep); // передали {ход} и [сохраняемые поля]
-    saveTurnInBuffer(copiedTurn); // сохранили turn в LocalStorage
+
+    const linesFieldsToKeep = [
+      'sourceMarker',
+      'sourceTurnId',
+      'targetMarker',
+      'targetTurnId',
+      'type',
+    ];
+
+    const copiedLines = dataCopy(
+      lines.filter(
+        (line) =>
+          line.sourceTurnId === copiedTurnId ||
+          line.targetTurnId === copiedTurnId
+      )
+    );
+    copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
+
+    saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
     addNotification({
       title: 'Info:',
       text: 'Turn was copied, ready to paste',
@@ -179,18 +215,27 @@ const TurnNewComponent = ({
     // alert('button_edit_clicked');
   };
 
+  const _deleteTurnAndLines = () => {
+    tempMiddlewareFn(
+      { type: ACTION_DELETE_TURN, payload: { _id } },
+      {
+        successCallback: () => {
+          deleteTurn(_id, {
+            successCallback: () => {
+              dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
+              setInteractionMode(MODE_GAME);
+            },
+          });
+        },
+      }
+    );
+  };
+
   const handleDelete = (e) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
       // confirm - глобальная функция браузера
-      deleteTurn(_id, {
-        successCallback: () => {
-          dispatch({ type: ACTION_DELETE_TURN, payload: { _id } });
-          tempMiddlewareFn({ type: ACTION_DELETE_TURN, payload: { _id } });
-        },
-      });
-
-      //alert('button_delete_clicked');
+      _deleteTurnAndLines();
     }
   };
 
@@ -249,6 +294,10 @@ const TurnNewComponent = ({
   };
 
   useEffect(() => {
+    recalculateQuotes();
+  }, [quotes]);
+
+  useEffect(() => {
     $(wrapper.current).resizable({
       // stop: (event, ui) => {
       resize: (event, ui) => {
@@ -286,7 +335,7 @@ const TurnNewComponent = ({
   }, []);
 
   useEffect(() => {
-    if (widgets.length === 1 + !!imageUrl + !!videoUrl + isParagraphExist) {
+    if (widgets.length === 1 + !!imageUrl + !!videoUrl + doesParagraphExist) {
       // setTimeout(() => {
       //   // console.log(header, 'handle resize');
       //   handleResize(width, height);
@@ -314,6 +363,7 @@ const TurnNewComponent = ({
         can={can}
         header={header}
         handleClone={handleClone}
+        handleCut={handleCut}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         registerHandleResize={registerHandleResize}
@@ -394,7 +444,7 @@ const TurnNewComponent = ({
           width={width}
         />
       )}
-      {isParagraphExist && (
+      {doesParagraphExist && (
         <Paragraph
           {...{
             contentType,

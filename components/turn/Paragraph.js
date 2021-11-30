@@ -6,8 +6,13 @@ import {
   ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnContext';
 import { quoteRectangleThickness } from '../сonst';
+import {
+  MODE_GAME,
+  PANEL_LINES,
+  useInteractionContext,
+} from '../contexts/InteractionContext';
 
-const delayRenderScroll = 20;
+// const delayRenderScroll = 20;
 
 const Paragraph = ({
   contentType,
@@ -37,6 +42,11 @@ const Paragraph = ({
   const bottomQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
   }).length;
+
+  const {
+    setInteractionMode,
+    bottomPanelSettings: { setPanelType },
+  } = useInteractionContext();
 
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId: _id, quoteId } });
@@ -151,6 +161,7 @@ const Paragraph = ({
           setQuotes={setQuotesWithCoords}
           onQuoteClick={onQuoteClick}
           turnId={turnId}
+          activeQuote={activeQuote}
           // paragraphRect={
           //   !!paragraphEl && !!paragraphEl.current
           //     ? paragraphEl.current.getBoundingClientRect()
@@ -187,7 +198,25 @@ const Paragraph = ({
               ...quote,
               outline,
             }}
-            onClick={() => onQuoteClick(quote.quoteId)}
+            onClick={() => {
+              onQuoteClick(quote.quoteId);
+              const isQuoteActive =
+                activeQuote &&
+                activeQuote.turnId === turnId &&
+                activeQuote.quoteId === quote.quoteId;
+              if (isQuoteActive) {
+                setInteractionMode(MODE_GAME);
+                setPanelType(null);
+              } else {
+                // setInteractionMode(MODE_WIDGET_TEXT_QUOTE_ACTIVE); // @todo
+                if (
+                  lineEnds[`${quote.turnId}_${quote.quoteId}`]
+                  // && !!activeQuote
+                ) {
+                  setPanelType(PANEL_LINES);
+                }
+              }
+            }}
           ></div>
         );
       })}

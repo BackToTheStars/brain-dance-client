@@ -16,9 +16,9 @@ const TurnsComponent = () => {
     tempMiddlewareFn,
     lineEnds,
     activeQuote,
+    lines,
   } = useTurnContext();
-  const { can, saveTurnInBuffer, getTurnFromBufferAndRemove } =
-    useUserContext(); // @todo замерять производительность
+  const { can, saveTurnInBuffer } = useUserContext(); // @todo замерять производительность
   const {
     minimapState: { turnsToRender },
     setCreateEditTurnPopupIsHidden,
@@ -67,8 +67,8 @@ const TurnsComponent = () => {
                 activeQuote, // активная цитата, на которую кликнули мышкой
                 windowSize,
                 saveTurnInBuffer,
-                getTurnFromBufferAndRemove,
                 addNotification,
+                lines,
               }}
             />
           );

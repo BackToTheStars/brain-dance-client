@@ -31,12 +31,13 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
           setInteractionMode(MODE_GAME);
         }}
       >
-        {linesWithEndCoords.map((line, i) => {
+        {linesWithEndCoords.map((lineWithEndCoords) => {
+          // console.log(lineWithEndCoords.line._id);
           return (
             <Line
-              key={line.line._id}
-              sourceCoords={line.sourceCoords}
-              targetCoords={line.targetCoords}
+              key={lineWithEndCoords.line._id}
+              sourceCoords={lineWithEndCoords.sourceCoords}
+              targetCoords={lineWithEndCoords.targetCoords}
             />
           );
         })}

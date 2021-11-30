@@ -8,10 +8,11 @@ import { useRouter } from 'next/router';
 import { Fragment } from 'react';
 
 const Game = dynamic(() => import('../components/Game'), { ssr: false });
-const TurnContext = dynamic(
-  () => import('../components/contexts/TurnContext'),
-  { ssr: false }
-);
+// @learn
+// const TurnContext = dynamic(
+//   () => import('../components/contexts/TurnContext'),
+//   { ssr: false }
+// );
 // ssr = server side rendering
 const GamePage = () => {
   const router = useRouter();
