@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PARAGRAPH,
   MODE_GAME,
   useInteractionContext,
 } from '../contexts/InteractionContext';
@@ -16,7 +17,7 @@ import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
-import { WIDGET_PICTURE } from './settings';
+import { WIDGET_PICTURE, WIDGET_PARAGRAPH } from './settings';
 import { checkIfParagraphExists } from '../helpers/quillHandler';
 
 let timerId = null;
@@ -467,6 +468,11 @@ const TurnNewComponent = ({
             scrollPosition,
             recalculateQuotes,
             unregisterHandleResize,
+            makeWidgetActive: () => {
+              setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
+              makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
+              // делаем синюю рамку у картинки
+            },
           }}
         />
       )}

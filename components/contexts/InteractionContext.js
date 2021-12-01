@@ -1,16 +1,19 @@
 import { useState, useContext, createContext } from 'react';
 import { useGameMode } from './interaction-hooks/useGameMode';
 import { usePictureMode } from './interaction-hooks/usePictureMode';
+
 import { usePictureQuoteAdd } from './interaction-hooks/usePictureQuoteAdd';
 import { usePictureQuoteActive } from './interaction-hooks/usePictureQuoteActive';
 import { useTurnContext } from './TurnContext';
 import { useQuotes } from './panel-hooks/useQuotes';
+import { useParagraphMode } from './interaction-hooks/paragraph/useParagraphMode';
 
 export const InteractionContext = createContext();
 export const INTERACTION_ADD_OR_EDIT_QUOTE = 'add-or-edit-quote';
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
+export const MODE_WIDGET_PARAGRAPH = 'widget-paragraph';
 
 export const MODE_WIDGET_PICTURE_QUOTE_ADD = 'widget-picture-quote-add';
 export const MODE_BUTTON_PICTURE_ADD_AREA = 'widget-picture-add-area';
@@ -70,6 +73,12 @@ export const InteractionProvider = ({ children }) => {
       performActions,
       makeWidgetActive,
       dispatch,
+    }),
+    [MODE_WIDGET_PARAGRAPH]: useParagraphMode({
+      // setInteractionType,
+      setInteractionMode,
+      makeWidgetActive,
+      // dispatch,
     }),
   };
 

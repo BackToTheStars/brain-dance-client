@@ -44,6 +44,7 @@ const Header = ({
         <a key="clone" className="clone-btn" onClick={handleClone}>
           <i className="fas fa-clone"></i>
         </a>
+
         {can(RULE_TURNS_CRUD) && (
           <>
             <a key="edit" className="edit-btn" onClick={handleEdit}>

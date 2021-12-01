@@ -212,6 +212,9 @@ const AddEditTurnPopup = () => {
       createTurn(turnObj, {
         successCallback: () => {
           setCreateEditTurnPopupIsHidden(true);
+          setForm({});
+          const { quill } = quillConstants;
+          quill.setContents([]);
         },
         errorCallback: (message) => {
           setError({ message });

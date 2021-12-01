@@ -35,6 +35,7 @@ const Paragraph = ({
   scrollPosition,
   recalculateQuotes,
   turnId,
+  makeWidgetActive,
 }) => {
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'top';
@@ -171,7 +172,19 @@ const Paragraph = ({
         {!!bottomQuotesCount && (
           <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
         )}
+        <a
+          className="widget-button"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            makeWidgetActive();
+            // console.log('paragraph active!');
+          }}
+        >
+          <i className="fas fa-highlighter"></i>
+        </a>
       </p>
+
       {quotesWithCoords.map((quote, i) => {
         // все цитаты
         let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет

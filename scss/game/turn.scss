@@ -59,26 +59,27 @@ $black-color: rgb(0, 0, 0);
     img {
       width: 100%;
     }
+  }
+  .widget-button {
+    position: absolute;
+    border-radius: 25%;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    right: 20px;
+    bottom: 20px;
+    color: white;
+    opacity: 0;
+    transition: 0.3s;
+  }
+  div:hover,
+  p:hover {
     .widget-button {
-      position: absolute;
-      border-radius: 25%;
-      background-color: rgba(0, 0, 0, 0.3);
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-decoration: none;
-      right: 20px;
-      bottom: 20px;
-      color: white;
-      opacity: 0;
-      transition: 0.3s;
-    }
-    &:hover {
-      .widget-button {
-        opacity: 1;
-      }
+      opacity: 1;
     }
   }
   .video > div {
@@ -208,9 +209,10 @@ $black-color: rgb(0, 0, 0);
   .clone-btn,
   .edit-btn,
   .cut-btn,
+  .compress-btn,
   .delete-btn {
     transition: 0.2s;
-    font-size: 22px;
+    // font-size: 22px;
     display: inline-block;
     margin-left: 14px;
     cursor: pointer;
@@ -219,6 +221,7 @@ $black-color: rgb(0, 0, 0);
   a.delete-btn,
   a.edit-btn,
   a.cut-btn,
+  a.compress-btn,
   a.clone-btn {
     font-size: 21px;
     position: relative;
@@ -228,7 +231,8 @@ $black-color: rgb(0, 0, 0);
     margin-top: 0px;
   }
   a.clone-btn:hover,
-  a.edit-btn:hover {
+  a.edit-btn:hover,
+  a.compress-btn:hover {
     color: rgb(58, 58, 58);
   }
 

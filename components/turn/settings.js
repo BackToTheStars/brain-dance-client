@@ -19,6 +19,7 @@ const FIELD_BACKGROUND_COLOR = 'backgroundColor';
 const FIELD_FONT_COLOR = 'fontColor';
 
 export const WIDGET_PICTURE = 'picture';
+export const WIDGET_PARAGRAPH = 'paragraph';
 
 // по умолчанию виджет текста присутствует
 const settings = {
