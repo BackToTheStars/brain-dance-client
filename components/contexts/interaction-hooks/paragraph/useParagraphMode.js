@@ -1,9 +1,12 @@
 import { useUserContext } from '../../UserContext';
 // import { RULE_TURNS_CRUD } from '../../../config';
-import { MODE_GAME } from '../../InteractionContext';
+import {
+  MODE_GAME,
+  INTERACTION_COMPRESS_PARAGRAPH,
+} from '../../InteractionContext';
 
 export const useParagraphMode = ({
-  // setInteractionType,
+  setInteractionType,
   setInteractionMode,
   makeWidgetActive,
   // dispatch,
@@ -13,7 +16,12 @@ export const useParagraphMode = ({
   return [
     {
       text: 'Compress',
-      callback: () => {},
+      callback: () => {
+        console.log({ INTERACTION_COMPRESS_PARAGRAPH });
+        setInteractionType(INTERACTION_COMPRESS_PARAGRAPH);
+        // setInteractionMode(MODE_GAME);
+        // makeWidgetActive(null);
+      },
     },
     null,
     null,

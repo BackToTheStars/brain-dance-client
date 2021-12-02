@@ -10,6 +10,7 @@ import { useParagraphMode } from './interaction-hooks/paragraph/useParagraphMode
 
 export const InteractionContext = createContext();
 export const INTERACTION_ADD_OR_EDIT_QUOTE = 'add-or-edit-quote';
+export const INTERACTION_COMPRESS_PARAGRAPH = 'compress-paragraph';
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
@@ -75,7 +76,7 @@ export const InteractionProvider = ({ children }) => {
       dispatch,
     }),
     [MODE_WIDGET_PARAGRAPH]: useParagraphMode({
-      // setInteractionType,
+      setInteractionType,
       setInteractionMode,
       makeWidgetActive,
       // dispatch,

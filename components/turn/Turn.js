@@ -468,6 +468,7 @@ const TurnNewComponent = ({
             scrollPosition,
             recalculateQuotes,
             unregisterHandleResize,
+            isActive: isWidgetActive('paragraph'), // (widgetId)
             makeWidgetActive: () => {
               setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)

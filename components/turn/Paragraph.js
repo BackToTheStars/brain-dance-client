@@ -8,6 +8,7 @@ import {
 import { quoteRectangleThickness } from '../сonst';
 import {
   MODE_GAME,
+  INTERACTION_COMPRESS_PARAGRAPH,
   PANEL_LINES,
   useInteractionContext,
 } from '../contexts/InteractionContext';
@@ -36,6 +37,7 @@ const Paragraph = ({
   recalculateQuotes,
   turnId,
   makeWidgetActive,
+  isActive,
 }) => {
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'top';
@@ -46,6 +48,7 @@ const Paragraph = ({
 
   const {
     setInteractionMode,
+    interactionType,
     bottomPanelSettings: { setPanelType },
   } = useInteractionContext();
 
@@ -57,6 +60,15 @@ const Paragraph = ({
 
   // const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   // const [quotesLoaded, setQuotesLoaded] = useState(false);
+
+  useEffect(() => {
+    if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
+      console.log(quotesWithCoords);
+      console.log(paragraphEl.current.getBoundingClientRect());
+      console.log(paragraphEl.current.scrollTop);
+      console.log(paragraphEl.current.scrollHeight);
+    }
+  }, [isActive, interactionType]);
 
   useEffect(() => {
     if (!paragraphEl.current) return;

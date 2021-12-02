@@ -90,20 +90,20 @@ export const SpanTextPiece = ({
       //   console.log({ turnId }, turnElRect.left - paragraphElRect.left);
       // }
 
-      let isQuoteVisible = true;
+      // let isQuoteVisible = true;
 
-      if (paragraphRect) {
-        // console.log(
-        // paragraphRect.top - rect.top
-        // { rect, paragraphRect }
-        // paragraphTop - rect.top,
-        // rect.height / 2,
-        // paragraphScroll,
-        // paragraphHeight,
-        // paragraphTop + paragraphScroll,
-        // rect.top
-        // );
-      }
+      // if (paragraphRect) {
+      // console.log(
+      // paragraphRect.top - rect.top
+      // { rect, paragraphRect }
+      // paragraphTop - rect.top,
+      // rect.height / 2,
+      // paragraphScroll,
+      // paragraphHeight,
+      // paragraphTop + paragraphScroll,
+      // rect.top
+      // );
+      // }
 
       let left = rect.left - turnElRect.left;
       let top = rect.top - turnElRect.top;
@@ -112,8 +112,9 @@ export const SpanTextPiece = ({
       let position = 'default';
       const outlineWidth = 2; // ещё в Turn.js строчка 466
 
+      const initialCoords = { left, top, width, height };
+
       if (rect.top + rect.height / 2 < paragraphRect.top) {
-        // console.log('quote hidden up');
         //
         height = 0;
         width = paragraphRect.width - outlineWidth; // 2 ширины рамки
@@ -140,6 +141,7 @@ export const SpanTextPiece = ({
       return [
         ...quotes,
         {
+          initialCoords,
           quoteId,
           quoteKey: `${turnId}_${quoteId}`,
           turnId,
