@@ -63,10 +63,83 @@ const Paragraph = ({
 
   useEffect(() => {
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
-      console.log(quotesWithCoords);
-      console.log(paragraphEl.current.getBoundingClientRect());
-      console.log(paragraphEl.current.scrollTop);
-      console.log(paragraphEl.current.scrollHeight);
+      console.log({
+        height: paragraphEl.current.getBoundingClientRect().height,
+      });
+      console.log({ scrollTop: paragraphEl.current.scrollTop });
+      console.log({ scrollHeight: paragraphEl.current.scrollHeight });
+
+      const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
+        top: quote.initialCoords.top + paragraphEl.current.scrollTop,
+        height: quote.initialCoords.height,
+      }));
+
+      console.log(textQuotesVerticalPositions);
+
+      const createEmptyTextPiece = () => ({
+        quotes: [],
+        height: 0,
+        top: 0,
+        scrollHeight: 0,
+      });
+
+      const textPieces = [];
+      let textPiece = createEmptyTextPiece();
+      let prevTextPiece = null;
+
+      const freeSpaceRequired = 50;
+
+      for (let i = 0; i < textQuotesVerticalPositions.length; i++) {
+        const quote = textQuotesVerticalPositions[i];
+
+        if (i === 0) {
+          textPiece.height =
+            Math.min(quote.top, freeSpaceRequired) + quote.height;
+          textPiece.quotes.push(quote); // { top: ..., height: ...}
+          textPiece.scrollHeight = quote.top + quote.height;
+          continue;
+        } else if (!textPiece.quotes.length) {
+          // @todo: check
+          textPiece.height = freeSpaceRequired + quote.height;
+        }
+        // @todo: iterations count
+
+        if (
+          quote.top - (textPiece.top + textPiece.scrollHeight) > // если есть отсечка
+          2 * freeSpaceRequired
+        ) {
+          const middle = Math.floor(
+            (quote.top - (textPiece.top + textPiece.scrollHeight)) / 2
+          );
+          textPiece.scrollHeight = textPiece.scrollHeight + middle;
+          textPieces.push(textPiece);
+          textPiece.height += quote.height + freeSpaceRequired;
+          prevTextPiece = textPiece;
+          textPiece = createEmptyTextPiece();
+          textPiece.top = prevTextPiece.top + prevTextPiece.scrollHeight;
+          // textPiece.height += quote.height;
+        } else {
+          // если нет отсечки, и мы до сих пор накапливаем цитаты, то
+          textPiece.height +=
+            quote.top - (textPiece.top + textPiece.scrollHeight) + quote.height;
+        }
+        textPiece.quotes.push(quote);
+        textPiece.scrollHeight = quote.top + quote.height - textPiece.top;
+
+        if (i === textQuotesVerticalPositions.length - 1) {
+          // если это последний фрагмент, то
+          const realScrollHeight =
+            paragraphEl.current.scrollHeight - textPiece.top;
+
+          textPiece.height += Math.min(
+            realScrollHeight - textPiece.scrollHeight,
+            freeSpaceRequired
+          );
+          textPiece.scrollHeight = realScrollHeight;
+          textPieces.push(textPiece);
+        }
+      }
+      console.log(textPieces);
     }
   }, [isActive, interactionType]);
 
