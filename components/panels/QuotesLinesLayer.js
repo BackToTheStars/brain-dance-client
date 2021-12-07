@@ -14,6 +14,9 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
   const { linesWithEndCoords } = useTurnContext();
   const { makeWidgetActive, setInteractionMode } = useInteractionContext();
+  const {
+    debugData: { debugLines },
+  } = useUiContext();
 
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
@@ -41,6 +44,13 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
             />
           );
         })}
+
+        {!!debugLines.length &&
+          debugLines.map((line, i) => {
+            return (
+              <line key={i} {...line} stroke={line.color} strokeWidth="1px" />
+            );
+          })}
       </svg>
       {!svgLayerZIndex && (
         <div className="rec-rectangle">

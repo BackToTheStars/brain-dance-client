@@ -1,5 +1,6 @@
 import { useState, useContext, createContext, useEffect } from 'react';
 import { useReducer } from 'reinspect';
+import { useDebug } from './debug/useDebug';
 
 export const NOTIFICATION_TRANSITION = 500;
 export const UI_Context = createContext();
@@ -92,6 +93,8 @@ export const UI_Provider = ({ children }) => {
     innerWidth: 800,
   });
 
+  const debugData = useDebug();
+
   const [state, dispatch] = useReducer(
     reducer,
     initialState,
@@ -162,6 +165,8 @@ export const UI_Provider = ({ children }) => {
         addNotification,
 
         windowSize,
+
+        debugData, // { debugLines, addDebugLine }
       }}
     >
       {children}

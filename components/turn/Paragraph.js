@@ -12,6 +12,7 @@ import {
   PANEL_LINES,
   useInteractionContext,
 } from '../contexts/InteractionContext';
+import { useUiContext } from '../contexts/UI_Context';
 
 // const delayRenderScroll = 20;
 
@@ -51,6 +52,10 @@ const Paragraph = ({
     interactionType,
     bottomPanelSettings: { setPanelType },
   } = useInteractionContext();
+
+  const {
+    debugData: { updateDebugLines },
+  } = useUiContext();
 
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId: _id, quoteId } });
@@ -140,6 +145,40 @@ const Paragraph = ({
         }
       }
       console.log(textPieces);
+
+      // --------- console log lines
+      const left = 800;
+      const top = 20;
+      const drawTopLines = textPieces.map((textPiece) => ({
+        x1: left,
+        x2: left + 200,
+        y1: textPiece.top + top,
+        y2: textPiece.top + top,
+        color: 'green',
+      }));
+
+      const drawBottomLines = textPieces.map((textPiece) => ({
+        x1: left,
+        x2: left + 200,
+        y1: textPiece.top + textPiece.scrollHeight + top,
+        y2: textPiece.top + textPiece.scrollHeight + top,
+        color: 'purple',
+      }));
+
+      const drawViewportBottomLines = textPieces.map((textPiece) => ({
+        x1: left,
+        x2: left + 200,
+        y1: textPiece.top + textPiece.height + top,
+        y2: textPiece.top + textPiece.height + top,
+        color: 'blue',
+      }));
+
+      updateDebugLines([
+        ...drawTopLines,
+        ...drawViewportBottomLines,
+        ...drawBottomLines,
+      ]);
+      // ---------- end
     }
   }, [isActive, interactionType]);
 
