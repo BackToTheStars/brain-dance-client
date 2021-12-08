@@ -98,14 +98,17 @@ const Paragraph = ({
         const quote = textQuotesVerticalPositions[i];
 
         if (i === 0) {
+          // первый textPiece
           textPiece.height =
             Math.min(quote.top, freeSpaceRequired) + quote.height;
           textPiece.quotes.push(quote); // { top: ..., height: ...}
           textPiece.scrollHeight = quote.top + quote.height;
           continue;
         } else if (!textPiece.quotes.length) {
+          // } else {
           // @todo: check
-          textPiece.height = freeSpaceRequired + quote.height;
+          // textPiece.height = freeSpaceRequired + quote.height;
+          // console.log(i, { height1: textPiece.height });
         }
         // @todo: iterations count
 
@@ -118,18 +121,22 @@ const Paragraph = ({
           );
           textPiece.scrollHeight = textPiece.scrollHeight + middle;
           textPieces.push(textPiece);
-          textPiece.height += quote.height + freeSpaceRequired;
+          textPiece.height += freeSpaceRequired; // quote.height;
+          console.log(i, { height2: textPiece.height });
           prevTextPiece = textPiece;
           textPiece = createEmptyTextPiece();
           textPiece.top = prevTextPiece.top + prevTextPiece.scrollHeight;
+          textPiece.quotes.push(quote);
+          textPiece.height = freeSpaceRequired + quote.height;
+          textPiece.scrollHeight = quote.top + quote.height - textPiece.top;
           // textPiece.height += quote.height;
         } else {
           // если нет отсечки, и мы до сих пор накапливаем цитаты, то
           textPiece.height +=
             quote.top - (textPiece.top + textPiece.scrollHeight) + quote.height;
+          textPiece.quotes.push(quote);
+          textPiece.scrollHeight = quote.top + quote.height - textPiece.top;
         }
-        textPiece.quotes.push(quote);
-        textPiece.scrollHeight = quote.top + quote.height - textPiece.top;
 
         if (i === textQuotesVerticalPositions.length - 1) {
           // если это последний фрагмент, то
@@ -144,17 +151,51 @@ const Paragraph = ({
           textPieces.push(textPiece);
         }
       }
-      console.log(textPieces);
+
+      // for (let textPiece of textPieces) {
+      //   const top = textPiece.quotes[0].top;
+      //   textPiece.scrollTop = Math.min(top, freeSpaceRequired);
+      // }
+      console.log('check1', textPieces);
+
+      for (let i = 0; i < textPieces.length; i++) {
+        const textPiece = textPieces[i];
+        const top = textPiece.quotes[0].top;
+        if (i === 0) {
+          textPiece.scrollTop =
+            top < freeSpaceRequired ? 0 : top - freeSpaceRequired;
+          continue;
+        }
+        textPiece.scrollTop = top - freeSpaceRequired;
+      }
+
+      console.log('check2', textPieces);
 
       // --------- console log lines
-      const left = 800;
+      const left = 700;
       const top = 20;
       const drawTopLines = textPieces.map((textPiece) => ({
         x1: left,
-        x2: left + 200,
+        x2: left + 300,
         y1: textPiece.top + top,
         y2: textPiece.top + top,
         color: 'green',
+      }));
+
+      const drawViewportTopLines = textPieces.map((textPiece) => ({
+        x1: left,
+        x2: left + 300,
+        y1: textPiece.top + textPiece.scrollTop + top,
+        y2: textPiece.top + textPiece.scrollTop + top,
+        color: 'red',
+      }));
+
+      const drawViewportBottomLines = textPieces.map((textPiece) => ({
+        x1: left,
+        x2: left + 200,
+        y1: textPiece.top + textPiece.scrollTop + textPiece.height + top,
+        y2: textPiece.top + textPiece.scrollTop + textPiece.height + top,
+        color: 'blue',
       }));
 
       const drawBottomLines = textPieces.map((textPiece) => ({
@@ -165,16 +206,9 @@ const Paragraph = ({
         color: 'purple',
       }));
 
-      const drawViewportBottomLines = textPieces.map((textPiece) => ({
-        x1: left,
-        x2: left + 200,
-        y1: textPiece.top + textPiece.height + top,
-        y2: textPiece.top + textPiece.height + top,
-        color: 'blue',
-      }));
-
       updateDebugLines([
         ...drawTopLines,
+        ...drawViewportTopLines,
         ...drawViewportBottomLines,
         ...drawBottomLines,
       ]);
