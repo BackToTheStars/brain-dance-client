@@ -19,6 +19,7 @@ import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
 import { WIDGET_PICTURE, WIDGET_PARAGRAPH } from './settings';
 import { checkIfParagraphExists } from '../helpers/quillHandler';
+import Compressor from './Compressor';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат
@@ -69,6 +70,7 @@ const TurnNewComponent = ({
   const [variableHeight, setVariableHeight] = useState(0);
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
+  const [textPieces, setTextPieces] = useState([]);
 
   const {
     activeWidget,
@@ -445,9 +447,13 @@ const TurnNewComponent = ({
           width={width}
         />
       )}
+      {!!textPieces.length && (
+        <Compressor {...{ textPieces, width, paragraph }} />
+      )}
       {doesParagraphExist && (
         <Paragraph
           {...{
+            setTextPieces,
             contentType,
             backgroundColor,
             fontColor,

@@ -94,6 +94,12 @@ $black-color: rgb(0, 0, 0);
       word-wrap: break-word;
     }
   }
+  .compressor {
+    position: absolute;
+    background: white;
+    right: -110%;
+    top: 40px;
+  }
   &.zero-point {
     visibility: hidden;
   }

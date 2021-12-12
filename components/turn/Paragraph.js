@@ -17,6 +17,7 @@ import { useUiContext } from '../contexts/UI_Context';
 // const delayRenderScroll = 20;
 
 const Paragraph = ({
+  setTextPieces,
   contentType,
   backgroundColor,
   fontColor,
@@ -75,7 +76,7 @@ const Paragraph = ({
       console.log({ scrollHeight: paragraphEl.current.scrollHeight });
 
       const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
-        top: quote.initialCoords.top + paragraphEl.current.scrollTop,
+        top: quote.initialCoords.top + paragraphEl.current.scrollTop - 40, // @todo: использовать положение параграфа
         height: quote.initialCoords.height,
       }));
 
@@ -93,6 +94,7 @@ const Paragraph = ({
       let prevTextPiece = null;
 
       const freeSpaceRequired = 50;
+      // @todo отдельно просчитать случай с одной цитатой
 
       for (let i = 0; i < textQuotesVerticalPositions.length; i++) {
         const quote = textQuotesVerticalPositions[i];
@@ -100,9 +102,10 @@ const Paragraph = ({
         if (i === 0) {
           // первый textPiece
           textPiece.height =
-            Math.min(quote.top, freeSpaceRequired) + quote.height;
+            Math.min(quote.top, freeSpaceRequired) + quote.height; // остановка внизу цитаты
           textPiece.quotes.push(quote); // { top: ..., height: ...}
           textPiece.scrollHeight = quote.top + quote.height;
+          textPieces.push(textPiece); // @todo: убрать
           continue;
         } else if (!textPiece.quotes.length) {
           // } else {
@@ -152,27 +155,26 @@ const Paragraph = ({
         }
       }
 
-      // for (let textPiece of textPieces) {
-      //   const top = textPiece.quotes[0].top;
-      //   textPiece.scrollTop = Math.min(top, freeSpaceRequired);
-      // }
-      console.log('check1', textPieces);
+      // console.log('check1', textPieces);
 
       for (let i = 0; i < textPieces.length; i++) {
         const textPiece = textPieces[i];
         const top = textPiece.quotes[0].top;
         if (i === 0) {
-          textPiece.scrollTop =
+          textPiece.viewportTop =
             top < freeSpaceRequired ? 0 : top - freeSpaceRequired;
+          textPiece.scrollTop = textPiece.viewportTop - textPiece.top;
           continue;
         }
-        textPiece.scrollTop = top - freeSpaceRequired;
+        textPiece.viewportTop = top - freeSpaceRequired;
+        textPiece.scrollTop = textPiece.viewportTop - textPiece.top;
       }
 
       console.log('check2', textPieces);
 
       // --------- console log lines
-      const left = 700;
+
+      const left = 700; // начало текстового блока
       const top = 20;
       const drawTopLines = textPieces.map((textPiece) => ({
         x1: left,
@@ -183,18 +185,19 @@ const Paragraph = ({
       }));
 
       const drawViewportTopLines = textPieces.map((textPiece) => ({
+        // топ вьюпорта
         x1: left,
         x2: left + 300,
-        y1: textPiece.top + textPiece.scrollTop + top,
-        y2: textPiece.top + textPiece.scrollTop + top,
+        y1: textPiece.viewportTop + top,
+        y2: textPiece.viewportTop + top,
         color: 'red',
       }));
 
       const drawViewportBottomLines = textPieces.map((textPiece) => ({
         x1: left,
         x2: left + 200,
-        y1: textPiece.top + textPiece.scrollTop + textPiece.height + top,
-        y2: textPiece.top + textPiece.scrollTop + textPiece.height + top,
+        y1: textPiece.viewportTop + textPiece.height + top,
+        y2: textPiece.viewportTop + textPiece.height + top,
         color: 'blue',
       }));
 
@@ -206,6 +209,13 @@ const Paragraph = ({
         color: 'purple',
       }));
 
+      console.log([
+        ...drawTopLines,
+        ...drawViewportTopLines,
+        ...drawViewportBottomLines,
+        ...drawBottomLines,
+      ]);
+
       updateDebugLines([
         ...drawTopLines,
         ...drawViewportTopLines,
@@ -213,7 +223,11 @@ const Paragraph = ({
         ...drawBottomLines,
       ]);
       // ---------- end
+
+      // сообщаем шагу, что у нас есть настройки параграфа для операции Compress
+      setTextPieces(textPieces);
     }
+    // @todo: отправить информацию о том, что мы вышли из режима Compress
   }, [isActive, interactionType]);
 
   useEffect(() => {
