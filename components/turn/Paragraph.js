@@ -105,7 +105,7 @@ const Paragraph = ({
             Math.min(quote.top, freeSpaceRequired) + quote.height; // остановка внизу цитаты
           textPiece.quotes.push(quote); // { top: ..., height: ...}
           textPiece.scrollHeight = quote.top + quote.height;
-          textPieces.push(textPiece); // @todo: убрать
+          // textPieces.push(textPiece); // @todo: убрать
           continue;
         } else if (!textPiece.quotes.length) {
           // } else {
@@ -209,12 +209,12 @@ const Paragraph = ({
         color: 'purple',
       }));
 
-      console.log([
-        ...drawTopLines,
-        ...drawViewportTopLines,
-        ...drawViewportBottomLines,
-        ...drawBottomLines,
-      ]);
+      // console.log([
+      //   ...drawTopLines,
+      //   ...drawViewportTopLines,
+      //   ...drawViewportBottomLines,
+      //   ...drawBottomLines,
+      // ]);
 
       updateDebugLines([
         ...drawTopLines,

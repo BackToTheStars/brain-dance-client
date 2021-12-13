@@ -1,4 +1,5 @@
 import { Fragment, useRef } from 'react';
+import { useEffect } from 'react/cjs/react.development';
 
 const Compressor = ({ width, paragraph, textPieces }) => {
   //
@@ -9,6 +10,38 @@ const Compressor = ({ width, paragraph, textPieces }) => {
     .map((textItem) => textItem.insert)
     .join(' ')
     .split(' '); // слили всё в один большой текст и разделили по словам
+
+  useEffect(() => {
+    if (!wrapperRef.current) return false;
+    const spans = wrapperRef.current.querySelectorAll('span');
+
+    let maxHeightPlusTop = 0;
+    let lettersCount = 0;
+    let textPieceIndex = 0;
+
+    textPieces[textPieceIndex].startLettersCount = lettersCount;
+
+    for (let span of spans) {
+      const { height, top } = span.getBoundingClientRect();
+
+      if (height + top > maxHeightPlusTop) {
+        maxHeightPlusTop = height + top;
+        console.log(maxHeightPlusTop);
+        if (textPieceIndex < textPieces.length - 1) {
+          if (textPieces[textPieceIndex + 1].top < maxHeightPlusTop) {
+            // textPieceIndex++;
+            console.log((textPieceIndex += 1));
+            textPieces[textPieceIndex].startLettersCount = lettersCount;
+          }
+        }
+        lettersCount += span.innerText.length;
+      } else {
+        lettersCount += span.innerText.length;
+      }
+    }
+    console.log(textPieces);
+    console.log(paragraph);
+  }, [width]);
 
   return (
     <div
