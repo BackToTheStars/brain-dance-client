@@ -453,29 +453,30 @@ const TurnNewComponent = ({
       {doesParagraphExist && (
         <Paragraph
           {...{
-            setTextPieces,
+            setTextPieces, //
             contentType,
             backgroundColor,
             fontColor,
             paragraph,
-            updateSizeTime,
+            updateSizeTime, //
             registerHandleResize,
+            unregisterHandleResize,
             variableHeight,
             quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
-            dispatch,
-            _id,
-            lineEnds,
-            activeQuote,
-            quotesWithCoords,
-            setQuotesWithCoords,
+            dispatch, //
+            _id, // @todo: оставить _id или turnId
+            lineEnds, //
+            activeQuote, //
+            quotesWithCoords, //
+            setQuotesWithCoords, //
             turnId: _id,
-            quotesLoaded,
-            setQuotesLoaded,
+            quotesLoaded, //
+            setQuotesLoaded, //
             scrollPosition,
-            recalculateQuotes,
-            unregisterHandleResize,
+            recalculateQuotes, //
             isActive: isWidgetActive('paragraph'), // (widgetId)
             makeWidgetActive: () => {
+              //
               setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
               // делаем синюю рамку у картинки

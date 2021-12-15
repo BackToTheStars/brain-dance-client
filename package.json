@@ -8,7 +8,7 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p $PORT",
-    "client": "next dev -p 3001"
+    "client": "next dev -p 3002"
   },
   "keywords": [],
   "author": "",
