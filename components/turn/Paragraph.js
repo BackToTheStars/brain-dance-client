@@ -324,7 +324,11 @@ const Paragraph = ({
 
   return (
     <>
-      <p className="paragraphText" ref={paragraphEl} style={style}>
+      <p
+        className="paragraphText original-text"
+        ref={paragraphEl}
+        style={style}
+      >
         {!!topQuotesCount && (
           <span className="top-quotes-counter">{topQuotesCount}</span>
         )}

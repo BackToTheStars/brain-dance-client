@@ -1,7 +1,21 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
+import TextAroundQuote from './TextAroundQuote';
 
-const Compressor = ({ width, paragraph: originalParagraph, textPieces }) => {
+const Compressor = ({
+  width,
+  paragraph: originalParagraph,
+  textPieces,
+  paragraphTop,
+  contentType,
+  backgroundColor,
+  fontColor,
+  registerHandleResize,
+  unregisterHandleResize,
+  variableHeight,
+}) => {
+  //
+  const [compressedTexts, setCompressedTexts] = useState([]);
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
     ...paragraphItem,
@@ -24,11 +38,11 @@ const Compressor = ({ width, paragraph: originalParagraph, textPieces }) => {
 
     textPieces[textPieceIndex].startLettersCount = lettersCount;
 
-    const tempTurnTop = 26;
+    // const tempTurnTop = 26;
     console.log('===============');
     for (let span of spans) {
       const { height, top: absoluteTop } = span.getBoundingClientRect();
-      const top = absoluteTop - tempTurnTop;
+      const top = absoluteTop - paragraphTop;
       console.log('span', height, top);
       if (height + top > maxHeightPlusTop) {
         maxHeightPlusTop = height + top;
@@ -98,28 +112,52 @@ const Compressor = ({ width, paragraph: originalParagraph, textPieces }) => {
     console.log('завершение цикла');
     textPieces[textPieces.length - 1].paragraph =
       paragraph.slice(paragraphIndex);
+    setCompressedTexts(textPieces);
     console.log({ textPieces });
   }, [width]);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="compressor paragraphText"
-      style={{ width: `${width}px` }}
-    >
-      {words.map((word, i) => {
-        const arrWords = word ? word.split('\n') : [];
-        const newWords = [];
-        for (let j = 0; j < arrWords.length; j++) {
-          newWords.push(<span key={j * 3}>{arrWords[j]}</span>);
-          newWords.push(<span key={j * 3 + 1}> </span>);
-          newWords.push(<br key={j * 3 + 2} />);
-        }
-        newWords.pop();
-        // newWords.pop();
-        return <Fragment key={`${i}`}>{newWords}</Fragment>;
-      })}
-    </div>
+    <>
+      <div
+        ref={wrapperRef}
+        className="compressor paragraphText"
+        style={{ width: `${width}px` }}
+      >
+        {words.map((word, i) => {
+          const arrWords = word ? word.split('\n') : [];
+          const newWords = [];
+          for (let j = 0; j < arrWords.length; j++) {
+            newWords.push(<span key={j * 3}>{arrWords[j]}</span>);
+            newWords.push(<span key={j * 3 + 1}> </span>);
+            newWords.push(<br key={j * 3 + 2} />);
+          }
+          newWords.pop();
+          // newWords.pop();
+          return <Fragment key={`${i}`}>{newWords}</Fragment>;
+        })}
+      </div>
+      <div className="compressed-paragraph-widget">
+        {compressedTexts.map((text, i) => {
+          return (
+            <TextAroundQuote
+              key={i}
+              {...{
+                // contentType,
+                // backgroundColor,
+                // fontColor,
+                // registerHandleResize,
+                // unregisterHandleResize,
+                // variableHeight,
+
+                paragraph: text.paragraph,
+                scrollPosition: text.scrollTop,
+                height: text.height, // через этот viewport смотрим на кусок текста
+              }}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 };
 

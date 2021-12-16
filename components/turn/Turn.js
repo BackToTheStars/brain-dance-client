@@ -354,7 +354,7 @@ const TurnNewComponent = ({
       ref={wrapper}
       className={`${contentType} react-turn-new ${
         dontShowHeader ? 'dont-show-header' : ''
-      }`}
+      } ${!!textPieces.length ? 'compressed-turn' : ''}`}
       style={wrapperStyles}
     >
       <Header
@@ -448,7 +448,21 @@ const TurnNewComponent = ({
         />
       )}
       {!!textPieces.length && (
-        <Compressor {...{ textPieces, width, paragraph }} />
+        <Compressor
+          {...{
+            textPieces,
+            width,
+            paragraph,
+            paragraphTop: y + 40, // @todo: верх виджета параграфа под header, picture
+
+            contentType,
+            backgroundColor,
+            fontColor,
+            registerHandleResize,
+            unregisterHandleResize,
+            variableHeight,
+          }}
+        />
       )}
       {doesParagraphExist && (
         <Paragraph
