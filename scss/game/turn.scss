@@ -89,14 +89,20 @@ $black-color: rgb(0, 0, 0);
   }
   &.compressed-turn {
     .original-text {
-      visibility: hidden;
+      // visibility: hidden;
     }
     .paragraphText {
       border-bottom: 1px solid black;
     }
     .compressor {
-      visibility: hidden;
+      // visibility: hidden;
     }
+  }
+  .compressed-paragraph-widget {
+    top: 40px;
+    right: -110%;
+    position: absolute;
+    width: 100%;
   }
   .paragraphText {
     // flex: 1;
@@ -108,7 +114,8 @@ $black-color: rgb(0, 0, 0);
   .compressor {
     position: absolute;
     background: white;
-    right: -110%;
+    // right: -110%;
+    right: -220%;
     top: 40px;
   }
   &.zero-point {

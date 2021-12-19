@@ -5,7 +5,7 @@ import TextAroundQuote from './TextAroundQuote';
 const Compressor = ({
   width,
   paragraph: originalParagraph,
-  textPieces,
+  textPieces: originalTextPieces,
   paragraphTop,
   contentType,
   backgroundColor,
@@ -36,6 +36,12 @@ const Compressor = ({
     let lettersCount = 0;
     let textPieceIndex = 0;
 
+    const textPieces = originalTextPieces.map((textPiece) => ({
+      ...textPiece,
+    }));
+
+    textPieces[0].delta = 0;
+
     textPieces[textPieceIndex].startLettersCount = lettersCount;
 
     // const tempTurnTop = 26;
@@ -52,6 +58,8 @@ const Compressor = ({
             textPieceIndex += 1;
             console.log('new textPieceIndex', textPieceIndex);
             textPieces[textPieceIndex].startLettersCount = lettersCount;
+            textPieces[textPieceIndex].delta =
+              maxHeightPlusTop - textPieces[textPieceIndex].top;
           }
         }
       }
@@ -131,6 +139,7 @@ const Compressor = ({
             newWords.push(<span key={j * 3 + 1}> </span>);
             newWords.push(<br key={j * 3 + 2} />);
           }
+          // console.log({ newWords });
           newWords.pop();
           // newWords.pop();
           return <Fragment key={`${i}`}>{newWords}</Fragment>;
@@ -150,7 +159,7 @@ const Compressor = ({
                 // variableHeight,
 
                 paragraph: text.paragraph,
-                scrollPosition: text.scrollTop,
+                scrollPosition: text.scrollTop + text.delta,
                 height: text.height, // через этот viewport смотрим на кусок текста
               }}
             />
