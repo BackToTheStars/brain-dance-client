@@ -53,6 +53,7 @@ const AddEditTurnPopup = () => {
         const { quill } = quillConstants;
         // quill.setContents(turnToEdit.paragraph);
         quill.setContents(turnToEdit.paragraph);
+        // console.log(' quill.getLine(0).value()', quill.getLine(0).value());
         setTimeout(() => {
           const spans = document.querySelectorAll('.ql-editor span');
           let i = 1;

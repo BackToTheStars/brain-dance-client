@@ -65,7 +65,12 @@ const Compressor = ({
       }
       lettersCount += span.innerText.length;
       if (span.tagName === 'BR') {
-        lettersCount += 1;
+        if (span.parentNode.tagName !== 'SPAN') {
+          // если br находится в span
+          lettersCount += 1;
+        } else {
+          debugger;
+        }
       }
       console.log({ lettersCount });
     }
@@ -99,7 +104,8 @@ const Compressor = ({
           //
         } else if (insertLength + lettersCount > startLettersCount) {
           console.log('if 3', insertLength + lettersCount, startLettersCount);
-          const difference = insertLength + lettersCount - startLettersCount;
+          // const difference = insertLength + lettersCount - startLettersCount;
+          const difference = startLettersCount - lettersCount;
           paragraphCountingBuffer.push({
             insert: paragraph[j].insert.slice(0, difference),
           });
@@ -159,8 +165,9 @@ const Compressor = ({
                 // variableHeight,
 
                 paragraph: text.paragraph,
-                scrollPosition: text.scrollTop + text.delta,
-                height: text.height, // через этот viewport смотрим на кусок текста
+                // scrollPosition: text.scrollTop + text.delta,
+                // height: text.height, // через этот viewport смотрим на кусок текста
+                height: text.scrollHeight,
               }}
             />
           );
