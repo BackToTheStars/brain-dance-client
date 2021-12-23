@@ -1,5 +1,6 @@
 import { Fragment, useRef, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
+import { ParagraphTextWrapper } from './ParagraphTextWrapper';
 import TextAroundQuote from './TextAroundQuote';
 
 const Compressor = ({
@@ -30,7 +31,7 @@ const Compressor = ({
 
   useEffect(() => {
     if (!wrapperRef.current) return false;
-    const spans = wrapperRef.current.querySelectorAll('span, br');
+    const spans = [...wrapperRef.current.querySelectorAll('span, br')]; // @learn возвращает коллекцию
 
     let maxHeightPlusTop = 0;
     let lettersCount = 0;
@@ -44,9 +45,19 @@ const Compressor = ({
 
     textPieces[textPieceIndex].startLettersCount = lettersCount;
 
+    const filteredSpans = spans.filter((span) => {
+      if (span.parentNode.style.background) return false;
+      if (
+        !span.style.background &&
+        span.parentNode.classList.contains('compressor')
+      )
+        return false;
+      return true;
+    });
+
     // const tempTurnTop = 26;
     console.log('===============');
-    for (let span of spans) {
+    for (let span of filteredSpans) {
       const { height, top: absoluteTop } = span.getBoundingClientRect();
       const top = absoluteTop - paragraphTop;
       console.log('span', height, top);
@@ -65,12 +76,12 @@ const Compressor = ({
       }
       lettersCount += span.innerText.length;
       if (span.tagName === 'BR') {
-        if (span.parentNode.tagName !== 'SPAN') {
-          // если br находится в span
-          lettersCount += 1;
-        } else {
-          debugger;
-        }
+        // if (span.parentNode.tagName !== 'SPAN') {
+        // если br находится в span
+        lettersCount += 1;
+        // } else {
+        // debugger;
+        // }
       }
       console.log({ lettersCount });
     }
@@ -137,7 +148,8 @@ const Compressor = ({
         className="compressor paragraphText"
         style={{ width: `${width}px` }}
       >
-        {words.map((word, i) => {
+        <ParagraphTextWrapper {...{ arrText: paragraph }} />
+        {/* {words.map((word, i) => {
           const arrWords = word ? word.split('\n') : [];
           const newWords = [];
           for (let j = 0; j < arrWords.length; j++) {
@@ -149,7 +161,7 @@ const Compressor = ({
           newWords.pop();
           // newWords.pop();
           return <Fragment key={`${i}`}>{newWords}</Fragment>;
-        })}
+        })} */}
       </div>
       <div className="compressed-paragraph-widget">
         {compressedTexts.map((text, i) => {
@@ -165,9 +177,9 @@ const Compressor = ({
                 // variableHeight,
 
                 paragraph: text.paragraph,
-                // scrollPosition: text.scrollTop + text.delta,
-                // height: text.height, // через этот viewport смотрим на кусок текста
-                height: text.scrollHeight,
+                scrollPosition: text.scrollTop + text.delta,
+                height: text.height, // через этот viewport смотрим на кусок текста
+                // height: text.scrollHeight,
               }}
             />
           );

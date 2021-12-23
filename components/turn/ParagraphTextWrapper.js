@@ -1,7 +1,10 @@
+import { Fragment } from 'react';
+
 export const ParagraphTextWrapper = ({ arrText }) => {
+  console.log({ arrText });
   return (
     <>
-      {arrText.map((textItem, i) => {
+      {(arrText || []).map((textItem, i) => {
         // @todo: refactoring
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
         const newInserts = [];
@@ -25,5 +28,30 @@ export const ParagraphTextWrapper = ({ arrText }) => {
 };
 
 export const SpanTextPiece = ({ textItem, newInserts }) => {
-  return <span style={textItem.attributes}>{newInserts}</span>;
+  return (
+    <span style={textItem.attributes}>
+      {newInserts.map((item, index) => {
+        if (typeof item === 'string') {
+          if (item.includes(' ')) {
+            const words = item.split(' ');
+            return (
+              <Fragment key={'item' + index}>
+                {words.map((word, index2) => {
+                  return (
+                    <span key={`item-${index}-${index2}`}>
+                      {word}
+                      {index2 < words.length - 1 ? ' ' : ''}
+                    </span>
+                  );
+                })}
+              </Fragment>
+            );
+          } else {
+            return <span key={'item' + index}>{item}</span>;
+          }
+        }
+        return item;
+      })}
+    </span>
+  );
 };
