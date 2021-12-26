@@ -29,7 +29,14 @@ export const ParagraphTextWrapper = ({ arrText }) => {
 
 export const SpanTextPiece = ({ textItem, newInserts }) => {
   return (
-    <span style={textItem.attributes}>
+    <span
+      style={textItem.attributes}
+      className={
+        !!textItem && textItem.attributes && textItem.attributes.background
+          ? 'compressed-quote'
+          : ''
+      }
+    >
       {newInserts.map((item, index) => {
         if (typeof item === 'string') {
           if (item.includes(' ')) {

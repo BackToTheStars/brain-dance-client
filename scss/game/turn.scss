@@ -115,8 +115,9 @@ $black-color: rgb(0, 0, 0);
     position: absolute;
     background: white;
     // right: -110%;
-    right: -220%;
+    // right: -220%;
     top: 40px;
+    opacity: 0;
   }
   &.zero-point {
     visibility: hidden;

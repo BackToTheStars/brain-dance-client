@@ -178,6 +178,7 @@ const Compressor = ({
 
                 paragraph: text.paragraph,
                 scrollPosition: text.scrollTop + text.delta,
+                // scrollPosition: text.scrollTop,
                 height: text.height, // через этот viewport смотрим на кусок текста
                 // height: text.scrollHeight,
               }}
