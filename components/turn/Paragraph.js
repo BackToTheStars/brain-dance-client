@@ -9,6 +9,7 @@ import { quoteRectangleThickness } from '../сonst';
 import {
   MODE_GAME,
   INTERACTION_COMPRESS_PARAGRAPH,
+  INTERACTION_UNCOMPRESS_PARAGRAPH,
   PANEL_LINES,
   useInteractionContext,
 } from '../contexts/InteractionContext';
@@ -40,6 +41,10 @@ const Paragraph = ({
   turnId,
   makeWidgetActive,
   isActive,
+  compressedHeight,
+  setCompressedHeight,
+  turnSavePreviousHeight,
+  turnReturnPreviousHeight,
 }) => {
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'top';
@@ -68,19 +73,26 @@ const Paragraph = ({
   // const [quotesLoaded, setQuotesLoaded] = useState(false);
 
   useEffect(() => {
+    if (isActive && interactionType === INTERACTION_UNCOMPRESS_PARAGRAPH) {
+      setTextPieces([]);
+      setCompressedHeight(null);
+      turnReturnPreviousHeight();
+    }
+
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
-      console.log({
-        height: paragraphEl.current.getBoundingClientRect().height,
-      });
-      console.log({ scrollTop: paragraphEl.current.scrollTop });
-      console.log({ scrollHeight: paragraphEl.current.scrollHeight });
+      turnSavePreviousHeight();
+      // console.log({
+      //   height: paragraphEl.current.getBoundingClientRect().height,
+      // });
+      // console.log({ scrollTop: paragraphEl.current.scrollTop });
+      // console.log({ scrollHeight: paragraphEl.current.scrollHeight });
 
       const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
         top: quote.initialCoords.top + paragraphEl.current.scrollTop - 40, // @todo: использовать положение параграфа
         height: quote.initialCoords.height,
       }));
 
-      console.log(textQuotesVerticalPositions);
+      // console.log(textQuotesVerticalPositions);
 
       const createEmptyTextPiece = () => ({
         quotes: [],
@@ -93,7 +105,7 @@ const Paragraph = ({
       let textPiece = createEmptyTextPiece();
       let prevTextPiece = null;
 
-      const freeSpaceRequired = 50;
+      const freeSpaceRequired = 59;
       // @todo отдельно просчитать случай с одной цитатой
 
       for (let i = 0; i < textQuotesVerticalPositions.length; i++) {
@@ -247,11 +259,15 @@ const Paragraph = ({
         if (!paragraphEl.current) {
           return 0;
         }
-        return paragraphEl.current.scrollHeight;
+        console.log({
+          compressedHeight,
+          scrollHeight: paragraphEl.current.scrollHeight,
+        });
+        return compressedHeight || paragraphEl.current.scrollHeight;
       },
     });
     return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
-  }, [paragraphEl]);
+  }, [paragraphEl, compressedHeight]);
 
   // useEffect(() => {
   //   setQuotesLoaded(false);

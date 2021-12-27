@@ -71,6 +71,8 @@ const TurnNewComponent = ({
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [textPieces, setTextPieces] = useState([]);
+  const [compressedHeight, setCompressedHeight] = useState(null);
+  const [prevHeight, setPrevHeight] = useState(null);
 
   const {
     activeWidget,
@@ -461,6 +463,7 @@ const TurnNewComponent = ({
             registerHandleResize,
             unregisterHandleResize,
             variableHeight,
+            setCompressedHeight,
           }}
         />
       )}
@@ -490,10 +493,18 @@ const TurnNewComponent = ({
             recalculateQuotes, //
             isActive: isWidgetActive('paragraph'), // (widgetId)
             makeWidgetActive: () => {
-              //
               setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
               // делаем синюю рамку у картинки
+            },
+            compressedHeight,
+            setCompressedHeight,
+
+            turnSavePreviousHeight: () => setPrevHeight(height),
+            turnReturnPreviousHeight: () => {
+              console.log({ width, prevHeight });
+              handleResize(width, prevHeight);
+              // $(wrapper.current).height(prevHeight + 'px');
             },
           }}
         />

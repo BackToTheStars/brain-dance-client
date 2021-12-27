@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
 export const ParagraphTextWrapper = ({ arrText }) => {
-  console.log({ arrText });
+  // console.log({ arrText });
   return (
     <>
       {(arrText || []).map((textItem, i) => {

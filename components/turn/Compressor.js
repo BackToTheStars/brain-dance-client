@@ -8,12 +8,13 @@ const Compressor = ({
   paragraph: originalParagraph,
   textPieces: originalTextPieces,
   paragraphTop,
-  contentType,
-  backgroundColor,
-  fontColor,
-  registerHandleResize,
-  unregisterHandleResize,
-  variableHeight,
+  setCompressedHeight,
+  // contentType,
+  // backgroundColor,
+  // fontColor,
+  // registerHandleResize,
+  // unregisterHandleResize,
+  // variableHeight,
 }) => {
   //
   const [compressedTexts, setCompressedTexts] = useState([]);
@@ -60,10 +61,10 @@ const Compressor = ({
     for (let span of filteredSpans) {
       const { height, top: absoluteTop } = span.getBoundingClientRect();
       const top = absoluteTop - paragraphTop;
-      console.log('span', height, top);
+      // console.log('span', height, top);
       if (height + top > maxHeightPlusTop) {
         maxHeightPlusTop = height + top;
-        console.log({ maxHeightPlusTop });
+        // console.log({ maxHeightPlusTop });
         if (textPieceIndex < textPieces.length - 1) {
           if (textPieces[textPieceIndex + 1].top < maxHeightPlusTop) {
             textPieceIndex += 1;
@@ -83,7 +84,7 @@ const Compressor = ({
         // debugger;
         // }
       }
-      console.log({ lettersCount });
+      // console.log({ lettersCount });
     }
     console.log('===============');
     console.log(textPieces);
@@ -109,7 +110,7 @@ const Compressor = ({
           break; // @learn - breaks работает для while, for, switch
           //
         } else if (insertLength + lettersCount < startLettersCount) {
-          console.log('if 2', insertLength + lettersCount, startLettersCount);
+          // console.log('if 2', insertLength + lettersCount, startLettersCount);
           paragraphCountingBuffer.push(paragraph[j]);
           lettersCount += insertLength;
           //
@@ -134,10 +135,15 @@ const Compressor = ({
         }
       }
     }
-    console.log('завершение цикла');
+    // console.log('завершение цикла');
     textPieces[textPieces.length - 1].paragraph =
       paragraph.slice(paragraphIndex);
     setCompressedTexts(textPieces);
+
+    setCompressedHeight(
+      textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
+    );
+
     console.log({ textPieces });
   }, [width]);
 

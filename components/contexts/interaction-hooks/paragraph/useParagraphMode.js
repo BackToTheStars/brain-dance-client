@@ -3,6 +3,7 @@ import { useUserContext } from '../../UserContext';
 import {
   MODE_GAME,
   INTERACTION_COMPRESS_PARAGRAPH,
+  INTERACTION_UNCOMPRESS_PARAGRAPH,
 } from '../../InteractionContext';
 
 export const useParagraphMode = ({
@@ -23,7 +24,13 @@ export const useParagraphMode = ({
         // makeWidgetActive(null);
       },
     },
-    null,
+    {
+      text: 'Uncompress',
+      callback: () => {
+        console.log({ INTERACTION_UNCOMPRESS_PARAGRAPH });
+        setInteractionType(INTERACTION_UNCOMPRESS_PARAGRAPH);
+      },
+    },
     null,
     null,
     null,

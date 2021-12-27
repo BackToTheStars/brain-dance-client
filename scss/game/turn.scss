@@ -92,7 +92,7 @@ $black-color: rgb(0, 0, 0);
       // visibility: hidden;
     }
     .paragraphText {
-      border-bottom: 1px solid black;
+      border-bottom: 1px solid grey;
     }
     .compressor {
       // visibility: hidden;
@@ -100,7 +100,7 @@ $black-color: rgb(0, 0, 0);
   }
   .compressed-paragraph-widget {
     top: 40px;
-    right: -110%;
+    // right: -110%;
     position: absolute;
     width: 100%;
   }
