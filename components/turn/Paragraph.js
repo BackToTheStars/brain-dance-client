@@ -76,7 +76,9 @@ const Paragraph = ({
     if (isActive && interactionType === INTERACTION_UNCOMPRESS_PARAGRAPH) {
       setTextPieces([]);
       setCompressedHeight(null);
-      turnReturnPreviousHeight();
+      setTimeout(() => {
+        turnReturnPreviousHeight();
+      }, 300);
     }
 
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {

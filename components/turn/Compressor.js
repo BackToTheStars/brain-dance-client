@@ -143,7 +143,6 @@ const Compressor = ({
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
     );
-
     console.log({ textPieces });
   }, [width]);
 

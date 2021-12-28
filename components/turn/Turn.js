@@ -90,6 +90,13 @@ const TurnNewComponent = ({
 
   const doesParagraphExist = checkIfParagraphExists(paragraph);
 
+  if (_id === '61a5a92cdbb19f7558aa0bb4') {
+    console.log({ widgets });
+    console.log(
+      widgets.find((widget) => widget.id === 'paragraph')?.maxHeightCallback()
+    );
+  }
+
   const registerHandleResize = (widget) => {
     setWidgets((widgets) => {
       const newWidgets = [...widgets];
@@ -280,6 +287,7 @@ const TurnNewComponent = ({
       width: newTurnWidth,
       height: newTurnHeight,
     });
+    console.log({ newTurnHeight, minHeightBasic });
     setVariableHeight(newTurnHeight - minHeightBasic);
     dispatch({
       type: ACTION_TURN_WAS_CHANGED,
@@ -350,6 +358,10 @@ const TurnNewComponent = ({
       handleResize(width, height);
     }
   }, [widgets]);
+
+  if (_id === '61a5a92cdbb19f7558aa0bb4') {
+    console.log({ variableHeight });
+  }
 
   return (
     <div
@@ -503,8 +515,11 @@ const TurnNewComponent = ({
             turnSavePreviousHeight: () => setPrevHeight(height),
             turnReturnPreviousHeight: () => {
               console.log({ width, prevHeight });
-              handleResize(width, prevHeight);
-              // $(wrapper.current).height(prevHeight + 'px');
+              setCompressedHeight(null);
+              $(wrapper.current).height(prevHeight);
+              setTimeout(() => {
+                handleResize(width, prevHeight);
+              }, 2500);
             },
           }}
         />
