@@ -31,7 +31,7 @@ const TurnNewComponent = ({
   dispatch,
   lineEnds,
   activeQuote,
-  setCreateEditTurnPopupIsHidden,
+  setCreateEditTurnPopupIsHidden, // @todo: remove
   updateTurn,
   deleteTurn,
   saveTurnInBuffer,
@@ -55,6 +55,7 @@ const TurnNewComponent = ({
     scrollPosition,
   } = turn;
 
+  // @todo: также стили устанавливаются во время resize
   const wrapperStyles = {
     left: `${x}px`,
     top: `${y}px`,
@@ -66,10 +67,13 @@ const TurnNewComponent = ({
   const wrapper = useRef(null);
 
   const [widgets, setWidgets] = useState([]);
+  // для передачи информации о том, что цитаты нужно перерисовать
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
+  // если задана, то применяется к параграфу
   const [variableHeight, setVariableHeight] = useState(0);
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
+
   const [textPieces, setTextPieces] = useState([]);
   const [compressedHeight, setCompressedHeight] = useState(null);
   const [prevHeight, setPrevHeight] = useState(null);
@@ -89,13 +93,6 @@ const TurnNewComponent = ({
   };
 
   const doesParagraphExist = checkIfParagraphExists(paragraph);
-
-  if (_id === '61a5a92cdbb19f7558aa0bb4') {
-    console.log({ widgets });
-    console.log(
-      widgets.find((widget) => widget.id === 'paragraph')?.maxHeightCallback()
-    );
-  }
 
   const registerHandleResize = (widget) => {
     setWidgets((widgets) => {
@@ -222,6 +219,7 @@ const TurnNewComponent = ({
 
   const handleEdit = (e) => {
     e.preventDefault();
+    // @todo объединить
     dispatch({ type: ACTION_SET_TURN_TO_EDIT_MODE, payload: { _id } });
     setCreateEditTurnPopupIsHidden(false);
     // alert('button_edit_clicked');
@@ -287,8 +285,7 @@ const TurnNewComponent = ({
       width: newTurnWidth,
       height: newTurnHeight,
     });
-    console.log({ newTurnHeight, minHeightBasic });
-    setVariableHeight(newTurnHeight - minHeightBasic);
+    // setVariableHeight(newTurnHeight - minHeightBasic);
     dispatch({
       type: ACTION_TURN_WAS_CHANGED,
       payload: {
@@ -349,19 +346,9 @@ const TurnNewComponent = ({
 
   useEffect(() => {
     if (widgets.length === 1 + !!imageUrl + !!videoUrl + doesParagraphExist) {
-      // setTimeout(() => {
-      //   // console.log(header, 'handle resize');
-      //   handleResize(width, height);
-      //   // handleResize(width, height, 2000);
-      //   // handleResize(width, height, 4000);
-      // }, 400);
       handleResize(width, height);
     }
   }, [widgets]);
-
-  if (_id === '61a5a92cdbb19f7558aa0bb4') {
-    console.log({ variableHeight });
-  }
 
   return (
     <div
@@ -514,12 +501,21 @@ const TurnNewComponent = ({
 
             turnSavePreviousHeight: () => setPrevHeight(height),
             turnReturnPreviousHeight: () => {
-              console.log({ width, prevHeight });
-              setCompressedHeight(null);
+              dispatch({
+                type: ACTION_TURN_WAS_CHANGED,
+                payload: {
+                  _id,
+                  wasChanged: true,
+                  // width: newTurnWidth,
+                  height: prevHeight,
+                },
+              });
+              // setCompressedHeight(null);
               $(wrapper.current).height(prevHeight);
-              setTimeout(() => {
-                handleResize(width, prevHeight);
-              }, 2500);
+              console.log(prevHeight);
+              // setTimeout(() => {
+              //   handleResize(width, prevHeight);
+              // }, 2500);
             },
           }}
         />

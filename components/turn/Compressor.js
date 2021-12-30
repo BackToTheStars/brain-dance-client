@@ -57,18 +57,14 @@ const Compressor = ({
     });
 
     // const tempTurnTop = 26;
-    console.log('===============');
     for (let span of filteredSpans) {
       const { height, top: absoluteTop } = span.getBoundingClientRect();
       const top = absoluteTop - paragraphTop;
-      // console.log('span', height, top);
       if (height + top > maxHeightPlusTop) {
         maxHeightPlusTop = height + top;
-        // console.log({ maxHeightPlusTop });
         if (textPieceIndex < textPieces.length - 1) {
           if (textPieces[textPieceIndex + 1].top < maxHeightPlusTop) {
             textPieceIndex += 1;
-            console.log('new textPieceIndex', textPieceIndex);
             textPieces[textPieceIndex].startLettersCount = lettersCount;
             textPieces[textPieceIndex].delta =
               maxHeightPlusTop - textPieces[textPieceIndex].top;
@@ -84,11 +80,7 @@ const Compressor = ({
         // debugger;
         // }
       }
-      // console.log({ lettersCount });
     }
-    console.log('===============');
-    console.log(textPieces);
-    console.log(paragraph);
 
     let paragraphCountingBuffer = [];
     lettersCount = 0;
@@ -100,7 +92,6 @@ const Compressor = ({
       for (let j = paragraphIndex; j < paragraph.length; j += 1) {
         const insertLength = paragraph[j].insert.length;
         if (insertLength + lettersCount === startLettersCount) {
-          console.log('if 1');
           // решить, делать ли копию
           paragraphCountingBuffer.push(paragraph[j]);
           paragraphIndex = j + 1;
@@ -110,12 +101,10 @@ const Compressor = ({
           break; // @learn - breaks работает для while, for, switch
           //
         } else if (insertLength + lettersCount < startLettersCount) {
-          // console.log('if 2', insertLength + lettersCount, startLettersCount);
           paragraphCountingBuffer.push(paragraph[j]);
           lettersCount += insertLength;
           //
         } else if (insertLength + lettersCount > startLettersCount) {
-          console.log('if 3', insertLength + lettersCount, startLettersCount);
           // const difference = insertLength + lettersCount - startLettersCount;
           const difference = startLettersCount - lettersCount;
           paragraphCountingBuffer.push({
@@ -135,7 +124,6 @@ const Compressor = ({
         }
       }
     }
-    // console.log('завершение цикла');
     textPieces[textPieces.length - 1].paragraph =
       paragraph.slice(paragraphIndex);
     setCompressedTexts(textPieces);
@@ -143,7 +131,6 @@ const Compressor = ({
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
     );
-    console.log({ textPieces });
   }, [width]);
 
   return (
@@ -162,7 +149,6 @@ const Compressor = ({
             newWords.push(<span key={j * 3 + 1}> </span>);
             newWords.push(<br key={j * 3 + 2} />);
           }
-          // console.log({ newWords });
           newWords.pop();
           // newWords.pop();
           return <Fragment key={`${i}`}>{newWords}</Fragment>;

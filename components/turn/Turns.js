@@ -36,6 +36,7 @@ const TurnsComponent = () => {
           return turnsToRender.includes(turn._id); // оставляем только те, которые рендерятся
         })
         .map((turn) => {
+          // @todo: перенести получение turnLineEnds в turnContext
           const turnLineEnds = {};
           for (let quoteKey in lineEnds) {
             const lines = lineEnds[quoteKey].lines.filter(

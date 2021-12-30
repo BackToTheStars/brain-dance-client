@@ -83,18 +83,11 @@ const Paragraph = ({
 
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
       turnSavePreviousHeight();
-      // console.log({
-      //   height: paragraphEl.current.getBoundingClientRect().height,
-      // });
-      // console.log({ scrollTop: paragraphEl.current.scrollTop });
-      // console.log({ scrollHeight: paragraphEl.current.scrollHeight });
 
       const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
         top: quote.initialCoords.top + paragraphEl.current.scrollTop - 40, // @todo: использовать положение параграфа
         height: quote.initialCoords.height,
       }));
-
-      // console.log(textQuotesVerticalPositions);
 
       const createEmptyTextPiece = () => ({
         quotes: [],
@@ -125,7 +118,6 @@ const Paragraph = ({
           // } else {
           // @todo: check
           // textPiece.height = freeSpaceRequired + quote.height;
-          // console.log(i, { height1: textPiece.height });
         }
         // @todo: iterations count
 
@@ -139,7 +131,6 @@ const Paragraph = ({
           textPiece.scrollHeight = textPiece.scrollHeight + middle;
           textPieces.push(textPiece);
           textPiece.height += freeSpaceRequired; // quote.height;
-          console.log(i, { height2: textPiece.height });
           prevTextPiece = textPiece;
           textPiece = createEmptyTextPiece();
           textPiece.top = prevTextPiece.top + prevTextPiece.scrollHeight;
@@ -169,8 +160,6 @@ const Paragraph = ({
         }
       }
 
-      // console.log('check1', textPieces);
-
       for (let i = 0; i < textPieces.length; i++) {
         const textPiece = textPieces[i];
         const top = textPiece.quotes[0].top;
@@ -183,8 +172,6 @@ const Paragraph = ({
         textPiece.viewportTop = top - freeSpaceRequired;
         textPiece.scrollTop = textPiece.viewportTop - textPiece.top;
       }
-
-      console.log('check2', textPieces);
 
       // --------- console log lines
 
@@ -223,13 +210,6 @@ const Paragraph = ({
         color: 'purple',
       }));
 
-      // console.log([
-      //   ...drawTopLines,
-      //   ...drawViewportTopLines,
-      //   ...drawViewportBottomLines,
-      //   ...drawBottomLines,
-      // ]);
-
       updateDebugLines([
         ...drawTopLines,
         ...drawViewportTopLines,
@@ -261,10 +241,6 @@ const Paragraph = ({
         if (!paragraphEl.current) {
           return 0;
         }
-        console.log({
-          compressedHeight,
-          scrollHeight: paragraphEl.current.scrollHeight,
-        });
         return compressedHeight || paragraphEl.current.scrollHeight;
       },
     });
@@ -294,7 +270,6 @@ const Paragraph = ({
         Math.floor(paragraphEl.current.scrollTop) === Math.floor(scrollPosition)
       )
         return;
-      // console.log(scrollPosition, 2);
       recalculateQuotes();
     }, 50);
   }, [paragraphEl, scrollPosition]);
@@ -308,7 +283,6 @@ const Paragraph = ({
 
     const scrollHandler = () => {
       if (!!paragraphEl.current) {
-        // console.log(Math.floor(paragraphEl.current.scrollTop), 3);
         dispatch({
           type: ACTION_TURN_WAS_CHANGED,
           payload: {
@@ -318,7 +292,6 @@ const Paragraph = ({
           },
         });
       } else {
-        // console.log(`!!paragraphEl.current turnId: ${turnId}`);
       }
     };
 
@@ -372,7 +345,6 @@ const Paragraph = ({
           onClick={(e) => {
             e.preventDefault();
             makeWidgetActive();
-            // console.log('paragraph active!');
           }}
         >
           <i className="fas fa-highlighter"></i>
