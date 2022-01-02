@@ -3,14 +3,14 @@ import Head from 'next/head'; // в head засовываем всё что бы
 import { UI_Provider } from '../components/contexts/UI_Context';
 import { UserProvider } from '../components/contexts/UserContext';
 import { InteractionProvider } from '../components/contexts/InteractionContext';
-import { TurnProvider } from '../components/contexts/TurnContext';
+import { TurnsCollectionProvider } from '../components/contexts/TurnsCollectionContext';
 import { useRouter } from 'next/router';
 import { Fragment } from 'react';
 
 const Game = dynamic(() => import('../components/Game'), { ssr: false });
 // @learn
-// const TurnContext = dynamic(
-//   () => import('../components/contexts/TurnContext'),
+// const TurnsCollectionContext = dynamic(
+//   () => import('../components/contexts/TurnsCollectionContext'),
 //   { ssr: false }
 // );
 // ssr = server side rendering
@@ -48,11 +48,11 @@ const GamePage = () => {
       ) : (
         <UserProvider hash={hash} timecode={router.query.timecode}>
           <UI_Provider>
-            <TurnProvider>
+            <TurnsCollectionProvider>
               <InteractionProvider>
                 <Game />
               </InteractionProvider>
-            </TurnProvider>
+            </TurnsCollectionProvider>
           </UI_Provider>
         </UserProvider>
       )}

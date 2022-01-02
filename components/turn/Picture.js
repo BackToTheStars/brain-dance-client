@@ -6,7 +6,7 @@ import {
   useInteractionContext,
   INTERACTION_ADD_OR_EDIT_QUOTE,
 } from '../contexts/InteractionContext';
-import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnContext';
+import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnsCollectionContext';
 import PictureQuotes from './picture/Quotes';
 import { lineOffset } from '../сonst';
 

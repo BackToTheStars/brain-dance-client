@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { getQuill } from '../helpers/quillHandler';
 import { useUiContext } from '../contexts/UI_Context';
 import {
-  useTurnContext,
+  useTurnsCollectionContext,
   ACTION_TURN_CREATED,
   ACTION_TURN_WAS_CHANGED,
-} from '../contexts/TurnContext';
+} from '../contexts/TurnsCollectionContext';
 import turnSettings from '../turn/settings';
 
 const {
@@ -27,7 +27,7 @@ const AddEditTurnPopup = () => {
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
   const { createTurn, turns, dispatch, turnToEdit, updateTurn } =
-    useTurnContext();
+    useTurnsCollectionContext();
   const {
     minimapState: { left, top },
     createEditTurnPopupIsHidden,

@@ -10,19 +10,15 @@ import FlexMinimap from './panels/FlexMinimap';
 import { useUserContext } from './contexts/UserContext';
 // import { useUiContext } from './contexts/UI_Context';
 import {
-  useTurnContext,
+  useTurnsCollectionContext,
   ACTION_FIELD_WAS_MOVED,
   ACTION_LINES_INIT,
-} from './contexts/TurnContext';
+} from './contexts/TurnsCollectionContext';
 import { API_URL } from './config';
 import TurnsComponent from './turn/Turns';
 import AddEditTurnPopup from './popups/AddEditTurnPopup';
 import QuotesLinesLayer from './panels/QuotesLinesLayer';
 import BottomPanelWrapper from './panels/BottomPanelWrapper';
-
-// import { TurnProvider } from './contexts/TurnContext';
-
-// let globalGame;
 
 const GameComponent = () => {
   const [notes, setNotes] = useState([]);
@@ -40,7 +36,7 @@ const GameComponent = () => {
   // minimapDispatch,
   // } = useUiContext();
 
-  const { dispatch: turnsDispatch, turns } = useTurnContext();
+  const { dispatch: turnsDispatch, turns } = useTurnsCollectionContext();
 
   //   const notificationAlert = (note) => {
   //     setNotes((notes) => {

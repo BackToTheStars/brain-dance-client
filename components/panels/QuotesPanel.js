@@ -1,4 +1,7 @@
-import { useTurnContext, ACTION_LINES_DELETE } from '../contexts/TurnContext';
+import {
+  useTurnsCollectionContext,
+  ACTION_LINES_DELETE,
+} from '../contexts/TurnsCollectionContext';
 import { RULE_TURNS_CRUD } from '../config';
 import { useUserContext } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
@@ -11,7 +14,7 @@ const cutTextToSize = (text, size) => {
 };
 
 const QuotesPanel = ({ preparedLines }) => {
-  const { dispatch, deleteLines } = useTurnContext();
+  const { dispatch, deleteLines } = useTurnsCollectionContext();
   const { can } = useUserContext();
   const {
     bottomPanelSettings: { setPanelType },

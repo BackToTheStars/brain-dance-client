@@ -1,7 +1,10 @@
 import { useRouter } from 'next/router';
 import { useUiContext } from '../UI_Context'; // export const useUiContext
 import { useUserContext } from '../UserContext';
-import { useTurnContext, ACTION_RESET_TURN_EDIT_MODE } from '../TurnContext';
+import {
+  useTurnsCollectionContext,
+  ACTION_RESET_TURN_EDIT_MODE,
+} from '../TurnsCollectionContext';
 import { RULE_TURNS_CRUD } from '../../config';
 import { PANEL_PASTE } from '../InteractionContext';
 
@@ -20,7 +23,7 @@ export const useGameMode = ({ setPanelType }) => {
     saveField,
     dispatch: turnDispatch,
     insertTurnFromBuffer,
-  } = useTurnContext();
+  } = useTurnsCollectionContext();
 
   return [
     {

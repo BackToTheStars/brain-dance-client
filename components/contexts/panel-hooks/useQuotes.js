@@ -1,13 +1,13 @@
 // @learn Next.js сам везде добавляет import React, в отличие от create-react-app
 import { useEffect, useState } from 'react';
-import { useTurnContext } from '../TurnContext';
+import { useTurnsCollectionContext } from '../TurnsCollectionContext';
 import { useUserContext } from '../UserContext';
 
 export const useQuotes = () => {
   const [preparedLines, setPreparedLines] = useState([]);
 
   const { activeQuote, lineEnds, quotesInfo, pictureQuotesInfo } =
-    useTurnContext();
+    useTurnsCollectionContext();
 
   const {
     request,

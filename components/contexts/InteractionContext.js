@@ -4,7 +4,7 @@ import { usePictureMode } from './interaction-hooks/usePictureMode';
 
 import { usePictureQuoteAdd } from './interaction-hooks/usePictureQuoteAdd';
 import { usePictureQuoteActive } from './interaction-hooks/usePictureQuoteActive';
-import { useTurnContext } from './TurnContext';
+import { useTurnsCollectionContext } from './TurnsCollectionContext';
 import { useQuotes } from './panel-hooks/useQuotes';
 import { useParagraphMode } from './interaction-hooks/paragraph/useParagraphMode';
 
@@ -39,7 +39,7 @@ export const InteractionProvider = ({ children }) => {
 
   const [panelType, setPanelType] = useState(null);
 
-  const { dispatch } = useTurnContext();
+  const { dispatch } = useTurnsCollectionContext();
 
   const { preparedLines } = useQuotes();
 

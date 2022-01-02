@@ -1,6 +1,6 @@
 import { RULE_TURNS_CRUD } from '../config';
 import { useUserContext } from '../contexts/UserContext';
-import { useTurnContext } from '../contexts/TurnContext';
+import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
 import { paragraphToString } from '../helpers/quillHandler';
 import { useEffect } from 'react';
 import { useInteractionContext } from '../contexts/InteractionContext';
@@ -9,7 +9,7 @@ const PasteTurnPanel = () => {
   //
   const { getTurnsFromBuffer, can, getTurnFromBufferAndRemove } =
     useUserContext();
-  const { insertTurnFromBuffer } = useTurnContext();
+  const { insertTurnFromBuffer } = useTurnsCollectionContext();
   const turnsToPaste = getTurnsFromBuffer();
   const {
     bottomPanelSettings: { setPanelType }, // @learn {} второго уровня в деструктуризаторе (можно любую вложенность)

@@ -5,7 +5,7 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
   INTERACTION_ADD_OR_EDIT_QUOTE,
 } from '../InteractionContext';
-import { ACTION_QUOTE_CANCEL } from '../TurnContext';
+import { ACTION_QUOTE_CANCEL } from '../TurnsCollectionContext';
 
 export const usePictureMode = ({
   setInteractionType,

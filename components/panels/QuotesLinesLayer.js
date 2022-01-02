@@ -2,7 +2,7 @@ import {
   useInteractionContext,
   MODE_GAME,
 } from '../contexts/InteractionContext';
-import { useTurnContext } from '../contexts/TurnContext';
+import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
 import { useRef, useState } from 'react';
 import Line from '../line/line';
 import { useUiContext } from '../contexts/UI_Context';
@@ -12,7 +12,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
-  const { linesWithEndCoords } = useTurnContext();
+  const { linesWithEndCoords } = useTurnsCollectionContext();
   const { makeWidgetActive, setInteractionMode } = useInteractionContext();
   const {
     debugData: { debugLines },

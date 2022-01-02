@@ -1,15 +1,16 @@
 import { useUiContext } from '../contexts/UI_Context';
 import { useEffect, useState, useRef } from 'react';
 import {
-  useTurnContext,
+  useTurnsCollectionContext,
   ACTION_FIELD_WAS_MOVED,
-} from '../contexts/TurnContext';
+} from '../contexts/TurnsCollectionContext';
 import { panelSpacer } from '../сonst';
 import Line from '../line/line';
 
 const FlexMinimap = ({ gameBox }) => {
   const { minimapState, minimapDispatch } = useUiContext();
-  const { dispatch: turnsDispatch, lines: uiLines } = useTurnContext();
+  const { dispatch: turnsDispatch, lines: uiLines } =
+    useTurnsCollectionContext();
   const [lines, setLines] = useState([]);
   const {
     left,

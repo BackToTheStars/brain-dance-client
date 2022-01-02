@@ -12,7 +12,7 @@ import {
   ACTION_TURN_WAS_CHANGED,
   ACTION_SET_TURN_TO_EDIT_MODE,
   ACTION_DELETE_TURN,
-} from '../contexts/TurnContext';
+} from '../contexts/TurnsCollectionContext';
 import Paragraph from './Paragraph';
 import BottomLabels from './BottomLabels';
 import Telemetry from './Telemetry';

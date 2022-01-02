@@ -4,7 +4,7 @@ import {
   ACTION_QUOTE_COORDS_UPDATED,
   ACTION_QUOTE_CLICKED,
   ACTION_TURN_WAS_CHANGED,
-} from '../contexts/TurnContext';
+} from '../contexts/TurnsCollectionContext';
 import { quoteRectangleThickness } from '../сonst';
 import {
   MODE_GAME,

@@ -1,5 +1,5 @@
 import { quoteRectangleThickness } from '../../сonst';
-import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnContext';
+import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnsCollectionContext';
 import {
   MODE_GAME,
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,

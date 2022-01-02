@@ -1,5 +1,5 @@
 import { useUserContext } from '../UserContext';
-import { useTurnContext } from '../TurnContext';
+import { useTurnsCollectionContext } from '../TurnsCollectionContext';
 
 import { RULE_TURNS_CRUD } from '../../config';
 import {
@@ -13,7 +13,7 @@ import {
   ACTION_QUOTE_CANCEL,
   ACTION_PICTURE_QUOTE_DELETE,
   ACTION_LINES_DELETE,
-} from '../TurnContext';
+} from '../TurnsCollectionContext';
 
 export const usePictureQuoteActive = ({
   setInteractionMode,
@@ -24,7 +24,7 @@ export const usePictureQuoteActive = ({
 }) => {
   const { can } = useUserContext();
   const { activeQuote, deleteQuote, lineEnds, lines, deleteLines } =
-    useTurnContext();
+    useTurnsCollectionContext();
 
   return [
     {
