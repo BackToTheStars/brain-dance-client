@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useTurnContext } from '../contexts/TurnContext';
+import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnsCollectionContext';
 import BottomLabels from './BottomLabels';
 import Header from './Header';
 
@@ -18,9 +19,12 @@ const NextTurn = () => {
     // addNotification,
     // tempMiddlewareFn,
     // lines,
+
+    setInteractionMode,
   } = useTurnContext();
 
   const { _id, x, y, width, height } = turn;
+
   const {
     contentType,
     header,
@@ -47,6 +51,46 @@ const NextTurn = () => {
   // подключаем useRef к div хода
   const wrapper = useRef(null);
   const textPieces = []; // потом убрать
+
+  useEffect(() => {
+    $(wrapper.current).draggable({
+      start: (event, ui) => {
+        $('#gameBox')
+          .addClass('remove-line-transition')
+          .addClass('translucent-field');
+      },
+      drag: (event, ui) => {
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: _id,
+            wasChanged: true,
+            x: ui.position.left, // x - left - ui.position.left,
+            y: ui.position.top, // y - top - ui.position.top,
+          },
+        });
+      },
+      stop: (event, ui) => {
+        $('#gameBox')
+          .removeClass('remove-line-transition')
+          .removeClass('translucent-field');
+      },
+    });
+
+    setTimeout(() => {
+      dispatch({
+        type: ACTION_TURN_WAS_CHANGED,
+        payload: {
+          _id: _id,
+          wasChanged: true,
+          width: 700,
+          height: 400,
+        },
+      });
+    }, 5000);
+
+    return () => $(wrapper.current).draggable('destroy');
+  }, []);
 
   return (
     <div

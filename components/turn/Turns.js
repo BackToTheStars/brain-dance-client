@@ -3,6 +3,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { useUiContext } from '../contexts/UI_Context';
 import Turn from './Turn';
 import { TurnProvider } from '../contexts/TurnContext';
+import { useInteractionContext } from '../contexts/InteractionContext';
 import NextTurn from './NextTurn';
 
 const TurnsComponent = () => {
@@ -26,6 +27,13 @@ const TurnsComponent = () => {
     windowSize,
     addNotification,
   } = useUiContext();
+  const {
+    // activeWidget,
+    // makeWidgetActive,
+    // interactionType,
+    setInteractionMode,
+  } = useInteractionContext();
+  console.log('turns render');
 
   // console.log('turns component', { turns }, ' turnsToRender: ', {
   // turnsToRender,
@@ -71,6 +79,7 @@ const TurnsComponent = () => {
                 saveTurnInBuffer,
                 addNotification,
                 lines,
+                setInteractionMode,
               }}
             >
               <NextTurn />

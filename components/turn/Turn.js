@@ -40,6 +40,7 @@ const TurnNewComponent = ({
   lines,
 }) => {
   const { _id, x, y, width, height } = turn;
+
   const {
     contentType,
     header,

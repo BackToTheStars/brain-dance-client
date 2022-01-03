@@ -14,6 +14,7 @@ import {
   useInteractionContext,
 } from '../contexts/InteractionContext';
 import { useUiContext } from '../contexts/UI_Context';
+import { freeSpaceRequired } from '../сonst';
 
 // const delayRenderScroll = 20;
 
@@ -100,7 +101,7 @@ const Paragraph = ({
       let textPiece = createEmptyTextPiece();
       let prevTextPiece = null;
 
-      const freeSpaceRequired = 59;
+      // const freeSpaceRequired = 59;
       // @todo отдельно просчитать случай с одной цитатой
 
       for (let i = 0; i < textQuotesVerticalPositions.length; i++) {

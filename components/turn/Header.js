@@ -3,13 +3,28 @@ import { RULE_TURNS_CRUD } from '../config';
 import { ACTION_DELETE_TURN } from '../contexts/TurnsCollectionContext';
 import { useTurnContext } from '../contexts/TurnContext';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
-
-const HEADER_HEIGHT = 40;
+import { HEADER_HEIGHT } from '../сonst';
+import { MODE_GAME } from '../contexts/InteractionContext';
 
 const Header = ({ registerHandleResize }) => {
-  const { can, turn, saveTurnInBuffer, tempMiddlewareFn } = useTurnContext();
-  const { header, contentType, backgroundColor, fontColor, dontShowHeader } =
-    turn;
+  const {
+    dispatch,
+    deleteTurn,
+    can,
+    turn,
+    saveTurnInBuffer,
+    tempMiddlewareFn,
+    setInteractionMode,
+  } = useTurnContext();
+
+  const {
+    _id,
+    header,
+    contentType,
+    backgroundColor,
+    fontColor,
+    dontShowHeader,
+  } = turn;
   const headerEl = useRef(null);
   const style =
     contentType === 'comment' && !dontShowHeader
