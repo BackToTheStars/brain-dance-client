@@ -15,31 +15,22 @@ import {
 } from '../contexts/InteractionContext';
 import { useUiContext } from '../contexts/UI_Context';
 import { freeSpaceRequired } from '../сonst';
+import { useTurnContext } from '../contexts/TurnContext';
 
 // const delayRenderScroll = 20;
 
 const Paragraph = ({
   setTextPieces,
-  contentType,
-  backgroundColor,
-  fontColor,
-  paragraph,
   updateSizeTime,
   registerHandleResize,
   unregisterHandleResize,
   variableHeight,
   quotes,
-  dispatch,
-  _id,
-  lineEnds,
-  activeQuote,
   quotesWithCoords,
   setQuotesWithCoords,
   quotesLoaded,
   setQuotesLoaded,
-  scrollPosition,
   recalculateQuotes,
-  turnId,
   makeWidgetActive,
   isActive,
   compressedHeight,
@@ -54,6 +45,16 @@ const Paragraph = ({
     return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
   }).length;
 
+  const { turn, lineEnds, dispatch, activeQuote } = useTurnContext();
+  const {
+    _id: turnId,
+    contentType,
+    backgroundColor,
+    fontColor,
+    paragraph,
+    scrollPosition,
+  } = turn;
+
   const {
     setInteractionMode,
     interactionType,
@@ -65,7 +66,7 @@ const Paragraph = ({
   } = useUiContext();
 
   const onQuoteClick = (quoteId) => {
-    dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId: _id, quoteId } });
+    dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
   };
 
   const paragraphEl = useRef(null);
@@ -259,7 +260,7 @@ const Paragraph = ({
       setQuotesLoaded(true);
       dispatch({
         type: ACTION_QUOTE_COORDS_UPDATED,
-        payload: { turnId: _id, quotesInfo: quotesWithCoords },
+        payload: { turnId, quotesInfo: quotesWithCoords },
       });
     }
   }, [quotesWithCoords]);
@@ -287,7 +288,7 @@ const Paragraph = ({
         dispatch({
           type: ACTION_TURN_WAS_CHANGED,
           payload: {
-            _id: _id,
+            _id: turnId,
             wasChanged: true,
             scrollPosition: Math.floor(paragraphEl.current.scrollTop),
           },
@@ -358,7 +359,7 @@ const Paragraph = ({
         let outline = '0px solid transparent';
         if (
           activeQuote &&
-          activeQuote.turnId === _id &&
+          activeQuote.turnId === turnId &&
           activeQuote.quoteId === quote.quoteId
         ) {
           bordered = true;

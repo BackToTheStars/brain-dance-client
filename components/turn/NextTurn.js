@@ -1,8 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useTurnContext } from '../contexts/TurnContext';
 import { ACTION_TURN_WAS_CHANGED } from '../contexts/TurnsCollectionContext';
 import BottomLabels from './BottomLabels';
 import Header from './Header';
+import { checkIfParagraphExists } from '../helpers/quillHandler';
+import Paragraph from './Paragraph';
 
 const NextTurn = () => {
   const {
@@ -23,6 +25,8 @@ const NextTurn = () => {
     setInteractionMode,
   } = useTurnContext();
 
+  const [widgets, setWidgets] = useState([]);
+
   const { _id, x, y, width, height } = turn;
 
   const {
@@ -40,6 +44,8 @@ const NextTurn = () => {
     scrollPosition,
   } = turn;
 
+  const doesParagraphExist = checkIfParagraphExists(paragraph);
+
   // @todo: также стили устанавливаются во время resize
   const wrapperStyles = {
     left: `${x}px`,
@@ -51,6 +57,83 @@ const NextTurn = () => {
   // подключаем useRef к div хода
   const wrapper = useRef(null);
   const textPieces = []; // потом убрать
+
+  const handleResize = (newTurnWidth, newTurnHeight, delay = 400) => {
+    let minWidth = 0;
+    let minHeight = 0;
+    let maxHeight = 0;
+    let minHeightBasic = 0;
+
+    for (let widget of widgets) {
+      if (minWidth < widget.minWidthCallback()) {
+        minWidth = widget.minWidthCallback();
+      }
+    }
+
+    if (newTurnWidth < minWidth) {
+      newTurnWidth = minWidth;
+    }
+
+    for (let widget of widgets) {
+      minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
+      maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+      if (!widget.variableHeight) {
+        minHeightBasic =
+          minHeightBasic + widget.minHeightCallback(newTurnWidth);
+      }
+    }
+
+    if (newTurnHeight < minHeight) {
+      newTurnHeight = minHeight;
+    }
+    if (newTurnHeight > maxHeight) {
+      newTurnHeight = maxHeight;
+    }
+
+    $(wrapper.current).css({
+      width: newTurnWidth,
+      height: newTurnHeight,
+    });
+    // setVariableHeight(newTurnHeight - minHeightBasic);
+    dispatch({
+      type: ACTION_TURN_WAS_CHANGED,
+      payload: {
+        _id,
+        wasChanged: true,
+        width: newTurnWidth,
+        height: newTurnHeight,
+      },
+    });
+    setTimeout(() => {
+      // recalculateQuotes(); @todo
+      widgets.forEach(
+        (widget) => !!widget.resizeCallback && widget.resizeCallback()
+      );
+    }, delay);
+  };
+
+  const registerHandleResize = (widget) => {
+    setWidgets((widgets) => {
+      const newWidgets = [...widgets];
+      const index = newWidgets.findIndex(
+        (newWidget) => newWidget.id === widget.id
+      );
+      if (index === -1) {
+        newWidgets.push(widget);
+      } else {
+        newWidgets[index] = widget;
+      }
+      return newWidgets;
+    });
+  };
+
+  const unregisterHandleResize = (widget) => {
+    setWidgets((widgets) => {
+      return widgets.filter(
+        (widgetToReturn) => widget.id !== widgetToReturn.id
+      );
+    });
+  };
 
   useEffect(() => {
     $(wrapper.current).draggable({
@@ -77,20 +160,18 @@ const NextTurn = () => {
       },
     });
 
-    setTimeout(() => {
-      dispatch({
-        type: ACTION_TURN_WAS_CHANGED,
-        payload: {
-          _id: _id,
-          wasChanged: true,
-          width: 700,
-          height: 400,
-        },
-      });
-    }, 5000);
-
     return () => $(wrapper.current).draggable('destroy');
   }, []);
+
+  useEffect(() => {
+    $(wrapper.current).resizable({
+      // stop: (event, ui) => {
+      resize: (event, ui) => {
+        handleResize(ui.size.width, ui.size.height);
+      },
+    });
+    return () => $(wrapper.current).resizable('destroy');
+  }, []); // widgets
 
   return (
     <div
@@ -106,8 +187,8 @@ const NextTurn = () => {
         // handleCut={handleCut}
         // handleEdit={handleEdit}
         // handleDelete={handleDelete}
-        registerHandleResize={() => {}}
-        // registerHandleResize={registerHandleResize}
+        // @todo нужно ли передавать unRegisterHandleResize
+        registerHandleResize={registerHandleResize}
       />
       {/* {!!imageUrl && (
         <Picture
@@ -202,38 +283,39 @@ const NextTurn = () => {
           }}
         />
       )} */}
-      {/* {doesParagraphExist && (
+      {doesParagraphExist && (
         <Paragraph
           {...{
-            setTextPieces, //
-            contentType,
-            backgroundColor,
-            fontColor,
-            paragraph,
-            updateSizeTime, //
+            setTextPieces: () => {}, //
+            updateSizeTime: () => {}, //
+
+            // quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
+            // quotesWithCoords, //
+            // setQuotesWithCoords, //
+            // quotesLoaded, //
+            // setQuotesLoaded, //
+            // recalculateQuotes, //
+            //@todo remove
+            quotes: [],
+            quotesWithCoords: [], //
+            setQuotesWithCoords: () => {}, //
+            quotesLoaded: [], //
+            setQuotesLoaded: () => {}, //
+            recalculateQuotes: () => {}, //
+
             registerHandleResize,
             unregisterHandleResize,
-            variableHeight,
-            quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
-            dispatch, //
-            _id, // @todo: оставить _id или turnId
-            lineEnds, //
-            activeQuote, //
-            quotesWithCoords, //
-            setQuotesWithCoords, //
-            turnId: _id,
-            quotesLoaded, //
-            setQuotesLoaded, //
-            scrollPosition,
-            recalculateQuotes, //
-            isActive: isWidgetActive('paragraph'), // (widgetId)
+            variableHeight: null, //
+            compressedHeight: 0, //
+            setCompressedHeight: () => {}, //
+
+            // @todo: проверить, стоит ли вынести в контекст
+            isActive: false, // isWidgetActive('paragraph'), @todo
             makeWidgetActive: () => {
               setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
               // делаем синюю рамку у картинки
             },
-            compressedHeight,
-            setCompressedHeight,
 
             turnSavePreviousHeight: () => setPrevHeight(height),
             turnReturnPreviousHeight: () => {
@@ -255,7 +337,7 @@ const NextTurn = () => {
             },
           }}
         />
-      )} */}
+      )}
       <BottomLabels
         {...{
           sourceUrl,
