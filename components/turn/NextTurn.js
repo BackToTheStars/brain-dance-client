@@ -5,6 +5,11 @@ import BottomLabels from './BottomLabels';
 import Header from './Header';
 import { checkIfParagraphExists } from '../helpers/quillHandler';
 import Paragraph from './Paragraph';
+import { WIDGET_PARAGRAPH } from './settings';
+import {
+  MODE_WIDGET_PARAGRAPH,
+  useInteractionContext,
+} from '../contexts/InteractionContext';
 
 const NextTurn = () => {
   const {
@@ -24,6 +29,8 @@ const NextTurn = () => {
 
     setInteractionMode,
   } = useTurnContext();
+  const { makeWidgetActive, interactionType, activeWidget } =
+    useInteractionContext();
 
   const [widgets, setWidgets] = useState([]);
 
@@ -53,12 +60,20 @@ const NextTurn = () => {
     width: `${width}px`,
     height: `${height}px`,
   };
-
+  console.log({ height });
   // подключаем useRef к div хода
   const wrapper = useRef(null);
-  const textPieces = []; // потом убрать
+  const [textPieces, setTextPieces] = useState([]); // потом убрать
+
+  const isWidgetActive = (widgetId) => {
+    if (!activeWidget) return false;
+    if (activeWidget.turnId !== _id) return false;
+    if (activeWidget.widgetId !== widgetId) return false;
+    return true;
+  };
 
   const handleResize = (newTurnWidth, newTurnHeight, delay = 400) => {
+    console.log({ newTurnHeight, newTurnWidth });
     let minWidth = 0;
     let minHeight = 0;
     let maxHeight = 0;
@@ -77,11 +92,13 @@ const NextTurn = () => {
     for (let widget of widgets) {
       minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
       maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+      console.log({ maxHeight });
       if (!widget.variableHeight) {
         minHeightBasic =
           minHeightBasic + widget.minHeightCallback(newTurnWidth);
       }
     }
+    // console.log({ maxHeight, widgets });
 
     if (newTurnHeight < minHeight) {
       newTurnHeight = minHeight;
@@ -163,15 +180,25 @@ const NextTurn = () => {
     return () => $(wrapper.current).draggable('destroy');
   }, []);
 
+  const getWidgets = () => widgets;
+
   useEffect(() => {
     $(wrapper.current).resizable({
       // stop: (event, ui) => {
       resize: (event, ui) => {
+        // @todo: setState
         handleResize(ui.size.width, ui.size.height);
       },
     });
     return () => $(wrapper.current).resizable('destroy');
-  }, []); // widgets
+  }, [widgets]); // @todo: Найти способ, не подписываться на изменение widgets
+
+  useEffect(() => {
+    if (widgets.length === 1 + doesParagraphExist) {
+      // + !!imageUrl + !!videoUrl
+      handleResize(width, height);
+    }
+  }, [widgets]);
 
   return (
     <div
@@ -265,7 +292,7 @@ const NextTurn = () => {
           width={width}
         />
       )} */}
-      {/* {!!textPieces.length && (
+      {!!textPieces.length && (
         <Compressor
           {...{
             textPieces,
@@ -282,11 +309,11 @@ const NextTurn = () => {
             setCompressedHeight,
           }}
         />
-      )} */}
+      )}
       {doesParagraphExist && (
         <Paragraph
           {...{
-            setTextPieces: () => {}, //
+            setTextPieces, //
             updateSizeTime: () => {}, //
 
             // quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
@@ -310,14 +337,18 @@ const NextTurn = () => {
             setCompressedHeight: () => {}, //
 
             // @todo: проверить, стоит ли вынести в контекст
-            isActive: false, // isWidgetActive('paragraph'), @todo
+            // isActive: false, //  @todo
+            isActive: isWidgetActive('paragraph'),
+            interactionType,
             makeWidgetActive: () => {
               setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
               // делаем синюю рамку у картинки
             },
 
-            turnSavePreviousHeight: () => setPrevHeight(height),
+            turnSavePreviousHeight: () => {
+              // setPrevHeight(height)
+            },
             turnReturnPreviousHeight: () => {
               dispatch({
                 type: ACTION_TURN_WAS_CHANGED,

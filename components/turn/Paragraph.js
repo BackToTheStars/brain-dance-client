@@ -83,7 +83,9 @@ const Paragraph = ({
       }, 300);
     }
 
+    console.log('check 1');
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
+      console.log('check 2');
       turnSavePreviousHeight();
 
       const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({

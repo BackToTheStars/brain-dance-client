@@ -33,7 +33,7 @@ const TurnsComponent = () => {
     // interactionType,
     setInteractionMode,
   } = useInteractionContext();
-  console.log('turns render');
+  // console.log('turns render');
 
   // console.log('turns component', { turns }, ' turnsToRender: ', {
   // turnsToRender,

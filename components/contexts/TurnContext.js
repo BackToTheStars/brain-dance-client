@@ -44,7 +44,7 @@ export const TurnProvider = ({
 
     setInteractionMode,
   };
-  console.log('turn ', turn?._id, ' rendered');
+  // console.log('turn ', turn?._id, ' rendered');
   return <TurnContext.Provider value={value}>{children}</TurnContext.Provider>;
 };
 
