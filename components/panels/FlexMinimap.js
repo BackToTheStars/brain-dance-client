@@ -4,7 +4,7 @@ import {
   useTurnsCollectionContext,
   ACTION_FIELD_WAS_MOVED,
 } from '../contexts/TurnsCollectionContext';
-import { panelSpacer } from '../сonst';
+import { panelSpacer } from '../const';
 import Line from '../line/line';
 
 const FlexMinimap = ({ gameBox }) => {

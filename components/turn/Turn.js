@@ -69,11 +69,11 @@ const TurnNewComponent = ({
 
   const [widgets, setWidgets] = useState([]);
   // для передачи информации о том, что цитаты нужно перерисовать
-  const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
   // если задана, то применяется к параграфу
   const [variableHeight, setVariableHeight] = useState(0);
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
+  const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
 
   const [textPieces, setTextPieces] = useState([]);
   const [compressedHeight, setCompressedHeight] = useState(null);

@@ -10,6 +10,7 @@ import {
   MODE_WIDGET_PARAGRAPH,
   useInteractionContext,
 } from '../contexts/InteractionContext';
+import Compressor from './Compressor';
 
 const NextTurn = () => {
   const {
@@ -33,6 +34,8 @@ const NextTurn = () => {
     useInteractionContext();
 
   const [widgets, setWidgets] = useState([]);
+  const [variableHeight, setVariableHeight] = useState(0);
+  const [compressedHeight, setCompressedHeight] = useState(null);
 
   const { _id, x, y, width, height } = turn;
 
@@ -64,6 +67,7 @@ const NextTurn = () => {
   // подключаем useRef к div хода
   const wrapper = useRef(null);
   const [textPieces, setTextPieces] = useState([]); // потом убрать
+  console.log({ textPieces });
 
   const isWidgetActive = (widgetId) => {
     if (!activeWidget) return false;
@@ -314,27 +318,19 @@ const NextTurn = () => {
         <Paragraph
           {...{
             setTextPieces, //
-            updateSizeTime: () => {}, //
-
             // quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
             // quotesWithCoords, //
             // setQuotesWithCoords, //
-            // quotesLoaded, //
-            // setQuotesLoaded, //
             // recalculateQuotes, //
             //@todo remove
-            quotes: [],
-            quotesWithCoords: [], //
-            setQuotesWithCoords: () => {}, //
-            quotesLoaded: [], //
-            setQuotesLoaded: () => {}, //
-            recalculateQuotes: () => {}, //
-
+            // quotes: [],
+            // quotesWithCoords: [], //
+            // setQuotesWithCoords: () => {}, //
             registerHandleResize,
             unregisterHandleResize,
             variableHeight: null, //
             compressedHeight: 0, //
-            setCompressedHeight: () => {}, //
+            setCompressedHeight, //
 
             // @todo: проверить, стоит ли вынести в контекст
             // isActive: false, //  @todo

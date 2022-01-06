@@ -1,6 +1,6 @@
 import { useUiContext } from '../contexts/UI_Context';
 import { useEffect, useState } from 'react';
-import { panelSpacer } from '../сonst';
+import { panelSpacer } from '../const';
 import ClassList from '../classes/ClassList';
 import { ClassProvider } from '../contexts/ClassContext';
 

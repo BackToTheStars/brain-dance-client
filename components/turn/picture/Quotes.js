@@ -1,4 +1,4 @@
-import { quoteRectangleThickness } from '../../сonst';
+import { quoteRectangleThickness } from '../../const';
 import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnsCollectionContext';
 import {
   MODE_GAME,

@@ -3,7 +3,7 @@ import { RULE_TURNS_CRUD } from '../config';
 import { ACTION_DELETE_TURN } from '../contexts/TurnsCollectionContext';
 import { useTurnContext } from '../contexts/TurnContext';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
-import { HEADER_HEIGHT } from '../сonst';
+import { HEADER_HEIGHT } from '../const';
 import { MODE_GAME } from '../contexts/InteractionContext';
 
 const Header = ({ registerHandleResize }) => {

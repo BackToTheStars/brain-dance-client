@@ -1,4 +1,4 @@
-import { lineThickness, lineOffset, kBezier } from '../сonst';
+import { lineThickness, lineOffset, kBezier } from '../const';
 import {
   SIDE_RIGHT,
   SIDE_LEFT,

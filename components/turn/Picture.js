@@ -8,7 +8,7 @@ import {
 } from '../contexts/InteractionContext';
 import { ACTION_PICTURE_QUOTE_COORDS_UPDATED } from '../contexts/TurnsCollectionContext';
 import PictureQuotes from './picture/Quotes';
-import { lineOffset } from '../сonst';
+import { lineOffset } from '../const';
 
 const getPercentage = (a, b) => {
   // выдаёт 4-й знак после запятой в процентах
