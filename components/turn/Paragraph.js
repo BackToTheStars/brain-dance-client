@@ -19,14 +19,15 @@ import {
   calculateTextPiecesFromQuotes,
   consoleLogLines,
 } from './paragraph/helper';
+import ParagraphOriginal from './paragraph/ParagraphOriginal';
 
 // const delayRenderScroll = 20;
 
 const Paragraph = ({
-  setTextPieces,
   registerHandleResize,
   unregisterHandleResize,
   variableHeight,
+  setTextPieces,
   // quotesWithCoords,
   // setQuotesWithCoords,
   makeWidgetActive,
@@ -196,54 +197,17 @@ const Paragraph = ({
     };
   }, [paragraphEl]);
 
-  const style = {};
-
-  if (contentType === 'comment') {
-    style.backgroundColor = backgroundColor;
-    style.color = fontColor || 'black';
-  }
-  if (!!variableHeight) {
-    style.height = `${variableHeight}px`;
-  }
-
   return (
     <>
-      <p
-        className="paragraphText original-text"
-        ref={paragraphEl}
-        style={style}
-      >
-        {!!topQuotesCount && (
-          <span className="top-quotes-counter">{topQuotesCount}</span>
-        )}
-        <ParagraphTextWrapper
-          arrText={paragraph || []}
-          updateSizeTime={updateSizeTime}
-          setQuotes={setQuotesWithCoords}
-          onQuoteClick={onQuoteClick}
-          turnId={turnId}
-          activeQuote={activeQuote}
-          // paragraphRect={
-          //   !!paragraphEl && !!paragraphEl.current
-          //     ? paragraphEl.current.getBoundingClientRect()
-          //     : {}
-          // }
-        />
-        {!!bottomQuotesCount && (
-          <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
-        )}
-        <a
-          className="widget-button"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            makeWidgetActive();
-          }}
-        >
-          <i className="fas fa-highlighter"></i>
-        </a>
-      </p>
-
+      <ParagraphOriginal
+        {...{
+          topQuotesCount,
+          bottomQuotesCount,
+          updateSizeTime,
+          setQuotesWithCoords,
+          variableHeight,
+        }}
+      />
       {quotesWithCoords.map((quote, i) => {
         // все цитаты
         let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет

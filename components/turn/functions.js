@@ -1,19 +1,19 @@
 import { useEffect, useRef } from 'react';
-import { PANEL_LINES } from '../contexts/InteractionContext';
+// import { PANEL_LINES } from '../contexts/InteractionContext';
 
 let incId = Math.floor(new Date().getTime() / 1000);
 
 export const ParagraphTextWrapper = ({
   arrText,
   setQuotes,
-  onQuoteClick,
+  // onQuoteClick,
   updateSizeTime,
   // paragraphHeight,
   // paragraphWidth,
   // paragraphScroll,
   // paragraphRect,
   turnId,
-  activeQuote,
+  // activeQuote,
 }) => {
   return (
     <>
@@ -33,14 +33,14 @@ export const ParagraphTextWrapper = ({
               textItem,
               newInserts,
               setQuotes,
-              onQuoteClick,
+              // onQuoteClick,
               updateSizeTime,
               // paragraphHeight,
               // paragraphWidth,
               // paragraphScroll,
               // paragraphRect,
               turnId,
-              activeQuote,
+              // activeQuote,
             }}
           />
         );
@@ -53,9 +53,9 @@ export const SpanTextPiece = ({
   textItem,
   newInserts,
   setQuotes,
-  onQuoteClick,
+  // onQuoteClick,
   updateSizeTime,
-  activeQuote,
+  // activeQuote,
   // paragraphHeight,
   // paragraphWidth,
   // paragraphScroll,

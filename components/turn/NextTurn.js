@@ -36,6 +36,7 @@ const NextTurn = () => {
   const [widgets, setWidgets] = useState([]);
   const [variableHeight, setVariableHeight] = useState(0);
   const [compressedHeight, setCompressedHeight] = useState(null);
+  const [prevHeight, setPrevHeight] = useState(null);
 
   const { _id, x, y, width, height } = turn;
 
