@@ -75,6 +75,9 @@ $black-color: rgb(0, 0, 0);
     color: white;
     opacity: 0;
     transition: 0.3s;
+    &:hover {
+      opacity: 1;
+    }
   }
   div:hover,
   p:hover {

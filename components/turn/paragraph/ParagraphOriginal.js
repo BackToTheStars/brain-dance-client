@@ -1,21 +1,26 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTurnContext } from '../../contexts/TurnContext';
+import { ParagraphTextWrapper } from './functions';
+import { ACTION_TURN_WAS_CHANGED } from '../../contexts/TurnsCollectionContext';
 
 const ParagraphOriginal = ({
-  topQuotesCount,
-  bottomQuotesCount,
   updateSizeTime,
   setQuotesWithCoords,
   variableHeight,
+  quotesWithCoords,
+  setQuotesLoaded,
+  setUpdateSizeTime,
+  setParagraphElCurrent,
 }) => {
   //
-  const { turn } = useTurnContext();
+  const { turn, lineEnds, dispatch } = useTurnContext();
   const {
     paragraph,
     _id: turnId,
     backgroundColor,
     fontColor,
     contentType,
+    scrollPosition,
   } = turn;
 
   const paragraphEl = useRef(null);
@@ -29,6 +34,64 @@ const ParagraphOriginal = ({
   if (!!variableHeight) {
     style.height = `${variableHeight}px`;
   }
+
+  const topQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.quoteKey] && quote.position === 'top';
+  }).length;
+
+  const bottomQuotesCount = quotesWithCoords.filter((quote) => {
+    return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
+  }).length;
+
+  const recalculateQuotes = () => {
+    setQuotesLoaded(false);
+    setQuotesWithCoords([]);
+    setUpdateSizeTime(new Date().getTime());
+  };
+
+  useEffect(() => {
+    if (paragraphEl?.current) setParagraphElCurrent(paragraphEl.current);
+  }, [paragraphEl]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!paragraphEl || !paragraphEl.current) return;
+      if (
+        Math.floor(paragraphEl.current.scrollTop) === Math.floor(scrollPosition)
+      )
+        return;
+      recalculateQuotes();
+    }, 50);
+  }, [paragraphEl, scrollPosition]);
+
+  useEffect(() => {
+    paragraphEl.current.scrollTop = scrollPosition;
+  }, []);
+
+  useEffect(() => {
+    if (!paragraphEl || !paragraphEl.current) return;
+
+    const scrollHandler = () => {
+      if (!!paragraphEl.current) {
+        dispatch({
+          type: ACTION_TURN_WAS_CHANGED,
+          payload: {
+            _id: turnId,
+            wasChanged: true,
+            scrollPosition: Math.floor(paragraphEl.current.scrollTop),
+          },
+        });
+      } else {
+      }
+    };
+
+    paragraphEl.current.addEventListener('scroll', scrollHandler);
+    // @todo: removeEventListener scroll
+    return () => {
+      if (!!paragraphEl.current)
+        paragraphEl.current.removeEventListener('scroll', scrollHandler);
+    };
+  }, [paragraphEl]);
 
   return (
     <p className="paragraphText original-text" ref={paragraphEl} style={style}>
@@ -44,16 +107,6 @@ const ParagraphOriginal = ({
       {!!bottomQuotesCount && (
         <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
       )}
-      <a
-        className="widget-button"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          makeWidgetActive();
-        }}
-      >
-        <i className="fas fa-highlighter"></i>
-      </a>
     </p>
   );
 };

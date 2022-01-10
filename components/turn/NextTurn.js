@@ -52,7 +52,6 @@ const NextTurn = () => {
     sourceUrl,
     date,
     quotes,
-    scrollPosition,
   } = turn;
 
   const doesParagraphExist = checkIfParagraphExists(paragraph);

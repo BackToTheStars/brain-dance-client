@@ -1,9 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
-import { ParagraphTextWrapper } from './functions';
 import {
   ACTION_QUOTE_COORDS_UPDATED,
   ACTION_QUOTE_CLICKED,
-  ACTION_TURN_WAS_CHANGED,
 } from '../contexts/TurnsCollectionContext';
 import { quoteRectangleThickness } from '../const';
 import {
@@ -40,6 +38,7 @@ const Paragraph = ({
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
+  const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
 
   const {
     turn,
@@ -49,22 +48,7 @@ const Paragraph = ({
     paragraphQuotes: quotes,
   } = useTurnContext();
 
-  const topQuotesCount = quotesWithCoords.filter((quote) => {
-    return !!lineEnds[quote.quoteKey] && quote.position === 'top';
-  }).length;
-
-  const bottomQuotesCount = quotesWithCoords.filter((quote) => {
-    return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
-  }).length;
-
-  const {
-    _id: turnId,
-    contentType,
-    backgroundColor,
-    fontColor,
-    paragraph,
-    scrollPosition,
-  } = turn;
+  const { _id: turnId } = turn;
 
   const {
     setInteractionMode,
@@ -75,12 +59,6 @@ const Paragraph = ({
   const {
     debugData: { updateDebugLines },
   } = useUiContext();
-
-  const recalculateQuotes = () => {
-    setQuotesLoaded(false);
-    setQuotesWithCoords([]);
-    setUpdateSizeTime(new Date().getTime());
-  };
 
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
@@ -100,14 +78,12 @@ const Paragraph = ({
       }, 300);
     }
 
-    console.log('check 1');
     if (isActive && interactionType === INTERACTION_COMPRESS_PARAGRAPH) {
-      console.log('check 2');
       turnSavePreviousHeight();
 
       const textPieces = calculateTextPiecesFromQuotes(
         quotesWithCoords,
-        paragraphEl
+        paragraphElCurrent
       );
 
       consoleLogLines(textPieces, updateDebugLines);
@@ -119,7 +95,7 @@ const Paragraph = ({
   }, [isActive, interactionType]);
 
   useEffect(() => {
-    if (!paragraphEl.current) return;
+    if (!paragraphElCurrent) return;
     registerHandleResize({
       type: 'paragraph',
       id: 'paragraph',
@@ -132,10 +108,10 @@ const Paragraph = ({
         return 40;
       },
       maxHeightCallback: () => {
-        if (!paragraphEl.current) {
+        if (!paragraphElCurrent) {
           return 0;
         }
-        return compressedHeight || paragraphEl.current.scrollHeight;
+        return compressedHeight || paragraphElCurrent.scrollHeight;
       },
     });
     return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
@@ -157,57 +133,29 @@ const Paragraph = ({
     }
   }, [quotesWithCoords]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!paragraphEl || !paragraphEl.current) return;
-      if (
-        Math.floor(paragraphEl.current.scrollTop) === Math.floor(scrollPosition)
-      )
-        return;
-      recalculateQuotes();
-    }, 50);
-  }, [paragraphEl, scrollPosition]);
-
-  useEffect(() => {
-    paragraphEl.current.scrollTop = scrollPosition;
-  }, []);
-
-  useEffect(() => {
-    if (!paragraphEl || !paragraphEl.current) return;
-
-    const scrollHandler = () => {
-      if (!!paragraphEl.current) {
-        dispatch({
-          type: ACTION_TURN_WAS_CHANGED,
-          payload: {
-            _id: turnId,
-            wasChanged: true,
-            scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-          },
-        });
-      } else {
-      }
-    };
-
-    paragraphEl.current.addEventListener('scroll', scrollHandler);
-    // @todo: removeEventListener scroll
-    return () => {
-      if (!!paragraphEl.current)
-        paragraphEl.current.removeEventListener('scroll', scrollHandler);
-    };
-  }, [paragraphEl]);
-
   return (
     <>
       <ParagraphOriginal
         {...{
-          topQuotesCount,
-          bottomQuotesCount,
           updateSizeTime,
           setQuotesWithCoords,
           variableHeight,
+          quotesWithCoords,
+          setQuotesLoaded,
+          setUpdateSizeTime,
+          setParagraphElCurrent,
         }}
       />
+      <a
+        className="widget-button"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          makeWidgetActive();
+        }}
+      >
+        <i className="fas fa-highlighter"></i>
+      </a>
       {quotesWithCoords.map((quote, i) => {
         // все цитаты
         let bordered = !!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет

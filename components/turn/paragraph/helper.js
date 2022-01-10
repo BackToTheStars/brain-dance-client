@@ -2,11 +2,11 @@ import { freeSpaceRequired } from '../../const';
 
 export const calculateTextPiecesFromQuotes = (
   quotesWithCoords,
-  paragraphEl
+  paragraphElCurrent
 ) => {
   //
   const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
-    top: quote.initialCoords.top + paragraphEl.current.scrollTop - 40, // @todo: использовать положение параграфа
+    top: quote.initialCoords.top + paragraphElCurrent.scrollTop - 40, // @todo: использовать положение параграфа
     height: quote.initialCoords.height,
   }));
 
@@ -67,7 +67,7 @@ export const calculateTextPiecesFromQuotes = (
 
     if (i === textQuotesVerticalPositions.length - 1) {
       // если это последний фрагмент, то
-      const realScrollHeight = paragraphEl.current.scrollHeight - textPiece.top;
+      const realScrollHeight = paragraphElCurrent.scrollHeight - textPiece.top;
 
       textPiece.height += Math.min(
         realScrollHeight - textPiece.scrollHeight,
