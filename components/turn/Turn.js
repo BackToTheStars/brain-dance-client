@@ -19,7 +19,7 @@ import Telemetry from './Telemetry';
 import { dataCopy, fieldRemover } from '../helpers/formatters/dataCopier';
 import { WIDGET_PICTURE, WIDGET_PARAGRAPH } from './settings';
 import { checkIfParagraphExists } from '../helpers/quillHandler';
-import Compressor from './Compressor';
+import Compressor from './paragraph/Compressor';
 
 let timerId = null;
 const delayRenderTurn = 20; // сколько времени ждём для анимации линий и цитат

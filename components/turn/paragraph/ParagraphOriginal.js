@@ -6,7 +6,7 @@ import { ACTION_TURN_WAS_CHANGED } from '../../contexts/TurnsCollectionContext';
 const ParagraphOriginal = ({
   updateSizeTime,
   setQuotesWithCoords,
-  variableHeight,
+  // variableHeight,
   quotesWithCoords,
   setQuotesLoaded,
   setUpdateSizeTime,
@@ -31,9 +31,9 @@ const ParagraphOriginal = ({
     style.backgroundColor = backgroundColor;
     style.color = fontColor || 'black';
   }
-  if (!!variableHeight) {
-    style.height = `${variableHeight}px`;
-  }
+  // if (!!variableHeight) {
+  //   style.height = `${variableHeight}px`;
+  // }
 
   const topQuotesCount = quotesWithCoords.filter((quote) => {
     return !!lineEnds[quote.quoteKey] && quote.position === 'top';

@@ -1,13 +1,11 @@
 import { Fragment, useRef, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
-import { ParagraphTextWrapper } from './ParagraphTextWrapper';
-import TextAroundQuote from './TextAroundQuote';
+import { useTurnContext } from '../../contexts/TurnContext';
+import { ParagraphTextWrapper } from '../ParagraphTextWrapper';
+import TextAroundQuote from '../TextAroundQuote';
 
 const Compressor = ({
-  width,
-  paragraph: originalParagraph,
   textPieces: originalTextPieces,
-  paragraphTop,
   setCompressedHeight,
   // contentType,
   // backgroundColor,
@@ -17,6 +15,9 @@ const Compressor = ({
   // variableHeight,
 }) => {
   //
+  const { turn } = useTurnContext();
+  const { width, paragraph: originalParagraph, y } = turn;
+  const paragraphTop = y + 40; // @todo: верх виджета параграфа под header, picture
   const [compressedTexts, setCompressedTexts] = useState([]);
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({

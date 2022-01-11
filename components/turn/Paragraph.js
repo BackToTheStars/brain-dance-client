@@ -18,27 +18,27 @@ import {
   consoleLogLines,
 } from './paragraph/helper';
 import ParagraphOriginal from './paragraph/ParagraphOriginal';
+import Compressor from './paragraph/Compressor';
 
 // const delayRenderScroll = 20;
 
 const Paragraph = ({
   registerHandleResize,
   unregisterHandleResize,
-  variableHeight,
-  setTextPieces,
+  // variableHeight,
   // quotesWithCoords,
   // setQuotesWithCoords,
   makeWidgetActive,
   isActive,
-  compressedHeight,
-  setCompressedHeight,
   turnSavePreviousHeight,
-  turnReturnPreviousHeight,
 }) => {
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
+  const [textPieces, setTextPieces] = useState([]);
+  const [compressedHeight, setCompressedHeight] = useState(null);
+  const [prevHeight, setPrevHeight] = useState(null);
 
   const {
     turn,
@@ -60,21 +60,23 @@ const Paragraph = ({
     debugData: { updateDebugLines },
   } = useUiContext();
 
+  const paragraphEl = useRef(null);
+
   const onQuoteClick = (quoteId) => {
     dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
   };
 
-  const paragraphEl = useRef(null);
-
   // const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   // const [quotesLoaded, setQuotesLoaded] = useState(false);
+
+  const returnParagraphWidgetPreviousHeight = () => {};
 
   useEffect(() => {
     if (isActive && interactionType === INTERACTION_UNCOMPRESS_PARAGRAPH) {
       setTextPieces([]);
       setCompressedHeight(null);
       setTimeout(() => {
-        turnReturnPreviousHeight();
+        returnParagraphWidgetPreviousHeight();
       }, 300);
     }
 
@@ -135,11 +137,25 @@ const Paragraph = ({
 
   return (
     <>
+      {!!textPieces.length && (
+        <Compressor
+          {...{
+            textPieces,
+            // contentType,
+            // backgroundColor,
+            // fontColor,
+            // variableHeight,
+            setCompressedHeight,
+            // registerHandleResize,
+            // unregisterHandleResize,
+          }}
+        />
+      )}
       <ParagraphOriginal
         {...{
           updateSizeTime,
           setQuotesWithCoords,
-          variableHeight,
+          // variableHeight,
           quotesWithCoords,
           setQuotesLoaded,
           setUpdateSizeTime,

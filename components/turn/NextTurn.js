@@ -10,7 +10,7 @@ import {
   MODE_WIDGET_PARAGRAPH,
   useInteractionContext,
 } from '../contexts/InteractionContext';
-import Compressor from './Compressor';
+import Compressor from './paragraph/Compressor';
 
 const NextTurn = () => {
   const {
@@ -35,9 +35,6 @@ const NextTurn = () => {
 
   const [widgets, setWidgets] = useState([]);
   const [variableHeight, setVariableHeight] = useState(0);
-  const [compressedHeight, setCompressedHeight] = useState(null);
-  const [prevHeight, setPrevHeight] = useState(null);
-
   const { _id, x, y, width, height } = turn;
 
   const {
@@ -66,8 +63,6 @@ const NextTurn = () => {
   console.log({ height });
   // подключаем useRef к div хода
   const wrapper = useRef(null);
-  const [textPieces, setTextPieces] = useState([]); // потом убрать
-  console.log({ textPieces });
 
   const isWidgetActive = (widgetId) => {
     if (!activeWidget) return false;
@@ -209,7 +204,7 @@ const NextTurn = () => {
       ref={wrapper}
       className={`${contentType} react-turn-new ${
         dontShowHeader ? 'dont-show-header' : ''
-      } ${!!textPieces.length ? 'compressed-turn' : ''}`}
+      }`}
       style={wrapperStyles}
     >
       <Header
@@ -296,28 +291,10 @@ const NextTurn = () => {
           width={width}
         />
       )} */}
-      {!!textPieces.length && (
-        <Compressor
-          {...{
-            textPieces,
-            width,
-            paragraph,
-            paragraphTop: y + 40, // @todo: верх виджета параграфа под header, picture
 
-            contentType,
-            backgroundColor,
-            fontColor,
-            registerHandleResize,
-            unregisterHandleResize,
-            variableHeight,
-            setCompressedHeight,
-          }}
-        />
-      )}
       {doesParagraphExist && (
         <Paragraph
           {...{
-            setTextPieces, //
             // quotes: quotes.filter((quote) => quote.type !== 'picture'), //@todo check
             // quotesWithCoords, //
             // setQuotesWithCoords, //
@@ -329,8 +306,6 @@ const NextTurn = () => {
             registerHandleResize,
             unregisterHandleResize,
             variableHeight: null, //
-            compressedHeight: 0, //
-            setCompressedHeight, //
 
             // @todo: проверить, стоит ли вынести в контекст
             // isActive: false, //  @todo
@@ -344,23 +319,6 @@ const NextTurn = () => {
 
             turnSavePreviousHeight: () => {
               // setPrevHeight(height)
-            },
-            turnReturnPreviousHeight: () => {
-              dispatch({
-                type: ACTION_TURN_WAS_CHANGED,
-                payload: {
-                  _id,
-                  wasChanged: true,
-                  // width: newTurnWidth,
-                  height: prevHeight,
-                },
-              });
-              // setCompressedHeight(null);
-              $(wrapper.current).height(prevHeight);
-              console.log(prevHeight);
-              // setTimeout(() => {
-              //   handleResize(width, prevHeight);
-              // }, 2500);
             },
           }}
         />

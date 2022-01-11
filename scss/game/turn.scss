@@ -90,25 +90,16 @@ $black-color: rgb(0, 0, 0);
     // width: 100%
     height: 100%;
   }
-  &.compressed-turn {
-    .original-text {
-      // visibility: hidden;
-    }
-    .paragraphText {
-      border-bottom: 1px solid grey;
-    }
-    .compressor {
-      // visibility: hidden;
-    }
-  }
+
   .compressed-paragraph-widget {
     top: 40px;
-    // right: -110%;
+    right: -110%;
     position: absolute;
     width: 100%;
   }
   .paragraphText {
     // flex: 1;
+    border-bottom: 1px solid grey;
     margin-bottom: 0;
     span {
       word-wrap: break-word;
@@ -118,7 +109,7 @@ $black-color: rgb(0, 0, 0);
     position: absolute;
     background: white;
     // right: -110%;
-    // right: -220%;
+    right: -220%;
     top: 40px;
     opacity: 0;
   }
