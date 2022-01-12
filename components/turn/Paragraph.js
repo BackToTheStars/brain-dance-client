@@ -31,14 +31,21 @@ const Paragraph = ({
   makeWidgetActive,
   isActive,
   turnSavePreviousHeight,
+  handleResize,
 }) => {
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
   const [updateSizeTime, setUpdateSizeTime] = useState(new Date().getTime());
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
   const [textPieces, setTextPieces] = useState([]);
-  const [compressedHeight, setCompressedHeight] = useState(null);
+  const [compressedHeight, setComp] = useState(null);
   const [prevHeight, setPrevHeight] = useState(null);
+
+  const setCompressedHeight = (newComp) => {
+    console.trace();
+    console.log({ newComp });
+    setComp(newComp);
+  };
 
   const {
     turn,
@@ -48,7 +55,7 @@ const Paragraph = ({
     paragraphQuotes: quotes,
   } = useTurnContext();
 
-  const { _id: turnId } = turn;
+  const { _id: turnId, width } = turn;
 
   const {
     setInteractionMode,
@@ -69,14 +76,12 @@ const Paragraph = ({
   // const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   // const [quotesLoaded, setQuotesLoaded] = useState(false);
 
-  const returnParagraphWidgetPreviousHeight = () => {};
-
   useEffect(() => {
     if (isActive && interactionType === INTERACTION_UNCOMPRESS_PARAGRAPH) {
       setTextPieces([]);
       setCompressedHeight(null);
       setTimeout(() => {
-        returnParagraphWidgetPreviousHeight();
+        handleResize(width, 700);
       }, 300);
     }
 
@@ -113,6 +118,7 @@ const Paragraph = ({
         if (!paragraphElCurrent) {
           return 0;
         }
+        console.log({ compressedHeight });
         return compressedHeight || paragraphElCurrent.scrollHeight;
       },
     });
@@ -145,6 +151,7 @@ const Paragraph = ({
             // backgroundColor,
             // fontColor,
             // variableHeight,
+            compressedHeight,
             setCompressedHeight,
             // registerHandleResize,
             // unregisterHandleResize,

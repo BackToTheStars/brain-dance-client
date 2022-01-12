@@ -6,6 +6,7 @@ import TextAroundQuote from '../TextAroundQuote';
 
 const Compressor = ({
   textPieces: originalTextPieces,
+  compressedHeight,
   setCompressedHeight,
   // contentType,
   // backgroundColor,
@@ -132,6 +133,9 @@ const Compressor = ({
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
     );
+    setTimeout(() => {
+      if (!!compressedHeight) setCompressedHeight(null);
+    }, 300);
   }, [width]);
 
   return (

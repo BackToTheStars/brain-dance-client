@@ -106,6 +106,8 @@ const NextTurn = () => {
       newTurnHeight = maxHeight;
     }
 
+    console.log({ newTurnWidth, newTurnHeight });
+
     $(wrapper.current).css({
       width: newTurnWidth,
       height: newTurnHeight,
@@ -129,6 +131,7 @@ const NextTurn = () => {
   };
 
   const registerHandleResize = (widget) => {
+    console.log('регистрация виджета');
     setWidgets((widgets) => {
       const newWidgets = [...widgets];
       const index = newWidgets.findIndex(
@@ -303,6 +306,7 @@ const NextTurn = () => {
             // quotes: [],
             // quotesWithCoords: [], //
             // setQuotesWithCoords: () => {}, //
+            handleResize,
             registerHandleResize,
             unregisterHandleResize,
             variableHeight: null, //
