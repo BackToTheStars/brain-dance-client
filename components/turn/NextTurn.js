@@ -35,6 +35,8 @@ const NextTurn = () => {
 
   const [widgets, setWidgets] = useState([]);
   const [variableHeight, setVariableHeight] = useState(0);
+  const [prevHeight, setPrevHeight] = useState(null);
+
   const { _id, x, y, width, height } = turn;
 
   const {
@@ -72,62 +74,65 @@ const NextTurn = () => {
   };
 
   const handleResize = (newTurnWidth, newTurnHeight, delay = 400) => {
-    console.log({ newTurnHeight, newTurnWidth });
-    let minWidth = 0;
-    let minHeight = 0;
-    let maxHeight = 0;
-    let minHeightBasic = 0;
+    setWidgets((widgets) => {
+      console.log({ newTurnHeight, newTurnWidth });
+      let minWidth = 0;
+      let minHeight = 0;
+      let maxHeight = 0;
+      let minHeightBasic = 0;
 
-    for (let widget of widgets) {
-      if (minWidth < widget.minWidthCallback()) {
-        minWidth = widget.minWidthCallback();
+      for (let widget of widgets) {
+        if (minWidth < widget.minWidthCallback()) {
+          minWidth = widget.minWidthCallback();
+        }
       }
-    }
 
-    if (newTurnWidth < minWidth) {
-      newTurnWidth = minWidth;
-    }
-
-    for (let widget of widgets) {
-      minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
-      maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
-      console.log({ maxHeight });
-      if (!widget.variableHeight) {
-        minHeightBasic =
-          minHeightBasic + widget.minHeightCallback(newTurnWidth);
+      if (newTurnWidth < minWidth) {
+        newTurnWidth = minWidth;
       }
-    }
-    // console.log({ maxHeight, widgets });
 
-    if (newTurnHeight < minHeight) {
-      newTurnHeight = minHeight;
-    }
-    if (newTurnHeight > maxHeight) {
-      newTurnHeight = maxHeight;
-    }
+      for (let widget of widgets) {
+        minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
+        maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+        console.log({ maxHeight });
+        if (!widget.variableHeight) {
+          minHeightBasic =
+            minHeightBasic + widget.minHeightCallback(newTurnWidth);
+        }
+      }
+      // console.log({ maxHeight, widgets });
 
-    console.log({ newTurnWidth, newTurnHeight });
+      if (newTurnHeight < minHeight) {
+        newTurnHeight = minHeight;
+      }
+      if (newTurnHeight > maxHeight) {
+        newTurnHeight = maxHeight;
+      }
 
-    $(wrapper.current).css({
-      width: newTurnWidth,
-      height: newTurnHeight,
-    });
-    // setVariableHeight(newTurnHeight - minHeightBasic);
-    dispatch({
-      type: ACTION_TURN_WAS_CHANGED,
-      payload: {
-        _id,
-        wasChanged: true,
+      console.log({ newTurnWidth, newTurnHeight });
+
+      $(wrapper.current).css({
         width: newTurnWidth,
         height: newTurnHeight,
-      },
+      });
+      // setVariableHeight(newTurnHeight - minHeightBasic);
+      dispatch({
+        type: ACTION_TURN_WAS_CHANGED,
+        payload: {
+          _id,
+          wasChanged: true,
+          width: newTurnWidth,
+          height: newTurnHeight,
+        },
+      });
+      setTimeout(() => {
+        // recalculateQuotes(); @todo
+        widgets.forEach(
+          (widget) => !!widget.resizeCallback && widget.resizeCallback()
+        );
+      }, delay);
+      return widgets;
     });
-    setTimeout(() => {
-      // recalculateQuotes(); @todo
-      widgets.forEach(
-        (widget) => !!widget.resizeCallback && widget.resizeCallback()
-      );
-    }, delay);
   };
 
   const registerHandleResize = (widget) => {
@@ -182,7 +187,19 @@ const NextTurn = () => {
     return () => $(wrapper.current).draggable('destroy');
   }, []);
 
-  const getWidgets = () => widgets;
+  const turnSavePreviousHeight = () => setPrevHeight(height);
+  const turnReturnPreviousHeight = () => {
+    handleResize(width, prevHeight);
+    // dispatch({
+    //   type: ACTION_TURN_WAS_CHANGED,
+    //   payload: {
+    //     _id,
+    //     wasChanged: true,
+    //     // width: newTurnWidth,
+    //     height: prevHeight,
+    //   },
+    // });
+  };
 
   useEffect(() => {
     $(wrapper.current).resizable({
@@ -320,10 +337,8 @@ const NextTurn = () => {
               makeWidgetActive(_id, WIDGET_PARAGRAPH, 'paragraph'); // (turnId, widgetType, widgetId)
               // делаем синюю рамку у картинки
             },
-
-            turnSavePreviousHeight: () => {
-              // setPrevHeight(height)
-            },
+            turnSavePreviousHeight,
+            turnReturnPreviousHeight,
           }}
         />
       )}

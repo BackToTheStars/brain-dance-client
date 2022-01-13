@@ -30,8 +30,9 @@ const Paragraph = ({
   // setQuotesWithCoords,
   makeWidgetActive,
   isActive,
-  turnSavePreviousHeight,
   handleResize,
+  turnSavePreviousHeight,
+  turnReturnPreviousHeight,
 }) => {
   const [quotesWithCoords, setQuotesWithCoords] = useState([]);
   const [quotesLoaded, setQuotesLoaded] = useState(false);
@@ -81,7 +82,8 @@ const Paragraph = ({
       setTextPieces([]);
       setCompressedHeight(null);
       setTimeout(() => {
-        handleResize(width, 700);
+        turnReturnPreviousHeight();
+        //   handleResize(width, );
       }, 300);
     }
 
