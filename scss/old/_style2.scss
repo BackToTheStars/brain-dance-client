@@ -1,0 +1,57 @@
+.w-400 {
+  width: 400px;
+}
+
+.card-game-buttons .btn {
+  margin-right: 10px;
+}
+
+/** bootstrap overwrite */
+.btn-success,
+.btn-primary,
+.btn-danger {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+}
+
+.btn-success:hover,
+.btn-primary:hover,
+.btn-danger:hover {
+  opacity: 0.9;
+}
+
+body {
+  font-size: 1.3rem;
+  /* 1.2rem; */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.modal-content {
+  width: 430px;
+  padding: 20px;
+}
+.games-list {
+  &__item {
+    cursor: pointer;
+  }
+  &__turns-count {
+    width: 12%;
+  }
+  &__visibility {
+    width: 15%;
+  }
+}

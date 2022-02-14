@@ -1,0 +1,45 @@
+.table-games {
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+  }
+  .item {
+    cursor: pointer;
+    &:hover {
+      background-color: $hovered-item-bg;
+    }
+  }
+}
+
+.game-dashboard {
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  &-list {
+    flex: 1;
+    overflow-y: scroll;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  &-detail {
+    max-height: 50vh;
+  }
+}
+
+@media (min-width: 576px) {
+  .game-dashboard {
+    max-height: initial;
+    flex-direction: row;
+    flex-wrap: wrap;
+    &-list {
+      flex: auto;
+      overflow-y: auto;
+    }
+    &-detail {
+      max-height: initial;
+    }
+  }  
+}

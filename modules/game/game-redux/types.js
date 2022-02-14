@@ -1,0 +1,1 @@
+export const LOAD_GAME = 'load_game';
