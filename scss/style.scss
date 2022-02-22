@@ -1,10 +1,11 @@
-@import "variables";
-@import "../node_modules/bootstrap/scss/bootstrap";
-@import "overrides";
-@import "extra";
+@import 'variables';
+@import '../node_modules/bootstrap/scss/bootstrap';
+@import 'overrides';
+@import 'extra';
 
-@import "tmp";
-@import "../modules/game/scss/style.scss";
+@import 'tmp';
+@import '../modules/game/scss/style.scss';
+@import '../modules/panels/scss/style.scss';
 
-@import "./old/styles";
-@import "./refactoring";
+@import './old/styles';
+@import './refactoring';

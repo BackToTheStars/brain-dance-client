@@ -1,10 +1,11 @@
-import { loadFullGame } from "@/modules/game/game-redux/actions";
-import LinesCalculator from "@/modules/lines/components/LinesCalculator";
-import QuotesLinesLayer from "@/modules/lines/components/QuotesLinesLayer";
-import Turns from "@/modules/turns/components/Turns";
-import { moveField } from "@/modules/turns/redux/actions";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { loadFullGame } from '@/modules/game/game-redux/actions';
+import LinesCalculator from '@/modules/lines/components/LinesCalculator';
+import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
+import Panels from '@/modules/panels/components/Panels';
+import Turns from '@/modules/turns/components/Turns';
+import { moveField } from '@/modules/turns/redux/actions';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 const Game = ({ hash }) => {
   const gameBox = useRef();
@@ -21,10 +22,12 @@ const Game = ({ hash }) => {
     $(gameBox.current).draggable({
       stop: (event, ui) => {
         $(gameBox.current).addClass('remove-line-transition');
-        dispatch(moveField({
+        dispatch(
+          moveField({
             left: ui.position.left,
             top: ui.position.top,
-        }))
+          })
+        );
         // dispatch(ACTION_FIELD_WAS_MOVED, {
         //   left: ui.position.left,
         //   top: ui.position.top,
@@ -52,10 +55,10 @@ const Game = ({ hash }) => {
           {/* <LinesCalculator />
           <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} /> */}
         </div>
-        {/* PANELS */}
+        <Panels />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Game
+export default Game;
