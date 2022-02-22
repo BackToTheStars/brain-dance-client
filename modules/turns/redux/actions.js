@@ -14,3 +14,16 @@ export const updateGeometry = (data) => (dispatch) => dispatch({
   type: types.TURNS_UPDATE_GEOMETRY,
   payload: data,
 });
+
+export const updateScrollPosition = (data) => (dispatch) => dispatch({
+  type: types.TURNS_SCROLL,
+  payload: data
+})
+
+export const moveField = (data) => (dispatch) => {
+  return dispatch({
+    type: types.TURNS_FIELD_WAS_MOVED,
+    payload: data,
+  });
+};
+

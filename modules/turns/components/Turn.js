@@ -1,10 +1,17 @@
+import { TURNS_GEOMETRY_TIMEOUT_DELAY, TURNS_POSITION_TIMEOUT_DELAY } from '@/config/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { updateGeometry } from '../redux/actions';
+import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
+import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import Paragraph from './widgets/paragraph/Paragraph';
+
+
+const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
+const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
 const Turn = ({ id }) => {
   const turn = useSelector((store) => store.turns.d[id]);
@@ -77,13 +84,15 @@ const Turn = ({ id }) => {
           .addClass('translucent-field');
       },
       drag: (event, ui) => {
-        dispatch(
-          updateGeometry({
-            _id,
-            x: ui.position.left, // x - left - ui.position.left,
-            y: ui.position.top, // y - top - ui.position.top,
-          })
-        );
+        turnPositionQueue.add(() => {
+          dispatch(
+            updateGeometry({
+              _id,
+              x: ui.position.left, // x - left - ui.position.left,
+              y: ui.position.top, // y - top - ui.position.top,
+            })
+          );
+        });
       },
       stop: (event, ui) => {
         $('#gameBox')
@@ -107,13 +116,16 @@ const Turn = ({ id }) => {
           maxHeight
         );
         const newWidth = Math.min(Math.max(ui.size.width, minWidth), maxWidth);
-        dispatch(
-          updateGeometry({
-            _id,
-            width: newWidth,
-            height: newHeight,
-          })
-        );
+
+        turnGeometryQueue.add(() => {
+          dispatch(
+            updateGeometry({
+              _id,
+              width: newWidth,
+              height: newHeight,
+            })
+          );
+        });
 
         if (newHeight !== ui.size.height || newWidth !== ui.size.width) {
           $(wrapper.current).css({
@@ -123,7 +135,7 @@ const Turn = ({ id }) => {
         }
       },
     });
-    return () => $(wrapper.current).resizable('destroy');
+    // return () => $(wrapper.current).resizable('destroy');
   }, [widgets]);
 
   return (

@@ -27,7 +27,7 @@ const Header = ({
   const openEdit = () => {};
 
   const style = useMemo(() => {
-    const style = {
+    let style = {
       height: `${HEADER_HEIGHT}px`,
     };
     if (contentType === 'comment' && !dontShowHeader) {
