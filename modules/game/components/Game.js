@@ -55,7 +55,7 @@ const Game = ({ hash }) => {
           {/* <LinesCalculator />
           <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} /> */}
         </div>
-        <Panels />
+        <Panels hash={hash} />
       </div>
     </div>
   );

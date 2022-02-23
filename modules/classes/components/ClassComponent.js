@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import SubClassList from './SubClassList';
 // import { useClassContext } from '../contexts/ClassContext';
 
@@ -7,7 +8,7 @@ const ClassComponent = ({ classItemId }) => {
   const removeClass = () => {};
   const updateClass = () => {};
 
-  const classItem = {};
+  const classItem = useSelector((state) => state.classes.d[classItemId]);
 
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
@@ -72,7 +73,7 @@ const ClassComponent = ({ classItemId }) => {
               <img src="/icons/edit.svg" />
             </button>
 
-            {!classItem.children.length && (
+            {!classItem?.children?.length && ( // @learn
               <button
                 className="btn btn-success btn-sm"
                 onClick={() => removeClass(classItem.id)}

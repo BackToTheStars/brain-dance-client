@@ -1,11 +1,11 @@
 import ClassList from '@/modules/classes/components/ClassList';
 import UIPanel from './UIPanel';
 
-const Panels = () => {
+const Panels = ({ hash }) => {
   return (
     <>
       <UIPanel>
-        <ClassList />
+        <ClassList hash={hash} />
       </UIPanel>
     </>
   );
