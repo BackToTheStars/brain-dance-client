@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import SubClassList from './SubClassList';
 // import { useClassContext } from '../contexts/ClassContext';
 
-const ClassComponent = ({ classItemId }) => {
+const ClassComponent = ({ classItemId, _id }) => {
   // const { removeClass, updateClass } = useClassContext();
   const removeClass = () => {};
   const updateClass = () => {};
@@ -27,7 +27,7 @@ const ClassComponent = ({ classItemId }) => {
 
   const handleAddSubClass = (e) => {
     e.preventDefault();
-    setEditSubclassMode(true);
+    setEditSubclassMode(!editSubclassMode);
   };
 
   // const removeClass = () => {
@@ -64,7 +64,11 @@ const ClassComponent = ({ classItemId }) => {
               className="btn btn-success btn-sm"
               onClick={handleAddSubClass}
             >
-              <img src="/icons/add.svg" />
+              {editSubclassMode ? (
+                <img src="/icons/minus.svg" />
+              ) : (
+                <img src="/icons/add.svg" />
+              )}
             </button>
             <button
               className="btn btn-success btn-sm"
@@ -90,7 +94,7 @@ const ClassComponent = ({ classItemId }) => {
           parentId: classItemId,
           editSubclassMode,
           setEditSubclassMode,
-          // subClasses: classItem.children,
+          subClasses: classItem.children,
         }}
       />
     </div>

@@ -5,8 +5,7 @@ import ClassComponent from './ClassComponent';
 // import { useClassContext } from '../contexts/ClassContext';
 
 const ClassList = ({ hash }) => {
-  // const { classesTree: classes, addClass } = useClassContext();
-  const classes = useSelector((state) => state.classes.classes);
+  const classes = useSelector((state) => state.classes.classesTree);
   const addClass = () => {};
 
   // const [classes, setClasses] = useState(classesTree);
@@ -27,7 +26,11 @@ const ClassList = ({ hash }) => {
   return (
     <div className="p-2 d-flex flex-column h-100">
       {classes.map((classItem, i) => (
-        <ClassComponent key={classItem._id} classItemId={classItem._id} />
+        <ClassComponent
+          key={classItem.id}
+          classItemId={classItem.id}
+          _id={classItem._id}
+        />
       ))}
       <div className="flex-grow-1"></div>
       <form className="add-class form-inline d-flex" onSubmit={submitAddClass}>

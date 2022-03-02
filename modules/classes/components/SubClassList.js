@@ -1,22 +1,22 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { addClass } from '../redux/actions';
 import SubClassComponent from './SubClassComponent';
 // import { useClassContext } from '../contexts/ClassContext';
 
 const SubClassList = ({
   editSubclassMode,
   setEditSubclassMode,
-  // subClasses = [],
+  subClasses = [],
   parentId,
 }) => {
-  // const { addClass } = useClassContext();
-  const addClass = () => {};
-  const subClasses = [];
+  const hash = useSelector((state) => state.game.game.hash);
 
   const [subClassTitle, setSubClassTitle] = useState('');
 
   const addSubClass = (e) => {
     e.preventDefault();
-    addClass(subClassTitle, parentId);
+    addClass(hash, subClassTitle, parentId);
     setEditSubclassMode(false);
     setSubClassTitle('');
   };

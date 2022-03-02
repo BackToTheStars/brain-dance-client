@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeClass } from '../redux/actions';
 // import { useClassContext } from '../contexts/ClassContext';
 
 const SubClassComponent = ({ subClassItemId }) => {
+  const dispatch = useDispatch();
+  const subClassItem = useSelector((state) => state.classes.d[subClassItemId]);
+  const hash = useSelector((state) => state.game.game.hash);
   const [editTitleMode, setEditTitleMode] = useState(false);
+
   const [title, setTitle] = useState(subClassItem.title);
 
   // const { updateClass, removeClass } = useClassContext();
   const updateClass = () => {};
-  const removeClass = () => {};
-  const subClassItem = {};
 
   // const removeSubClass = () => {
   //   classesDispatch({
@@ -63,7 +67,7 @@ const SubClassComponent = ({ subClassItemId }) => {
             </button>
             <button
               className="btn btn-success btn-sm"
-              onClick={() => removeClass(subClassItem.id)}
+              onClick={() => dispatch(removeClass(hash, subClassItem.id))}
             >
               <img src="/icons/delete.svg" />
             </button>

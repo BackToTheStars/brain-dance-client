@@ -1,5 +1,5 @@
 import { API_URL } from '@/config/server';
-let token;
+import { settings } from '@/modules/game/requests';
 export const setUserToken = (nextToken) => (token = nextToken);
 
 const request = async (
@@ -15,7 +15,7 @@ const request = async (
     },
   };
   if (tokenFlag) {
-    params.headers['game-token'] = token;
+    params.headers['game-token'] = settings.token;
   }
   if (body) {
     params.body = JSON.stringify(body);
@@ -49,29 +49,19 @@ const request = async (
   });
 };
 
-export const createClass =
-  (
-    request, // можно добавить (request, обработчикОшибок) - это замыкание, closure
-    hash
-  ) =>
-  (body, callbacks = {}) => {
-    request(
-      `classes?hash=${hash}`,
-      {
-        method: 'POST',
-        tokenFlag: true,
-        body: body,
-      },
-      {
-        successCallback: (data) => {
-          if (callbacks.successCallback) {
-            callbacks.successCallback(data);
-          }
-        },
-        ...callbacks,
-      }
-    );
-  };
+export const createClassRequest = (hash, body) =>
+  request(`classes?hash=${hash}`, {
+    method: 'POST',
+    tokenFlag: true,
+    body: body,
+  });
+
+export const deleteClass = (hash, classItemId) => {
+  return request(`classes/${classItemId}?hash=${hash}`, {
+    method: 'DELETE',
+    tokenFlag: true,
+  });
+};
 
 export const editClass =
   (request, hash) =>
@@ -82,26 +72,6 @@ export const editClass =
         method: 'PUT',
         tokenFlag: true,
         body: body,
-      },
-      {
-        successCallback: (data) => {
-          if (callbacks.successCallback) {
-            callbacks.successCallback(data);
-          }
-        },
-        ...callbacks,
-      }
-    );
-  };
-
-export const deleteClass =
-  (request, hash) =>
-  (id, callbacks = {}) => {
-    request(
-      `classes/${id}?hash=${hash}`,
-      {
-        method: 'DELETE',
-        tokenFlag: true,
       },
       {
         successCallback: (data) => {
