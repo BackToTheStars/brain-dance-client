@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeClass, updateClass } from '../redux/actions';
 import SubClassList from './SubClassList';
 // import { useClassContext } from '../contexts/ClassContext';
 
 const ClassComponent = ({ classItemId, _id }) => {
   // const { removeClass, updateClass } = useClassContext();
-  const removeClass = () => {};
-  const updateClass = () => {};
+  const dispatch = useDispatch();
 
   const classItem = useSelector((state) => state.classes.d[classItemId]);
+  const hash = useSelector((state) => state.game.game.hash);
 
   const [editTitleMode, setEditTitleMode] = useState(false);
   const [title, setTitle] = useState(classItem.title);
@@ -18,7 +19,7 @@ const ClassComponent = ({ classItemId, _id }) => {
   const updateTitle = (e) => {
     e.preventDefault();
     setEditTitleMode(false);
-    updateClass({ id: classItem.id, title });
+    dispatch(updateClass(hash, { id: classItem.id, title }));
     // classesDispatch({
     //   type: ACTION_CLASS_UPDATE,
     //   payload: { id: classItem.id, title },
@@ -45,17 +46,17 @@ const ClassComponent = ({ classItemId, _id }) => {
   return (
     <div className="class-item mb-2">
       {editTitleMode ? (
-        <div className="d-flex class-title-row">
+        <form onSubmit={updateTitle} className="d-flex class-title-row">
           <input
             className="mr-2 flex-grow-1"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button className="btn btn-success" onClick={updateTitle}>
+          <button className="btn btn-success">
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
-        </div>
+        </form>
       ) : (
         <div className="d-flex class-title-row">
           <div className="mr-3 pt-1 ">{title}</div>
@@ -80,7 +81,7 @@ const ClassComponent = ({ classItemId, _id }) => {
             {!classItem?.children?.length && ( // @learn
               <button
                 className="btn btn-success btn-sm"
-                onClick={() => removeClass(classItem.id)}
+                onClick={() => dispatch(removeClass(hash, classItem.id))}
               >
                 <img src="/icons/delete.svg" />
               </button>

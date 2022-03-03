@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadClasses } from '../redux/actions';
+import { addClass, loadClasses } from '../redux/actions';
 import ClassComponent from './ClassComponent';
 // import { useClassContext } from '../contexts/ClassContext';
 
 const ClassList = ({ hash }) => {
   const classes = useSelector((state) => state.classes.classesTree);
-  const addClass = () => {};
+  const maxId = useSelector((state) => state.classes.maxId);
 
   // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
@@ -15,7 +15,8 @@ const ClassList = ({ hash }) => {
   const submitAddClass = (e) => {
     e.preventDefault();
     // подготовить данные для payload
-    addClass(title);
+    // addClass(title);
+    dispatch(addClass(hash, title, maxId + 1));
     setTitle('');
   };
 

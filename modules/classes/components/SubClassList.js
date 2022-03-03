@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addClass } from '../redux/actions';
 import SubClassComponent from './SubClassComponent';
 // import { useClassContext } from '../contexts/ClassContext';
@@ -11,12 +11,14 @@ const SubClassList = ({
   parentId,
 }) => {
   const hash = useSelector((state) => state.game.game.hash);
+  const maxId = useSelector((state) => state.classes.maxId);
+  const dispatch = useDispatch();
 
   const [subClassTitle, setSubClassTitle] = useState('');
 
   const addSubClass = (e) => {
     e.preventDefault();
-    addClass(hash, subClassTitle, parentId);
+    dispatch(addClass(hash, subClassTitle, maxId + 1, parentId));
     setEditSubclassMode(false);
     setSubClassTitle('');
   };

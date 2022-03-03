@@ -5,6 +5,17 @@ const initialClassesState = {
   d: {},
   error: null,
   classesTree: [],
+  maxId: 0,
+};
+
+const _getMaxId = (classes) => {
+  let max = 0;
+  for (const classItem of classes) {
+    if (+classItem.id > max) {
+      max = +classItem.id;
+    }
+  }
+  return max;
 };
 
 const getNewClassesState = (state, classes) => {
@@ -41,13 +52,29 @@ export const classesReducer = (
 ) => {
   switch (type) {
     case types.LOAD_CLASSES:
-      // classes: payload.classes,
-      // // формируем из классов словарь
-      // d: payload.classes.reduce((a, classItem) => {
-      //   a[classItem._id] = classItem; // accumulator
-      //   return a;
-      // }, {}),
-      return getNewClassesState(state, payload.classes);
+      return {
+        ...getNewClassesState(state, payload.classes),
+        maxId: _getMaxId(payload.classes),
+      };
+
+    case types.CLASS_ADD: {
+      const classes = [...state.classes, payload];
+      return {
+        ...getNewClassesState(state, classes),
+        maxId: payload.id,
+      };
+    }
+    case types.CLASS_UPDATE: {
+      const classes = state.classes.map((classItem) => {
+        return classItem.id !== payload.id
+          ? classItem
+          : { ...classItem, ...payload };
+      });
+      return {
+        ...getNewClassesState(state, classes),
+        maxId: payload.id,
+      };
+    }
     case types.CLASS_DELETE: {
       const newClasses = state.classes.filter(
         (classItem) => classItem.id !== payload.id

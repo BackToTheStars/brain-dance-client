@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeClass } from '../redux/actions';
-// import { useClassContext } from '../contexts/ClassContext';
+import { removeClass, updateClass } from '../redux/actions';
 
 const SubClassComponent = ({ subClassItemId }) => {
   const dispatch = useDispatch();
@@ -11,24 +10,10 @@ const SubClassComponent = ({ subClassItemId }) => {
 
   const [title, setTitle] = useState(subClassItem.title);
 
-  // const { updateClass, removeClass } = useClassContext();
-  const updateClass = () => {};
-
-  // const removeSubClass = () => {
-  //   classesDispatch({
-  //     type: ACTION_CLASS_DELETE,
-  //     payload: { id: subClassItem.id },
-  //   });
-  // };
-
   const updateTitle = (e) => {
     e.preventDefault();
     setEditTitleMode(false);
-    updateClass({ id: subClassItem.id, title });
-    // classesDispatch({
-    //   type: ACTION_CLASS_UPDATE,
-    //   payload: { id: subClassItem.id, title },
-    // });
+    dispatch(updateClass(hash, { id: subClassItem.id, title }));
   };
 
   useEffect(() => {
@@ -38,17 +23,17 @@ const SubClassComponent = ({ subClassItemId }) => {
   return (
     <div className="class-item ml-3">
       {editTitleMode ? (
-        <div className="d-flex pt-1 class-title-row">
+        <form onSubmit={updateTitle} className="d-flex pt-1 class-title-row">
           <input
             className="mr-2 flex-grow-1"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button className="btn btn-success btn-sm" onClick={updateTitle}>
+          <button className="btn btn-success btn-sm">
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
-        </div>
+        </form>
       ) : (
         <div className="d-flex class-title-row">
           <div className="mr-3 pt-1">

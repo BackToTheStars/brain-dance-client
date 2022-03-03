@@ -56,33 +56,19 @@ export const createClassRequest = (hash, body) =>
     body: body,
   });
 
-export const deleteClass = (hash, classItemId) => {
+export const deleteClassRequest = (hash, classItemId) => {
   return request(`classes/${classItemId}?hash=${hash}`, {
     method: 'DELETE',
     tokenFlag: true,
   });
 };
 
-export const editClass =
-  (request, hash) =>
-  (id, body, callbacks = {}) => {
-    request(
-      `classes/${id}?hash=${hash}`,
-      {
-        method: 'PUT',
-        tokenFlag: true,
-        body: body,
-      },
-      {
-        successCallback: (data) => {
-          if (callbacks.successCallback) {
-            callbacks.successCallback(data);
-          }
-        },
-        ...callbacks,
-      }
-    );
-  };
+export const updateClassRequest = (hash, params) =>
+  request(`classes/${params.id}?hash=${hash}`, {
+    method: 'PUT',
+    tokenFlag: true,
+    body: params,
+  });
 
 export const getClassesRequest = (hash) => {
   return request(`classes?hash=${hash}`);

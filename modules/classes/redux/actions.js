@@ -1,9 +1,11 @@
 import * as types from './types';
 import {
   createClassRequest,
-  deleteClass,
+  deleteClassRequest,
   getClassesRequest,
+  updateClassRequest,
 } from '../requests';
+import { ACTION_CLASS_ADD } from 'old/components/contexts/ClassContext';
 
 export const loadClasses = (hash) => {
   return (dispatch) => {
@@ -15,53 +17,41 @@ export const loadClasses = (hash) => {
 
 const _getAlias = (title, nextId) => {
   let name = _getNameAlias(title);
-  if (classes.find((classItem) => classItem.name === name)) {
-    name = name + `_${nextId}`;
-  }
+  // if (classes.find((classItem) => classItem.name === name)) {
+  name = name + `_${nextId}`;
+  // }
   return name;
 };
 
 const _getNameAlias = (title) => title.toLowerCase().replace(/\s/g, '-');
 
-const _getNextId = (classes) => {
-  let max = 1;
-  for (const classItem of classes) {
-    if (+classItem.id > max) {
-      max = +classItem.id;
-    }
-  }
-  return max + 1;
-};
-
-const classes = [];
-
-export const addClass = (hash, title, parentId = null) => {
+export const addClass = (hash, title, id, parentId = null) => {
   return (dispatch) => {
-    const nextId = _getNextId(classes);
     const payload = {
-      id: nextId,
+      id,
       title,
       parentId,
-      name: _getAlias(title, nextId),
+      name: _getAlias(title, id),
     };
-    // classesDispatch({
-    //   type: ACTION_CLASS_ADD,
-    //   payload,
-    // });
+
     createClassRequest(hash, payload).then((data) => {
-      console.log({ data });
-      // reloadClasses();
+      dispatch({ type: types.CLASS_ADD, payload: data.item });
+    });
+  };
+};
+
+export const updateClass = (hash, params) => {
+  const payload = { ...params, name: _getAlias(params.title, params.id) };
+  return (dispatch) => {
+    updateClassRequest(hash, payload).then(() => {
+      dispatch({ type: types.CLASS_UPDATE, payload });
     });
   };
 };
 
 export const removeClass = (hash, id) => {
-  // classesDispatch({
-  //   type: ACTION_CLASS_DELETE,
-  //   payload: { id },
-  // });
   return (dispatch) => {
-    deleteClass(hash, id).then(() => {
+    deleteClassRequest(hash, id).then(() => {
       dispatch({ type: types.CLASS_DELETE, payload: { id } });
     });
   };
