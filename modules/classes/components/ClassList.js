@@ -4,7 +4,7 @@ import { addClass, loadClasses } from '../redux/actions';
 import ClassComponent from './ClassComponent';
 // import { useClassContext } from '../contexts/ClassContext';
 
-const ClassList = ({ hash }) => {
+const ClassList = () => {
   const classes = useSelector((state) => state.classes.classesTree);
   const maxId = useSelector((state) => state.classes.maxId);
 
@@ -16,12 +16,12 @@ const ClassList = ({ hash }) => {
     e.preventDefault();
     // подготовить данные для payload
     // addClass(title);
-    dispatch(addClass(hash, title, maxId + 1));
+    dispatch(addClass(title, maxId + 1));
     setTitle('');
   };
 
   useEffect(() => {
-    dispatch(loadClasses(hash));
+    dispatch(loadClasses());
   }, []);
 
   return (

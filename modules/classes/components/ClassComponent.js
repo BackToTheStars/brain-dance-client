@@ -19,7 +19,7 @@ const ClassComponent = ({ classItemId, _id }) => {
   const updateTitle = (e) => {
     e.preventDefault();
     setEditTitleMode(false);
-    dispatch(updateClass(hash, { id: classItem.id, title }));
+    dispatch(updateClass({ id: classItem.id, title }));
     // classesDispatch({
     //   type: ACTION_CLASS_UPDATE,
     //   payload: { id: classItem.id, title },
@@ -81,7 +81,7 @@ const ClassComponent = ({ classItemId, _id }) => {
             {!classItem?.children?.length && ( // @learn
               <button
                 className="btn btn-success btn-sm"
-                onClick={() => dispatch(removeClass(hash, classItem.id))}
+                onClick={() => dispatch(removeClass(classItem.id))}
               >
                 <img src="/icons/delete.svg" />
               </button>

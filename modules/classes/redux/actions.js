@@ -7,9 +7,9 @@ import {
 } from '../requests';
 import { ACTION_CLASS_ADD } from 'old/components/contexts/ClassContext';
 
-export const loadClasses = (hash) => {
+export const loadClasses = () => {
   return (dispatch) => {
-    getClassesRequest(hash).then((data) => {
+    getClassesRequest().then((data) => {
       dispatch({ type: types.LOAD_CLASSES, payload: { classes: data.items } });
     });
   };
@@ -25,7 +25,7 @@ const _getAlias = (title, nextId) => {
 
 const _getNameAlias = (title) => title.toLowerCase().replace(/\s/g, '-');
 
-export const addClass = (hash, title, id, parentId = null) => {
+export const addClass = (title, id, parentId = null) => {
   return (dispatch) => {
     const payload = {
       id,
@@ -34,24 +34,24 @@ export const addClass = (hash, title, id, parentId = null) => {
       name: _getAlias(title, id),
     };
 
-    createClassRequest(hash, payload).then((data) => {
+    createClassRequest(payload).then((data) => {
       dispatch({ type: types.CLASS_ADD, payload: data.item });
     });
   };
 };
 
-export const updateClass = (hash, params) => {
+export const updateClass = (params) => {
   const payload = { ...params, name: _getAlias(params.title, params.id) };
   return (dispatch) => {
-    updateClassRequest(hash, payload).then(() => {
+    updateClassRequest(payload).then(() => {
       dispatch({ type: types.CLASS_UPDATE, payload });
     });
   };
 };
 
-export const removeClass = (hash, id) => {
+export const removeClass = (id) => {
   return (dispatch) => {
-    deleteClassRequest(hash, id).then(() => {
+    deleteClassRequest(id).then(() => {
       dispatch({ type: types.CLASS_DELETE, payload: { id } });
     });
   };

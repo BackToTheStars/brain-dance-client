@@ -13,7 +13,7 @@ const SubClassComponent = ({ subClassItemId }) => {
   const updateTitle = (e) => {
     e.preventDefault();
     setEditTitleMode(false);
-    dispatch(updateClass(hash, { id: subClassItem.id, title }));
+    dispatch(updateClass({ id: subClassItem.id, title }));
   };
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const SubClassComponent = ({ subClassItemId }) => {
             </button>
             <button
               className="btn btn-success btn-sm"
-              onClick={() => dispatch(removeClass(hash, subClassItem.id))}
+              onClick={() => dispatch(removeClass(subClassItem.id))}
             >
               <img src="/icons/delete.svg" />
             </button>

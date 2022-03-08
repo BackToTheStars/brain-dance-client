@@ -10,8 +10,8 @@ export const setGameInfoIntoStorage = (hash, data) => {
   // info (hash, nickname, role)
   // token
   // @todo fixme
-  // setUserToken(data.token);
-  setRequestSettings(hash, data.token);
+  // setUserToken(data?.token);
+  setRequestSettings(hash, data?.token);
   localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
 };
 const removeGameInfo = (hash) => {
@@ -27,8 +27,8 @@ const getGameInfo = (hash) => {
 
   const data = JSON.parse(localStorage.getItem(`${GAME_KEY_PREFIX}${hash}`));
   // @todo fixme
-  // setUserToken(data.token);
-  setRequestSettings(hash, data.token);
+  // setUserToken(data?.token);
+  setRequestSettings(hash, data?.token);
   return data;
 };
 

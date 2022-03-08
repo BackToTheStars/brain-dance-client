@@ -1,8 +1,8 @@
-#classMenu {
+.position_upper_left {
   // background-color: #fff;
   overflow-y: auto;
-  height: calc(100vh - 2 * #{$panels-spacer});
-  width: 500px;
+  // height: calc(100vh - 2 * #{$panels-spacer});
+  // width: 500px;
   top: $panels-spacer;
   left: $panels-spacer;
   transform: translateY(0%);

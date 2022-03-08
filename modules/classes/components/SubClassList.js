@@ -10,7 +10,6 @@ const SubClassList = ({
   subClasses = [],
   parentId,
 }) => {
-  const hash = useSelector((state) => state.game.game.hash);
   const maxId = useSelector((state) => state.classes.maxId);
   const dispatch = useDispatch();
 
@@ -18,7 +17,7 @@ const SubClassList = ({
 
   const addSubClass = (e) => {
     e.preventDefault();
-    dispatch(addClass(hash, subClassTitle, maxId + 1, parentId));
+    dispatch(addClass(subClassTitle, maxId + 1, parentId));
     setEditSubclassMode(false);
     setSubClassTitle('');
   };

@@ -1,31 +1,19 @@
 import { panelSpacer } from '@/config/ui';
+import { POSITION_UPPER_LEFT } from '../settings';
 
-const UIPanel = ({ children }) => {
-  // const {
-  //   state: { classesPanelIsHidden },
-  //   minimapState: { minimapSize, isHidden },
-  // } = useUiContext();
+const UIPanel = ({ children, position, height, width }) => {
+  //
+  const style = {};
 
-  // const [height, setHeight] = useState(0);
-
-  // useEffect(() => {
-  //   if (classesPanelIsHidden) return;
-  //   if (isHidden) {
-  //     setHeight(window.innerHeight - 2 * panelSpacer); // отправили доступную высоту для панели классов в State
-  //   } else {
-  //     setHeight(minimapSize.top - 2 * panelSpacer);
-  //   }
-  // }, [minimapSize, isHidden, classesPanelIsHidden]);
-
-  const panelIsHidden = false;
-  const height = window.innerHeight - 2 * panelSpacer;
+  if (!!width) {
+    style.width = width();
+  }
+  if (!!height) {
+    style.height = height();
+  }
 
   return (
-    <div
-      className={`${panelIsHidden ? 'hidden' : ''} po panel`}
-      id="classMenu"
-      style={{ height: `${height}px` }}
-    >
+    <div className={`${position} po panel`} style={style}>
       {children}
     </div>
   );
