@@ -1,17 +1,17 @@
 export const getLinesCoords = (
   lines,
-  turns,
   turnsToRender,
+  turnsDictionary,
   quotesInfo,
   pictureQuotesInfo
 ) => {
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, targetTurnId}
 
-  const turnsDictionary = {};
-  for (let turn of turns) {
-    turnsDictionary[turn._id] = turn;
-  }
+  // const turnsDictionary = {};
+  // for (let turn of turns) {
+  //   turnsDictionary[turn._id] = turn;
+  // }
 
   const turnsToRenderDictionary = {};
   for (let turn of turnsToRender) {

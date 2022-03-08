@@ -1,3 +1,4 @@
+import { setRequestSettings } from '@/config/request';
 import { checkRuleByRole, ROLE_GAME_VISITOR } from '@/config/user';
 import { setUserToken } from '@/modules/game/requests';
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -9,12 +10,14 @@ export const setGameInfoIntoStorage = (hash, data) => {
   // info (hash, nickname, role)
   // token
   // @todo fixme
-  setUserToken(data.token);
+  // setUserToken(data.token);
+  setRequestSettings(hash, data.token);
   localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
 };
 const removeGameInfo = (hash) => {
   // @todo fixme
-  setUserToken(null);
+  // setUserToken(null);
+  setRequestSettings(null, null);
   return localStorage.removeItem(`${GAME_KEY_PREFIX}${hash}`);
 };
 const getGameInfo = (hash) => {
@@ -24,7 +27,8 @@ const getGameInfo = (hash) => {
 
   const data = JSON.parse(localStorage.getItem(`${GAME_KEY_PREFIX}${hash}`));
   // @todo fixme
-  setUserToken(data.token);
+  // setUserToken(data.token);
+  setRequestSettings(hash, data.token);
   return data;
 };
 

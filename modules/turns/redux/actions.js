@@ -1,5 +1,6 @@
 import { getTurnsRequest } from '@/modules/game/requests';
 import * as types from './types';
+import * as gameTypes from '@/modules/game/game-redux/types';
 
 export const loadTurns = (hash) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -21,7 +22,11 @@ export const updateScrollPosition = (data) => (dispatch) => dispatch({
 })
 
 export const moveField = (data) => (dispatch) => {
-  return dispatch({
+  dispatch({
+    type: gameTypes.GAME_FIELD_MOVE,
+    payload: data,
+  });
+  dispatch({
     type: types.TURNS_FIELD_WAS_MOVED,
     payload: data,
   });

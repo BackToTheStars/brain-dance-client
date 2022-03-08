@@ -45,35 +45,16 @@ const Paragraph = ({turn, registerHandleResize, unregisterHandleResize}) => {
   }, [paragraphElCurrent]);
 
   useEffect(() => {
-    console.log("par quotes")
     dispatch(quoteCoordsUpdate(_id, paragraphQuotes));
   }, [paragraphQuotes])
 
   return (
     <>
-      {/* {!!textPieces.length && (
-        <Compressor
-          {...{
-            textPieces,
-            // contentType,
-            // backgroundColor,
-            // fontColor,
-            // variableHeight,
-            compressedHeight,
-            setCompressedHeight,
-            // registerHandleResize,
-            // unregisterHandleResize,
-          }}
-        />
-      )} */}
       <ParagraphOriginal
         {...{
-          // turn,
           setParagraphElCurrent,
           setParagraphQuotes,
-          // setQuotesWithCoords,
 
-          
           paragraph,
           _id,
           backgroundColor,
@@ -90,9 +71,6 @@ const Paragraph = ({turn, registerHandleResize, unregisterHandleResize}) => {
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          interactWithWidget();
-          // setInteractionMode(MODE_WIDGET_PARAGRAPH); // говорим набор кнопок для панели справа
-          // makeWidgetActive(_id, WIDGET_PARAGRAPH, widgetId); // (turnId, widgetType, widgetId)
         }}
       >
         <i className="fas fa-highlighter"></i>

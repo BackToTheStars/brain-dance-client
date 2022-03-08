@@ -1,13 +1,37 @@
 import { quoteRectangleThickness } from "@/config/ui";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 
 const ParagraphQuotes = ({ paragraphQuotes }) => {
   const lineEnds = {}
   const activeQuote = null;
+  const lines = useSelector((store) => store.lines.lines)
+  const activeQuotesDictionary = useMemo(() => {
+    const d = {}
+    for (let paragraphQuote of paragraphQuotes) {
+      d[paragraphQuote._id] = false;
+      if (lines.find(line => {
+        if (line.sourceTurnId == paragraphQuote.turnId) {
+          if (line.sourceMarker == paragraphQuote.quoteId) {
+            return true;
+          }
+        } else if (line.targetTurnId == paragraphQuote.turnId) {
+          if (line.targetMarker == paragraphQuote.quoteId) {
+            return true;
+          }
+        }
+        return false
+      })) {
+        d[paragraphQuote.quoteId] = true;
+      }
+    }
+    return d
+  }, [paragraphQuotes, lines])
   return (
     <>
       {paragraphQuotes.map((quote, i) => {
         // все цитаты
-        let bordered = true; //!!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
+        let bordered = !!activeQuotesDictionary[quote.quoteId]; //!!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
         let outline = '0px solid transparent';
         if (
           activeQuote &&

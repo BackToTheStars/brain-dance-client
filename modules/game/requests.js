@@ -1,9 +1,10 @@
+import { s } from '@/config/request';
 import { API_URL } from '@/config/server';
 
 export const settings = { token: null };
 export const setUserToken = (nextToken) => (settings.token = nextToken);
 
-const request = async (
+export const request = async (
   path,
   { body = null, tokenFlag = false, method = 'GET' } = {},
   { errorMessage, errorCallback, successCallback } = {}
@@ -16,7 +17,7 @@ const request = async (
     },
   };
   if (tokenFlag) {
-    params.headers['game-token'] = settings.token;
+    params.headers['game-token'] = s.token;
   }
   if (body) {
     params.body = JSON.stringify(body);
@@ -51,13 +52,13 @@ const request = async (
 };
 
 export const getGameRequest = (hash) => {
-  return request(`game?hash=${hash}`, {
+  return request(`game?hash=${s.hash}`, {
     tokenFlag: true,
   });
 };
 
 export const getTurnsRequest = (hash) => {
-  return request(`turns?hash=${hash}`, {
+  return request(`turns?hash=${s.hash}`, {
     tokenFlag: true,
   });
 };

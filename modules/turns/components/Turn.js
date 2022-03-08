@@ -1,4 +1,7 @@
-import { TURNS_GEOMETRY_TIMEOUT_DELAY, TURNS_POSITION_TIMEOUT_DELAY } from '@/config/ui';
+import {
+  TURNS_GEOMETRY_TIMEOUT_DELAY,
+  TURNS_POSITION_TIMEOUT_DELAY,
+} from '@/config/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
@@ -8,7 +11,7 @@ import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import Paragraph from './widgets/paragraph/Paragraph';
-
+import Picture from './widgets/Picture';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -35,6 +38,8 @@ const Turn = ({ id }) => {
     dontShowHeader,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
+    //-- image
+    imageUrl,
   } = turn;
 
   const doesParagraphExist = checkIfParagraphExists(paragraph);
@@ -158,6 +163,15 @@ const Turn = ({ id }) => {
           _id,
         }}
       />
+      {/* {!!imageUrl && (
+        <Picture
+          imageUrl={imageUrl}
+          registerHandleResize={registerHandleResize}
+          unregisterHandleResize={unregisterHandleResize}
+          widgetId="picture1"
+          widgetType="picture"
+        />
+      )} */}
       {doesParagraphExist && (
         <Paragraph
           turn={turn}

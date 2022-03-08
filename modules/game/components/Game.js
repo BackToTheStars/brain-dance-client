@@ -52,10 +52,10 @@ const Game = ({ hash }) => {
           onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
         >
           <Turns />
-          {/* <LinesCalculator />
-          <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} /> */}
+          <LinesCalculator />
+          <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
         </div>
-        <Panels hash={hash} />
+        {/* <Panels /> */}
       </div>
     </div>
   );
