@@ -2,6 +2,7 @@ import { classesReducer } from '@/modules/classes/redux/reducers';
 import { gameReducer } from '@/modules/game/game-redux/reducers';
 import { gamesReducer } from '@/modules/game/games-redux/reducers';
 import { linesReducer } from '@/modules/lines/redux/reducers';
+import { panelReducer } from '@/modules/panels/redux/reducers';
 import { turnsReducer } from '@/modules/turns/redux/reducers';
 import { combineReducers } from 'redux';
 
@@ -12,8 +13,8 @@ const reducers = {
   turns: turnsReducer,
   lines: linesReducer,
   classes: classesReducer,
+  panels: panelReducer,
   // quotes,
-  // panels,
   // interactions,
   // minimap,
 };
