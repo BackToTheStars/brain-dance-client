@@ -1,7 +1,7 @@
-import ClassList from '@/modules/classes/components/ClassList';
 import { useSelector } from 'react-redux';
 import UIPanel from './UIPanel';
 import { panels } from '../settings';
+import SettingsButton from './SettingsButton';
 
 const Panels = () => {
   const hash = useSelector((state) => state.game?.game?.hash);
@@ -20,6 +20,7 @@ const Panels = () => {
             <panel.component settings={panel} />
           </UIPanel>
         ))}
+        <SettingsButton />
     </>
   );
 };

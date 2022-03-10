@@ -14,3 +14,17 @@
     margin: 5px;
   }
 }
+.panel-settings-btn {
+  position: fixed;
+  right: $panels-spacer;
+  top: 0;
+  font-size: 40px;
+  color: rgba(255, 255, 255, 0.842);
+  opacity: 0;
+  transition: 0.3s;
+  cursor: pointer;
+  z-index: 10;
+  &:hover {
+    opacity: 1;
+  }
+}
