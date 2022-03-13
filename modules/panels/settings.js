@@ -2,14 +2,15 @@ import dynamic from 'next/dynamic';
 
 import { panelSpacer } from '@/config/ui';
 import ClassList from '../classes/components/ClassList';
-// import AddEditTurnPopup from './components/addEditTurn';
-const AddEditTurnPopup = dynamic(() => import('./components/addEditTurn'), {
+// import AddEditTurnPopup from '@/modules/turns/components/addEditTurn';
+const AddEditTurnPopup = dynamic(() => import('@/modules/turns/components/forms/AddEditTurn'), {
   ssr: false,
 });
 import SettingsPanel from './components/SettingsPanel';
 
 export const POSITION_UPPER_LEFT = 'position_upper_left';
 export const POSITION_UPPER_CENTER = 'position_upper_center';
+export const POSITION_POPUP = 'position_popup';
 
 export const PANEL_CLASSES = 'panel_classes';
 export const PANEL_SETTINGS = 'panel_settings';
@@ -38,7 +39,7 @@ export const panels = [
   },
   {
     type: PANEL_ADD_EDIT_TURN,
-    position: POSITION_UPPER_CENTER,
+    position: POSITION_POPUP,
     component: AddEditTurnPopup,
     isDisplayed: false,
     id: 3,

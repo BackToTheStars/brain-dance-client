@@ -1,6 +1,8 @@
 import { useSelector } from 'react-redux';
 import UIPanel from './UIPanel';
 import SettingsButton from './SettingsButton';
+import { POSITION_POPUP } from '../settings';
+import PanelPopup from './Popup';
 
 const Panels = () => {
   const hash = useSelector((state) => state.game?.game?.hash);
@@ -10,16 +12,22 @@ const Panels = () => {
     <>
       {panels
         .filter((panel) => panel.isDisplayed)
-        .map((panel) => (
-          <UIPanel
-            key={panel.id}
-            position={panel.position}
-            height={panel?.height}
-            width={panel?.width}
-          >
-            <panel.component settings={panel} />
-          </UIPanel>
-        ))}
+        .map((panel) => {
+          const Wrapper = UIPanel
+          if (panel.position === POSITION_POPUP) {
+            Wrapper = PanelPopup
+          }
+          return (
+            <Wrapper
+              key={panel.id}
+              position={panel.position}
+              height={panel?.height}
+              width={panel?.width}
+            >
+              <panel.component settings={panel} />
+            </Wrapper>
+          )
+        })}
       <SettingsButton />
     </>
   );

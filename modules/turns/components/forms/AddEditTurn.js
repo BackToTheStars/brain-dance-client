@@ -1,6 +1,7 @@
 import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState } from 'react';
 import turnSettings from '@/modules/turns/settings';
+import FormInput from './FormInput';
 
 const {
   settings,
@@ -24,7 +25,7 @@ const AddEditTurnPopup = () => {
     createTurn = () => {},
     turns = () => {},
     dispatch = () => {},
-    turnToEdit = () => {},
+    turnToEdit,
     updateTurn = () => {},
   } = {}; // useTurnsCollectionContext();
   const {
@@ -222,183 +223,97 @@ const AddEditTurnPopup = () => {
           setError({ message });
         },
       });
-      // turnObj.height = 600;
-      // turnObj.width = 800;
-      // turnObj.x = -zeroPointX + Math.floor(window.innerWidth / 2) - 250;
-      // turnObj.y = -zeroPointY + Math.floor(window.innerHeight / 2) - 250;
-      // // создать шаг, закрыть модальное окно
-      // createTurn(turnObj, {
-      //   successCallback: (data) => {
-      //     // console.log('успешный коллбэк на уровне Попапа');
-      //     setCreateEditTurnPopupIsHidden(true);
-      //     dispatch({
-      //       type: ACTION_TURN_CREATED,
-      //       payload: {
-      //         ...data.item,
-      //         x: data.item.x + zeroPointX,
-      //         y: data.item.y + zeroPointY,
-      //       },
-      //     });
-      //   },
-      //   errorCallback: (message) => {
-      //     setError({ message });
-      //   },
-      // });
     }
   };
 
   return (
-    <div
-      id="modalBackground"
-      style={{ display: createEditTurnPopupIsHidden ? 'none' : 'block' }}
-    >
-      <div id="modal" className="container">
-        <div className="row my-4 flex-1">
-          <div className="col-8 quill-wrapper">
-            <div id="toolbar-container-new">
-              <span className="ql-formats">
-                <select className="ql-background">
-                  {[
-                    '',
-                    'rgb(255, 255, 0)',
-                    'rgb(138, 255, 36)',
-                    'rgb(253, 201, 255)',
-                    'rgb(156, 245, 255)',
-                    'rgb(210, 211, 212)',
-                    'rgb(255, 213, 150)',
-                  ].map((val, i) => (
-                    <option value={val} key={i} />
-                  ))}
-                </select>
-              </span>
-            </div>
-            <div id="editor-container-new" />
-            {/* class="h-85"> */}
+    <>
+      <div className="row my-4 flex-1">
+        <div className="col-8 quill-wrapper">
+          <div id="toolbar-container-new">
+            <span className="ql-formats">
+              <select className="ql-background">
+                {[
+                  '',
+                  'rgb(255, 255, 0)',
+                  'rgb(138, 255, 36)',
+                  'rgb(253, 201, 255)',
+                  'rgb(156, 245, 255)',
+                  'rgb(210, 211, 212)',
+                  'rgb(255, 213, 150)',
+                ].map((val, i) => (
+                  <option value={val} key={i} />
+                ))}
+              </select>
+            </span>
           </div>
-          <div className="col-4">
-            <div className="radio-group">
-              {templatesToShow.map((el) => {
-                const templateSettings = settings[el];
-                return (
-                  <div className="form-group row" key={el}>
-                    <input
-                      type="radio"
-                      name="template"
-                      value={templateSettings.value}
-                      checked={activeTemplate === el}
-                      onChange={(e) => {
-                        setActiveTemplate(el);
-                        setError(null);
-                      }}
-                    />
-                    <span>{templateSettings.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <input type="hidden" id="idInput" />
-
-            {fieldsToShow
-              .filter((field) => {
-                if (!fieldSettings[field].special) {
-                  return true;
-                }
-                return availableFields.includes(field);
-              })
-              .map((field) => {
-                return (
-                  <FormInput
-                    changeHandler={(value) => {
-                      if (!!error) setError(null);
-                      setForm({ ...form, [field]: value });
+          <div id="editor-container-new" />
+          {/* class="h-85"> */}
+        </div>
+        <div className="col-4">
+          <div className="radio-group">
+            {templatesToShow.map((el) => {
+              const templateSettings = settings[el];
+              return (
+                <div className="form-check" key={el}>
+                  <input
+                    type="radio"
+                    name="template"
+                    className="form-check-input"
+                    value={templateSettings.value}
+                    checked={activeTemplate === el}
+                    onChange={(e) => {
+                      setActiveTemplate(el);
+                      setError(null);
                     }}
-                    label={fieldSettings[field].label}
-                    prefixClass={fieldSettings[field].prefixClass}
-                    inputType={fieldSettings[field].inputType}
-                    key={field}
-                    value={form[field] || ''}
-                    widgetSettings={fieldSettings[field].widgetSettings}
                   />
-                );
-              })}
-            {!!error && (
-              <div className="alert alert-danger">{error.message}</div>
-            )}
+                  <label className="form-check-label">{templateSettings.label}</label>
+                </div>
+              );
+            })}
           </div>
-        </div>
-        <div className="row mb-4">
-          <div className="col">
-            <button onClick={(e) => saveHandler(e)}>Save</button>
-            <button
-              id="cancel-turn-modal"
-              onClick={(e) => setCreateEditTurnPopupIsHidden(true)}
-            >
-              Cancel
-            </button>
-          </div>
+          <input type="hidden" id="idInput" />
+
+          {fieldsToShow
+            .filter((field) => {
+              if (!fieldSettings[field].special) {
+                return true;
+              }
+              return availableFields.includes(field);
+            })
+            .map((field) => {
+              return (
+                <FormInput
+                  changeHandler={(value) => {
+                    if (!!error) setError(null);
+                    setForm({ ...form, [field]: value });
+                  }}
+                  label={fieldSettings[field].label}
+                  prefixClass={fieldSettings[field].prefixClass}
+                  inputType={fieldSettings[field].inputType}
+                  key={field}
+                  value={form[field] || ''}
+                  widgetSettings={fieldSettings[field].widgetSettings}
+                />
+              );
+            })}
+          {!!error && (
+            <div className="alert alert-danger">{error.message}</div>
+          )}
         </div>
       </div>
-    </div>
-  );
-};
-
-const ColorPicker = ({ value, changeHandler, widgetSettings }) => {
-  // @todo: проверить, почему настройки по умолчанию устанавливаются только
-  // для последнего ColorPicker
-  useEffect(() => {
-    if (!!widgetSettings.defaultColor && !value) {
-      console.log(widgetSettings.defaultColor);
-      changeHandler(widgetSettings.defaultColor);
-    }
-  }, [widgetSettings.defaultColor]);
-
-  return (
-    <div className="color-picker-widget">
-      {widgetSettings.colors.map((color, index) => (
-        <div
-          key={index}
-          className={`color-picker-square ${value === color ? 'active' : ''}`}
-          style={{ backgroundColor: color }}
-          onClick={() => changeHandler(color)}
-        />
-      ))}
-    </div>
-  );
-};
-
-const FormInput = ({
-  label,
-  prefixClass,
-  inputType = 'text',
-  changeHandler = () => {},
-  value,
-  widgetSettings = {},
-}) => {
-  return (
-    <div className={`form-group row ${prefixClass}-row`}>
-      <label className="col-sm-3 col-form-label">{label}</label>
-      <div className="col-sm-9">
-        {inputType === 'color-picker' ? (
-          <ColorPicker
-            value={value}
-            changeHandler={changeHandler}
-            widgetSettings={widgetSettings}
-          />
-        ) : (
-          <input
-            type={inputType}
-            className="form-control"
-            value={value}
-            onChange={(e) =>
-              changeHandler(
-                inputType === 'checkbox' ? e.target.checked : e.target.value
-              )
-            }
-            checked={inputType === 'checkbox' && value}
-          />
-        )}
+      <div className="row mb-4">
+        <div className="col">
+          <button onClick={(e) => saveHandler(e)}>Save</button>
+          <button
+            id="cancel-turn-modal"
+            onClick={(e) => setCreateEditTurnPopupIsHidden(true)}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
