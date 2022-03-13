@@ -3,9 +3,12 @@ import dynamic from 'next/dynamic';
 import { panelSpacer } from '@/config/ui';
 import ClassList from '../classes/components/ClassList';
 // import AddEditTurnPopup from '@/modules/turns/components/addEditTurn';
-const AddEditTurnPopup = dynamic(() => import('@/modules/turns/components/forms/AddEditTurn'), {
-  ssr: false,
-});
+const AddEditTurnPopup = dynamic(
+  () => import('@/modules/turns/components/forms/AddEditTurn'),
+  {
+    ssr: false,
+  }
+);
 import SettingsPanel from './components/SettingsPanel';
 
 export const POSITION_UPPER_LEFT = 'position_upper_left';

@@ -52,6 +52,15 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       }
       return newState;
     }
+    case types.TURN_RESAVE: {
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: payload,
+        },
+      };
+    }
     default:
       return state;
   }

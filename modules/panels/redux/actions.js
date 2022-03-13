@@ -6,3 +6,10 @@ export const togglePanel = (panelType) => (dispatch) => {
     payload: panelType,
   });
 };
+
+export const setTurnToEdit = (id) => (dispatch) => {
+  dispatch({
+    type: types.PANEL_SET_TURN_TO_EDIT,
+    payload: id,
+  });
+};

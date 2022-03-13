@@ -1,6 +1,7 @@
 import { getTurnsRequest } from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
+import { updateTurnRequest } from '../requests';
 
 export const loadTurns = (hash) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -11,15 +12,17 @@ export const loadTurns = (hash) => (dispatch) => {
   });
 };
 
-export const updateGeometry = (data) => (dispatch) => dispatch({
-  type: types.TURNS_UPDATE_GEOMETRY,
-  payload: data,
-});
+export const updateGeometry = (data) => (dispatch) =>
+  dispatch({
+    type: types.TURNS_UPDATE_GEOMETRY,
+    payload: data,
+  });
 
-export const updateScrollPosition = (data) => (dispatch) => dispatch({
-  type: types.TURNS_SCROLL,
-  payload: data
-})
+export const updateScrollPosition = (data) => (dispatch) =>
+  dispatch({
+    type: types.TURNS_SCROLL,
+    payload: data,
+  });
 
 export const moveField = (data) => (dispatch) => {
   dispatch({
@@ -32,3 +35,11 @@ export const moveField = (data) => (dispatch) => {
   });
 };
 
+export const resaveTurn = (turn) => (dispatch) => {
+  updateTurnRequest(turn._id, turn).then((data) => {
+    dispatch({
+      type: types.TURN_RESAVE,
+      payload: data.item,
+    });
+  });
+};

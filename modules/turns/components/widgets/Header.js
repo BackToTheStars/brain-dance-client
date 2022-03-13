@@ -1,6 +1,16 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { setTurnToEdit, togglePanel } from '@/modules/panels/redux/actions';
+import { PANEL_TOGGLE } from '@/modules/panels/redux/types';
+import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useMemo,
+  useState,
+  useDebugValue,
+} from 'react';
+import { useDispatch } from 'react-redux';
 // import { HEADER_HEIGHT } from '@/components/const';
 const HEADER_HEIGHT = 40;
 
@@ -14,17 +24,22 @@ const CloneButton = () => {
     <a key="clone" className="clone-btn" onClick={handleClone}>
       <i className="fas fa-clone"></i>
     </a>
-  )
-}
+  );
+};
 
 const Header = ({
   registerHandleResize,
-  _id, header, contentType, backgroundColor, fontColor, dontShowHeader,
+  _id,
+  header,
+  contentType,
+  backgroundColor,
+  fontColor,
+  dontShowHeader,
 }) => {
   const headerEl = useRef(null);
   const { can } = useUserContext();
   const remove = () => {};
-  const openEdit = () => {};
+  const dispatch = useDispatch();
 
   const style = useMemo(() => {
     let style = {
@@ -55,7 +70,8 @@ const Header = ({
 
   const handleEdit = (e) => {
     e.preventDefault();
-    openEdit();
+    dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+    dispatch(setTurnToEdit(_id));
   };
 
   useEffect(() => {

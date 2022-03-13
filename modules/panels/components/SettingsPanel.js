@@ -3,6 +3,7 @@ import { togglePanel } from '../redux/actions';
 
 const SettingsPanel = () => {
   const panels = useSelector((state) => state.panels.panels);
+  const editTurnId = useSelector((state) => state.panels.editTurnId);
   const dispatch = useDispatch();
   const getTogglePanel = (type) => () => dispatch(togglePanel({ type }));
 
@@ -43,6 +44,7 @@ const SettingsPanel = () => {
           })}
         </tbody>
       </table>
+      <div>editTurnId: {editTurnId} </div>
     </div>
   );
 };

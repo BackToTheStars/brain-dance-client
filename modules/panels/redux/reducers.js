@@ -3,7 +3,7 @@ import * as types from './types';
 
 const initialPanelState = {
   panels: panels,
-
+  editTurnId: null,
   //   [{
   //     type: PANEL_CLASSES,
   //     position: POSITION_UPPER_LEFT,
@@ -28,6 +28,11 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
             return { ...panel, isDisplayed: !panel.isDisplayed };
           } else return panel;
         }),
+      };
+    case types.PANEL_SET_TURN_TO_EDIT:
+      return {
+        ...state,
+        editTurnId: payload,
       };
     default:
       return state;

@@ -2,6 +2,10 @@ import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState } from 'react';
 import turnSettings from '@/modules/turns/settings';
 import FormInput from './FormInput';
+import { useDispatch, useSelector } from 'react-redux';
+import { togglePanel } from '@/modules/panels/redux/actions';
+import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
+import { resaveTurn } from '../../redux/actions';
 
 const {
   settings,
@@ -13,6 +17,9 @@ const {
 
 const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
+  const editTurnId = useSelector((state) => state.panels.editTurnId);
+  const turnToEdit = useSelector((state) => state.turns.d[editTurnId]);
+  console.log(turnToEdit);
 
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
@@ -21,22 +28,19 @@ const AddEditTurnPopup = () => {
   const requiredFields = settings[activeTemplate].requiredFields || [];
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
-  const {
-    createTurn = () => {},
-    turns = () => {},
-    dispatch = () => {},
-    turnToEdit,
-    updateTurn = () => {},
-  } = {}; // useTurnsCollectionContext();
+  const { createTurn = () => {}, turns = () => {}, updateTurn = () => {} } = {}; // useTurnsCollectionContext();
   const {
     // minimapState: { left, top },
     left = 0, // @todo: game.position
     top = 0, // @todo: game.position
     createEditTurnPopupIsHidden = () => {},
-    setCreateEditTurnPopupIsHidden = () => {},
   } = {}; // useUiContext();
 
+  const dispatch = useDispatch();
+  const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+
   useEffect(() => {
+    if (!quillConstants.quill) return;
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
       const newForm = {};
@@ -71,7 +75,7 @@ const AddEditTurnPopup = () => {
         quill.setContents([]);
       }
     }
-  }, [turnToEdit]);
+  }, [turnToEdit, quillConstants]);
 
   useEffect(() => {
     setQuillConstants(
@@ -82,66 +86,59 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
-    console.log({ textArr });
-    const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
-    const { x: zeroPointX, y: zeroPointY } = zeroPoint;
+    // console.log({ textArr });
+    // const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
+    // const { x: zeroPointX, y: zeroPointY } = zeroPoint;
 
-    // const viewportHeight = window ? window.innerHeight : 1600;
-    // const viewportWidth = window ? window.innerWidth : 1200;
+    // // const viewportHeight = window ? window.innerHeight : 1600;
+    // // const viewportWidth = window ? window.innerWidth : 1200;
 
-    // const widthK = 0.3; // коэффициент ширины вокруг мини-карты
+    // // const widthK = 0.3; // коэффициент ширины вокруг мини-карты
 
-    // const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
-    // const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
+    // // const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
+    // // const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
 
-    let incId = Math.floor(new Date().getTime() / 1000);
+    // let incId = Math.floor(new Date().getTime() / 1000);
 
-    const resTextArr = [];
-    let i = 0;
-    const paragraphQuotes =
-      turnToEdit && turnToEdit.quotes
-        ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-        : [];
-    for (let textItem of textArr) {
-      if (!textItem.attributes || !textItem.attributes.background) {
-        resTextArr.push(textItem);
-        continue;
-      }
+    // const resTextArr = [];
+    // let i = 0;
+    // const paragraphQuotes =
+    //   turnToEdit && turnToEdit.quotes
+    //     ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+    //     : [];
+    // for (let textItem of textArr) {
+    //   if (!textItem.attributes || !textItem.attributes.background) {
+    //     resTextArr.push(textItem);
+    //     continue;
+    //   }
 
-      // const quoteId =
-      //   !!textItem.attributes && !!textItem.attributes.id
-      //     ? textItem.attributes.id
-      //     : (incId += 1);
+    //   const quoteId =
+    //     !!turnToEdit && paragraphQuotes[i]
+    //       ? paragraphQuotes[i].id
+    //       : (incId += 1);
+    //   i += 1;
+    //   resTextArr.push({
+    //     ...textItem,
+    //     attributes: {
+    //       ...textItem.attributes,
+    //       id: quoteId,
+    //     },
+    //   });
+    // }
 
-      const quoteId =
-        !!turnToEdit && paragraphQuotes[i]
-          ? paragraphQuotes[i].id
-          : (incId += 1);
-      i += 1;
-      resTextArr.push({
-        ...textItem,
-        attributes: {
-          ...textItem.attributes,
-          id: quoteId,
-          // id: textItem.attributes.id || (incId += 1),
-          // id: 'quote-' + (textItem.attributes.id || (incId += 1)),
-        },
-      });
-    }
+    // const quotes = [];
 
-    const quotes = [];
+    // console.log(resTextArr);
 
-    console.log(resTextArr);
-
-    for (let textItem of resTextArr) {
-      if (textItem.attributes && textItem.attributes.id) {
-        quotes.push({
-          id: textItem.attributes.id,
-          text: textItem.insert,
-          type: 'text',
-        });
-      }
-    }
+    // for (let textItem of resTextArr) {
+    //   if (textItem.attributes && textItem.attributes.id) {
+    //     quotes.push({
+    //       id: textItem.attributes.id,
+    //       text: textItem.insert,
+    //       type: 'text',
+    //     });
+    //   }
+    // }
 
     const preparedForm = {};
     for (let fieldToShow of fieldsToShow) {
@@ -161,68 +158,72 @@ const AddEditTurnPopup = () => {
       }
     }
 
-    if (
-      requiredParagraph &&
-      (!resTextArr ||
-        !resTextArr.length ||
-        (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
-    ) {
-      return setError({ message: 'Need text body' });
-    }
+    // if (
+    //   requiredParagraph &&
+    //   (!resTextArr ||
+    //     !resTextArr.length ||
+    //     (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
+    // ) {
+    //   return setError({ message: 'Need text body' });
+    // }
 
-    const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
+    // const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
 
     let turnObj = {
       ...preparedForm,
-      paragraph: resTextArr,
+      // paragraph: resTextArr,
       contentType: activeTemplate,
-      quotes: [
-        ...quotes,
-        ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
-      ],
+      // quotes: [
+      //   ...quotes,
+      //   ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
+      // ],
     };
-    // console.log(turnObj);
 
     if (!!turnToEdit) {
-      turnObj.x = -zeroPointX + turnToEdit.x;
-      turnObj.y = -zeroPointY + turnToEdit.y;
-      const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
+      turnObj._id = turnToEdit._id;
+      // turnObj.x = -zeroPointX + turnToEdit.x;
+      // turnObj.y = -zeroPointY + turnToEdit.y;
+      // const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
 
-      if (prevQuotes.length > quotes.length) {
-        const deletedQuotes = prevQuotes.slice(quotes.length);
-        // @todo: удалить связи, которые содержат эти цитаты
-      }
+      // if (prevQuotes.length > quotes.length) {
+      //   const deletedQuotes = prevQuotes.slice(quotes.length);
+      //   // @todo: удалить связи, которые содержат эти цитаты
+      // }
 
-      updateTurn(turnToEdit._id, turnObj, {
-        successCallback: (data) => {
-          setCreateEditTurnPopupIsHidden(true); // закрыть popup
-          dispatch({
-            type: ACTION_TURN_WAS_CHANGED,
-            payload: {
-              ...data.item,
-              x: data.item.x + zeroPointX,
-              y: data.item.y + zeroPointY,
-            },
-          });
-        },
-        errorCallback: (message) => {
-          setError({ message });
-        },
-      });
+      // updateTurn(turnToEdit._id, turnObj, {
+      //   successCallback: (data) => {
+      //     hidePanel(); // закрыть popup
+      //     dispatch({
+      //       type: ACTION_TURN_WAS_CHANGED,
+      //       payload: {
+      //         ...data.item,
+      //         x: data.item.x + zeroPointX,
+      //         y: data.item.y + zeroPointY,
+      //       },
+      //     });
+      //   },
+      //   errorCallback: (message) => {
+      //     setError({ message });
+      //   },
+      // });
+
+      dispatch(resaveTurn(turnObj));
+
+      console.log(turnObj);
     } else {
-      turnObj.height = 600;
-      turnObj.width = 800;
-      createTurn(turnObj, {
-        successCallback: () => {
-          setCreateEditTurnPopupIsHidden(true);
-          setForm({});
-          const { quill } = quillConstants;
-          quill.setContents([]);
-        },
-        errorCallback: (message) => {
-          setError({ message });
-        },
-      });
+      // turnObj.height = 600;
+      // turnObj.width = 800;
+      // createTurn(turnObj, {
+      //   successCallback: () => {
+      //     hidePanel();
+      //     setForm({});
+      //     const { quill } = quillConstants;
+      //     quill.setContents([]);
+      //   },
+      //   errorCallback: (message) => {
+      //     setError({ message });
+      //   },
+      // });
     }
   };
 
@@ -267,7 +268,9 @@ const AddEditTurnPopup = () => {
                       setError(null);
                     }}
                   />
-                  <label className="form-check-label">{templateSettings.label}</label>
+                  <label className="form-check-label">
+                    {templateSettings.label}
+                  </label>
                 </div>
               );
             })}
@@ -297,18 +300,13 @@ const AddEditTurnPopup = () => {
                 />
               );
             })}
-          {!!error && (
-            <div className="alert alert-danger">{error.message}</div>
-          )}
+          {!!error && <div className="alert alert-danger">{error.message}</div>}
         </div>
       </div>
       <div className="row mb-4">
         <div className="col">
           <button onClick={(e) => saveHandler(e)}>Save</button>
-          <button
-            id="cancel-turn-modal"
-            onClick={(e) => setCreateEditTurnPopupIsHidden(true)}
-          >
+          <button id="cancel-turn-modal" onClick={(e) => hidePanel()}>
             Cancel
           </button>
         </div>
