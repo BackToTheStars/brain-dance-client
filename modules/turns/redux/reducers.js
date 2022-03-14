@@ -46,8 +46,8 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       for (let id in state.d) {
         newState.d[id] = {
           ...newState.d[id],
-          x: newState.d[id].x + left,
-          y: newState.d[id].y + top,
+          x: newState.d[id].x - left,
+          y: newState.d[id].y - top,
         };
       }
       return newState;

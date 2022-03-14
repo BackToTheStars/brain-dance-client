@@ -6,16 +6,18 @@ import PanelPopup from './Popup';
 
 const Panels = () => {
   const hash = useSelector((state) => state.game?.game?.hash);
-  const panels = useSelector((state) => state.panels.panels);
+  // const panels = useSelector((state) => state.panels.panels);
+  const panelsDict = useSelector((state) => state.panels.d);
+  const panels = Object.values(panelsDict);
   if (!hash) return null;
   return (
     <>
       {panels
         .filter((panel) => panel.isDisplayed)
         .map((panel) => {
-          const Wrapper = UIPanel
+          const Wrapper = UIPanel;
           if (panel.position === POSITION_POPUP) {
-            Wrapper = PanelPopup
+            Wrapper = PanelPopup;
           }
           return (
             <Wrapper
@@ -26,7 +28,7 @@ const Panels = () => {
             >
               <panel.component settings={panel} />
             </Wrapper>
-          )
+          );
         })}
       <SettingsButton />
     </>

@@ -8,6 +8,17 @@
   color: $white;
 }
 
+.position_upper_center {
+  top: $panels-spacer;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.position_bottom_right {
+  right: $panels-spacer;
+  bottom: $panels-spacer;
+}
+
 .text-cut-to-size {
   white-space: nowrap;
   overflow: hidden;

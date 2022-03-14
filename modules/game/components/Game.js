@@ -24,8 +24,8 @@ const Game = ({ hash }) => {
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(
           moveField({
-            left: ui.position.left,
-            top: ui.position.top,
+            left: -ui.position.left,
+            top: -ui.position.top,
           })
         );
         // dispatch(ACTION_FIELD_WAS_MOVED, {
