@@ -1,4 +1,4 @@
-import { panels } from '../settings';
+import { MODE_GAME, panels } from '../settings';
 import * as types from './types';
 
 const d = {};
@@ -10,6 +10,7 @@ const initialPanelState = {
   panels: panels,
   d: d,
   editTurnId: null,
+  mode: MODE_GAME,
 
   //   [{
   //     type: PANEL_CLASSES,
