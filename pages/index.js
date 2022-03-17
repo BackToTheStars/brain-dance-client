@@ -5,9 +5,7 @@ import GameTable from '@/modules/game/components/tables/GameListTable';
 
 import { loadGames } from '@/modules/game/games-redux/actions';
 import AdminMode from '@/modules/admin/components/profile/AdminMode';
-import {
-  AdminProvider,
-} from '@/modules/admin/contexts/AdminContext';
+import { AdminProvider } from '@/modules/admin/contexts/AdminContext';
 import { useRouter } from 'next/router';
 
 import { useDispatch } from 'react-redux';
@@ -15,13 +13,11 @@ import ErrorGameModal from '@/modules/game/components/modals/ErrorGameModal';
 
 const MainDashboard = () => {
   const router = useRouter();
-
-  const dispatch = useDispatch();
-  const loadGamesAction = () => dispatch(loadGames());
-
   const enterGame = (hash, nickname) => {
     router.push(`/code?hash=${hash}&nickname=${nickname}`);
   };
+  const dispatch = useDispatch();
+  const loadGamesAction = () => dispatch(loadGames());
 
   return (
     <div className="container-fluid col-lg-10">

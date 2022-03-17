@@ -127,7 +127,7 @@ const GameInfoPanel = ({ game, setGame }) => {
             <td>Your role:</td>
             <td>
               <h4>{ROLES[role].name}</h4>
-              {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
+              {role === ROLE_GAME_VISITOR && <CodeEnterForm hash={hash} />}
             </td>
           </tr>
         </tbody>

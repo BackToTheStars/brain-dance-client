@@ -1,9 +1,16 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 
-const CodeEnterForm = ({ enterGame }) => {
+const CodeEnterForm = ({ hash }) => {
   const [accessCode, setAccessCode] = useState('');
   const [userNickname, setUserNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const router = useRouter();
+  const enterGame = (hash, nickname) => {
+    router.push(`/code?hash=${hash}&nickname=${nickname}`);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

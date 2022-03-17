@@ -11,7 +11,7 @@ const CreateEnterGameBlock = ({ enterGame, onGameCreate }) => {
     <>
       <div className="row">
         <div className="col-xl-9 pt-2">
-          <CodeEnterForm enterGame={enterGame} />
+          <CodeEnterForm />
         </div>
         <div className="col-xl-3 pt-2 text-md-end">
           <button

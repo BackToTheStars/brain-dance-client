@@ -9,54 +9,50 @@
 // import EditGameForm from '../forms/EditGameForm';
 // import useEditGame from '../hooks/edit-game';
 
+import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '@/config/user';
+import CodeEnterForm from '@/modules/game/components/forms/CodeEnterForm';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Fragment } from 'react/cjs/react.development';
+import { togglePanel } from '../redux/actions';
+import { PANEL_INFO } from '../settings';
+import EditGameForm from './info/EditGameForm';
+
 const getUrl = ({ hash }) => {
   return typeof window === 'undefined' // SSR
     ? `${process.env.NEXT_PUBLIC_SITE_URL}/game?hash=${hash}`
     : window.location.href;
 };
 
-const InfoPanel = ({ game, setGame }) => {
-  return 'InfoPanel';
-
-  const { gameInfoPanelIsHidden, setGameInfoPanelIsHidden, addNotification } =
-    useUiContext();
-  const { info, can, token } = useUserContext();
-  const { code, addCode, codes: newGameAccessCodes } = useGamePlayerCode(token);
-  const { game: editedGame, editGame } = useEditGame(token);
-
+const InfoPanel = ({ setGame }) => {
+  const dispatch = useDispatch();
+  const game = useSelector((state) => state.game.game);
   const [viewMode, setViewMode] = useState(true);
 
+  const { info, can } = useUserContext();
   const { role, nickname } = info;
+  // const { code, addCode, codes: newGameAccessCodes } = useGamePlayerCode(token);
+  // const { game: editedGame, editGame } = useEditGame(token);
 
-  useEffect(() => {
-    if (editedGame) {
-      setGame(editedGame);
-      setViewMode(true);
-    }
-  }, [editedGame]);
+  // useEffect(() => {
+  //   if (editedGame) {
+  //     setGame(editedGame);
+  //     setViewMode(true);
+  //   }
+  // }, [editedGame]);
 
-  useEffect(() => {
-    addNotification({ title: 'Info:', text: `User ${nickname} logged in.` });
-  }, []);
+  // useEffect(() => {
+  //   addNotification({ title: 'Info:', text: `User ${nickname} logged in.` });
+  // }, []);
 
-  if (!game)
-    return (
-      <div
-        className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''}`}
-        id="gameInfoPanel"
-      >
-        Loading...
-      </div>
-    );
+  if (!game) return <>Loading...</>;
 
-  const { name, description, image, public: publicStatus, codes = [] } = game;
+  const { name, description, public: publicStatus, codes = [] } = game;
 
   return (
-    <div
-      className={`p0 ${gameInfoPanelIsHidden ? 'hidden' : ''} panel`}
-      id="gameInfoPanel"
-    >
-      {!viewMode && <EditGameForm game={game} editGame={editGame} />}
+    <>
+      {!viewMode && <EditGameForm />}
       <table className="table game-info-table table-dark">
         <tbody>
           {viewMode && (
@@ -102,7 +98,7 @@ const InfoPanel = ({ game, setGame }) => {
           )}
           {can(RULE_GAME_EDIT) && viewMode && (
             <tr>
-              <td>
+              {/* <td>
                 <p>Invite admin / player</p>
                 <a
                   href="#"
@@ -111,14 +107,14 @@ const InfoPanel = ({ game, setGame }) => {
                 >
                   Get player code
                 </a>
-              </td>
+              </td> 
               <td className="pt-0 pb-0">
-                {/* {!!code && <span>{code}</span>} */}
+                 {!!code && <span>{code}</span>} 
                 <AccessCodesTable
                   newAccessCode={code}
                   codes={newGameAccessCodes.length ? newGameAccessCodes : codes}
                 />
-              </td>
+              </td>*/}
             </tr>
           )}
           <tr className="td-no-borders">
@@ -136,7 +132,7 @@ const InfoPanel = ({ game, setGame }) => {
       </table>
       {viewMode ? (
         <button
-          onClick={() => setGameInfoPanelIsHidden(true)}
+          onClick={() => dispatch(togglePanel({ type: PANEL_INFO }))}
           className="btn btn-secondary"
         >
           Close
@@ -152,7 +148,7 @@ const InfoPanel = ({ game, setGame }) => {
           Cancel
         </button>
       )}
-    </div>
+    </>
   );
 };
 
