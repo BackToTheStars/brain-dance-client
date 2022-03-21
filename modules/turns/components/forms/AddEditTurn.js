@@ -5,7 +5,7 @@ import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
-import { resaveTurn } from '../../redux/actions';
+import { createTurn, resaveTurn } from '../../redux/actions';
 
 const {
   settings,
@@ -19,6 +19,8 @@ const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const turnToEdit = useSelector((state) => state.turns.d[editTurnId]);
+  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
+  const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
   console.log(turnToEdit);
 
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
@@ -28,7 +30,7 @@ const AddEditTurnPopup = () => {
   const requiredFields = settings[activeTemplate].requiredFields || [];
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
-  const { createTurn = () => {}, turns = () => {}, updateTurn = () => {} } = {}; // useTurnsCollectionContext();
+  const { turns = () => {}, updateTurn = () => {} } = {}; // useTurnsCollectionContext();
   const {
     // minimapState: { left, top },
     left = 0, // @todo: game.position
@@ -181,8 +183,8 @@ const AddEditTurnPopup = () => {
 
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
-      // turnObj.x = -zeroPointX + turnToEdit.x;
-      // turnObj.y = -zeroPointY + turnToEdit.y;
+      turnObj.x = -zeroPoint.x + turnToEdit.x;
+      turnObj.y = -zeroPoint.y + turnToEdit.y;
       // const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
 
       // if (prevQuotes.length > quotes.length) {
@@ -207,12 +209,19 @@ const AddEditTurnPopup = () => {
       //   },
       // });
 
-      dispatch(resaveTurn(turnObj));
+      dispatch(resaveTurn(turnObj, zeroPoint));
 
       console.log(turnObj);
     } else {
-      // turnObj.height = 600;
-      // turnObj.width = 800;
+      turnObj.height = 600;
+      turnObj.width = 800;
+      turnObj.x =
+        -zeroPoint.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
+      turnObj.y =
+        -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
+
+      dispatch(createTurn(turnObj, zeroPoint));
+
       // createTurn(turnObj, {
       //   successCallback: () => {
       //     hidePanel();

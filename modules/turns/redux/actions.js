@@ -1,7 +1,7 @@
 import { getTurnsRequest } from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
-import { updateTurnRequest } from '../requests';
+import { createTurnRequest, updateTurnRequest } from '../requests';
 
 export const loadTurns = (hash) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -35,11 +35,44 @@ export const moveField = (data) => (dispatch) => {
   });
 };
 
-export const resaveTurn = (turn) => (dispatch) => {
+export const createTurn = (turn, zeroPoint) => (dispatch) => {
+  createTurnRequest(turn).then((data) => {
+    const preparedTurn = {
+      ...data.item,
+      x: turn.x + zeroPoint.x,
+      y: turn.y + zeroPoint.y,
+    };
+    dispatch({
+      type: types.TURN_CREATE,
+      payload: preparedTurn,
+    });
+  });
+};
+
+export const deleteTurn = (_id) => (dispatch) => {
+  // updateTurnRequest(turn._id, turn).then((data) => {
+  //   const preparedTurn = {
+  //     ...data.item,
+  //     x: turn.x + zeroPoint.x,
+  //     y: turn.y + zeroPoint.y,
+  //   };
+  dispatch({
+    type: types.TURN_DELETE,
+    payload: _id,
+  });
+  // });
+};
+
+export const resaveTurn = (turn, zeroPoint) => (dispatch) => {
   updateTurnRequest(turn._id, turn).then((data) => {
+    const preparedTurn = {
+      ...data.item,
+      x: turn.x + zeroPoint.x,
+      y: turn.y + zeroPoint.y,
+    };
     dispatch({
       type: types.TURN_RESAVE,
-      payload: data.item,
+      payload: preparedTurn,
     });
   });
 };

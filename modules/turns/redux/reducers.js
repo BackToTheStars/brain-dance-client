@@ -1,9 +1,11 @@
+import turnSettings from '../settings';
 import * as types from './types';
 
 const initialTurnsState = {
   turns: [],
   d: {},
   error: null,
+  zeroPointId: null,
 };
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
@@ -12,6 +14,9 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       return {
         ...state,
         turns: payload.turns,
+        zeroPointId: payload.turns.find(
+          (turn) => turn.contentType === turnSettings.TEMPLATE_ZERO_POINT
+        )._id,
         d: payload.turns.reduce((a, turn) => {
           a[turn._id] = turn;
           return a;
@@ -52,6 +57,18 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       }
       return newState;
     }
+
+    case types.TURN_CREATE: {
+      return {
+        ...state,
+        turns: [...state.turns, payload],
+        d: {
+          ...state.d,
+          [payload._id]: payload,
+        },
+      };
+    }
+
     case types.TURN_RESAVE: {
       return {
         ...state,
@@ -61,6 +78,19 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
       };
     }
+
+    case types.TURN_DELETE: {
+      // в payload прилетит _id
+      const preparedD = { ...state.d };
+      delete preparedD[payload];
+
+      return {
+        ...state,
+        turns: state.turns.filter((turn) => turn._id !== payload),
+        d: preparedD,
+      };
+    }
+
     default:
       return state;
   }

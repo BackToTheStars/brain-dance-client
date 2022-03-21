@@ -11,6 +11,7 @@ import React, {
   useDebugValue,
 } from 'react';
 import { useDispatch } from 'react-redux';
+import { deleteTurn } from '../../redux/actions';
 // import { HEADER_HEIGHT } from '@/components/const';
 const HEADER_HEIGHT = 40;
 
@@ -64,7 +65,7 @@ const Header = ({
     e.preventDefault();
     if (confirm('Точно удалить?')) {
       // confirm - глобальная функция браузера
-      remove();
+      dispatch(deleteTurn(_id));
     }
   };
 

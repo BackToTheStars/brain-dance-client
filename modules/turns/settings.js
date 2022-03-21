@@ -1,5 +1,6 @@
 // все переменные для работы Turn
 
+const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
 const TEMPLATE_COMMENT = 'comment';
@@ -106,6 +107,7 @@ const fieldSettings = {
 const fieldsToShow = Object.keys(fieldSettings); // возвращает массив строк-ключей объекта
 
 const turnSettings = {
+  TEMPLATE_ZERO_POINT,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
   TEMPLATE_COMMENT,
