@@ -21,7 +21,6 @@ const AddEditTurnPopup = () => {
   const turnToEdit = useSelector((state) => state.turns.d[editTurnId]);
   const zeroPointId = useSelector((state) => state.turns.zeroPointId);
   const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
-  console.log(turnToEdit);
 
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
@@ -30,13 +29,6 @@ const AddEditTurnPopup = () => {
   const requiredFields = settings[activeTemplate].requiredFields || [];
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
   const [form, setForm] = useState({});
-  const { turns = () => {}, updateTurn = () => {} } = {}; // useTurnsCollectionContext();
-  const {
-    // minimapState: { left, top },
-    left = 0, // @todo: game.position
-    top = 0, // @todo: game.position
-    createEditTurnPopupIsHidden = () => {},
-  } = {}; // useUiContext();
 
   const dispatch = useDispatch();
   const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
@@ -88,49 +80,36 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
-    // console.log({ textArr });
-    // const zeroPoint = turns.find((turn) => turn.contentType === 'zero-point');
-    // const { x: zeroPointX, y: zeroPointY } = zeroPoint;
 
-    // // const viewportHeight = window ? window.innerHeight : 1600;
-    // // const viewportWidth = window ? window.innerWidth : 1200;
+    let incId = Math.floor(new Date().getTime() / 1000);
 
-    // // const widthK = 0.3; // коэффициент ширины вокруг мини-карты
+    const resTextArr = [];
+    let i = 0;
+    const paragraphQuotes =
+      turnToEdit && turnToEdit.quotes
+        ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+        : [];
+    for (let textItem of textArr) {
+      if (!textItem.attributes || !textItem.attributes.background) {
+        resTextArr.push(textItem);
+        continue;
+      }
 
-    // // const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
-    // // const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
-
-    // let incId = Math.floor(new Date().getTime() / 1000);
-
-    // const resTextArr = [];
-    // let i = 0;
-    // const paragraphQuotes =
-    //   turnToEdit && turnToEdit.quotes
-    //     ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-    //     : [];
-    // for (let textItem of textArr) {
-    //   if (!textItem.attributes || !textItem.attributes.background) {
-    //     resTextArr.push(textItem);
-    //     continue;
-    //   }
-
-    //   const quoteId =
-    //     !!turnToEdit && paragraphQuotes[i]
-    //       ? paragraphQuotes[i].id
-    //       : (incId += 1);
-    //   i += 1;
-    //   resTextArr.push({
-    //     ...textItem,
-    //     attributes: {
-    //       ...textItem.attributes,
-    //       id: quoteId,
-    //     },
-    //   });
-    // }
+      const quoteId =
+        !!turnToEdit && paragraphQuotes[i]
+          ? paragraphQuotes[i].id
+          : (incId += 1);
+      i += 1;
+      resTextArr.push({
+        ...textItem,
+        attributes: {
+          ...textItem.attributes,
+          id: quoteId,
+        },
+      });
+    }
 
     // const quotes = [];
-
-    // console.log(resTextArr);
 
     // for (let textItem of resTextArr) {
     //   if (textItem.attributes && textItem.attributes.id) {
@@ -160,20 +139,20 @@ const AddEditTurnPopup = () => {
       }
     }
 
-    // if (
-    //   requiredParagraph &&
-    //   (!resTextArr ||
-    //     !resTextArr.length ||
-    //     (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
-    // ) {
-    //   return setError({ message: 'Need text body' });
-    // }
+    if (
+      requiredParagraph &&
+      (!resTextArr ||
+        !resTextArr.length ||
+        (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
+    ) {
+      return setError({ message: 'Need text body' });
+    }
 
     // const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
 
     let turnObj = {
       ...preparedForm,
-      // paragraph: resTextArr,
+      paragraph: resTextArr,
       contentType: activeTemplate,
       // quotes: [
       //   ...quotes,
@@ -221,18 +200,6 @@ const AddEditTurnPopup = () => {
         -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
 
       dispatch(createTurn(turnObj, zeroPoint));
-
-      // createTurn(turnObj, {
-      //   successCallback: () => {
-      //     hidePanel();
-      //     setForm({});
-      //     const { quill } = quillConstants;
-      //     quill.setContents([]);
-      //   },
-      //   errorCallback: (message) => {
-      //     setError({ message });
-      //   },
-      // });
     }
   };
 

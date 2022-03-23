@@ -16,3 +16,10 @@ export const updateTurnRequest = (id, body) => {
     body: body,
   });
 };
+
+export const deleteTurnRequest = (id) => {
+  return request(`turns/${id}?hash=${s.hash}`, {
+    method: 'DELETE',
+    tokenFlag: true
+  });
+};

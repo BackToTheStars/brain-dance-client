@@ -1,7 +1,7 @@
 import { getTurnsRequest } from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
-import { createTurnRequest, updateTurnRequest } from '../requests';
+import { createTurnRequest, deleteTurnRequest, updateTurnRequest } from '../requests';
 
 export const loadTurns = (hash) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -50,17 +50,12 @@ export const createTurn = (turn, zeroPoint) => (dispatch) => {
 };
 
 export const deleteTurn = (_id) => (dispatch) => {
-  // updateTurnRequest(turn._id, turn).then((data) => {
-  //   const preparedTurn = {
-  //     ...data.item,
-  //     x: turn.x + zeroPoint.x,
-  //     y: turn.y + zeroPoint.y,
-  //   };
-  dispatch({
-    type: types.TURN_DELETE,
-    payload: _id,
+  deleteTurnRequest(_id).then((data) => {
+    dispatch({
+      type: types.TURN_DELETE,
+      payload: _id,
+    });
   });
-  // });
 };
 
 export const resaveTurn = (turn, zeroPoint) => (dispatch) => {
