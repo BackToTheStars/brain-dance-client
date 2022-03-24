@@ -1,9 +1,15 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { saveField } from '@/modules/game/game-redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { togglePanel } from '../../redux/actions';
-import { PANEL_ADD_EDIT_TURN, PANEL_CLASSES, PANEL_INFO } from '../../settings';
+import {
+  PANEL_ADD_EDIT_TURN,
+  PANEL_CLASSES,
+  PANEL_INFO,
+  PANEL_MINIMAP,
+} from '../../settings';
 import { Buttons } from '../ButtonsPanel';
 
 const GameMode = () => {
@@ -11,6 +17,10 @@ const GameMode = () => {
   const router = useRouter();
   const { can } = useUserContext();
   const isTurnInBuffer = false;
+  const d = useSelector((state) => state.turns.d);
+  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
+  const zeroPoint = d[zeroPointId];
+  const gamePosition = useSelector((state) => state.game.position);
 
   const dispatch = useDispatch();
 
@@ -37,7 +47,7 @@ const GameMode = () => {
     },
     {
       text: 'Save Field',
-      // callback: () => saveField(),
+      callback: () => dispatch(saveField(d, zeroPoint, gamePosition)),
       show: () => can(RULE_TURNS_CRUD),
     },
     {
@@ -55,7 +65,7 @@ const GameMode = () => {
     {
       text: 'Minimap',
       callback: () => {
-        // minimapDispatch({ type: 'MINIMAP_SHOW_HIDE' })
+        dispatch(togglePanel({ type: PANEL_MINIMAP }));
       },
     },
     { text: 'Lobby', callback: () => router.push('/') },

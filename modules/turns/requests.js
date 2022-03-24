@@ -20,6 +20,16 @@ export const updateTurnRequest = (id, body) => {
 export const deleteTurnRequest = (id) => {
   return request(`turns/${id}?hash=${s.hash}`, {
     method: 'DELETE',
-    tokenFlag: true
+    tokenFlag: true,
+  });
+};
+
+export const updateCoordinatesRequest = (changedTurns) => {
+  return request(`turns/coordinates?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'PUT',
+    body: {
+      turns: changedTurns,
+    },
   });
 };

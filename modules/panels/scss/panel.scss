@@ -19,6 +19,11 @@
   bottom: $panels-spacer;
 }
 
+.position_bottom_left {
+  left: $panels-spacer;
+  bottom: $panels-spacer;
+}
+
 .text-cut-to-size {
   white-space: nowrap;
   overflow: hidden;

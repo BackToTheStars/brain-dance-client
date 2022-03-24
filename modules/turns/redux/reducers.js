@@ -30,6 +30,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             ...payload,
+            wasChanged: true,
           },
         },
       };
@@ -40,7 +41,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...state.d,
           [payload._id]: {
             ...state.d[payload._id],
-            scrollPosition: [payload.scrollPosition],
+            scrollPosition: payload.scrollPosition,
           },
         },
       };
@@ -53,6 +54,17 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...newState.d[id],
           x: newState.d[id].x - left,
           y: newState.d[id].y - top,
+        };
+      }
+      return newState;
+    }
+
+    case types.TURNS_SYNC_DONE: {
+      const newState = { ...state };
+      for (let id in state.d) {
+        newState.d[id] = {
+          ...newState.d[id],
+          wasChanged: false,
         };
       }
       return newState;

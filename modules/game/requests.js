@@ -62,3 +62,14 @@ export const getTurnsRequest = (hash) => {
     tokenFlag: true,
   });
 };
+
+export const saveGamePositionRequest = (gamePosition) => {
+  return request(`games/viewport?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'PUT',
+    body: {
+      x: gamePosition.left,
+      y: gamePosition.top,
+    },
+  });
+};
