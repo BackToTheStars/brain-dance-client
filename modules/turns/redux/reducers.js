@@ -6,6 +6,7 @@ const initialTurnsState = {
   d: {},
   error: null,
   zeroPointId: null,
+  updateGeometryTime: 0,
 };
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
@@ -21,6 +22,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           a[turn._id] = turn;
           return a;
         }, {}),
+        updateGeometryTime: new Date().getTime(),
       };
     case types.TURNS_UPDATE_GEOMETRY:
       return {
@@ -33,6 +35,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
             wasChanged: true,
           },
         },
+        updateGeometryTime: new Date().getTime(),
       };
     case types.TURNS_SCROLL: {
       return {
@@ -56,6 +59,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           y: newState.d[id].y - top,
         };
       }
+      newState.updateGeometryTime = new Date().getTime();
       return newState;
     }
 
@@ -78,6 +82,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...state.d,
           [payload._id]: payload,
         },
+        updateGeometryTime: new Date().getTime(),
       };
     }
 
@@ -100,6 +105,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         turns: state.turns.filter((turn) => turn._id !== payload),
         d: preparedD,
+        updateGeometryTime: new Date().getTime(),
       };
     }
 

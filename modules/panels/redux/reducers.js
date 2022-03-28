@@ -49,6 +49,19 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         ...state,
         editTurnId: payload,
       };
+
+    case types.PANEL_CHANGE_GEOMETRY:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload.type]: {
+            ...state.d[payload.type],
+            ...payload.geometryData,
+          },
+        },
+      };
+
     default:
       return state;
   }

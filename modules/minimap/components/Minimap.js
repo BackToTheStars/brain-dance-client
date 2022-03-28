@@ -1,6 +1,10 @@
 // import { useUiContext } from '../contexts/UI_Context';
 import { panelSpacer } from '@/config/ui';
+import { changePanelGeometry } from '@/modules/panels/redux/actions';
+import { PANEL_MINIMAP } from '@/modules/panels/settings';
 import { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getScreenRect } from './helpers/screen';
 import Line from './line/Line';
 // import {
 // useTurnsCollectionContext,
@@ -9,6 +13,11 @@ import Line from './line/Line';
 
 const Minimap = () => {
   const [gameBoxEl, setGameBoxEl] = useState(null);
+  const turnsDictionary = useSelector((state) => state.turns.d);
+  const turns = Object.values(turnsDictionary);
+  const position = useSelector((state) => state.game.position);
+  useSelector((state) => state.turns.updateGeometryTime);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setGameBoxEl(document.querySelector('#gameBox'));
@@ -25,15 +34,15 @@ const Minimap = () => {
   const uiLines = [];
 
   const {
-    left = 0,
-    right = 3000,
-    top = 0,
-    bottom = 2000,
-    zeroX = 1500,
-    zeroY = 1000,
-    turns = [],
-    isHidden = false,
-  } = minimapState;
+    left,
+    right,
+    top,
+    bottom,
+    zeroX,
+    zeroY,
+    // turns = [],
+  } = getScreenRect(turns);
+  const isHidden = false; // @todo: remove
 
   const minimapPnlRef = useRef(null);
   const widthPx = right - left; // ширина всего поля
@@ -68,6 +77,7 @@ const Minimap = () => {
   };
 
   const value = {
+    position,
     minimapWidth,
     width: widthPx + 2 * freeSpaceLeftRight, // ширина field
     height: heightPx + 2 * freeSpaceTopBottom, // высота field
@@ -145,6 +155,11 @@ const Minimap = () => {
     // @todo: оптимизировать ?
     // minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
   }, [turns]); // массив с id тех ходов, которые нужно render
+
+  useEffect(() => {
+    if (!value.minimapWidth) return;
+    dispatch(changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth }));
+  }, [value.minimapWidth]);
 
   useEffect(() => {
     if (!minimapPnlRef.current) return;
@@ -252,6 +267,7 @@ const areRectanglesIntersect = (rect1, rect2) => {
 };
 
 const SVGMiniMap = ({
+  position,
   minimapWidth,
   width,
   height,
@@ -274,7 +290,7 @@ const SVGMiniMap = ({
 
   return (
     <svg
-      viewBox={`0 0 ${width} ${height}`}
+      viewBox={`${position.left} ${position.top} ${width} ${height}`}
       xmlns="http://www.w3.org/2000/svg"
       style={{ width: `${minimapWidth}px` }}
       onClick={(e) => onMapClick(e)}

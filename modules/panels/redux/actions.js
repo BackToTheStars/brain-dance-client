@@ -13,3 +13,15 @@ export const setTurnToEdit = (id) => (dispatch) => {
     payload: id,
   });
 };
+
+export const changePanelGeometry = (type, geometryData) => (dispatch) => {
+  // const geometryData = {};
+  // if (geometryRawData?.width) {
+  //   geometryData.width = () => `${geometryRawData.width}.px`;
+  // }
+  // console.log({ geometryData });
+  dispatch({
+    type: types.PANEL_CHANGE_GEOMETRY,
+    payload: { type, geometryData },
+  });
+};

@@ -6,7 +6,12 @@ const UIPanel = ({ children, position, height, width }) => {
   const style = {};
 
   if (!!width) {
-    style.width = width();
+    if (+width == width) {
+      style.width = `${width}px`;
+      // @learn приведение к числу и проверка
+    } else {
+      style.width = width();
+    }
   }
   if (!!height) {
     style.height = height();
