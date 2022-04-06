@@ -35,7 +35,7 @@ export const moveField = (data) => (dispatch) => {
   });
 };
 
-export const createTurn = (turn, zeroPoint) => (dispatch) => {
+export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   createTurnRequest(turn).then((data) => {
     const preparedTurn = {
       ...data.item,
@@ -46,6 +46,7 @@ export const createTurn = (turn, zeroPoint) => (dispatch) => {
       type: types.TURN_CREATE,
       payload: preparedTurn,
     });
+    callbacks?.success();
   });
 };
 
@@ -58,7 +59,7 @@ export const deleteTurn = (_id) => (dispatch) => {
   });
 };
 
-export const resaveTurn = (turn, zeroPoint) => (dispatch) => {
+export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   updateTurnRequest(turn._id, turn).then((data) => {
     const preparedTurn = {
       ...data.item,
@@ -69,5 +70,6 @@ export const resaveTurn = (turn, zeroPoint) => (dispatch) => {
       type: types.TURN_RESAVE,
       payload: preparedTurn,
     });
+    callbacks?.success();
   });
 };

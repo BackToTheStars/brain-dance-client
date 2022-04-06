@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import ParagraphOriginal from "./ParagraphOriginal";
 import ParagraphQuotes from "./ParagraphQuotes";
 
-const Paragraph = ({turn, registerHandleResize, unregisterHandleResize}) => {
+const Paragraph = ({turn, registerHandleResize, unregisterHandleResize, recalculatedTime}) => {
   const {
     paragraph,
     _id,

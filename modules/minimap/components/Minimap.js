@@ -2,6 +2,7 @@
 import { panelSpacer } from '@/config/ui';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import { PANEL_MINIMAP } from '@/modules/panels/settings';
+import { moveField } from '@/modules/turns/redux/actions';
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getScreenRect } from './helpers/screen';
@@ -15,6 +16,7 @@ const Minimap = () => {
   const [gameBoxEl, setGameBoxEl] = useState(null);
   const turnsDictionary = useSelector((state) => state.turns.d);
   const turns = Object.values(turnsDictionary);
+
   const position = useSelector((state) => state.game.position);
   useSelector((state) => state.turns.updateGeometryTime);
   const dispatch = useDispatch();
@@ -76,6 +78,31 @@ const Minimap = () => {
     height: viewportHeight,
   };
 
+  const preparedTurns = turns
+  .map((turn) => ({
+    ...turn,
+    // для получения координаты шага на карте достаточно
+    // сместить его координаты на координаты viewport
+    x: turn.x - left + freeSpaceLeftRight - zeroX,
+    y: turn.y - top + freeSpaceTopBottom - zeroY,
+  }))
+  .map((turn) => {
+    const isTurnInsideViewport = areRectanglesIntersect(turn, {
+      // x: viewport.x,
+      // width: viewport.width,
+      // y: viewport.y,
+      // height: viewport.height,
+      x: viewport.x - viewport.width,
+      width: 3 * viewport.width,
+      y: viewport.y - viewport.height,
+      height: 3 * viewport.height,
+    });
+    return {
+      ...turn,
+      isTurnInsideViewport,
+    };
+  });
+
   const value = {
     position,
     minimapWidth,
@@ -91,8 +118,8 @@ const Minimap = () => {
       // - freeSpaceTopBottom;
       //   const gf = window[Symbol.for('MyGame')].gameField;
 
-      const left = viewport.x - targetXMap + Math.floor(viewport.width / 2);
-      const top = viewport.y - targetYMap + Math.floor(viewport.height / 2);
+      const left = viewport.x - targetXMap + Math.floor(viewport.width / 2) + zeroX;
+      const top = viewport.y - targetYMap + Math.floor(viewport.height / 2) + zeroY;
 
       $(gameBoxEl).addClass('remove-line-transition');
       $(gameBoxEl).animate(
@@ -102,6 +129,12 @@ const Minimap = () => {
         },
         300,
         () => {
+          dispatch(
+            moveField({
+              left: -left,
+              top: -top,
+            })
+          );
           //   gf.triggers.dispatch('RECALCULATE_FIELD');
           //   gf.triggers.dispatch('DRAW_LINES');
           // turnsDispatch({
@@ -115,35 +148,13 @@ const Minimap = () => {
           $(gameBoxEl).css('top', 0);
           setTimeout(() => {
             $(gameBoxEl).removeClass('remove-line-transition');
+
           }, 100);
         }
       );
     },
-    turns: turns
-      .map((turn) => ({
-        ...turn,
-        // для получения координаты шага на карте достаточно
-        // сместить его координаты на координаты viewport
-        x: turn.x - left + freeSpaceLeftRight - zeroX,
-        y: turn.y - top + freeSpaceTopBottom - zeroY,
-      }))
-      .map((turn) => {
-        const isTurnInsideViewport = areRectanglesIntersect(turn, {
-          // x: viewport.x,
-          // width: viewport.width,
-          // y: viewport.y,
-          // height: viewport.height,
-          x: viewport.x - viewport.width,
-          width: 3 * viewport.width,
-          y: viewport.y - viewport.height,
-          height: 3 * viewport.height,
-        });
-        return {
-          ...turn,
-          isTurnInsideViewport,
-        };
-      })
-      .filter((turn) => turn.contentType !== 'zero-point'),
+    turns: preparedTurns.filter((turn) => turn.contentType !== 'zero-point'),
+    zeroPoint: preparedTurns.find((turn) => turn.contentType === 'zero-point'),
   };
 
   const turnsToRender = value.turns
@@ -273,6 +284,7 @@ const SVGMiniMap = ({
   height,
   viewport,
   turns,
+  zeroPoint,
   lines,
   onMapClick,
 }) => {
@@ -295,6 +307,14 @@ const SVGMiniMap = ({
       style={{ width: `${minimapWidth}px` }}
       onClick={(e) => onMapClick(e)}
     >
+      {!!zeroPoint && <rect
+        key={zeroPoint._id}
+        x={zeroPoint.x-20}
+        y={zeroPoint.y-20}
+        width={40}
+        fill={'red'}
+        height={40}
+      />}
       {turns.map((turn, i) => {
         // viewport x y width height
         // turn x y width height
@@ -305,7 +325,7 @@ const SVGMiniMap = ({
 
         return (
           <rect
-            key={i}
+            key={turn._id}
             x={turn.x}
             y={turn.y}
             width={turn.width}

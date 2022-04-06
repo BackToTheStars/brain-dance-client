@@ -160,6 +160,10 @@ const AddEditTurnPopup = () => {
       // ],
     };
 
+    const saveCallbacks = { // @todo: передавать в виджет через props
+      success: () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN })),
+    };
+
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
       turnObj.x = -zeroPoint.x + turnToEdit.x;
@@ -188,7 +192,7 @@ const AddEditTurnPopup = () => {
       //   },
       // });
 
-      dispatch(resaveTurn(turnObj, zeroPoint));
+      dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
 
       console.log(turnObj);
     } else {
@@ -199,7 +203,7 @@ const AddEditTurnPopup = () => {
       turnObj.y =
         -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
 
-      dispatch(createTurn(turnObj, zeroPoint));
+      dispatch(createTurn(turnObj, zeroPoint, saveCallbacks));
     }
   };
 

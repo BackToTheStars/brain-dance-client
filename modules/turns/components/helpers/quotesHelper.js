@@ -110,7 +110,7 @@ export const getScrolledQuotes = (quotes, paragraphEl, scrollPosition) => {
     let position = 'default';
     const outlineWidth = 2; // ещё в Turn.js строчка 466
 
-    if (top < scrollPosition + topGap) { // height / 2
+    if (top < scrollPosition) { // height / 2
       height = 0;
       width = paragraphRect.width - outlineWidth; // 2 ширины рамки
       left = outlineWidth; //left + outlineWidth;

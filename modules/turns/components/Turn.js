@@ -12,6 +12,7 @@ import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import Paragraph from './widgets/paragraph/Paragraph';
 import Picture from './widgets/Picture';
+import Video from './widgets/Video';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -38,6 +39,8 @@ const Turn = ({ id }) => {
     dontShowHeader,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
+    //-- video
+    videoUrl,
     //-- image
     imageUrl,
   } = turn;
@@ -80,6 +83,36 @@ const Turn = ({ id }) => {
     [widgets]
   );
 
+  const recalculateSize = (width, height) => {
+    const { minHeight, maxHeight, minWidth, maxWidth } = getTurnMinMaxHeight(
+      widgets,
+      width
+    );
+
+    const newHeight = Math.min(
+      Math.max(height, minHeight),
+      maxHeight
+    );
+    const newWidth = Math.min(Math.max(width, minWidth), maxWidth);
+
+    turnGeometryQueue.add(() => {
+      dispatch(
+        updateGeometry({
+          _id,
+          width: newWidth,
+          height: newHeight,
+        })
+      );
+    });
+
+    if (newHeight !== height || newWidth !== width) {
+      $(wrapper.current).css({
+        height: `${newHeight}px`,
+        width: `${newWidth}px`,
+      });
+    }
+  }
+
   // DRAGGABLE
   useEffect(() => {
     $(wrapper.current).draggable({
@@ -113,34 +146,22 @@ const Turn = ({ id }) => {
   useEffect(() => {
     $(wrapper.current).resizable({
       resize: (event, ui) => {
-        const { minHeight, maxHeight, minWidth, maxWidth } =
-          getTurnMinMaxHeight(widgets, ui.size.width);
-
-        const newHeight = Math.min(
-          Math.max(ui.size.height, minHeight),
-          maxHeight
-        );
-        const newWidth = Math.min(Math.max(ui.size.width, minWidth), maxWidth);
-
-        turnGeometryQueue.add(() => {
-          dispatch(
-            updateGeometry({
-              _id,
-              width: newWidth,
-              height: newHeight,
-            })
-          );
-        });
-
-        if (newHeight !== ui.size.height || newWidth !== ui.size.width) {
-          $(wrapper.current).css({
-            height: `${newHeight}px`,
-            width: `${newWidth}px`,
-          });
-        }
+        recalculateSize(ui.size.width, ui.size.height)
       },
     });
-    // return () => $(wrapper.current).resizable('destroy');
+    return () => $(wrapper.current).resizable('destroy');
+  }, [widgets]);
+
+  useEffect(() => {
+    const widgetsCount =
+      1 + // header
+      + !!imageUrl // Picture
+      + !!videoUrl // Video
+      doesParagraphExist; // Paragraph
+
+    if (widgetsCount === widgets.length) {
+      recalculateSize(width, height);
+    }
   }, [widgets]);
 
   return (
@@ -163,7 +184,14 @@ const Turn = ({ id }) => {
           _id,
         }}
       />
-      {/* {!!imageUrl && (
+      {!!videoUrl && (
+        <Video
+          videoUrl={videoUrl}
+          registerHandleResize={registerHandleResize}
+          width={width}
+        />
+      )}
+      {!!imageUrl && (
         <Picture
           imageUrl={imageUrl}
           registerHandleResize={registerHandleResize}
@@ -171,7 +199,7 @@ const Turn = ({ id }) => {
           widgetId="picture1"
           widgetType="picture"
         />
-      )} */}
+      )}
       {doesParagraphExist && (
         <Paragraph
           turn={turn}
