@@ -89,10 +89,7 @@ const Turn = ({ id }) => {
       width
     );
 
-    const newHeight = Math.min(
-      Math.max(height, minHeight),
-      maxHeight
-    );
+    const newHeight = Math.min(Math.max(height, minHeight), maxHeight);
     const newWidth = Math.min(Math.max(width, minWidth), maxWidth);
 
     turnGeometryQueue.add(() => {
@@ -111,7 +108,7 @@ const Turn = ({ id }) => {
         width: `${newWidth}px`,
       });
     }
-  }
+  };
 
   // DRAGGABLE
   useEffect(() => {
@@ -146,7 +143,7 @@ const Turn = ({ id }) => {
   useEffect(() => {
     $(wrapper.current).resizable({
       resize: (event, ui) => {
-        recalculateSize(ui.size.width, ui.size.height)
+        recalculateSize(ui.size.width, ui.size.height);
       },
     });
     return () => $(wrapper.current).resizable('destroy');
@@ -155,8 +152,8 @@ const Turn = ({ id }) => {
   useEffect(() => {
     const widgetsCount =
       1 + // header
-      + !!imageUrl // Picture
-      + !!videoUrl // Video
+      !!imageUrl + // Picture
+      !!videoUrl + // Video
       doesParagraphExist; // Paragraph
 
     if (widgetsCount === widgets.length) {
