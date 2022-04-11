@@ -10,6 +10,7 @@ import {
   updateCoordinates,
   updateCoordinatesRequest,
 } from '@/modules/turns/requests';
+import { addNotification } from '@/modules/ui/redux/actions';
 
 export const loadFullGame = (hash) => (dispatch) => {
   // GET GAME DATA
@@ -66,7 +67,7 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
 
   updateCoordinatesRequest(changedTurns).then((data) => {
     dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
-    // addNotification({ title: 'Info:', text: 'Field has been saved' });
+    dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
   });
 
   saveGamePositionRequest(gamePosition);

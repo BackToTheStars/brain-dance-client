@@ -11,8 +11,9 @@
 
 import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '@/config/user';
 import CodeEnterForm from '@/modules/game/components/forms/CodeEnterForm';
+import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Fragment } from 'react/cjs/react.development';
 import { togglePanel } from '../redux/actions';
@@ -41,10 +42,6 @@ const InfoPanel = ({ setGame }) => {
   //     setViewMode(true);
   //   }
   // }, [editedGame]);
-
-  // useEffect(() => {
-  //   addNotification({ title: 'Info:', text: `User ${nickname} logged in.` });
-  // }, []);
 
   if (!game) return <>Loading...</>;
 

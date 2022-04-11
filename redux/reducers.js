@@ -4,6 +4,7 @@ import { gamesReducer } from '@/modules/game/games-redux/reducers';
 import { linesReducer } from '@/modules/lines/redux/reducers';
 import { panelReducer } from '@/modules/panels/redux/reducers';
 import { turnsReducer } from '@/modules/turns/redux/reducers';
+import { UIReducer } from '@/modules/ui/redux/reducers';
 import { combineReducers } from 'redux';
 
 // COMBINED REDUCERS
@@ -14,6 +15,7 @@ const reducers = {
   lines: linesReducer,
   classes: classesReducer,
   panels: panelReducer,
+  ui: UIReducer,
   // quotes,
   // interactions,
   // minimap,

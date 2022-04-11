@@ -4,6 +4,8 @@ import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
 import Turns from '@/modules/turns/components/Turns';
 import { moveField } from '@/modules/turns/redux/actions';
+import { addNotification } from '@/modules/ui/redux/actions';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -12,8 +14,14 @@ const Game = ({ hash }) => {
   const dispatch = useDispatch();
   const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
 
+  const { info } = useUserContext();
+  const { nickname } = info;
+
   useEffect(() => {
     dispatch(loadFullGame(hash));
+    dispatch(
+      addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
+    );
     // loadClasses();
   }, []); // token
 

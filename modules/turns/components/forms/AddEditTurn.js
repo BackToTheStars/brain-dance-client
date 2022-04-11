@@ -160,7 +160,8 @@ const AddEditTurnPopup = () => {
       // ],
     };
 
-    const saveCallbacks = { // @todo: передавать в виджет через props
+    const saveCallbacks = {
+      // @todo: передавать в виджет через props
       success: () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN })),
     };
 
