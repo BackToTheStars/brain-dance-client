@@ -1,3 +1,17 @@
+export const filterLinesByQuoteKey = (lines, quoteKey) =>
+  lines.filter(
+    (line) =>
+      `${line.sourceTurnId}_${line.sourceMarker}` === quoteKey ||
+      `${line.targetTurnId}_${line.targetMarker}` === quoteKey
+  );
+
+export const findLineByQuoteKey = (lines, quoteKey) =>
+  lines.find(
+    (line) =>
+      `${line.sourceTurnId}_${line.sourceMarker}` === quoteKey ||
+      `${line.targetTurnId}_${line.targetMarker}` === quoteKey
+  );
+
 export const getLinesCoords = (
   lines,
   turnsToRender,

@@ -1,10 +1,15 @@
-import { quoteCoordsUpdate } from "@/modules/lines/redux/actions";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import ParagraphOriginal from "./ParagraphOriginal";
-import ParagraphQuotes from "./ParagraphQuotes";
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import ParagraphOriginal from './ParagraphOriginal';
+import ParagraphQuotes from './ParagraphQuotes';
 
-const Paragraph = ({turn, registerHandleResize, unregisterHandleResize, recalculatedTime}) => {
+const Paragraph = ({
+  turn,
+  registerHandleResize,
+  unregisterHandleResize,
+  recalculatedTime,
+}) => {
   const {
     paragraph,
     _id,
@@ -46,7 +51,7 @@ const Paragraph = ({turn, registerHandleResize, unregisterHandleResize, recalcul
 
   useEffect(() => {
     dispatch(quoteCoordsUpdate(_id, paragraphQuotes));
-  }, [paragraphQuotes])
+  }, [paragraphQuotes]);
 
   return (
     <>
@@ -65,7 +70,7 @@ const Paragraph = ({turn, registerHandleResize, unregisterHandleResize, recalcul
           height,
         }}
       />
-      <ParagraphQuotes paragraphQuotes={paragraphQuotes} />
+      <ParagraphQuotes turnId={_id} paragraphQuotes={paragraphQuotes} />
       <a
         className="widget-button"
         href="#"
@@ -76,7 +81,7 @@ const Paragraph = ({turn, registerHandleResize, unregisterHandleResize, recalcul
         <i className="fas fa-highlighter"></i>
       </a>
     </>
-  )
-}
+  );
+};
 
-export default Paragraph
+export default Paragraph;

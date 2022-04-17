@@ -1,47 +1,54 @@
-import { quoteRectangleThickness } from "@/config/ui";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { quoteRectangleThickness } from '@/config/ui';
+import {
+  filterLinesByQuoteKey,
+  findLineByQuoteKey,
+} from '@/modules/lines/components/helpers/line';
+import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
+import { useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-const ParagraphQuotes = ({ paragraphQuotes }) => {
-  const lineEnds = {}
+const ParagraphQuotes = ({ paragraphQuotes, turnId }) => {
+  //
+  const dispatch = useDispatch();
+
+  const lineEnds = {};
   const activeQuote = null;
-  const lines = useSelector((store) => store.lines.lines)
+  const lines = useSelector((store) => store.lines.lines);
+  const activeQuoteKey = useSelector((store) => store.quotes.activeQuoteKey);
 
-  const onQuoteClick = () => {} // @todo
-  const setInteractionMode = () => {} // @todo
-  const setPanelType = () => {} // @todo
+  const onQuoteClick = () => {}; // @todo
+  const setInteractionMode = () => {}; // @todo
+  const setPanelType = () => {}; // @todo
 
   const activeQuotesDictionary = useMemo(() => {
-    const d = {}
+    const d = {};
     for (let paragraphQuote of paragraphQuotes) {
       d[paragraphQuote._id] = false;
-      if (lines.find(line => {
-        if (line.sourceTurnId == paragraphQuote.turnId) {
-          if (line.sourceMarker == paragraphQuote.quoteId) {
-            return true;
-          }
-        } else if (line.targetTurnId == paragraphQuote.turnId) {
-          if (line.targetMarker == paragraphQuote.quoteId) {
-            return true;
-          }
-        }
-        return false
-      })) {
+      if (
+        findLineByQuoteKey(
+          lines,
+          `${paragraphQuote.turnId}_${paragraphQuote.quoteId}`
+        )
+      ) {
         d[paragraphQuote.quoteId] = true;
       }
     }
-    return d
-  }, [paragraphQuotes, lines])
+    return d;
+  }, [paragraphQuotes, lines]);
   return (
     <>
       {paragraphQuotes.map((quote, i) => {
         // все цитаты
         let bordered = !!activeQuotesDictionary[quote.quoteId]; //!!lineEnds[`${quote.turnId}_${quote.quoteId}`]; // проверка нужно показывать рамку или нет
         let outline = '0px solid transparent';
+
+        const currentQuoteKey = `${turnId}_${quote.quoteId}`;
+
         if (
-          activeQuote &&
-          activeQuote.turnId === turnId &&
-          activeQuote.quoteId === quote.quoteId
+          currentQuoteKey === activeQuoteKey
+          // activeQuote &&
+          // activeQuote.turnId === turnId &&
+          // activeQuote.quoteId === quote.quoteId
         ) {
           bordered = true;
         }
@@ -61,23 +68,35 @@ const ParagraphQuotes = ({ paragraphQuotes }) => {
               outline,
             }}
             onClick={() => {
-              console.log(quote)
+              console.log(quote);
               onQuoteClick(quote.quoteId);
-              const isQuoteActive =
-                activeQuote &&
-                activeQuote.turnId === turnId &&
-                activeQuote.quoteId === quote.quoteId;
-              if (isQuoteActive) {
-                setInteractionMode(MODE_GAME);
-                setPanelType(null);
+
+              // const isQuoteActive =
+              //   activeQuote &&
+              //   activeQuote.turnId === turnId &&
+              //   activeQuote.quoteId === quote.quoteId;
+              if (activeQuoteKey === currentQuoteKey) {
+                dispatch(setActiveQuoteKey(null));
+                // setInteractionMode(MODE_GAME);
+                // setPanelType(null);
               } else {
-                // setInteractionMode(MODE_WIDGET_TEXT_QUOTE_ACTIVE); // @todo
-                if (
-                  lineEnds[`${quote.turnId}_${quote.quoteId}`]
-                  // && !!activeQuote
-                ) {
-                  setPanelType(PANEL_LINES);
+                if (!activeQuoteKey) {
+                  dispatch(setActiveQuoteKey(currentQuoteKey));
+                  return;
                 }
+                if (activeQuoteKey.split('_')[0] === turnId) {
+                  dispatch(setActiveQuoteKey(currentQuoteKey));
+                  return;
+                }
+                const connectedLines = filterLinesByQuoteKey(
+                  lines,
+                  currentQuoteKey
+                );
+                if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
+                  dispatch(setActiveQuoteKey(currentQuoteKey));
+                  return;
+                }
+                // @todo: нарисовать линию
               }
             }}
           ></div>
