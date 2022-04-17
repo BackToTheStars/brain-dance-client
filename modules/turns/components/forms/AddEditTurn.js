@@ -55,10 +55,16 @@ const AddEditTurnPopup = () => {
         quill.setContents(turnToEdit.paragraph);
         // console.log(' quill.getLine(0).value()', quill.getLine(0).value());
         setTimeout(() => {
+          const paragraphQuotes = turnToEdit.quotes
+            ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+            : [];
           const spans = document.querySelectorAll('.ql-editor span');
-          let i = 1;
+          let i = 0;
+          let incId = Math.floor(new Date().getTime() / 1000);
           for (let span of spans) {
-            span.setAttribute('id', (i += 1));
+            const quoteId = paragraphQuotes[i] ? paragraphQuotes[i].id : (incId += 1);
+            span.setAttribute('id', quoteId);
+            i += 1
           }
         }, 300);
       }
@@ -80,25 +86,46 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
+    console.log({
+      textArr
+    })
 
     let incId = Math.floor(new Date().getTime() / 1000);
 
     const resTextArr = [];
     let i = 0;
-    const paragraphQuotes =
-      turnToEdit && turnToEdit.quotes
-        ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-        : [];
+    // const paragraphQuotes =
+    //   turnToEdit && turnToEdit.quotes
+    //     ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+    //     : [];
+    const spans = document.querySelectorAll('.ql-editor span');
+
+    let j = 0;
+    let newIncId = Math.floor(new Date().getTime() / 1000);
+    const spanIds = []
+    for (let span of spans) {
+      if (span.id) {
+        spanIds.push(span.id)
+      } else {
+        newIncId += 1
+        spanIds.push(newIncId)
+      }
+      j += 1
+    }
+
     for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
         resTextArr.push(textItem);
         continue;
       }
 
-      const quoteId =
-        !!turnToEdit && paragraphQuotes[i]
-          ? paragraphQuotes[i].id
+      let quoteId = textItem.attributes.id
+
+      if (!quoteId) {
+        quoteId = !!turnToEdit && spanIds[i]
+          ? spanIds[i]
           : (incId += 1);
+      }
       i += 1;
       resTextArr.push({
         ...textItem,
@@ -108,18 +135,6 @@ const AddEditTurnPopup = () => {
         },
       });
     }
-
-    // const quotes = [];
-
-    // for (let textItem of resTextArr) {
-    //   if (textItem.attributes && textItem.attributes.id) {
-    //     quotes.push({
-    //       id: textItem.attributes.id,
-    //       text: textItem.insert,
-    //       type: 'text',
-    //     });
-    //   }
-    // }
 
     const preparedForm = {};
     for (let fieldToShow of fieldsToShow) {
@@ -148,16 +163,28 @@ const AddEditTurnPopup = () => {
       return setError({ message: 'Need text body' });
     }
 
-    // const prevQuotes = (!!turnToEdit && turnToEdit.quotes) || [];
+    const quotes = [];
 
+    for (let textItem of resTextArr) {
+      if (textItem.attributes && textItem.attributes.id) {
+      quotes.push({
+        id: textItem.attributes.id,
+        text: textItem.insert,
+        type: 'text',
+      });
+      }
+    }
+    
+    const prevQuotes = turnToEdit?.quotes || [];
+    
     let turnObj = {
       ...preparedForm,
       paragraph: resTextArr,
       contentType: activeTemplate,
-      // quotes: [
-      //   ...quotes,
-      //   ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
-      // ],
+      quotes: [
+      ...quotes,
+      ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
+      ],
     };
 
     const saveCallbacks = {
@@ -194,8 +221,6 @@ const AddEditTurnPopup = () => {
       // });
 
       dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
-
-      console.log(turnObj);
     } else {
       turnObj.height = 600;
       turnObj.width = 800;

@@ -6,6 +6,11 @@ const ParagraphQuotes = ({ paragraphQuotes }) => {
   const lineEnds = {}
   const activeQuote = null;
   const lines = useSelector((store) => store.lines.lines)
+
+  const onQuoteClick = () => {} // @todo
+  const setInteractionMode = () => {} // @todo
+  const setPanelType = () => {} // @todo
+
   const activeQuotesDictionary = useMemo(() => {
     const d = {}
     for (let paragraphQuote of paragraphQuotes) {
@@ -56,6 +61,7 @@ const ParagraphQuotes = ({ paragraphQuotes }) => {
               outline,
             }}
             onClick={() => {
+              console.log(quote)
               onQuoteClick(quote.quoteId);
               const isQuoteActive =
                 activeQuote &&
