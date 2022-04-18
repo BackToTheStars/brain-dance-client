@@ -1,8 +1,6 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
 
-export const setUserToken = (nextToken) => (token = nextToken);
-
 export const createClassRequest = (body) =>
   request(`classes?hash=${s.hash}`, {
     method: 'POST',

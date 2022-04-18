@@ -31,16 +31,22 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
     case types.PANEL_TOGGLE:
       return {
         ...state,
-        // panels: state.panels.map((panel) => {
-        //   if (panel.type === payload.type) {
-        //     return { ...panel, isDisplayed: !panel.isDisplayed };
-        //   } else return panel;
-        // }),
         d: {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
             isDisplayed: !state.d[payload.type].isDisplayed,
+          },
+        },
+      };
+    case types.PANEL_SET_OPEN:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload.type]: {
+            ...state.d[payload.type],
+            isDisplayed: payload.isDisplayed,
           },
         },
       };

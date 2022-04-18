@@ -14,6 +14,11 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         ...state,
         lines: payload,
       };
+    case types.LINES_ADDED:
+      return {
+        ...state,
+        lines: [...state.lines, ...payload],
+      };
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {
         ...state,

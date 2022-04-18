@@ -1,3 +1,4 @@
+import { createLinesRequest } from '../requests';
 import * as types from './types';
 
 export const quoteCoordsUpdate = (turnId, quotesWithCoords) => (dispatch) =>
@@ -12,3 +13,11 @@ export const linesWithEndCoordsUpdate = (linesWithEndCoords) => (dispatch) =>
     payload: linesWithEndCoords,
   });
 
+export const lineCreate = (line) => (dispatch) => {
+  createLinesRequest({ lines: [line] }).then((data) => {
+    dispatch({
+      type: types.LINES_ADDED,
+      payload: data.items,
+    });
+  });
+};

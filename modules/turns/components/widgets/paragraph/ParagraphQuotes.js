@@ -3,6 +3,8 @@ import {
   filterLinesByQuoteKey,
   findLineByQuoteKey,
 } from '@/modules/lines/components/helpers/line';
+import { lineCreate } from '@/modules/lines/redux/actions';
+import { createLinesRequest } from '@/modules/lines/requests';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -96,7 +98,14 @@ const ParagraphQuotes = ({ paragraphQuotes, turnId }) => {
                   dispatch(setActiveQuoteKey(currentQuoteKey));
                   return;
                 }
-                // @todo: нарисовать линию
+                dispatch(
+                  lineCreate({
+                    sourceTurnId: activeQuoteKey.split('_')[0],
+                    sourceMarker: activeQuoteKey.split('_')[1],
+                    targetTurnId: currentQuoteKey.split('_')[0],
+                    targetMarker: currentQuoteKey.split('_')[1],
+                  })
+                );
               }
             }}
           ></div>

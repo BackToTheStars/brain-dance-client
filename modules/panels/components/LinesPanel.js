@@ -1,11 +1,13 @@
-import {
-  useTurnsCollectionContext,
-  ACTION_LINES_DELETE,
-} from '../contexts/TurnsCollectionContext';
-import { RULE_TURNS_CRUD } from '../config';
-import { useUserContext } from '../contexts/UserContext';
+// import {
+//   useTurnsCollectionContext,
+//   ACTION_LINES_DELETE,
+// } from '../contexts/TurnsCollectionContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { useInteractionContext } from '../contexts/InteractionContext';
+import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
+// import { useInteractionContext } from '../contexts/InteractionContext';
 
 const cutTextToSize = (text, size) => {
   // console.log(text, size);
@@ -13,12 +15,19 @@ const cutTextToSize = (text, size) => {
   return text.slice(0, size) + '...';
 };
 
-const LinesPanel = ({ preparedLines }) => {
-  const { dispatch, deleteLines } = useTurnsCollectionContext();
+const LinesPanel = () => {
+  // const { dispatch, deleteLines } = useTurnsCollectionContext();
+
+  const lines = useSelector((state) => state.lines.lines);
+  const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
+  const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
+
+  const dispatch = () => {};
+  const deleteLines = () => {};
   const { can } = useUserContext();
-  const {
-    bottomPanelSettings: { setPanelType },
-  } = useInteractionContext();
+  // const {
+  //   bottomPanelSettings: { setPanelType },
+  // } = useInteractionContext();
 
   const [preparedLinesCount, setPreparedLinesCount] = useState(
     preparedLines.length
@@ -40,12 +49,12 @@ const LinesPanel = ({ preparedLines }) => {
     }
   };
 
-  useEffect(() => {
-    setPreparedLinesCount(preparedLines.length);
-    if (!preparedLines.length && preparedLinesCount > 0) {
-      setPanelType(null);
-    }
-  }, [preparedLines]);
+  // useEffect(() => {
+  //   setPreparedLinesCount(preparedLines.length);
+  //   if (!preparedLines.length && preparedLinesCount > 0) {
+  //     setPanelType(null);
+  //   }
+  // }, [preparedLines]);
 
   if (!preparedLines.length) {
     return 'no preparedLines';
