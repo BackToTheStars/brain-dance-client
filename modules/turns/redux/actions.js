@@ -1,13 +1,35 @@
 import { getTurnsRequest } from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
-import { createTurnRequest, deleteTurnRequest, updateTurnRequest } from '../requests';
+import * as quotesTypes from '@/modules/quotes/redux/types';
+import {
+  createTurnRequest,
+  deleteTurnRequest,
+  updateTurnRequest,
+} from '../requests';
 
-export const loadTurns = (hash) => (dispatch) => {
+export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
+    const quotesD = {};
+    for (let turn of data.items) {
+      if (!turn.quotes) continue;
+      for (let quote of turn.quotes) {
+        quotesD[`${turn._id}_${quote.id}`] = quote;
+      }
+    }
     dispatch({
       type: types.LOAD_TURNS,
-      payload: { turns: data.items },
+      payload: {
+        turns: data.items.map((turn) => ({
+          ...turn,
+          x: turn.x - viewport.x,
+          y: turn.y - viewport.y,
+        })),
+      },
+    });
+    dispatch({
+      type: quotesTypes.QUOTES_SET_DICTIONARY,
+      payload: quotesD,
     });
   });
 };

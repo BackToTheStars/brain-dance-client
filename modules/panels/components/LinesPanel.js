@@ -15,6 +15,39 @@ const cutTextToSize = (text, size) => {
   return text.slice(0, size) + '...';
 };
 
+const LineRow = ({ line, can, handleDelete }) => {
+  const sourceQuoteInfo = useSelector(
+    (state) => state.quotes.d[`${line.sourceTurnId}_${line.sourceMarker}`]
+  );
+  const targetQuoteInfo = useSelector(
+    (state) => state.quotes.d[`${line.targetTurnId}_${line.targetMarker}`]
+  );
+  return (
+    <tr>
+      <td>{line.author}</td>
+      <td>{line.type}</td>
+      <td>
+        {!!sourceQuoteInfo && cutTextToSize(sourceQuoteInfo.text || '', 22)}
+      </td>
+      <td>
+        {!!targetQuoteInfo && cutTextToSize(targetQuoteInfo.text || '', 22)}
+        {/* сделать резиновую обрезку текста */}
+      </td>
+      {can(RULE_TURNS_CRUD) && (
+        <td className="text-right">
+          <button
+            // className="del-btn"
+            className="btn btn-danger"
+            onClick={(e) => handleDelete(e, line._id)}
+          >
+            Delete
+          </button>
+        </td>
+      )}
+    </tr>
+  );
+};
+
 const LinesPanel = () => {
   // const { dispatch, deleteLines } = useTurnsCollectionContext();
 
@@ -78,30 +111,12 @@ const LinesPanel = () => {
           const { sourceQuoteInfo, targetQuoteInfo } = line;
 
           return (
-            <tr key={index}>
-              <td>{line.author}</td>
-              <td>{line.type}</td>
-              <td>
-                {!!sourceQuoteInfo &&
-                  cutTextToSize(sourceQuoteInfo.text || '', 22)}
-              </td>
-              <td>
-                {!!targetQuoteInfo &&
-                  cutTextToSize(targetQuoteInfo.text || '', 22)}
-                {/* сделать резиновую обрезку текста */}
-              </td>
-              {can(RULE_TURNS_CRUD) && (
-                <td className="text-right">
-                  <button
-                    // className="del-btn"
-                    className="btn btn-danger"
-                    onClick={(e) => handleDelete(e, line._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              )}
-            </tr>
+            <LineRow
+              key={index}
+              line={line}
+              can={can}
+              handleDelete={handleDelete}
+            />
           );
         })}
       </tbody>

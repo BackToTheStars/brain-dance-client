@@ -11,6 +11,7 @@ import {
   updateCoordinatesRequest,
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
+import { loadTurns } from '@/modules/turns/redux/actions';
 
 export const loadFullGame = (hash) => (dispatch) => {
   // GET GAME DATA
@@ -30,19 +31,21 @@ export const loadFullGame = (hash) => (dispatch) => {
       y: data.item.viewportPointY,
     };
 
+    dispatch(loadTurns(hash, viewport));
+
     // GET TURNS DATA
-    getTurnsRequest(hash).then((data) => {
-      dispatch({
-        type: turnsTypes.LOAD_TURNS,
-        payload: {
-          turns: data.items.map((turn) => ({
-            ...turn,
-            x: turn.x - viewport.x,
-            y: turn.y - viewport.y,
-          })),
-        },
-      });
-    });
+    // getTurnsRequest(hash).then((data) => {
+    //   dispatch({
+    //     type: turnsTypes.LOAD_TURNS,
+    //     payload: {
+    //       turns: data.items.map((turn) => ({
+    //         ...turn,
+    //         x: turn.x - viewport.x,
+    //         y: turn.y - viewport.y,
+    //       })),
+    //     },
+    //   });
+    // });
   });
 };
 
