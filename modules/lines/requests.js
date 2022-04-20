@@ -8,10 +8,11 @@ export const createLinesRequest = (linesArray) =>
     body: linesArray,
   });
 
-export const deleteLineRequest = (lineItemId) => {
-  return request(`lines/${lineItemId}?hash=${s.hash}`, {
+export const deleteLinesRequest = (ids) => {
+  return request(`lines/?hash=${s.hash}`, {
     method: 'DELETE',
     tokenFlag: true,
+    body: ids,
   });
 };
 

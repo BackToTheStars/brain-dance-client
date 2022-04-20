@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
+import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 
 const {
   settings,
@@ -62,9 +63,11 @@ const AddEditTurnPopup = () => {
           let i = 0;
           let incId = Math.floor(new Date().getTime() / 1000);
           for (let span of spans) {
-            const quoteId = paragraphQuotes[i] ? paragraphQuotes[i].id : (incId += 1);
+            const quoteId = paragraphQuotes[i]
+              ? paragraphQuotes[i].id
+              : (incId += 1);
             span.setAttribute('id', quoteId);
-            i += 1
+            i += 1;
           }
         }, 300);
       }
@@ -87,8 +90,8 @@ const AddEditTurnPopup = () => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
     console.log({
-      textArr
-    })
+      textArr,
+    });
 
     let incId = Math.floor(new Date().getTime() / 1000);
 
@@ -102,15 +105,15 @@ const AddEditTurnPopup = () => {
 
     let j = 0;
     let newIncId = Math.floor(new Date().getTime() / 1000);
-    const spanIds = []
+    const spanIds = [];
     for (let span of spans) {
       if (span.id) {
-        spanIds.push(span.id)
+        spanIds.push(span.id);
       } else {
-        newIncId += 1
-        spanIds.push(newIncId)
+        newIncId += 1;
+        spanIds.push(newIncId);
       }
-      j += 1
+      j += 1;
     }
 
     for (let textItem of textArr) {
@@ -119,12 +122,10 @@ const AddEditTurnPopup = () => {
         continue;
       }
 
-      let quoteId = textItem.attributes.id
+      let quoteId = textItem.attributes.id;
 
       if (!quoteId) {
-        quoteId = !!turnToEdit && spanIds[i]
-          ? spanIds[i]
-          : (incId += 1);
+        quoteId = !!turnToEdit && spanIds[i] ? spanIds[i] : (incId += 1);
       }
       i += 1;
       resTextArr.push({
@@ -167,23 +168,32 @@ const AddEditTurnPopup = () => {
 
     for (let textItem of resTextArr) {
       if (textItem.attributes && textItem.attributes.id) {
-      quotes.push({
-        id: textItem.attributes.id,
-        text: textItem.insert,
-        type: 'text',
-      });
+        quotes.push({
+          id: textItem.attributes.id,
+          text: textItem.insert,
+          type: 'text',
+        });
       }
     }
-    
+
     const prevQuotes = turnToEdit?.quotes || [];
-    
+
+    const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
+
+    console.log({
+      quotes,
+      prevQuotes,
+      quotesDeleted,
+    });
+    // @todo: собрать линии и удалить их запросом
+
     let turnObj = {
       ...preparedForm,
       paragraph: resTextArr,
       contentType: activeTemplate,
       quotes: [
-      ...quotes,
-      ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
+        ...quotes,
+        ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
       ],
     };
 

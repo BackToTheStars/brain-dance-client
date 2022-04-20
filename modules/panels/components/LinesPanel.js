@@ -4,9 +4,11 @@
 // } from '../contexts/TurnsCollectionContext';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
+import { deleteLineRequest } from '@/modules/lines/requests';
+import { lineDelete } from '@/modules/lines/redux/actions';
 // import { useInteractionContext } from '../contexts/InteractionContext';
 
 const cutTextToSize = (text, size) => {
@@ -55,7 +57,7 @@ const LinesPanel = () => {
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
   const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
 
-  const dispatch = () => {};
+  const dispatch = useDispatch();
   const deleteLines = () => {};
   const { can } = useUserContext();
   // const {
@@ -71,13 +73,13 @@ const LinesPanel = () => {
   const handleDelete = (e, _id) => {
     e.preventDefault();
     if (confirm('Delete line?')) {
+      dispatch(lineDelete(_id));
       // confirm - глобальная функция браузера
-      deleteLines([_id], {
-        successCallback: () => {
-          dispatch({ type: ACTION_LINES_DELETE, payload: [_id] });
-        },
-      });
-
+      // deleteLines([_id], {
+      //   successCallback: () => {
+      //     dispatch({ type: ACTION_LINES_DELETE, payload: [_id] });
+      //   },
+      // });
       //alert('button_delete_clicked');
     }
   };

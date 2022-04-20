@@ -9,7 +9,7 @@ const initialLinesState = {
 
 export const linesReducer = (state = initialLinesState, { type, payload }) => {
   switch (type) {
-    case types.LOAD_LINES:
+    case types.LINES_LOAD:
       return {
         ...state,
         lines: payload,
@@ -18,6 +18,11 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       return {
         ...state,
         lines: [...state.lines, ...payload],
+      };
+    case types.LINE_DELETE:
+      return {
+        ...state,
+        lines: state.lines.filter((line) => line._id !== payload.id),
       };
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {

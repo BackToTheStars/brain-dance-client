@@ -22,7 +22,7 @@ export const loadFullGame = (hash) => (dispatch) => {
     });
 
     dispatch({
-      type: linesTypes.LOAD_LINES,
+      type: linesTypes.LINES_LOAD,
       payload: data.item.lines,
     });
 
