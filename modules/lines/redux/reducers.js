@@ -24,6 +24,15 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         ...state,
         lines: state.lines.filter((line) => line._id !== payload.id),
       };
+    case types.LINES_DELETE:
+      const d = {};
+      for (let id of payload.ids) {
+        d[id] = true;
+      }
+      return {
+        ...state,
+        lines: state.lines.filter((line) => d[line._id]),
+      };
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {
         ...state,

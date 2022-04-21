@@ -1,3 +1,15 @@
+export const filterLinesByQuoteKeys = (lines, quoteKeys) => {
+  const d = {};
+  for (let key of quoteKeys) {
+    d[key] = true;
+  }
+  return lines.filter(
+    (line) =>
+      d[`${line.sourceTurnId}_${line.sourceMarker}`] ||
+      d[`${line.targetTurnId}_${line.targetMarker}`]
+  );
+};
+
 export const filterLinesByQuoteKey = (lines, quoteKey) =>
   lines.filter(
     (line) =>

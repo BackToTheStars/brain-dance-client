@@ -22,6 +22,15 @@ export const lineDelete = (id) => (dispatch) => {
   });
 };
 
+export const linesDelete = (ids) => (dispatch) => {
+  deleteLinesRequest(ids).then((data) => {
+    dispatch({
+      type: types.LINES_DELETE,
+      payload: { ids },
+    });
+  });
+};
+
 export const lineCreate = (line) => (dispatch) => {
   createLinesRequest({ lines: [line] }).then((data) => {
     dispatch({

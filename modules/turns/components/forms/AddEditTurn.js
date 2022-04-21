@@ -7,6 +7,8 @@ import { togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
+import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
+import { linesDelete } from '@/modules/lines/redux/actions';
 
 const {
   settings,
@@ -33,6 +35,7 @@ const AddEditTurnPopup = () => {
 
   const dispatch = useDispatch();
   const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+  const lines = useSelector((state) => state.lines.lines);
 
   useEffect(() => {
     if (!quillConstants.quill) return;
@@ -185,7 +188,15 @@ const AddEditTurnPopup = () => {
       prevQuotes,
       quotesDeleted,
     });
-    // @todo: собрать линии и удалить их запросом
+
+    const linesToDelete = filterLinesByQuoteKeys(
+      lines,
+      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`)
+    );
+
+    if (!!quotesDeleted.length) {
+      dispatch(linesDelete(linesToDelete.map((l) => l._id)));
+    }
 
     let turnObj = {
       ...preparedForm,
