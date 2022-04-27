@@ -36,7 +36,7 @@ const LineRow = ({ line, can, handleDelete }) => {
         {/* сделать резиновую обрезку текста */}
       </td>
       {can(RULE_TURNS_CRUD) && (
-        <td className="text-right">
+        <td className="text-end">
           <button
             // className="del-btn"
             className="btn btn-danger"
@@ -105,7 +105,7 @@ const LinesPanel = () => {
           <th>Type</th>
           <th>From</th>
           <th>To</th>
-          {can(RULE_TURNS_CRUD) && <th className="text-right">Actions</th>}
+          {can(RULE_TURNS_CRUD) && <th className="text-end">Actions</th>}
         </tr>
       </thead>
       <tbody>
