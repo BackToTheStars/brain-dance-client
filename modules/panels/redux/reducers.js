@@ -68,6 +68,12 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         },
       };
 
+    case types.PANEL_CHANGE_MODE:
+      return {
+        ...state,
+        mode: payload.mode,
+      };
+
     default:
       return state;
   }

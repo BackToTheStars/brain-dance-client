@@ -1,4 +1,7 @@
+import { setPanelMode } from '@/modules/panels/redux/actions';
+import { MODE_WIDGET_PICTURE } from '@/modules/panels/settings';
 import { useEffect, useState, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import PictureCrop from './Crop';
 
 const Picture = ({
@@ -11,6 +14,7 @@ const Picture = ({
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
 
+  const dispatch = useDispatch();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
   const [displayCrop, setDiaplayCrop] = useState(false);
@@ -78,20 +82,16 @@ const Picture = ({
   }, [imageLoaded]);
 
   return (
-    <div
-      className={`picture-content`}
-      ref={imgWrapperEl}
-    >
-      {displayCrop && <PictureCrop
-        imageUrl={imageUrlToRender}
-      />}
+    <div className={`picture-content`} ref={imgWrapperEl}>
+      {displayCrop && <PictureCrop imageUrl={imageUrlToRender} />}
       <img src={imageUrlToRender} ref={imgEl} />
       <a
         className="widget-button"
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          setDiaplayCrop(true);
+          // setDiaplayCrop(true);
+          dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
         }}
       >
         <i className="fas fa-highlighter"></i>

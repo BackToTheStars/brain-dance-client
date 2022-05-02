@@ -1,4 +1,6 @@
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { setPanelMode } from '@/modules/panels/redux/actions';
+import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import ParagraphOriginal from './ParagraphOriginal';
@@ -76,6 +78,7 @@ const Paragraph = ({
         href="#"
         onClick={(e) => {
           e.preventDefault();
+          dispatch(setPanelMode({ mode: MODE_WIDGET_PARAGRAPH }));
         }}
       >
         <i className="fas fa-highlighter"></i>

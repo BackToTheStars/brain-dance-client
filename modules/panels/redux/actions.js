@@ -25,3 +25,12 @@ export const changePanelGeometry = (type, geometryData) => (dispatch) => {
     payload: { type, geometryData },
   });
 };
+
+export const setPanelMode =
+  ({ mode }) =>
+  (dispatch) => {
+    dispatch({
+      type: types.PANEL_CHANGE_MODE,
+      payload: { mode },
+    });
+  };

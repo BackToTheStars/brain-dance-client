@@ -1,6 +1,14 @@
 import { useSelector } from 'react-redux';
-import { MODE_GAME } from '../settings';
+import {
+  MODE_GAME,
+  MODE_WIDGET_PARAGRAPH,
+  MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '../settings';
 import GameMode from './buttons/GameMode';
+import ParagraphMode from './buttons/ParagraphMode';
+import PictureMode from './buttons/PictureMode';
+import PictureQuoteAdd from './buttons/PictureQuoteAdd';
 
 export const Buttons = ({ buttons }) => {
   return (
@@ -27,31 +35,9 @@ const ButtonsPanel = () => {
 
   const buttonSettings = {
     [MODE_GAME]: GameMode,
-    // @learn 'game': ...
-    // [MODE_WIDGET_PICTURE]: usePictureMode({
-    //   setInteractionType,
-    //   setInteractionMode,
-    //   makeWidgetActive,
-    //   dispatch,
-    // }),
-    // [MODE_WIDGET_PICTURE_QUOTE_ADD]: usePictureQuoteAdd({
-    //   setInteractionMode,
-    //   setInteractionType,
-    //   performActions,
-    // }),
-    // [MODE_WIDGET_PICTURE_QUOTE_ACTIVE]: usePictureQuoteActive({
-    //   setInteractionMode,
-    //   setInteractionType,
-    //   performActions,
-    //   makeWidgetActive,
-    //   dispatch,
-    // }),
-    // [MODE_WIDGET_PARAGRAPH]: useParagraphMode({
-    //   setInteractionType,
-    //   setInteractionMode,
-    //   makeWidgetActive,
-    //   // dispatch,
-    // }),
+    [MODE_WIDGET_PICTURE]: PictureMode,
+    [MODE_WIDGET_PICTURE_QUOTE_ADD]: PictureQuoteAdd,
+    [MODE_WIDGET_PARAGRAPH]: ParagraphMode,
   };
 
   const Component = buttonSettings[mode];
