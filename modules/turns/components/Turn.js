@@ -11,7 +11,7 @@ import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import Paragraph from './widgets/paragraph/Paragraph';
-import Picture from './widgets/Picture';
+import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);

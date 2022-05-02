@@ -25,6 +25,10 @@
   border-radius: 3px;
   display: flex;
   flex-direction: column;
+  & > .row > * {
+    overflow: auto;
+    max-height: 75vh;
+  }
 }
 
 .radio-group {

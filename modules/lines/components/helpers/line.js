@@ -24,6 +24,11 @@ export const findLineByQuoteKey = (lines, quoteKey) =>
       `${line.targetTurnId}_${line.targetMarker}` === quoteKey
   );
 
+export const filterLinesByTurnId = (lines, turnId) => 
+  lines.filter(
+    (line) => line.sourceTurnId === turnId || line.targetTurnId === turnId
+  )
+
 export const getLinesCoords = (
   lines,
   turnsToRender,

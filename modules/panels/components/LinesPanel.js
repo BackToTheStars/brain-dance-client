@@ -1,18 +1,10 @@
-// import {
-//   useTurnsCollectionContext,
-//   ACTION_LINES_DELETE,
-// } from '../contexts/TurnsCollectionContext';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
-import { deleteLineRequest } from '@/modules/lines/requests';
+import { filterLinesByQuoteKey, filterLinesByQuoteKeys, filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { lineDelete } from '@/modules/lines/redux/actions';
-// import { useInteractionContext } from '../contexts/InteractionContext';
 
 const cutTextToSize = (text, size) => {
-  // console.log(text, size);
   if (text.length < size + 3) return text;
   return text.slice(0, size) + '...';
 };
@@ -51,53 +43,28 @@ const LineRow = ({ line, can, handleDelete }) => {
 };
 
 const LinesPanel = () => {
-  // const { dispatch, deleteLines } = useTurnsCollectionContext();
+  const editTurnId = useSelector((state) => state.panels.editTurnId);
+  const turn = useSelector((state) => state.turns.d[editTurnId])
 
   const lines = useSelector((state) => state.lines.lines);
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
-  const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
+  const preparedLines = turn ? filterLinesByTurnId(lines, turn._id) : filterLinesByQuoteKey(lines, activeQuoteKey);
 
   const dispatch = useDispatch();
-  const deleteLines = () => {};
   const { can } = useUserContext();
-  // const {
-  //   bottomPanelSettings: { setPanelType },
-  // } = useInteractionContext();
-
-  const [preparedLinesCount, setPreparedLinesCount] = useState(
-    preparedLines.length
-  );
-
-  // if (!activeQuote) return null; // прочитать о разнице с false
 
   const handleDelete = (e, _id) => {
     e.preventDefault();
     if (confirm('Delete line?')) {
       dispatch(lineDelete(_id));
-      // confirm - глобальная функция браузера
-      // deleteLines([_id], {
-      //   successCallback: () => {
-      //     dispatch({ type: ACTION_LINES_DELETE, payload: [_id] });
-      //   },
-      // });
-      //alert('button_delete_clicked');
     }
   };
-
-  // useEffect(() => {
-  //   setPreparedLinesCount(preparedLines.length);
-  //   if (!preparedLines.length && preparedLinesCount > 0) {
-  //     setPanelType(null);
-  //   }
-  // }, [preparedLines]);
 
   if (!preparedLines.length) {
     return 'no preparedLines';
   }
 
   return (
-    // <div className={`${!preparedLines.length ? 'hidden' : ''} panel`}>
-    //   {!!preparedLines.length && (
     <table className="table m-0 table-dark table-striped">
       <thead>
         <tr>
@@ -123,8 +90,6 @@ const LinesPanel = () => {
         })}
       </tbody>
     </table>
-    //   )}
-    // </div>
   );
 };
 

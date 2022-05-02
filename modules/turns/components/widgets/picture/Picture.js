@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import PictureCrop from './Crop';
 
 const Picture = ({
   imageUrl,
@@ -12,6 +13,7 @@ const Picture = ({
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
+  const [displayCrop, setDiaplayCrop] = useState(false);
 
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
@@ -80,7 +82,20 @@ const Picture = ({
       className={`picture-content`}
       ref={imgWrapperEl}
     >
+      {displayCrop && <PictureCrop
+        imageUrl={imageUrlToRender}
+      />}
       <img src={imageUrlToRender} ref={imgEl} />
+      <a
+        className="widget-button"
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setDiaplayCrop(true);
+        }}
+      >
+        <i className="fas fa-highlighter"></i>
+      </a>
     </div>
   );
 };

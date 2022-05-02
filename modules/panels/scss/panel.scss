@@ -30,6 +30,13 @@
   text-overflow: ellipsis;
 }
 
+.position_flexible {
+  top: $panels-spacer;
+  left: $panels-spacer;
+  transition: 0s;
+  cursor: move;
+}
+
 .max-header {
   max-width: 20vw;
 }

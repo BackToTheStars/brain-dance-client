@@ -1,7 +1,7 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { setTurnToEdit, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TOGGLE } from '@/modules/panels/redux/types';
-import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN, PANEL_TURN_INFO } from '@/modules/panels/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import React, {
   useRef,
@@ -52,6 +52,11 @@ const Header = ({
     return style;
   }, [dontShowHeader, backgroundColor, fontColor, contentType]);
 
+  const handleInfo = (e) => {
+    dispatch(togglePanel({ type: PANEL_TURN_INFO }));
+    dispatch(setTurnToEdit(_id));
+  }
+
   const handleCut = async (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
@@ -89,6 +94,9 @@ const Header = ({
     <h5 className="headerText" ref={headerEl} style={style}>
       <div className="headerTextTitle">{header}</div>
       <div className="headerTextActions">
+        <a key="info" className="info-btn" onClick={handleInfo}>
+          <i className="fa fa-info"></i>
+        </a>
         {can(RULE_TURNS_CRUD) && (
           <a key="cut" className="cut-btn" onClick={handleCut}>
             <i className="fas fa-cut"></i>
