@@ -28,17 +28,25 @@ const initialPanelState = {
 
 export const panelReducer = (state = initialPanelState, { type, payload }) => {
   switch (type) {
-    case types.PANEL_TOGGLE:
+    case types.PANEL_TOGGLE: {
+      let open = null;
+      if (typeof payload.open === 'undefined') {
+        open = !state.d[payload.type].isDisplayed;
+      } else {
+        open = payload.open;
+      }
       return {
         ...state,
+        ...payload.params,
         d: {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isDisplayed: !state.d[payload.type].isDisplayed,
+            isDisplayed: open,
           },
         },
       };
+    }
     case types.PANEL_SET_OPEN:
       return {
         ...state,
@@ -49,11 +57,6 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
             isDisplayed: payload.isDisplayed,
           },
         },
-      };
-    case types.PANEL_SET_TURN_TO_EDIT:
-      return {
-        ...state,
-        editTurnId: payload,
       };
 
     case types.PANEL_CHANGE_GEOMETRY:
@@ -71,6 +74,7 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
     case types.PANEL_CHANGE_MODE:
       return {
         ...state,
+        ...payload.params,
         mode: payload.mode,
       };
 

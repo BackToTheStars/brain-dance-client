@@ -195,6 +195,7 @@ const Turn = ({ id }) => {
           unregisterHandleResize={unregisterHandleResize}
           widgetId="picture1"
           widgetType="picture"
+          turnId={_id}
         />
       )}
       {doesParagraphExist && (

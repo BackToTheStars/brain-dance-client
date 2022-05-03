@@ -1,7 +1,10 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { setTurnToEdit, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TOGGLE } from '@/modules/panels/redux/types';
-import { PANEL_ADD_EDIT_TURN, PANEL_TURN_INFO } from '@/modules/panels/settings';
+import {
+  PANEL_ADD_EDIT_TURN,
+  PANEL_TURN_INFO,
+} from '@/modules/panels/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import React, {
   useRef,
@@ -54,8 +57,8 @@ const Header = ({
 
   const handleInfo = (e) => {
     dispatch(togglePanel({ type: PANEL_TURN_INFO }));
-    dispatch(setTurnToEdit(_id));
-  }
+    // dispatch(setTurnToEdit(_id));
+  };
 
   const handleCut = async (e) => {
     e.preventDefault();
@@ -76,8 +79,9 @@ const Header = ({
 
   const handleEdit = (e) => {
     e.preventDefault();
-    dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
-    dispatch(setTurnToEdit(_id));
+    dispatch(
+      togglePanel({ type: PANEL_ADD_EDIT_TURN, params: { editTurnId: _id } })
+    );
   };
 
   useEffect(() => {

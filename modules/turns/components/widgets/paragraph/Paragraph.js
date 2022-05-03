@@ -78,7 +78,12 @@ const Paragraph = ({
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          dispatch(setPanelMode({ mode: MODE_WIDGET_PARAGRAPH }));
+          dispatch(
+            setPanelMode({
+              mode: MODE_WIDGET_PARAGRAPH,
+              params: { editTurnId: _id },
+            })
+          );
         }}
       >
         <i className="fas fa-highlighter"></i>

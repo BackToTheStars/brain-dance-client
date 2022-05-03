@@ -41,7 +41,13 @@ const GameMode = () => {
     {
       text: 'Add Turn',
       callback: () => {
-        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+        dispatch(
+          togglePanel({
+            type: PANEL_ADD_EDIT_TURN,
+            open: true,
+            params: { editTurnId: null },
+          })
+        );
       },
       show: () => can(RULE_TURNS_CRUD),
     },

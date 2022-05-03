@@ -10,6 +10,7 @@ const Picture = ({
   unregisterHandleResize,
   widgetId,
   widgetType,
+  turnId,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
@@ -91,7 +92,12 @@ const Picture = ({
         onClick={(e) => {
           e.preventDefault();
           // setDiaplayCrop(true);
-          dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+          dispatch(
+            setPanelMode({
+              mode: MODE_WIDGET_PICTURE,
+              params: { editTurnId: turnId },
+            })
+          );
         }}
       >
         <i className="fas fa-highlighter"></i>

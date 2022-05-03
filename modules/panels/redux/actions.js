@@ -7,13 +7,6 @@ export const togglePanel = (panelType) => (dispatch) => {
   });
 };
 
-export const setTurnToEdit = (id) => (dispatch) => {
-  dispatch({
-    type: types.PANEL_SET_TURN_TO_EDIT,
-    payload: id,
-  });
-};
-
 export const changePanelGeometry = (type, geometryData) => (dispatch) => {
   // const geometryData = {};
   // if (geometryRawData?.width) {
@@ -26,11 +19,9 @@ export const changePanelGeometry = (type, geometryData) => (dispatch) => {
   });
 };
 
-export const setPanelMode =
-  ({ mode }) =>
-  (dispatch) => {
-    dispatch({
-      type: types.PANEL_CHANGE_MODE,
-      payload: { mode },
-    });
-  };
+export const setPanelMode = (payload) => (dispatch) => {
+  dispatch({
+    type: types.PANEL_CHANGE_MODE,
+    payload: payload,
+  });
+};
