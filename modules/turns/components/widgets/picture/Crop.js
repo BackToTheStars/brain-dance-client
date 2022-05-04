@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { changeWidgetParams } from '@/modules/panels/redux/actions';
+import { PANEL_CHANGE_WIDGET_PARAMS } from '@/modules/panels/redux/types';
+import { useEffect, useState } from 'react';
 import ReactCrop from 'react-image-crop';
+import { useDispatch } from 'react-redux';
 
-const PictureCrop = ({imageUrl}) => {
+const PictureCrop = ({ imageUrl, widgetKey }) => {
+  const dispatch = useDispatch();
+
   const [crop, setCrop] = useState({
     unit: '%',
     // x: 10,
@@ -16,6 +21,11 @@ const PictureCrop = ({imageUrl}) => {
   //     setCrop({ unit: '%', x, y, width, height });
   // }, []);
 
+  useEffect(() => {
+    console.log({ crop });
+    dispatch(changeWidgetParams({ widgetKey, params: crop }));
+  }, [crop]);
+
   return (
     <ReactCrop
       src={imageUrl}
@@ -23,7 +33,7 @@ const PictureCrop = ({imageUrl}) => {
       crop={crop}
       onChange={(newCrop) => setCrop(newCrop)}
     />
-  )
-}
+  );
+};
 
-export default PictureCrop
+export default PictureCrop;

@@ -1,4 +1,5 @@
 @import 'variables';
+@import 'mixins';
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import 'overrides';
 @import 'extra';
@@ -6,6 +7,6 @@
 @import 'tmp';
 @import '../modules/game/scss/style.scss';
 @import '../modules/panels/scss/style.scss';
-
+@import '../modules/turns/scss/style.scss';
 @import './old/styles';
 @import './refactoring';

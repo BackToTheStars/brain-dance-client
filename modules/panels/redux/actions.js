@@ -25,3 +25,10 @@ export const setPanelMode = (payload) => (dispatch) => {
     payload: payload,
   });
 };
+
+export const changeWidgetParams = (payload) => (dispatch) => {
+  dispatch({
+    type: types.PANEL_CHANGE_WIDGET_PARAMS,
+    payload: payload, // widgetKey, params
+  });
+};

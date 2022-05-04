@@ -1,7 +1,7 @@
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PICTURE } from '@/modules/panels/settings';
 import { useEffect, useState, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
 
 const Picture = ({
@@ -18,7 +18,12 @@ const Picture = ({
   const dispatch = useDispatch();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
-  const [displayCrop, setDiaplayCrop] = useState(false);
+  const [displayCrop, setDisplayCrop] = useState(false);
+
+  const editTurnId = useSelector((state) => state.panels.editTurnId);
+  const editWidgetId = useSelector((state) => state.panels.editWidgetId);
+
+  const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
@@ -83,19 +88,27 @@ const Picture = ({
   }, [imageLoaded]);
 
   return (
-    <div className={`picture-content`} ref={imgWrapperEl}>
-      {displayCrop && <PictureCrop imageUrl={imageUrlToRender} />}
+    <div
+      className={`picture-content ${isActive ? 'active' : ''}`}
+      ref={imgWrapperEl}
+    >
+      {displayCrop && isActive && (
+        <PictureCrop
+          imageUrl={imageUrlToRender}
+          widgetKey={`${turnId}_${widgetId}`}
+        />
+      )}
       <img src={imageUrlToRender} ref={imgEl} />
       <a
         className="widget-button"
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          // setDiaplayCrop(true);
+          setDisplayCrop(true);
           dispatch(
             setPanelMode({
               mode: MODE_WIDGET_PICTURE,
-              params: { editTurnId: turnId },
+              params: { editTurnId: turnId, editWidgetId: widgetId },
             })
           );
         }}

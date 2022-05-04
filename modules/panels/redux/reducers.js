@@ -10,6 +10,8 @@ const initialPanelState = {
   panels: panels,
   d: d,
   editTurnId: null,
+  editWidgetId: null,
+  editWidgetParams: {},
   mode: MODE_GAME,
 
   //   [{
@@ -76,6 +78,15 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         ...state,
         ...payload.params,
         mode: payload.mode,
+      };
+
+    case types.PANEL_CHANGE_WIDGET_PARAMS:
+      return {
+        ...state,
+        editWidgetParams: {
+          ...state.editWidgetParams,
+          [payload.widgetKey]: payload.params,
+        },
       };
 
     default:
