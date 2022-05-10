@@ -1,7 +1,14 @@
-import { useSelector } from "react-redux";
+import { quoteRectangleThickness } from '@/config/ui';
+import { setPanelMode } from '@/modules/panels/redux/actions';
+import {
+  MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '@/modules/panels/settings';
+import { useDebugValue } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 // import { quoteRectangleThickness } from '../../const';
-const quoteRectangleThickness = 2
+// const quoteRectangleThickness = 2;
 // import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnsCollectionContext';
 // import {
 //   MODE_GAME,
@@ -19,10 +26,15 @@ const PictureQuotes = ({
   // lineEnds,
   // setInteractionMode,
 }) => {
+  const dispatch = useDispatch();
   // const { bottomPanelSettings } = []; //useInteractionContext();
   // const { setPanelType } = bottomPanelSettings;
-  const turn = useSelector(state => state.turns.d[turnId])
-  const quotes = turn.quotes.filter(quote => quote.type === 'picture')
+  const turn = useSelector((state) => state.turns.d[turnId]);
+  const quotes = turn.quotes.filter((quote) => quote.type === 'picture');
+  const activeQuoteId = useSelector(
+    (state) =>
+      state.panels.editWidgetParams[`${turnId}_${widgetId}`]?.activeQuoteId
+  );
   //
   // const onQuoteClick = (quoteId) => {
   //   dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
@@ -32,10 +44,9 @@ const PictureQuotes = ({
     <div>
       {quotes.map((quote) => {
         let bordered = false; // !!lineEnds[`${turnId}_${quote.id}`]; // проверка нужно показывать рамку или нет
-        const isQuoteActive = false;
-          // activeQuote &&
-          // activeQuote.turnId === turnId &&
-          // activeQuote.quoteId === quote.id;
+        const isQuoteActive = activeQuoteId === quote.id; // @todo: активен ли текущий виджет
+        // activeQuote &&
+        // activeQuote.turnId === turnId &&
         let outline = `${quoteRectangleThickness}px solid grey`;
         if (isQuoteActive) {
           bordered = true;
@@ -56,6 +67,18 @@ const PictureQuotes = ({
               outline,
             }}
             onClick={() => {
+              dispatch(
+                setPanelMode({
+                  mode: MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
+                  params: {
+                    editTurnId: turnId,
+                    editWidgetId: widgetId,
+                    editWidgetParams: {
+                      [`${turnId}_${widgetId}`]: { activeQuoteId: quote.id },
+                    },
+                  },
+                })
+              );
               // onQuoteClick(quote.id);
               // if (isQuoteActive) {
               //   setInteractionMode(MODE_GAME);

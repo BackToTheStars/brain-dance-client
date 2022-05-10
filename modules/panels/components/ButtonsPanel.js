@@ -3,11 +3,13 @@ import {
   MODE_GAME,
   MODE_WIDGET_PARAGRAPH,
   MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '../settings';
 import GameMode from './buttons/GameMode';
 import ParagraphMode from './buttons/ParagraphMode';
 import PictureMode from './buttons/picture/PictureMode';
+import PictureQuoteActive from './buttons/picture/PictureQuoteActive';
 import PictureQuoteAdd from './buttons/picture/PictureQuoteAdd';
 
 export const Buttons = ({ buttons }) => {
@@ -37,6 +39,7 @@ const ButtonsPanel = () => {
     [MODE_GAME]: GameMode,
     [MODE_WIDGET_PICTURE]: PictureMode,
     [MODE_WIDGET_PICTURE_QUOTE_ADD]: PictureQuoteAdd,
+    [MODE_WIDGET_PICTURE_QUOTE_ACTIVE]: PictureQuoteActive,
     [MODE_WIDGET_PARAGRAPH]: ParagraphMode,
   };
 

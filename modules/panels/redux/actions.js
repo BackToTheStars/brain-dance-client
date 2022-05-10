@@ -1,4 +1,4 @@
-import { MODE_BUTTON_PICTURE_ADD_AREA, MODE_GAME, MODE_WIDGET_PICTURE } from '../settings';
+import { MODE_GAME, MODE_WIDGET_PICTURE } from '../settings';
 import * as types from './types';
 
 export const togglePanel = (panelType) => (dispatch) => {
@@ -22,21 +22,21 @@ export const changePanelGeometry = (type, geometryData) => (dispatch) => {
 
 export const setPanelMode = (payload) => (dispatch) => {
   console.log(payload.mode);
-  let params = payload.params || {}
+  let params = payload.params || {};
   if (!payload.params) {
     if (payload.mode === MODE_GAME) {
       params = {
         editTurnId: null,
         editWidgetId: null,
         editWidgetParams: {},
-      }
+      };
     } else if (payload.mode === MODE_WIDGET_PICTURE) {
       params = {
         editWidgetParams: {},
-      }
+      };
     }
   }
-  
+
   dispatch({
     type: types.PANEL_CHANGE_MODE,
     payload: {

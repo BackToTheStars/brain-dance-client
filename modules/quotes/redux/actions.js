@@ -20,13 +20,14 @@ export const addPictureQuoteByCrop = () => (dispatch, getState) => {
   const editTurnId = state.panels.editTurnId;
   const turn = state.turns.d[editTurnId];
   const editWidgetId = state.panels.editWidgetId;
-  const editWidgetParams = state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`]
+  const editWidgetParams =
+    state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`];
 
   const zeroPointId = state.turns.zeroPointId;
   const zeroPoint = state.turns.d[zeroPointId];
 
   let id = Math.floor(new Date().getTime() / 1000); // @todo get quote id from store for update
-  const { x, y, width, height } = editWidgetParams.crop
+  const { x, y, width, height } = editWidgetParams.crop;
 
   const pictureQuote = {
     id,
@@ -35,20 +36,29 @@ export const addPictureQuoteByCrop = () => (dispatch, getState) => {
     y,
     height,
     width,
-  }
+  };
 
-  dispatch(resaveTurn({
-    _id: turn._id,
-    quotes: [...turn.quotes, pictureQuote], // @todo find quote and update
-  },
-  zeroPoint,
-  {success: () => {
-    // @todo: close panel
-  }}))
+  dispatch(
+    resaveTurn(
+      {
+        _id: turn._id,
+        quotes: [...turn.quotes, pictureQuote], // @todo find quote and update
+        x: turn.x - zeroPoint.x,
+        y: turn.y - zeroPoint.y,
+      },
+      zeroPoint,
+
+      {
+        success: () => {
+          // @todo: close panel
+        },
+      }
+    )
+  );
 
   console.log({
     editTurnId,
     editWidgetId,
-    editWidgetParams
-  })
-}
+    editWidgetParams,
+  });
+};
