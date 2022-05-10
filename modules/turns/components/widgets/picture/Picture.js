@@ -1,8 +1,9 @@
 import { setPanelMode } from '@/modules/panels/redux/actions';
-import { MODE_WIDGET_PICTURE } from '@/modules/panels/settings';
+import { MODE_WIDGET_PICTURE, MODE_WIDGET_PICTURE_QUOTE_ADD } from '@/modules/panels/settings';
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
+import PictureQuotes from './Quotes';
 
 const Picture = ({
   imageUrl,
@@ -22,7 +23,7 @@ const Picture = ({
 
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const editWidgetId = useSelector((state) => state.panels.editWidgetId);
-
+  const mode = useSelector((state) => state.panels.mode);
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {
@@ -92,12 +93,21 @@ const Picture = ({
       className={`picture-content ${isActive ? 'active' : ''}`}
       ref={imgWrapperEl}
     >
-      {displayCrop && isActive && (
+      {displayCrop && isActive && (mode === MODE_WIDGET_PICTURE_QUOTE_ADD) && (
         <PictureCrop
           imageUrl={imageUrlToRender}
           widgetKey={`${turnId}_${widgetId}`}
         />
       )}
+      <PictureQuotes
+        turnId={turnId}
+        widgetId={widgetId}
+        // quotes={
+        //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
+        //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
+        //     : quotes
+        // }
+      />
       <img src={imageUrlToRender} ref={imgEl} />
       <a
         className="widget-button"

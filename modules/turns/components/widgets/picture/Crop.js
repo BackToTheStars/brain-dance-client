@@ -1,8 +1,12 @@
+import { WIDGET_PICTURE_CROP_TIMEOUT_DELAY } from '@/config/ui';
 import { changeWidgetParams } from '@/modules/panels/redux/actions';
 import { PANEL_CHANGE_WIDGET_PARAMS } from '@/modules/panels/redux/types';
 import { useEffect, useState } from 'react';
 import ReactCrop from 'react-image-crop';
 import { useDispatch } from 'react-redux';
+import { getQueue } from '../../helpers/queueHelper';
+
+const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 
 const PictureCrop = ({ imageUrl, widgetKey }) => {
   const dispatch = useDispatch();
@@ -22,8 +26,9 @@ const PictureCrop = ({ imageUrl, widgetKey }) => {
   // }, []);
 
   useEffect(() => {
-    console.log({ crop });
-    dispatch(changeWidgetParams({ widgetKey, params: crop }));
+    cropQueue.add(() => {
+      dispatch(changeWidgetParams({ widgetKey, params: {crop} }));
+    });
   }, [crop]);
 
   return (
@@ -31,7 +36,9 @@ const PictureCrop = ({ imageUrl, widgetKey }) => {
       src={imageUrl}
       className="picture-react-crop"
       crop={crop}
-      onChange={(newCrop) => setCrop(newCrop)}
+      onChange={(newCrop, newPercentCrop) => {
+        setCrop(newPercentCrop)
+      }}
     />
   );
 };

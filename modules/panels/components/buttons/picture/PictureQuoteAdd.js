@@ -1,9 +1,10 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { addPictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { setPanelMode } from '../../redux/actions';
-import { MODE_GAME, MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../settings';
-import { Buttons } from '../ButtonsPanel';
+import { setPanelMode } from '../../../redux/actions';
+import { MODE_GAME, MODE_WIDGET_PICTURE, MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
+import { Buttons } from '../../ButtonsPanel';
 
 const PictureQuoteAdd = () => {
   //
@@ -14,6 +15,7 @@ const PictureQuoteAdd = () => {
     {
       text: 'Save Area',
       callback: () => {
+        dispatch(addPictureQuoteByCrop())
         // performActions({
         //   info: MODE_BUTTON_PICTURE_SAVE_AREA,
         //   func: () => {
@@ -35,7 +37,7 @@ const PictureQuoteAdd = () => {
     {
       text: 'Cancel',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_GAME }));
+        dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
         // makeWidgetActive(null);
       },
       show: () => can(RULE_TURNS_CRUD),

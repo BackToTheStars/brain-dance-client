@@ -49,17 +49,6 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         },
       };
     }
-    case types.PANEL_SET_OPEN:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload.type]: {
-            ...state.d[payload.type],
-            isDisplayed: payload.isDisplayed,
-          },
-        },
-      };
 
     case types.PANEL_CHANGE_GEOMETRY:
       return {

@@ -7,8 +7,8 @@ import {
 } from '../settings';
 import GameMode from './buttons/GameMode';
 import ParagraphMode from './buttons/ParagraphMode';
-import PictureMode from './buttons/PictureMode';
-import PictureQuoteAdd from './buttons/PictureQuoteAdd';
+import PictureMode from './buttons/picture/PictureMode';
+import PictureQuoteAdd from './buttons/picture/PictureQuoteAdd';
 
 export const Buttons = ({ buttons }) => {
   return (
