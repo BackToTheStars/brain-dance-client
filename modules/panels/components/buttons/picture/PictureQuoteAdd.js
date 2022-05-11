@@ -3,7 +3,11 @@ import { addPictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { setPanelMode } from '../../../redux/actions';
-import { MODE_GAME, MODE_WIDGET_PICTURE, MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
+import {
+  MODE_GAME,
+  MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '../../../settings';
 import { Buttons } from '../../ButtonsPanel';
 
 const PictureQuoteAdd = () => {
@@ -15,7 +19,9 @@ const PictureQuoteAdd = () => {
     {
       text: 'Save Area',
       callback: () => {
-        dispatch(addPictureQuoteByCrop())
+        dispatch(addPictureQuoteByCrop()).then(() => {
+          dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+        });
         // performActions({
         //   info: MODE_BUTTON_PICTURE_SAVE_AREA,
         //   func: () => {

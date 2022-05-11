@@ -21,7 +21,6 @@ export const changePanelGeometry = (type, geometryData) => (dispatch) => {
 };
 
 export const setPanelMode = (payload) => (dispatch) => {
-  console.log(payload.mode);
   let params = payload.params || {};
   if (!payload.params) {
     if (payload.mode === MODE_GAME) {
