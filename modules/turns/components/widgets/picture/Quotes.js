@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from 'react-redux';
 const PictureQuotes = ({
   turnId,
   widgetId,
+  activeQuoteId,
+  mode,
   // quotes,
   // dispatch,
   // activeQuote,
@@ -31,10 +33,10 @@ const PictureQuotes = ({
   // const { setPanelType } = bottomPanelSettings;
   const turn = useSelector((state) => state.turns.d[turnId]);
   const quotes = turn.quotes.filter((quote) => quote.type === 'picture');
-  const activeQuoteId = useSelector(
-    (state) =>
-      state.panels.editWidgetParams[`${turnId}_${widgetId}`]?.activeQuoteId
-  );
+  // const activeQuoteId = useSelector(
+  //   (state) =>
+  //     state.panels.editWidgetParams[`${turnId}_${widgetId}`]?.activeQuoteId
+  // );
   //
   // const onQuoteClick = (quoteId) => {
   //   dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
@@ -55,17 +57,26 @@ const PictureQuotes = ({
           outline = `${quoteRectangleThickness}px solid red`;
         }
 
+        const style = {
+          left: `${quote.x}%`,
+          top: `${quote.y}%`,
+          height: `${quote.height}%`,
+          width: `${quote.width}%`,
+          outline,
+        };
+
+        if (
+          mode === MODE_WIDGET_PICTURE_QUOTE_ADD &&
+          quote.id === activeQuoteId
+        ) {
+          style.visibility = 'hidden';
+        }
+
         return (
           <div
             className="quote-rectangle"
             key={quote.id}
-            style={{
-              left: `${quote.x}%`,
-              top: `${quote.y}%`,
-              height: `${quote.height}%`,
-              width: `${quote.width}%`,
-              outline,
-            }}
+            style={style}
             onClick={() => {
               dispatch(
                 setPanelMode({

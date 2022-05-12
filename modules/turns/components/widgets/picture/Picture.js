@@ -1,5 +1,8 @@
 import { setPanelMode } from '@/modules/panels/redux/actions';
-import { MODE_WIDGET_PICTURE, MODE_WIDGET_PICTURE_QUOTE_ADD } from '@/modules/panels/settings';
+import {
+  MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '@/modules/panels/settings';
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
@@ -19,11 +22,14 @@ const Picture = ({
   const dispatch = useDispatch();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
-  const [displayCrop, setDisplayCrop] = useState(false);
+  // const [displayCrop, setDisplayCrop] = useState(false);
 
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const editWidgetId = useSelector((state) => state.panels.editWidgetId);
   const mode = useSelector((state) => state.panels.mode);
+  const editWidgetParams = useSelector(
+    (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`]
+  );
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {
@@ -93,15 +99,20 @@ const Picture = ({
       className={`picture-content ${isActive ? 'active' : ''}`}
       ref={imgWrapperEl}
     >
-      {displayCrop && isActive && (mode === MODE_WIDGET_PICTURE_QUOTE_ADD) && (
+      {/* {displayCrop &&  */}
+      {isActive && mode === MODE_WIDGET_PICTURE_QUOTE_ADD && (
         <PictureCrop
           imageUrl={imageUrlToRender}
           widgetKey={`${turnId}_${widgetId}`}
+          stateCrop={editWidgetParams?.crop}
+          activeQuoteId={editWidgetParams?.activeQuoteId}
         />
       )}
       <PictureQuotes
         turnId={turnId}
         widgetId={widgetId}
+        activeQuoteId={editWidgetParams?.activeQuoteId}
+        mode={mode}
         // quotes={
         //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
         //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
@@ -114,7 +125,7 @@ const Picture = ({
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          setDisplayCrop(true);
+          // setDisplayCrop(true);
           dispatch(
             setPanelMode({
               mode: MODE_WIDGET_PICTURE,

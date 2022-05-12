@@ -19,9 +19,7 @@ const PictureQuoteActive = () => {
     {
       text: 'Modify',
       callback: () => {
-        dispatch(
-          setPanelMode({ mode: MODE_WIDGET_PICTURE_QUOTE_ADD, params: {} })
-        );
+        dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE_QUOTE_ADD }));
       },
       show: () => can(RULE_TURNS_CRUD),
     },

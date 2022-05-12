@@ -1,4 +1,9 @@
-import { MODE_GAME, MODE_WIDGET_PICTURE } from '../settings';
+import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
+import {
+  MODE_GAME,
+  MODE_WIDGET_PICTURE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '../settings';
 import * as types from './types';
 
 export const togglePanel = (panelType) => (dispatch) => {
@@ -20,7 +25,7 @@ export const changePanelGeometry = (type, geometryData) => (dispatch) => {
   });
 };
 
-export const setPanelMode = (payload) => (dispatch) => {
+export const setPanelMode = (payload) => (dispatch, getState) => {
   let params = payload.params || {};
   if (!payload.params) {
     if (payload.mode === MODE_GAME) {
@@ -33,6 +38,28 @@ export const setPanelMode = (payload) => (dispatch) => {
       params = {
         editWidgetParams: {},
       };
+    } else if (payload.mode === MODE_WIDGET_PICTURE_QUOTE_ADD) {
+      const state = getState();
+      const { turn, editWidgetParams, editWidgetId } =
+        getWidgetDataFromState(state);
+      if (!!editWidgetParams.activeQuoteId) {
+        const activeQuote =
+          state.quotes.d[`${turn._id}_${editWidgetParams.activeQuoteId}`];
+        params = {
+          editWidgetParams: {
+            [`${turn._id}_${editWidgetId}`]: {
+              activeQuoteId: editWidgetParams.activeQuoteId,
+              crop: {
+                unit: '%',
+                x: activeQuote.x,
+                y: activeQuote.y,
+                width: activeQuote.width,
+                height: activeQuote.height,
+              },
+            },
+          },
+        };
+      }
     }
   }
 

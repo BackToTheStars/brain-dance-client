@@ -2,19 +2,7 @@ import * as types from './types';
 import * as panelTypes from '@/modules/panels/redux/types';
 import { PANEL_LINES } from '@/modules/panels/settings';
 import { resaveTurn } from '@/modules/turns/redux/actions';
-
-const getWidgetDataFromState = (state) => {
-  const editTurnId = state.panels.editTurnId;
-  const turn = state.turns.d[editTurnId];
-  const editWidgetId = state.panels.editWidgetId;
-  const editWidgetParams =
-    state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`];
-
-  const zeroPointId = state.turns.zeroPointId;
-  const zeroPoint = state.turns.d[zeroPointId];
-
-  return { turn, editWidgetParams, zeroPoint };
-};
+import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
