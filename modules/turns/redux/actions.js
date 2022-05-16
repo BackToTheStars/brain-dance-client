@@ -92,6 +92,12 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
       type: types.TURN_RESAVE,
       payload: preparedTurn,
     });
+    dispatch({
+      type: quotesTypes.QUOTES_UPDATE_DICTIONARY,
+      payload: turn.quotes.reduce((acc, quote) => {
+        return { ...acc, [`${turn._id}_${quote.id}`]: quote };
+      }, {}),
+    });
     callbacks?.success();
   });
 };

@@ -4,6 +4,7 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/modules/panels/settings';
+import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { useDebugValue } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -90,6 +91,7 @@ const PictureQuotes = ({
                   },
                 })
               );
+              dispatch(processQuoteClicked(`${turnId}_${quote.id}`));
               // onQuoteClick(quote.id);
               // if (isQuoteActive) {
               //   setInteractionMode(MODE_GAME);

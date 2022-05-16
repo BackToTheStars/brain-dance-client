@@ -1,5 +1,5 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { addPictureQuoteByCrop } from '@/modules/quotes/redux/actions';
+import { savePictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { setPanelMode } from '../../../redux/actions';
@@ -19,7 +19,7 @@ const PictureQuoteAdd = () => {
     {
       text: 'Save Area',
       callback: () => {
-        dispatch(addPictureQuoteByCrop()).then(() => {
+        dispatch(savePictureQuoteByCrop()).then(() => {
           dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
         });
         // performActions({

@@ -42,7 +42,7 @@ export const setPanelMode = (payload) => (dispatch, getState) => {
       const state = getState();
       const { turn, editWidgetParams, editWidgetId } =
         getWidgetDataFromState(state);
-      if (!!editWidgetParams.activeQuoteId) {
+      if (!!editWidgetParams?.activeQuoteId) {
         const activeQuote =
           state.quotes.d[`${turn._id}_${editWidgetParams.activeQuoteId}`];
         params = {

@@ -17,6 +17,11 @@ export const quoteReducer = (state = initialState, { type, payload }) => {
         ...state,
         d: payload,
       };
+    case types.QUOTES_UPDATE_DICTIONARY:
+      return {
+        ...state,
+        d: { ...state.d, ...payload },
+      };
 
     default:
       return state;
