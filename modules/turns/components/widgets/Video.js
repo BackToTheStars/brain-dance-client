@@ -28,7 +28,7 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
   useEffect(() => {
     registerHandleResize({
       type: 'video',
-      id: 'video',
+      id: 'video1',
       minWidthCallback: () => {
         return 20;
       },

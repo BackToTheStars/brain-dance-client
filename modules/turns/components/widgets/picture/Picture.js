@@ -15,6 +15,7 @@ const Picture = ({
   widgetId,
   widgetType,
   turnId,
+  widgetSettings,
 }) => {
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
@@ -113,6 +114,7 @@ const Picture = ({
         widgetId={widgetId}
         activeQuoteId={editWidgetParams?.activeQuoteId}
         mode={mode}
+        widgetSettings={widgetSettings}
         // quotes={
         //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
         //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)

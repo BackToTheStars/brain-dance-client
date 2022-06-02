@@ -32,7 +32,7 @@ const Paragraph = ({
     if (!paragraphElCurrent) return;
     registerHandleResize({
       type: 'paragraph',
-      id: 'paragraph',
+      id: 'paragraph1',
       // этот виджет является гибким
       variableHeight: true,
       minWidthCallback: () => {

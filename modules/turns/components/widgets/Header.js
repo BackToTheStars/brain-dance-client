@@ -87,7 +87,7 @@ const Header = ({
   useEffect(() => {
     registerHandleResize({
       type: 'header',
-      id: 'header',
+      id: 'header1',
       minWidthCallback: () => 300,
       minHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),
       maxHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),

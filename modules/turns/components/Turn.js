@@ -22,6 +22,8 @@ const Turn = ({ id }) => {
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
+  const [widgetD, setWidgetD] = useState({});
+
   const wrapper = useRef(null);
 
   const {
@@ -84,10 +86,8 @@ const Turn = ({ id }) => {
   );
 
   const recalculateSize = (width, height) => {
-    const { minHeight, maxHeight, minWidth, maxWidth } = getTurnMinMaxHeight(
-      widgets,
-      width
-    );
+    const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
+      getTurnMinMaxHeight(widgets, width);
 
     const newHeight = Math.min(Math.max(height, minHeight), maxHeight);
     const newWidth = Math.min(Math.max(width, minWidth), maxWidth);
@@ -108,6 +108,27 @@ const Turn = ({ id }) => {
         width: `${newWidth}px`,
       });
     }
+    const newWidgetD = {};
+    const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1'];
+
+    let minTop = 0;
+    let maxTop = 0;
+
+    for (let widgetId of widgetIds) {
+      if (!widgetD[widgetId]) continue;
+
+      newWidgetD[widgetId] = {
+        ...widgetD[widgetId],
+        minTop,
+        maxTop,
+        width: newWidth,
+      };
+
+      minTop = minTop + widgetD[widgetId].minHeight;
+      maxTop = maxTop + widgetD[widgetId].maxHeight;
+    }
+
+    setWidgetD(newWidgetD);
   };
 
   // DRAGGABLE
@@ -161,6 +182,8 @@ const Turn = ({ id }) => {
     }
   }, [widgets]);
 
+  console.log({ widgets });
+
   return (
     <div
       ref={wrapper}
@@ -196,6 +219,7 @@ const Turn = ({ id }) => {
           widgetId="picture1"
           widgetType="picture"
           turnId={_id}
+          widgetSettings={widgetD['picture1']}
         />
       )}
       {doesParagraphExist && (
