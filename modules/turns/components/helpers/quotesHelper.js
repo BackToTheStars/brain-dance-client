@@ -63,7 +63,6 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
   // const turnElRect = paragraphEl.current.parentElement.getBoundingClientRect();
-  
 
   const quotes = [];
 
@@ -99,7 +98,11 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
   return quotes;
 };
 
-export const getScrolledQuotes = (quotes, paragraphEl, passedScrollPosition) => {
+export const getScrolledQuotes = (
+  quotes,
+  paragraphEl,
+  passedScrollPosition
+) => {
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
   const turnRect = paragraphEl.current.parentNode.getBoundingClientRect();
   const topGap = paragraphRect.top - turnRect.top;
@@ -111,13 +114,15 @@ export const getScrolledQuotes = (quotes, paragraphEl, passedScrollPosition) => 
     const outlineWidth = 2; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
 
-    if (top < scrollPosition) { // height / 2
+    if (top < scrollPosition) {
+      // height / 2
       height = 0;
       width = paragraphRect.width - outlineWidth; // 2 ширины рамки
       left = outlineWidth; //left + outlineWidth;
       top = topGap; //top + outlineWidth;
       position = 'top';
-    }  else if (top + height > paragraphRect.height + scrollPosition) { // height / 2
+    } else if (top + height > paragraphRect.height + scrollPosition) {
+      // height / 2
       height = 0;
       width = paragraphRect.width - outlineWidth;
       left = outlineWidth;
@@ -126,9 +131,10 @@ export const getScrolledQuotes = (quotes, paragraphEl, passedScrollPosition) => 
     } else {
       top = top + topGap - scrollPosition;
     }
-    
+
     return {
       ...quote,
+      type: 'paragraph',
       width,
       height,
       left,

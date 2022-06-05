@@ -39,10 +39,18 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         linesWithEndCoords: payload,
       };
     case types.LINES_QUOTE_COORDS_UPDATE:
-      const { turnId, quotesWithCoords } = payload;
+      const { turnId, quotesWithCoords, type } = payload;
       return {
         ...state,
-        quotesInfo: { ...state.quotesInfo, [turnId]: quotesWithCoords },
+        quotesInfo: {
+          ...state.quotesInfo,
+          [turnId]: [
+            ...(state.quotesInfo[turnId]?.filter(
+              (quote) => quote.type !== type
+            ) || []),
+            ...quotesWithCoords,
+          ],
+        },
       };
     default:
       return state;

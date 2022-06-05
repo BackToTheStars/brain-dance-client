@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
 
+const TYPE_QUOTE_PARAGRAPH = 'paragraph';
+
 const Paragraph = ({
   turn,
   registerHandleResize,
@@ -52,7 +54,7 @@ const Paragraph = ({
   }, [paragraphElCurrent]);
 
   useEffect(() => {
-    dispatch(quoteCoordsUpdate(_id, paragraphQuotes));
+    dispatch(quoteCoordsUpdate(_id, TYPE_QUOTE_PARAGRAPH, paragraphQuotes));
   }, [paragraphQuotes]);
 
   return (

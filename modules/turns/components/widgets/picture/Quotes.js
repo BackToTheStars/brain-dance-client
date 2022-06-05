@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from 'react-redux';
 //   useInteractionContext,
 // } from '../../contexts/InteractionContext';
 
+const TYPE_QUOTE_PICTURE = 'picture';
+
 const PictureQuotes = ({
   turnId,
   widgetId,
@@ -37,7 +39,7 @@ const PictureQuotes = ({
   const turn = useSelector((state) => state.turns.d[turnId]);
 
   const quotes = useMemo(() => {
-    return turn.quotes.filter((quote) => quote.type === 'picture');
+    return turn.quotes.filter((quote) => quote.type === TYPE_QUOTE_PICTURE);
   }, [turn.quotes]);
 
   // const activeQuoteId = useSelector(
@@ -55,8 +57,10 @@ const PictureQuotes = ({
     dispatch(
       quoteCoordsUpdate(
         turnId,
+        TYPE_QUOTE_PICTURE,
         quotes.map((quote) => {
           return {
+            type: TYPE_QUOTE_PICTURE,
             initialCoords: {},
             quoteId: quote.id,
             quoteKey: `${turnId}_${quote.id}`,
