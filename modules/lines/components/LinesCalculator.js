@@ -1,19 +1,19 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { linesWithEndCoordsUpdate } from "../redux/actions";
-import { getLineEnds, getLinesCoords } from "./helpers/line";
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { linesWithEndCoordsUpdate } from '../redux/actions';
+import { getLineEnds, getLinesCoords } from './helpers/line';
 
 const LinesCalculator = () => {
-  const lines = useSelector((store) => store.lines.lines)
-  const quotesInfo = useSelector((store) => store.lines.quotesInfo)
-  const turnsDictionary = useSelector((store) => store.turns.d)
-  const gamePosition = useSelector((store) => store.game.position)
+  const lines = useSelector((store) => store.lines.lines);
+  const quotesInfo = useSelector((store) => store.lines.quotesInfo);
+  const turnsDictionary = useSelector((store) => store.turns.d);
+  const gamePosition = useSelector((store) => store.game.position);
   const dispatch = useDispatch();
 
   const turnsToRender = Object.keys(turnsDictionary);
 
-  const pictureQuotesInfo = {}
+  const pictureQuotesInfo = {};
   useEffect(() => {
     const linesWithEndCoords = getLinesCoords(
       lines,
@@ -22,7 +22,7 @@ const LinesCalculator = () => {
       quotesInfo,
       pictureQuotesInfo
     );
-    dispatch(linesWithEndCoordsUpdate(linesWithEndCoords))
+    dispatch(linesWithEndCoordsUpdate(linesWithEndCoords));
     // turnsDispatch({
     //   type: ACTION_RECALCULATE_LINES,
     //   payload: linesWithEndCoords,
@@ -31,14 +31,8 @@ const LinesCalculator = () => {
     //   type: ACTION_UPDATE_LINE_ENDS,
     //   payload: getLineEnds(linesWithEndCoords),
     // });
-  }, [
-    lines,
-    turnsToRender,
-    quotesInfo,
-    pictureQuotesInfo,
-    gamePosition
-  ]);
-  return ""
-}
+  }, [lines, turnsToRender, quotesInfo, pictureQuotesInfo, gamePosition]);
+  return '';
+};
 
-export default LinesCalculator
+export default LinesCalculator;

@@ -1,12 +1,11 @@
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
+import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
-
-const TYPE_QUOTE_PARAGRAPH = 'paragraph';
 
 const Paragraph = ({
   turn,
@@ -54,7 +53,7 @@ const Paragraph = ({
   }, [paragraphElCurrent]);
 
   useEffect(() => {
-    dispatch(quoteCoordsUpdate(_id, TYPE_QUOTE_PARAGRAPH, paragraphQuotes));
+    dispatch(quoteCoordsUpdate(_id, TYPE_QUOTE_TEXT, paragraphQuotes));
   }, [paragraphQuotes]);
 
   return (

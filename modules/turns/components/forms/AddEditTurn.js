@@ -9,6 +9,7 @@ import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
 import { linesDelete } from '@/modules/lines/redux/actions';
+import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 const {
   settings,
@@ -181,6 +182,12 @@ const AddEditTurnPopup = () => {
 
     const prevQuotes = turnToEdit?.quotes || [];
 
+    for (let prevQuote of prevQuotes) {
+      if (prevQuote.type !== TYPE_QUOTE_TEXT) {
+        quotes.push(prevQuote);
+      }
+    }
+
     const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
 
     console.log({
@@ -204,7 +211,7 @@ const AddEditTurnPopup = () => {
       contentType: activeTemplate,
       quotes: [
         ...quotes,
-        ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
+        // ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
       ],
     };
 

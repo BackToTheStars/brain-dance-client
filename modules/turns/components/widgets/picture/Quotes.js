@@ -6,6 +6,7 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/modules/panels/settings';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
+import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
 import { useDebugValue, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,8 +19,6 @@ import { useDispatch, useSelector } from 'react-redux';
 //   PANEL_LINES,
 //   useInteractionContext,
 // } from '../../contexts/InteractionContext';
-
-const TYPE_QUOTE_PICTURE = 'picture';
 
 const PictureQuotes = ({
   turnId,

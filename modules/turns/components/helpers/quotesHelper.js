@@ -11,6 +11,8 @@
 //     let width = rect.width;
 //     let height = rect.height;
 
+import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
+
 //     let position = 'default';
 //     const outlineWidth = 2; // ещё в Turn.js строчка 466
 
@@ -134,7 +136,7 @@ export const getScrolledQuotes = (
 
     return {
       ...quote,
-      type: 'paragraph',
+      type: TYPE_QUOTE_TEXT,
       width,
       height,
       left,

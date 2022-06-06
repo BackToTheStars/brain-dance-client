@@ -31,7 +31,7 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       }
       return {
         ...state,
-        lines: state.lines.filter((line) => d[line._id]),
+        lines: state.lines.filter((line) => !d[line._id]),
       };
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {
