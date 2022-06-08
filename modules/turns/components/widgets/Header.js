@@ -16,7 +16,7 @@ import React, {
 import { useDispatch } from 'react-redux';
 import { deleteTurn } from '../../redux/actions';
 // import { HEADER_HEIGHT } from '@/components/const';
-const HEADER_HEIGHT = 40;
+const HEADER_HEIGHT = 80;
 
 const CloneButton = () => {
   // const { copyPasteActions: { clone } } = useTurnData();
@@ -26,7 +26,8 @@ const CloneButton = () => {
   };
   return (
     <a key="clone" className="clone-btn" onClick={handleClone}>
-      <i className="fas fa-clone"></i>
+      {/*<i className="fas fa-clone"></i>*/}
+      <img src="/images/document.svg" />
     </a>
   );
 };
@@ -95,28 +96,36 @@ const Header = ({
   }, [dontShowHeader]);
 
   return (
-    <h5 className="headerText" ref={headerEl} style={style}>
+    <div className="headerText" ref={headerEl} style={style}>
       <div className="headerTextTitle">{header}</div>
-      <div className="headerTextActions">
-        <a key="info" className="info-btn" onClick={handleInfo}>
-          <i className="fa fa-info"></i>
-        </a>
+      <div className="mod_icon_wrap">
         {can(RULE_TURNS_CRUD) && (
           <a key="cut" className="cut-btn" onClick={handleCut}>
-            <i className="fas fa-cut"></i>
+            <img src="/images/scissor.svg" />
+            {/*<i className="fas fa-cut"></i>*/}
           </a>
         )}
         <CloneButton />
         {can(RULE_TURNS_CRUD) && (
           <a key="edit" className="edit-btn" onClick={handleEdit}>
-            <i className="fas fa-pen-square"></i>
+            <img src="/images/cloud.svg" />
+            {/*<i className="fas fa-pen-square"></i>*/}
           </a>
         )}
-        <a key="delete" className="delete-btn" onClick={handleDelete}>
-          <i className="fas fa-trash-alt"></i>
-        </a>
+        {can(RULE_TURNS_CRUD) && (
+          <a key="delete" className="delete-btn" onClick={handleDelete}>
+            <img src="/images/delete.svg" />
+            {/*<i className="fas fa-trash-alt"></i>*/}
+          </a>
+        )}
       </div>
-    </h5>
+      <div className="flex_mod">
+        <a href="#" className="flex_mod_site">
+          ceur-ws.org
+        </a>
+        <div className="mod_date">8 July 2021</div>
+      </div>
+    </div>
   );
 };
 
