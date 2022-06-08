@@ -182,7 +182,7 @@ const Turn = ({ id }) => {
     }
   }, [widgets]);
 
-  console.log({ widgets });
+  // console.log({ widgets });
 
   return (
     <div

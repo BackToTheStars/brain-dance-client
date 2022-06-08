@@ -1,9 +1,9 @@
 import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
 import { useRouter } from 'next/router';
-import Head from 'next/head';
 import { UserProvider } from '@/modules/user/contexts/UserContext';
-import { NotificationsProvider } from '@/modules/ui/contexts/NotificationsContext';
-const Game = dynamic(() => import('@/modules/game/components/Game'), { ssr: false });
+const Game = dynamic(() => import('@/modules/game/components/Game'), {
+  ssr: false,
+});
 
 const GamePage = () => {
   const router = useRouter();
@@ -23,9 +23,7 @@ const GamePage = () => {
           <div style={{ color: '#aaa' }}>Loading...</div>
         ) : (
           <UserProvider hash={hash}>
-            <NotificationsProvider>
-              <Game hash={hash} />
-            </NotificationsProvider>
+            <Game hash={hash} />
           </UserProvider>
         )}
       </div>

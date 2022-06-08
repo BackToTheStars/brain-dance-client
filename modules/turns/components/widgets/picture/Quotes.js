@@ -51,7 +51,7 @@ const PictureQuotes = ({
   // };
 
   useEffect(() => {
-    console.log({ quotes });
+    // console.log({ quotes });
 
     dispatch(
       quoteCoordsUpdate(

@@ -1,13 +1,21 @@
+import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import { loadFullGame } from '@/modules/game/game-redux/actions';
 import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
+import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import { moveField } from '@/modules/turns/redux/actions';
-import { addNotification } from '@/modules/ui/redux/actions';
+import {
+  addNotification,
+  viewportGeometryUpdate,
+} from '@/modules/ui/redux/actions';
+import { VIEWPORT_UPDATE } from '@/modules/ui/redux/types';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+
+const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
 const Game = ({ hash }) => {
   const gameBox = useRef();
@@ -24,6 +32,21 @@ const Game = ({ hash }) => {
     );
     // loadClasses();
   }, []); // token
+
+  useEffect(() => {
+    if (!window) return;
+    const update = () => {
+      dispatch(
+        viewportGeometryUpdate({
+          viewport: { width: window.innerWidth, height: window.innerHeight },
+        })
+      );
+    };
+    window.addEventListener('resize', () => {
+      viewportGeometryUpdateQueue.add(update);
+    });
+    update();
+  }, []);
 
   useEffect(() => {
     if (!gameBox.current) return;

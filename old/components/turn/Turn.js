@@ -513,7 +513,7 @@ const TurnNewComponent = ({
               });
               // setCompressedHeight(null);
               $(wrapper.current).height(prevHeight);
-              console.log(prevHeight);
+              // console.log(prevHeight);
               // setTimeout(() => {
               //   handleResize(width, prevHeight);
               // }, 2500);

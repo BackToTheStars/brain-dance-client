@@ -1,4 +1,6 @@
 import * as types from './types';
+import * as turnTypes from '@/modules/turns/redux/types';
+
 import { NOTIFICATION_SHOWTIME, NOTIFICATION_TRANSITION } from '@/config/ui';
 
 export const addNotification =
@@ -21,4 +23,16 @@ export const addNotification =
         payload: { id },
       });
     }, NOTIFICATION_SHOWTIME + NOTIFICATION_TRANSITION);
+  };
+
+export const viewportGeometryUpdate =
+  ({ viewport }) =>
+  (dispatch) => {
+    dispatch({
+      type: types.VIEWPORT_UPDATE,
+      payload: { viewport },
+    });
+    dispatch({
+      type: turnTypes.TURNS_UPDATE_GEOMETRY_TIME,
+    });
   };

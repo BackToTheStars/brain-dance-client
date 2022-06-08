@@ -11,6 +11,11 @@ const initialTurnsState = {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
+    case types.TURNS_UPDATE_GEOMETRY_TIME:
+      return {
+        ...state,
+        updateGeometryTime: new Date().getTime(),
+      };
     case types.LOAD_TURNS:
       return {
         ...state,

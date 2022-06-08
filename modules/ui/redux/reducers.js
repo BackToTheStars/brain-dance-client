@@ -2,6 +2,7 @@ import * as types from './types';
 
 const initialUIState = {
   notifications: [],
+  viewport: { width: 1600, height: 1200 },
 };
 
 export const UIReducer = (state = initialUIState, { type, payload }) => {
@@ -34,6 +35,11 @@ export const UIReducer = (state = initialUIState, { type, payload }) => {
         notifications: state.notifications.filter(
           (notification) => notification.id !== payload.id
         ),
+      };
+    case types.VIEWPORT_UPDATE:
+      return {
+        ...state,
+        viewport: payload.viewport,
       };
     default:
       return state;
