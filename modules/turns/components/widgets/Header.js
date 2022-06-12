@@ -15,8 +15,9 @@ import React, {
 } from 'react';
 import { useDispatch } from 'react-redux';
 import { deleteTurn } from '../../redux/actions';
+import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
 // import { HEADER_HEIGHT } from '@/components/const';
-const HEADER_HEIGHT = 80;
+const HEADER_HEIGHT = 105;
 
 const CloneButton = () => {
   // const { copyPasteActions: { clone } } = useTurnData();
@@ -26,8 +27,10 @@ const CloneButton = () => {
   };
   return (
     <a key="clone" className="clone-btn" onClick={handleClone}>
-      {/*<i className="fas fa-clone"></i>*/}
-      <img src="/images/document.svg" />
+          {/*<i className="fas fa-clone"></i>*/}
+          <CopyIcon />
+
+          {/*<img src="/images/document.svg" />*/}
     </a>
   );
 };
@@ -101,21 +104,31 @@ const Header = ({
       <div className="mod_icon_wrap">
         {can(RULE_TURNS_CRUD) && (
           <a key="cut" className="cut-btn" onClick={handleCut}>
-            <img src="/images/scissor.svg" />
-            {/*<i className="fas fa-cut"></i>*/}
+                      {/*<img src="/images/scissor.svg" />*/}
+                      {/*<i className="fas fa-cut"></i>*/}
+
+            <ScissorIcon />
+
           </a>
         )}
         <CloneButton />
         {can(RULE_TURNS_CRUD) && (
           <a key="edit" className="edit-btn" onClick={handleEdit}>
-            <img src="/images/cloud.svg" />
-            {/*<i className="fas fa-pen-square"></i>*/}
+                      {/*<img src="/images/cloud.svg" />*/}
+                      {/*<i className="fas fa-pen-square"></i>*/}
+
+                      <EditIcon />
+
+
           </a>
         )}
         {can(RULE_TURNS_CRUD) && (
           <a key="delete" className="delete-btn" onClick={handleDelete}>
-            <img src="/images/delete.svg" />
+            {/*<img src="/images/delete.svg" />*/}
             {/*<i className="fas fa-trash-alt"></i>*/}
+
+            <DeleteIcon />
+
           </a>
         )}
       </div>

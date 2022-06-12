@@ -143,19 +143,22 @@ const ParagraphOriginal = ({
     };
   }, [paragraphEl]);
 
-  return (
-    <p className="paragraphText original-text" ref={paragraphEl} style={style}>
-      {/* {!!topQuotesCount && (
-        <span className="top-quotes-counter">{topQuotesCount}</span>
-      )} */}
-      <ParagraphOriginalTextWrapper
-        arrText={paragraph || []}
-        turnId={turnId}
-      />
-      {/* {!!bottomQuotesCount && (
-        <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
-      )} */}
-    </p>
+    return (
+        <p className="wrapperParagraphText">
+          <p className="paragraphText original-text" ref={paragraphEl} style={style}>
+          {/* {!!topQuotesCount && (
+            <span className="top-quotes-counter">{topQuotesCount}</span>
+          )} */}
+          <ParagraphOriginalTextWrapper
+            arrText={paragraph || []}
+            turnId={turnId}
+          />
+          {/* {!!bottomQuotesCount && (
+            <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
+          )} */}
+            </p>
+        </p>
+
   );
 };
 

@@ -18,8 +18,8 @@ $black-color: rgb(0, 0, 0);
     background-color: rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: $turn-corners-radius + 1;
+    border-top-right-radius: $turn-corners-radius + 1;
 
 
     &.dont-show-header {
@@ -57,6 +57,7 @@ $black-color: rgb(0, 0, 0);
     .picture-content {
         z-index: 1;
         position: relative;
+        padding: 24px;
 
         img {
             width: 100%;
@@ -66,7 +67,7 @@ $black-color: rgb(0, 0, 0);
             outline: 4px solid blue;
         }
         /* height: 100%; */
-        background: $black-color;
+        background: $turn-main-color;
 
         img {
             width: 100%;
@@ -130,7 +131,7 @@ $black-color: rgb(0, 0, 0);
     }
 
     .paragraphText::-webkit-scrollbar-thumb {
-        background-color: $additional-color;
+        background-color: $turn-scrollbar-color;
         border-radius: 8px;
     }
 
@@ -163,6 +164,33 @@ $black-color: rgb(0, 0, 0);
         background-color: rgba(255, 255, 255, 0.7);
         padding: 20px;
     }
+}
+
+
+/*.wrapperParagraphText::-webkit-scrollbar {
+    width: 0;
+    height: 79px;
+}*/
+
+.wrapperParagraphText::-webkit-scrollbar {
+    width: 0;
+    height: 8px;
+}
+
+
+/*.wrapperParagraphText::-webkit-scrollbar-thumb {
+    background-color: $turn-scrollbar-color;
+    border-radius: 8px;
+}*/
+
+
+
+.wrapperParagraphText {
+    padding: 0 25px 0 0;
+    display: block;
+    overflow-y: scroll;
+    background: $turn-main-color;
+    margin: 0;
 }
 
 .picture-react-crop {
@@ -271,7 +299,7 @@ $black-color: rgb(0, 0, 0);
         transition: 0.2s;
         // font-size: 22px;
         display: inline-block;
-        margin-left: 14px;
+        //margin-left: 14px;
         cursor: pointer;
     }
 
@@ -302,18 +330,24 @@ $black-color: rgb(0, 0, 0);
     a.cut-btn:hover {
         color: rgb(255, 92, 92);
     }
+
 }
 .paragraphText {
-    background-color: $turn-main-text-bg-color;
+    font-family: 'Nunito';
+    font-style: normal;
+    background-color: $turn-main-color;
     min-height: 0;
     width: 100%;
     max-height: 100%;
     // flex: 1;
     overflow-x: auto;
     overflow-y: scroll;
-    padding: 5px 15px 15px 15px;
+    padding: 5px 15px 15px 25px;
     font-size: 1.15rem;
-    color: #CBCBCB;
+    color: $turn-paragraph-text-color;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 120%;
     // border-bottom-left-radius: 10px;
 }
 
@@ -426,7 +460,7 @@ $black-color: rgb(0, 0, 0);
     font-weight: 600;
     font-size: 16px;
     line-height: 100%;
-    color: #1FA2FF !important;
+    color: $turn-header-link-color !important;
     text-decoration: none;
     display: inline-block;
     background: url(/images/mod_site.svg) 0 50% no-repeat;
@@ -445,7 +479,7 @@ $black-color: rgb(0, 0, 0);
     font-weight: 600;
     font-size: 16px;
     line-height: 100%;
-    color: #8A8A8A;
+    color: $turn-header-date-color;
 }
 
 
@@ -486,6 +520,11 @@ $black-color: rgb(0, 0, 0);
     border-radius: 0 0 20px 20px;
 }
 
+.turn-img {
+    border-radius: 10px;
+}
+
+
 /*.body_mod::-webkit-scrollbar {
     width: 0;
     height: 8px;
@@ -500,9 +539,7 @@ $black-color: rgb(0, 0, 0);
     width: 6px;
     height: 79px;
 }*/
-
-
-.body_mod_img {
+.body_mod {
     margin-bottom: 16px;
 
     img {
@@ -520,12 +557,12 @@ $black-color: rgb(0, 0, 0);
 .mod_icon_wrap {
     position: absolute;
     right: $turn-menu-right-spacing;
-    width: 120px;
+    width: auto;
     text-align: center;
     //background: #8A8A8A;
-    background: #252526;
+    background: $turn-upper-menu-color;
     border-radius: 20px;
-    padding: 0 0 5px 0;
+    padding: 0 12px 0 12px;
     top: -18px;
 }
 
@@ -533,6 +570,26 @@ $black-color: rgb(0, 0, 0);
     display: inline-block;
     margin: 0 4px;
 }
+
+
+.edit-btn path {
+    fill: $turn-edit-icon-color;
+}
+
+.cut-btn path {
+    fill: $turn-scissor-icon-color;
+}
+
+.delete-btn path {
+    fill: $turn-delete-icon-color;
+}
+
+.clone-btn path {
+    fill: $turn-copy-icon-color;
+}
+
+
+
 
 /* Ipad*/
 /*@media screen and (max-width: 768px) {

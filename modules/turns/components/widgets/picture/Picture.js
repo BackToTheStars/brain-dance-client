@@ -120,8 +120,10 @@ const Picture = ({
         //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
         //     : quotes
         // }
-      />
-      <img src={imageUrlToRender} ref={imgEl} />
+       />
+
+      <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
+
       <a
         className="widget-button"
         href="#"

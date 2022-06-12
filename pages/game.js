@@ -9,7 +9,10 @@ const GamePage = () => {
   const router = useRouter();
   const { hash } = router?.query;
   return (
-    <>
+      <>
+
+      <link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet'></link>
+
       <div
         style={{
           width: '100vw',

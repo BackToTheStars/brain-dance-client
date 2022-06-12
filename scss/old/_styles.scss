@@ -40,13 +40,15 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-top: 19px;
+  padding-bottom:6px;
 }
 
 .headerText {
     //background-color: lightgrey;
-    background-color: $turn-header-text-bg-color;
-    border-top-left-radius: $corners-radius;
-    border-top-right-radius: $corners-radius;
+    background-color: $turn-header-color;
+    border-top-left-radius: $turn-corners-radius;
+    border-top-right-radius: $turn-corners-radius;
     margin-bottom: 0;
     min-height: 0;
     /* max-height: 30%;  */
@@ -54,10 +56,13 @@ body {
     overflow-x: auto;
     width: 100%;
     padding: 6px 15px 6px 15px;
-    font-size: 1.45rem;
+    font-size: 24px;
+    font-family: 'Nunito';
+    font-style: normal;
+    font-weight: 600;
     flex-grow: 0;
     flex-shrink: 0;
-    color: #CBCBCB;
+    color: $turn-header-text-color;
 }
 
 .gameMenu {
