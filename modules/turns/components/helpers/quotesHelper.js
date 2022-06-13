@@ -106,7 +106,8 @@ export const getScrolledQuotes = (
   passedScrollPosition
 ) => {
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
-  const turnRect = paragraphEl.current.parentNode.getBoundingClientRect();
+  const turnRect =
+    paragraphEl.current.parentNode.parentNode.getBoundingClientRect();
   const topGap = paragraphRect.top - turnRect.top;
 
   return quotes.map((quote) => {

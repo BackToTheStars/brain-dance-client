@@ -12,7 +12,6 @@ import {
 import { ParagraphOriginalTextWrapper } from './TextWrappers';
 // import { useTurnData } from '../contexts/TurnData';
 
-
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
@@ -33,8 +32,6 @@ const ParagraphOriginal = ({
   scrollPosition,
   width,
   height,
-
-  
 }) => {
   //
   // const { lineEnds, dispatch } = useTurnData() || {};
@@ -77,26 +74,16 @@ const ParagraphOriginal = ({
     // полностью пересчитываем расположение цитат
     const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
     setQuotesWithoutScroll(quotes);
-    setParagraphQuotes(
-      getScrolledQuotes(
-        quotes,
-        paragraphEl,
-        scrollTop
-      )
-    )
-  }, [width])
+    setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
+  }, [width]);
 
   useEffect(() => {
-    if (!quotesWithoutScroll.length) return; 
+    if (!quotesWithoutScroll.length) return;
     // обновляем только вертикальное расположение цитат
     setParagraphQuotes(
-      getScrolledQuotes(
-        quotesWithoutScroll,
-        paragraphEl,
-        scrollTop
-      )
-    )
-  }, [height, scrollTop])
+      getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
+    );
+  }, [height, scrollTop]);
 
   useEffect(() => {
     if (paragraphEl?.current) setParagraphElCurrent(paragraphEl.current);
@@ -122,7 +109,7 @@ const ParagraphOriginal = ({
           );
           // @todo: сообщить сервисам минимапа и линий
         });
-       
+
         // dispatch({
         //   type: ACTION_TURN_WAS_CHANGED,
         //   payload: {
@@ -143,22 +130,25 @@ const ParagraphOriginal = ({
     };
   }, [paragraphEl]);
 
-    return (
-        <p className="wrapperParagraphText">
-          <p className="paragraphText original-text" ref={paragraphEl} style={style}>
-          {/* {!!topQuotesCount && (
+  return (
+    <p className="wrapperParagraphText">
+      <p
+        className="paragraphText original-text"
+        ref={paragraphEl}
+        style={style}
+      >
+        {/* {!!topQuotesCount && (
             <span className="top-quotes-counter">{topQuotesCount}</span>
           )} */}
-          <ParagraphOriginalTextWrapper
-            arrText={paragraph || []}
-            turnId={turnId}
-          />
-          {/* {!!bottomQuotesCount && (
+        <ParagraphOriginalTextWrapper
+          arrText={paragraph || []}
+          turnId={turnId}
+        />
+        {/* {!!bottomQuotesCount && (
             <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
           )} */}
-            </p>
-        </p>
-
+      </p>
+    </p>
   );
 };
 
