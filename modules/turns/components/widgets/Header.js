@@ -6,31 +6,22 @@ import {
   PANEL_TURN_INFO,
 } from '@/modules/panels/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import React, {
-  useRef,
-  useEffect,
-  useMemo,
-  useState,
-  useDebugValue,
-} from 'react';
-import { useDispatch } from 'react-redux';
-import { deleteTurn } from '../../redux/actions';
+import React, { useRef, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { cloneTurn, deleteTurn } from '../../redux/actions';
 import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
 // import { HEADER_HEIGHT } from '@/components/const';
 const HEADER_HEIGHT = 105;
 
-const CloneButton = () => {
+const CloneButton = ({ handleClone }) => {
   // const { copyPasteActions: { clone } } = useTurnData();
-  const handleClone = async (e) => {
-    e.preventDefault();
-    // clone();
-  };
+
   return (
     <a key="clone" className="clone-btn" onClick={handleClone}>
-          {/*<i className="fas fa-clone"></i>*/}
-          <CopyIcon />
+      {/*<i className="fas fa-clone"></i>*/}
+      <CopyIcon />
 
-          {/*<img src="/images/document.svg" />*/}
+      {/*<img src="/images/document.svg" />*/}
     </a>
   );
 };
@@ -48,6 +39,7 @@ const Header = ({
   const { can } = useUserContext();
   const remove = () => {};
   const dispatch = useDispatch();
+  const turn = useSelector((state) => state.turns.d[_id]);
 
   const style = useMemo(() => {
     let style = {
@@ -64,7 +56,7 @@ const Header = ({
     // dispatch(setTurnToEdit(_id));
   };
 
-  const handleCut = async (e) => {
+  const handleCut = (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
       clone();
@@ -88,6 +80,11 @@ const Header = ({
     );
   };
 
+  const handleClone = (e) => {
+    e.preventDefault();
+    dispatch(cloneTurn(turn));
+  };
+
   useEffect(() => {
     registerHandleResize({
       type: 'header',
@@ -104,22 +101,19 @@ const Header = ({
       <div className="mod_icon_wrap">
         {can(RULE_TURNS_CRUD) && (
           <a key="cut" className="cut-btn" onClick={handleCut}>
-                      {/*<img src="/images/scissor.svg" />*/}
-                      {/*<i className="fas fa-cut"></i>*/}
+            {/*<img src="/images/scissor.svg" />*/}
+            {/*<i className="fas fa-cut"></i>*/}
 
             <ScissorIcon />
-
           </a>
         )}
-        <CloneButton />
+        <CloneButton handleClone={handleClone} />
         {can(RULE_TURNS_CRUD) && (
           <a key="edit" className="edit-btn" onClick={handleEdit}>
-                      {/*<img src="/images/cloud.svg" />*/}
-                      {/*<i className="fas fa-pen-square"></i>*/}
+            {/*<img src="/images/cloud.svg" />*/}
+            {/*<i className="fas fa-pen-square"></i>*/}
 
-                      <EditIcon />
-
-
+            <EditIcon />
           </a>
         )}
         {can(RULE_TURNS_CRUD) && (
@@ -128,7 +122,6 @@ const Header = ({
             {/*<i className="fas fa-trash-alt"></i>*/}
 
             <DeleteIcon />
-
           </a>
         )}
       </div>

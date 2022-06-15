@@ -7,6 +7,13 @@ import {
   deleteTurnRequest,
   updateTurnRequest,
 } from '../requests';
+import {
+  dataCopy,
+  fieldRemover,
+  saveTurnInBuffer,
+} from '../components/helpers/dataCopier';
+import turnSettings from '../settings';
+import { addNotification } from '@/modules/ui/redux/actions';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -100,4 +107,56 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
     });
     callbacks?.success();
   });
+};
+
+export const cloneTurn = (turn) => (dispatch, getState) => {
+  // e.preventDefault();
+
+  const state = getState();
+  const lines = state.lines.lines;
+
+  const copiedTurn = dataCopy(turn);
+  // @todo: проверить, откуда появляется _id в quotes
+  copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
+    id: quote.id,
+    type: quote.type,
+    text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+    x: quote.x,
+    y: quote.y,
+    height: quote.height,
+    width: quote.width,
+  }));
+
+  copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
+  const copiedTurnId = copiedTurn._id;
+
+  const { fieldsToClone } = turnSettings;
+
+  fieldRemover(copiedTurn, fieldsToClone); // передали {ход} и [сохраняемые поля]
+
+  const linesFieldsToKeep = [
+    'sourceMarker',
+    'sourceTurnId',
+    'targetMarker',
+    'targetTurnId',
+    'type',
+  ];
+
+  const copiedLines = dataCopy(
+    lines.filter(
+      (line) =>
+        line.sourceTurnId === copiedTurnId || line.targetTurnId === copiedTurnId
+    )
+  );
+  copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
+
+  saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
+
+  dispatch(
+    addNotification({
+      title: 'Info:',
+      text: 'Turn was copied, ready to paste',
+    })
+  );
+  // { title: 'Info:', text: 'Field has been saved' }
 };

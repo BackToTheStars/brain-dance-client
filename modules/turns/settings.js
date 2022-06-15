@@ -106,6 +106,25 @@ const fieldSettings = {
 
 const fieldsToShow = Object.keys(fieldSettings); // возвращает массив строк-ключей объекта
 
+const fieldsToClone = [
+  'originalId',
+  'header',
+  'dontShowHeader',
+  'imageUrl',
+  'videoUrl',
+  'date',
+  'sourceUrl',
+  'backgroundColor',
+  'fontColor',
+
+  'contentType',
+  'paragraph',
+  'quotes',
+  'scrollPosition',
+  'height',
+  'width',
+];
+
 const turnSettings = {
   TEMPLATE_ZERO_POINT,
   TEMPLATE_PICTURE,
@@ -127,6 +146,7 @@ const turnSettings = {
   templatesToShow,
   fieldSettings,
   fieldsToShow,
+  fieldsToClone,
 };
 
 export default turnSettings;
