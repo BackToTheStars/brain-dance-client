@@ -12,6 +12,11 @@ import {
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { loadTurns } from '@/modules/turns/redux/actions';
+import {
+  getLinesNotExpired,
+  getTimestampsNotExpired,
+  getTurnsFromBuffer,
+} from '@/modules/turns/components/helpers/dataCopier';
 
 export const loadFullGame = (hash) => (dispatch) => {
   // GET GAME DATA
@@ -74,4 +79,18 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
   });
 
   saveGamePositionRequest(gamePosition);
+};
+
+export const loadTurnsAndLinesToPaste = () => (dispatch) => {
+  dispatch({
+    type: turnsTypes.TURNS_LOAD_TO_PASTE,
+    payload: { turnsToPaste: getTurnsFromBuffer() },
+  });
+  dispatch({
+    type: linesTypes.LINES_LOAD_TO_PASTE,
+    payload: { linesToPaste: getLinesNotExpired() },
+  });
+  console.log(getTimestampsNotExpired());
+  console.log(getLinesNotExpired());
+  console.log(getTurnsFromBuffer());
 };

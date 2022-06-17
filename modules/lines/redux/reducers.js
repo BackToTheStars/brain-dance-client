@@ -5,6 +5,7 @@ const initialLinesState = {
   linesWithEndCoords: [],
   quotesInfo: {},
   error: null,
+  linesToPaste: [],
 };
 
 export const linesReducer = (state = initialLinesState, { type, payload }) => {
@@ -14,16 +15,19 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         ...state,
         lines: payload,
       };
+
     case types.LINES_ADDED:
       return {
         ...state,
         lines: [...state.lines, ...payload],
       };
+
     case types.LINE_DELETE:
       return {
         ...state,
         lines: state.lines.filter((line) => line._id !== payload.id),
       };
+
     case types.LINES_DELETE:
       const d = {};
       for (let id of payload.ids) {
@@ -33,11 +37,13 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         ...state,
         lines: state.lines.filter((line) => !d[line._id]),
       };
+
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {
         ...state,
         linesWithEndCoords: payload,
       };
+
     case types.LINES_QUOTE_COORDS_UPDATE:
       const { turnId, quotesWithCoords, type } = payload;
       return {
@@ -52,6 +58,11 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
           ],
         },
       };
+
+    case types.LINES_LOAD_TO_PASTE: {
+      return { ...state, linesToPaste: payload.linesToPaste };
+    }
+
     default:
       return state;
   }

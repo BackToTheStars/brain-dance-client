@@ -46,7 +46,7 @@ const removeFromLocalStorage = (field) => {
   localStorage.removeItem(field);
 };
 
-const getLinesNotExpired = () => {
+export const getLinesNotExpired = () => {
   const lines = loadFromLocalStorage('savedLinesToPaste') || {};
   const linesNotExpired = {};
   for (const lineKey in lines) {
@@ -59,7 +59,7 @@ const getLinesNotExpired = () => {
   return linesNotExpired;
 };
 
-const getTurnsFromBuffer = () => {
+export const getTurnsFromBuffer = () => {
   const timeStamps = loadFromLocalStorage('timeStamps') || [];
   return timeStamps.map((timeStamp) => ({
     ...loadFromLocalStorage(`turn_${timeStamp}`),
@@ -77,7 +77,7 @@ const getTurnFromBufferAndRemove = (timeStamp) => {
   return res;
 };
 
-const getTimestampsNotExpired = () => {
+export const getTimestampsNotExpired = () => {
   const timeStamps = loadFromLocalStorage('timeStamps') || [];
   const turns = getTurnsFromBuffer();
   const timeStampsNotExpired = turns

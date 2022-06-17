@@ -14,6 +14,7 @@ import {
 } from '../components/helpers/dataCopier';
 import turnSettings from '../settings';
 import { addNotification } from '@/modules/ui/redux/actions';
+import { loadTurnsAndLinesToPaste } from '@/modules/game/game-redux/actions';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -110,53 +111,65 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
 };
 
 export const cloneTurn = (turn) => (dispatch, getState) => {
-  // e.preventDefault();
+  return new Promise((resolve, reject) => {
+    try {
+      // e.preventDefault();
 
-  const state = getState();
-  const lines = state.lines.lines;
+      const state = getState();
+      const lines = state.lines.lines;
 
-  const copiedTurn = dataCopy(turn);
-  // @todo: проверить, откуда появляется _id в quotes
-  copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
-    id: quote.id,
-    type: quote.type,
-    text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
-    x: quote.x,
-    y: quote.y,
-    height: quote.height,
-    width: quote.width,
-  }));
+      const copiedTurn = dataCopy(turn);
+      // @todo: проверить, откуда появляется _id в quotes
+      copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
+        id: quote.id,
+        type: quote.type,
+        text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+        x: quote.x,
+        y: quote.y,
+        height: quote.height,
+        width: quote.width,
+      }));
 
-  copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
-  const copiedTurnId = copiedTurn._id;
+      copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
+      const copiedTurnId = copiedTurn._id;
 
-  const { fieldsToClone } = turnSettings;
+      const { fieldsToClone } = turnSettings;
 
-  fieldRemover(copiedTurn, fieldsToClone); // передали {ход} и [сохраняемые поля]
+      fieldRemover(copiedTurn, fieldsToClone); // передали {ход} и [сохраняемые поля]
 
-  const linesFieldsToKeep = [
-    'sourceMarker',
-    'sourceTurnId',
-    'targetMarker',
-    'targetTurnId',
-    'type',
-  ];
+      const linesFieldsToKeep = [
+        'sourceMarker',
+        'sourceTurnId',
+        'targetMarker',
+        'targetTurnId',
+        'type',
+      ];
 
-  const copiedLines = dataCopy(
-    lines.filter(
-      (line) =>
-        line.sourceTurnId === copiedTurnId || line.targetTurnId === copiedTurnId
-    )
-  );
-  copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
+      const copiedLines = dataCopy(
+        lines.filter(
+          (line) =>
+            line.sourceTurnId === copiedTurnId ||
+            line.targetTurnId === copiedTurnId
+        )
+      );
+      copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
 
-  saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
+      saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
 
-  dispatch(
-    addNotification({
-      title: 'Info:',
-      text: 'Turn was copied, ready to paste',
-    })
-  );
-  // { title: 'Info:', text: 'Field has been saved' }
+      dispatch(loadTurnsAndLinesToPaste());
+
+      dispatch(
+        addNotification({
+          title: 'Info:',
+          text: 'Turn was copied, ready to paste',
+        })
+      );
+
+      resolve();
+
+      // { title: 'Info:', text: 'Field has been saved' }
+    } catch (err) {
+      reject(err);
+    }
+  });
 };

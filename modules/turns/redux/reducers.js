@@ -7,6 +7,7 @@ const initialTurnsState = {
   error: null,
   zeroPointId: null,
   updateGeometryTime: 0,
+  turnsToPaste: [],
 };
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
@@ -112,6 +113,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         d: preparedD,
         updateGeometryTime: new Date().getTime(),
       };
+    }
+
+    case types.TURNS_LOAD_TO_PASTE: {
+      return { ...state, turnsToPaste: payload.turnsToPaste };
     }
 
     default:

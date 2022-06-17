@@ -1,5 +1,8 @@
 import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
-import { loadFullGame } from '@/modules/game/game-redux/actions';
+import {
+  loadFullGame,
+  loadTurnsAndLinesToPaste,
+} from '@/modules/game/game-redux/actions';
 import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
@@ -46,6 +49,7 @@ const Game = ({ hash }) => {
       viewportGeometryUpdateQueue.add(update);
     });
     update();
+    dispatch(loadTurnsAndLinesToPaste());
   }, []);
 
   useEffect(() => {

@@ -16,7 +16,9 @@ const GameMode = () => {
   //
   const router = useRouter();
   const { can } = useUserContext();
-  const isTurnInBuffer = false;
+  const isTurnInBuffer = useSelector(
+    (state) => !!state.turns.turnsToPaste.length
+  );
   const d = useSelector((state) => state.turns.d);
   const zeroPointId = useSelector((state) => state.turns.zeroPointId);
   const zeroPoint = d[zeroPointId];

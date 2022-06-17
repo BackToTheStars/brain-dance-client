@@ -37,7 +37,6 @@ const Header = ({
 }) => {
   const headerEl = useRef(null);
   const { can } = useUserContext();
-  const remove = () => {};
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[_id]);
 
@@ -59,9 +58,11 @@ const Header = ({
   const handleCut = (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
-      clone();
+      // clone();
       // confirm - глобальная функция браузера
-      remove();
+      dispatch(cloneTurn(turn)).then(() => {
+        dispatch(deleteTurn(_id));
+      });
     }
   };
 
