@@ -9,6 +9,7 @@ import {
   PANEL_CLASSES,
   PANEL_INFO,
   PANEL_MINIMAP,
+  PANEL_TURNS_PASTE,
 } from '../../settings';
 import { Buttons } from '../ButtonsPanel';
 
@@ -80,15 +81,7 @@ const GameMode = () => {
     {
       text: 'Paste Turn',
       callback: () => {
-        // insertTurnFromBuffer(null, {
-        //   successCallback: () => {
-        //     console.log('success inserted turn from buffer');
-        //   },
-        //   errorCallback: (message) => {
-        //     console.log(message);
-        //   },
-        // });
-        // setPanelType(PANEL_PASTE);
+        dispatch(togglePanel({ type: PANEL_TURNS_PASTE }));
       },
       show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer,
     },

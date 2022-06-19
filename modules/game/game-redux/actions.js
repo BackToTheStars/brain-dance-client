@@ -71,8 +71,6 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
       };
     }); // ход был изменён, сохранить только его
 
-  console.log({ changedTurns });
-
   updateCoordinatesRequest(changedTurns).then((data) => {
     dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
@@ -90,7 +88,4 @@ export const loadTurnsAndLinesToPaste = () => (dispatch) => {
     type: linesTypes.LINES_LOAD_TO_PASTE,
     payload: { linesToPaste: getLinesNotExpired() },
   });
-  console.log(getTimestampsNotExpired());
-  console.log(getLinesNotExpired());
-  console.log(getTurnsFromBuffer());
 };

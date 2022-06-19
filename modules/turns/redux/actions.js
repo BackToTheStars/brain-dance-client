@@ -10,6 +10,7 @@ import {
 import {
   dataCopy,
   fieldRemover,
+  getTurnFromBufferAndRemove,
   saveTurnInBuffer,
 } from '../components/helpers/dataCopier';
 import turnSettings from '../settings';
@@ -172,4 +173,97 @@ export const cloneTurn = (turn) => (dispatch, getState) => {
       reject(err);
     }
   });
+};
+
+export const insertTurnFromBuffer =
+  (timeStamp, { successCallback, errorCallback }) =>
+  (dispatch) => {
+    // const copiedTurn = getTurnFromBufferAndRemove(
+    //   timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
+    // );
+    // if (!copiedTurn) {
+    //   errorCallback('No turn in buffer');
+    //   return false;
+    // }
+    // // @todo: get lines, connected with copied turn and display them
+    // createTurn(copiedTurn, {
+    //   successCallback: (data) => {
+    //     const turn = data.item;
+    //     // console.log({ copiedTurn,  turn, savedLinesToPaste });
+    //     // оставить только те линии, которые связаны с turn по originalId
+    //     const sourceLines = [];
+    //     const targetLines = [];
+    //     const turnsDict = {};
+    //     const lineKeys = Object.keys(savedLinesToPaste)
+    //       .filter((lineKey) => lineKey.indexOf(`${turn.originalId}`) !== -1)
+    //       .forEach((lineKey) => {
+    //         // составить набор id из противоположных концов линий
+    //         const line = savedLinesToPaste[lineKey];
+    //         if (line.sourceTurnId === turn.originalId) {
+    //           sourceLines.push(line);
+    //           turnsDict[line.targetTurnId] = [];
+    //         } else {
+    //           targetLines.push(line);
+    //           turnsDict[line.sourceTurnId] = [];
+    //         }
+    //       });
+    //     // найти все шаги игры, которые имеют id или originalId из набора
+    //     // {
+    //     //   <turnId>: [
+    //     //     {_id: <turnId>, ...},
+    //     //     {_id: <turnId2>, originalId: <turnId>...},
+    //     //     {_id: <turnId3>, originalId: <turnId>...},
+    //     //     {_id: <turnId4>, originalId: <turnId>...},
+    //     //   ]
+    //     // }
+    //     for (let turn of turns) {
+    //       if (turnsDict[turn._id]) {
+    //         turnsDict[turn._id].push(turn);
+    //       }
+    //       if (turnsDict[turn.originalId]) {
+    //         turnsDict[turn.originalId].push(turn);
+    //       }
+    //     }
+    //     // ещё раз отфильтровать линии, оставить только те, что с двумя концами
+    //     const lines = [];
+    //     for (let sourceLine of sourceLines) {
+    //       if (turnsDict[sourceLine.targetTurnId]?.length) {
+    //         // @learn массив есть и он не пустой
+    //         for (let targetTurn of turnsDict[sourceLine.targetTurnId]) {
+    //           lines.push({
+    //             ...sourceLine,
+    //             sourceTurnId: turn._id,
+    //             targetTurnId: targetTurn._id,
+    //           });
+    //         }
+    //       }
+    //     }
+    //     for (let targetLine of targetLines) {
+    //       if (turnsDict[targetLine.sourceTurnId]?.length) {
+    //         // @learn массив есть и он не пустой
+    //         for (let sourceTurn of turnsDict[targetLine.sourceTurnId]) {
+    //           lines.push({
+    //             ...targetLine,
+    //             targetTurnId: turn._id,
+    //             sourceTurnId: sourceTurn._id,
+    //           });
+    //         }
+    //       }
+    //     }
+    //     !!lines.length &&
+    //       createLines(lines, {
+    //         successCallback: (data) => {
+    //           turnsDispatch({ type: ACTION_LINES_CREATE, payload: data.items });
+    //         },
+    //       });
+    //     // console.log(lines);
+    //     // преобразовать sourceTurnId и targetTurnId и вставить линии
+    //   },
+    //   errorCallback,
+    // });
+  };
+
+export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
+  getTurnFromBufferAndRemove(timeStamp);
+  dispatch(loadTurnsAndLinesToPaste());
 };

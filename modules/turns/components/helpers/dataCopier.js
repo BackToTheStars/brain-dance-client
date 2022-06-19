@@ -67,7 +67,7 @@ export const getTurnsFromBuffer = () => {
   }));
 };
 
-const getTurnFromBufferAndRemove = (timeStamp) => {
+export const getTurnFromBufferAndRemove = (timeStamp) => {
   const res = loadFromLocalStorage(`turn_${timeStamp}`);
   removeFromLocalStorage(`turn_${timeStamp}`);
   let timeStamps = loadFromLocalStorage('timeStamps') || [];

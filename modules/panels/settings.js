@@ -17,6 +17,7 @@ import Minimap from '../minimap/components/Minimap';
 import Notifications from '../ui/components/Notifications';
 import LinesPanel from './components/LinesPanel';
 import TurnInfo from '../turns/components/TurnInfo';
+import PasteTurnPanel from './components/PasteTurnPanel';
 
 export const POSITION_UPPER_LEFT = 'position_upper_left';
 export const POSITION_UPPER_CENTER = 'position_upper_center';
@@ -36,6 +37,7 @@ export const PANEL_MINIMAP = 'panel_minimap';
 export const PANEL_NOTIFICATIONS = 'panel_notifications';
 export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
+export const PANEL_TURNS_PASTE = 'panel_turns_paste';
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
@@ -125,5 +127,13 @@ export const panels = [
     isDisplayed: false,
     id: (id += 1),
     width: () => `640px`,
+  },
+  {
+    type: PANEL_TURNS_PASTE,
+    position: POSITION_BOTTOM_CENTER,
+    component: PasteTurnPanel,
+    isDisplayed: false,
+    id: (id += 1),
+    width: () => `50vw`,
   },
 ];
