@@ -2,7 +2,10 @@ import { useEffect } from 'react';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { removeTurnFromBuffer } from '@/modules/turns/redux/actions';
+import {
+  insertTurnFromBuffer,
+  removeTurnFromBuffer,
+} from '@/modules/turns/redux/actions';
 // import dynamic from 'next/dynamic';
 
 // const quillHelper = dynamic(
@@ -27,7 +30,6 @@ const PasteTurnPanel = () => {
   const dispatch = useDispatch();
   const getTurnFromBufferAndRemove = () => {};
   const setPanelType = () => {};
-  const insertTurnFromBuffer = () => {};
 
   const { can } = useUserContext();
   // const { insertTurnFromBuffer } = useTurnsCollectionContext();
@@ -72,14 +74,16 @@ const PasteTurnPanel = () => {
                     // className="del-btn"
                     className="btn btn-primary me-2"
                     onClick={() => {
-                      insertTurnFromBuffer(timeStamp, {
-                        successCallback: () => {
-                          console.log('success inserted turn from buffer');
-                        },
-                        errorCallback: (message) => {
-                          console.log(message);
-                        },
-                      });
+                      dispatch(
+                        insertTurnFromBuffer(timeStamp, {
+                          successCallback: () => {
+                            console.log('success inserted turn from buffer');
+                          },
+                          errorCallback: (message) => {
+                            console.log(message);
+                          },
+                        })
+                      );
                     }}
                   >
                     Paste

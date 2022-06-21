@@ -40,3 +40,12 @@ export const lineCreate = (line) => (dispatch) => {
     });
   });
 };
+
+export const linesCreate = (lines) => (dispatch) => {
+  createLinesRequest({ lines }).then((data) => {
+    dispatch({
+      type: types.LINES_ADDED,
+      payload: data.items,
+    });
+  });
+};

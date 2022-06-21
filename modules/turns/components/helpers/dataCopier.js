@@ -102,6 +102,7 @@ let timeStamps = [];
 const setTimeStamps = (newTimeStamps) => {
   timeStamps = newTimeStamps;
 };
+export const getTimeStamps = () => timeStamps; // @todo: проверить, нужна ли функция
 
 // const [timeStamps, setTimeStamps] = useState([]);
 
