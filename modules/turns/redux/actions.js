@@ -18,7 +18,8 @@ import {
 import turnSettings from '../settings';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { loadTurnsAndLinesToPaste } from '@/modules/game/game-redux/actions';
-import { linesCreate } from '@/modules/lines/redux/actions';
+import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
+import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -84,11 +85,15 @@ export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   });
 };
 
-export const deleteTurn = (_id) => (dispatch) => {
-  deleteTurnRequest(_id).then((data) => {
-    dispatch({
-      type: types.TURN_DELETE,
-      payload: _id,
+export const deleteTurn = (_id) => (dispatch, getState) => {
+  const state = getState();
+  const lines = filterLinesByTurnId(state.lines.lines, _id);
+  dispatch(linesDelete(lines.map((line) => line._id))).then(() => {
+    deleteTurnRequest(_id).then((data) => {
+      dispatch({
+        type: types.TURN_DELETE,
+        payload: _id,
+      });
     });
   });
 };
@@ -190,6 +195,7 @@ export const insertTurnFromBuffer =
 
     const zeroPointId = state.turns.zeroPointId;
     const zeroPoint = state.turns.d[zeroPointId];
+    dispatch(loadTurnsAndLinesToPaste());
 
     // // @todo: get lines, connected with copied turn and display them
     dispatch(

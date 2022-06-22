@@ -111,7 +111,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         turns: state.turns.filter((turn) => turn._id !== payload),
         d: preparedD,
-        updateGeometryTime: new Date().getTime(),
+        // updateGeometryTime: new Date().getTime(),
       };
     }
 

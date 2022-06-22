@@ -3,8 +3,9 @@ import { saveField } from '@/modules/game/game-redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { togglePanel } from '../../redux/actions';
+import { setPanelMode, togglePanel } from '../../redux/actions';
 import {
+  MODE_OPERATION_PASTE,
   PANEL_ADD_EDIT_TURN,
   PANEL_CLASSES,
   PANEL_INFO,
@@ -82,6 +83,7 @@ const GameMode = () => {
       text: 'Paste Turn',
       callback: () => {
         dispatch(togglePanel({ type: PANEL_TURNS_PASTE }));
+        dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));
       },
       show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer,
     },
