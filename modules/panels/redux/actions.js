@@ -6,10 +6,10 @@ import {
 } from '../settings';
 import * as types from './types';
 
-export const togglePanel = (panelType) => (dispatch) => {
+export const togglePanel = (payload) => (dispatch) => {
   dispatch({
     type: types.PANEL_TOGGLE,
-    payload: panelType,
+    payload: payload,
   });
 };
 

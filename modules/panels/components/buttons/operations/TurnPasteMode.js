@@ -22,7 +22,7 @@ const TurnPasteMode = () => {
       text: 'Cancel',
       callback: () => {
         dispatch(setPanelMode({ mode: MODE_GAME }));
-        dispatch(togglePanel({ type: PANEL_TURNS_PASTE }));
+        dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
       },
     },
   ];

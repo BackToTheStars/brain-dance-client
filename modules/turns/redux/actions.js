@@ -20,6 +20,8 @@ import { addNotification } from '@/modules/ui/redux/actions';
 import { loadTurnsAndLinesToPaste } from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
+import { togglePanel } from '@/modules/panels/redux/actions';
+import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -196,6 +198,9 @@ export const insertTurnFromBuffer =
     const zeroPointId = state.turns.zeroPointId;
     const zeroPoint = state.turns.d[zeroPointId];
     dispatch(loadTurnsAndLinesToPaste());
+
+    if (timeStamps.length === 1)
+      dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
 
     // // @todo: get lines, connected with copied turn and display them
     dispatch(

@@ -82,7 +82,7 @@ const GameMode = () => {
     {
       text: 'Paste Turn',
       callback: () => {
-        dispatch(togglePanel({ type: PANEL_TURNS_PASTE }));
+        dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: true }));
         dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));
       },
       show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer,
