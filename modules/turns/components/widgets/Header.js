@@ -138,9 +138,9 @@ const Header = ({
         )}
           </div>
           {!!(date || sourceUrl) && <div className="flex_mod">
-              <a href={sourceUrl} className="flex_mod_site" target="_blank">
+              {!!sourceUrl && <a href={sourceUrl} className="flex_mod_site" target="_blank">
                   {getShortLink(sourceUrl)}
-              </a>
+              </a>}
 
               {!!date && <div className="mod_date">{dateFormatter(date)}</div>}
 
