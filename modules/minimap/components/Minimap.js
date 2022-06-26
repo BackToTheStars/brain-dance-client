@@ -79,29 +79,29 @@ const Minimap = () => {
   };
 
   const preparedTurns = turns
-  .map((turn) => ({
-    ...turn,
-    // для получения координаты шага на карте достаточно
-    // сместить его координаты на координаты viewport
-    x: turn.x - left + freeSpaceLeftRight - zeroX,
-    y: turn.y - top + freeSpaceTopBottom - zeroY,
-  }))
-  .map((turn) => {
-    const isTurnInsideViewport = areRectanglesIntersect(turn, {
-      // x: viewport.x,
-      // width: viewport.width,
-      // y: viewport.y,
-      // height: viewport.height,
-      x: viewport.x - viewport.width,
-      width: 3 * viewport.width,
-      y: viewport.y - viewport.height,
-      height: 3 * viewport.height,
-    });
-    return {
+    .map((turn) => ({
       ...turn,
-      isTurnInsideViewport,
-    };
-  });
+      // для получения координаты шага на карте достаточно
+      // сместить его координаты на координаты viewport
+      x: turn.x - left + freeSpaceLeftRight - zeroX,
+      y: turn.y - top + freeSpaceTopBottom - zeroY,
+    }))
+    .map((turn) => {
+      const isTurnInsideViewport = areRectanglesIntersect(turn, {
+        // x: viewport.x,
+        // width: viewport.width,
+        // y: viewport.y,
+        // height: viewport.height,
+        x: viewport.x - viewport.width,
+        width: 3 * viewport.width,
+        y: viewport.y - viewport.height,
+        height: 3 * viewport.height,
+      });
+      return {
+        ...turn,
+        isTurnInsideViewport,
+      };
+    });
 
   const value = {
     position,
@@ -118,8 +118,10 @@ const Minimap = () => {
       // - freeSpaceTopBottom;
       //   const gf = window[Symbol.for('MyGame')].gameField;
 
-      const left = viewport.x - targetXMap + Math.floor(viewport.width / 2) + zeroX;
-      const top = viewport.y - targetYMap + Math.floor(viewport.height / 2) + zeroY;
+      const left =
+        viewport.x - targetXMap + Math.floor(viewport.width / 2) + zeroX;
+      const top =
+        viewport.y - targetYMap + Math.floor(viewport.height / 2) + zeroY;
 
       $(gameBoxEl).addClass('remove-line-transition');
       $(gameBoxEl).animate(
@@ -135,20 +137,10 @@ const Minimap = () => {
               top: -top,
             })
           );
-          //   gf.triggers.dispatch('RECALCULATE_FIELD');
-          //   gf.triggers.dispatch('DRAW_LINES');
-          // turnsDispatch({
-          //   type: ACTION_FIELD_WAS_MOVED,
-          //   payload: {
-          //     left,
-          //     top,
-          //   },
-          // });
           $(gameBoxEl).css('left', 0);
           $(gameBoxEl).css('top', 0);
           setTimeout(() => {
             $(gameBoxEl).removeClass('remove-line-transition');
-
           }, 100);
         }
       );
@@ -307,14 +299,16 @@ const SVGMiniMap = ({
       style={{ width: `${minimapWidth}px` }}
       onClick={(e) => onMapClick(e)}
     >
-      {!!zeroPoint && <rect
-        key={zeroPoint._id}
-        x={zeroPoint.x-20}
-        y={zeroPoint.y-20}
-        width={40}
-        fill={'red'}
-        height={40}
-      />}
+      {!!zeroPoint && (
+        <rect
+          key={zeroPoint._id}
+          x={zeroPoint.x - 20}
+          y={zeroPoint.y - 20}
+          width={40}
+          fill={'red'}
+          height={40}
+        />
+      )}
       {turns.map((turn, i) => {
         // viewport x y width height
         // turn x y width height

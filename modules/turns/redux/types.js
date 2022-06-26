@@ -9,3 +9,5 @@ export const TURNS_LOAD_TO_PASTE = 'turns_load_to_paste';
 export const TURN_CREATE = 'turn_create';
 export const TURN_RESAVE = 'turn_resave';
 export const TURN_DELETE = 'turn_delete';
+
+export const TURN_NEXT_PASTE_POSITION = 'turn_next_paste_position';

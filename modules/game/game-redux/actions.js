@@ -11,7 +11,7 @@ import {
   updateCoordinatesRequest,
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { loadTurns } from '@/modules/turns/redux/actions';
+import { loadTurns, moveField } from '@/modules/turns/redux/actions';
 import {
   getLinesNotExpired,
   getTimestampsNotExpired,
@@ -89,3 +89,38 @@ export const loadTurnsAndLinesToPaste = () => (dispatch) => {
     payload: { linesToPaste: getLinesNotExpired() },
   });
 };
+
+export const centerViewportAtPosition =
+  ({ x, y }) =>
+  (dispatch, getState) => {
+    const state = getState();
+    const position = state.game.position;
+    const viewport = state.ui.viewport;
+
+    const left = position.left - x + Math.floor(viewport.width / 2);
+    const top = position.top - y + Math.floor(viewport.height / 2);
+
+    const gameBoxEl = $('#gameBox');
+
+    gameBoxEl.addClass('remove-line-transition');
+    gameBoxEl.animate(
+      {
+        left: `${left}px`,
+        top: `${top}px`,
+      },
+      300,
+      () => {
+        dispatch(
+          moveField({
+            left: -left,
+            top: -top,
+          })
+        );
+        gameBoxEl.css('left', 0);
+        gameBoxEl.css('top', 0);
+        setTimeout(() => {
+          gameBoxEl.removeClass('remove-line-transition');
+        }, 100);
+      }
+    );
+  };

@@ -8,6 +8,7 @@ const initialTurnsState = {
   zeroPointId: null,
   updateGeometryTime: 0,
   turnsToPaste: [],
+  pasteNextTurnPosition: null,
 };
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
@@ -117,6 +118,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
 
     case types.TURNS_LOAD_TO_PASTE: {
       return { ...state, turnsToPaste: payload.turnsToPaste };
+    }
+
+    case types.TURN_NEXT_PASTE_POSITION: {
+      return { ...state, pasteNextTurnPosition: payload };
     }
 
     default:

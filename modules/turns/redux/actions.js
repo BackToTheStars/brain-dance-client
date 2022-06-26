@@ -17,7 +17,10 @@ import {
 } from '../components/helpers/dataCopier';
 import turnSettings from '../settings';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { loadTurnsAndLinesToPaste } from '@/modules/game/game-redux/actions';
+import {
+  centerViewportAtPosition,
+  loadTurnsAndLinesToPaste,
+} from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { togglePanel } from '@/modules/panels/redux/actions';
@@ -189,6 +192,18 @@ export const insertTurnFromBuffer =
     const copiedTurn = getTurnFromBufferAndRemove(
       timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
     );
+    const { pasteNextTurnPosition } = state.turns;
+    const position = state.game.position;
+    const viewport = state.ui.viewport;
+    if (!!pasteNextTurnPosition) {
+      copiedTurn.x = pasteNextTurnPosition.x;
+      copiedTurn.y = pasteNextTurnPosition.y;
+    } else {
+      copiedTurn.x =
+        position.left + Math.floor((viewport.width - copiedTurn.width) / 2);
+      copiedTurn.y =
+        position.top + Math.floor((viewport.height - copiedTurn.height) / 2);
+    }
 
     if (!copiedTurn) {
       errorCallback('No turn in buffer');
@@ -206,6 +221,19 @@ export const insertTurnFromBuffer =
     dispatch(
       createTurn(copiedTurn, zeroPoint, {
         success: (turn) => {
+          dispatch({
+            type: types.TURN_NEXT_PASTE_POSITION,
+            payload: {
+              x: copiedTurn.x + copiedTurn.width + 40, // вставляет Paste Turn с промежутком от предыдущей вставки
+              y: copiedTurn.y,
+            },
+          });
+          dispatch(
+            centerViewportAtPosition({
+              x: copiedTurn.x + Math.floor(copiedTurn.width / 2),
+              y: copiedTurn.y + Math.floor(copiedTurn.height / 2),
+            })
+          );
           const turnId = copiedTurn.originalId;
           // оставить только те линии, которые связаны с turn по originalId
           const savedLinesToPaste = state.lines.linesToPaste;
@@ -264,4 +292,8 @@ export const insertTurnFromBuffer =
 export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
   getTurnFromBufferAndRemove(timeStamp);
   dispatch(loadTurnsAndLinesToPaste());
+};
+
+export const resetTurnNextPastePosition = () => (dispatch) => {
+  dispatch({ type: types.TURN_NEXT_PASTE_POSITION, payload: null });
 };
