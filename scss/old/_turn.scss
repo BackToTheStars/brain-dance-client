@@ -353,8 +353,8 @@ $black-color: rgb(0, 0, 0);
     padding: $turn-text-padding-top $turn-text-padding-right $turn-text-padding-bottom $turn-text-padding-left;
     font-size: 1.15rem;
     color: $turn-paragraph-text-color;
-    font-weight: 600;
-    font-size: 18px;
+    font-weight: $turn-main-text-font-weight;
+    font-size: $turn-main-text-font-size;
     line-height: 120%;
     // border-bottom-left-radius: 10px;
 }
@@ -530,7 +530,7 @@ $black-color: rgb(0, 0, 0);
 }
 
 .turn-img {
-    border-radius: 10px;
+    border-radius: $turn-pic-radius;
 }
 
 
@@ -597,35 +597,37 @@ $black-color: rgb(0, 0, 0);
     fill: $turn-copy-icon-color;
 }
 
-.clone-btn path:hover {
+.clone-btn:hover path {
     fill: white;
 }
 
-.edit-btn path:hover {
+.edit-btn:hover path {
     fill: white;
 }
 
-.delete-btn path:hover {
+.delete-btn:hover path {
     fill: red;
 }
 
-.cut-btn path:hover {
+.cut-btn:hover path {
     fill: red;
 }
 
 .hide-controls .mod_icon_wrap {
-    opacity: 0;
-    transform: translateY(-100%);
+    /*opacity: 0;
+    transform: translateY(-100%);*/
+    display: none;
 }
 
 .mod_icon_wrap {
-    opacity: 1;
+    /*opacity: 1;
     transform: translateY(0%);
-    transition: all 0.3s;
+    transition: all 0.3s;*/
+    display: block;
 }
 
 /* Ipad*/
-/*@media screen and (max-width: 768px) {
+    /*@media screen and (max-width: 768px) {
     .mod_wrap {
         width: 600px;
     }

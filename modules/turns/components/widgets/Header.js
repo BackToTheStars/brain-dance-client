@@ -19,8 +19,8 @@ import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
 
 import { dateFormatter } from '../../../../old/components/helpers/formatters/dateFormatter';
 import { getShortLink } from '../../../../old/components/helpers/formatters/urlFormatter';
-// import { HEADER_HEIGHT } from '@/components/const';
-const HEADER_HEIGHT = 105;
+import { HEADER_HEIGHT } from '@/config/ui';
+//const HEADER_HEIGHT = 105;
 
 const CloneButton = () => {
   // const { copyPasteActions: { clone } } = useTurnData();

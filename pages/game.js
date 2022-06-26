@@ -20,7 +20,9 @@ const GamePage = () => {
             //background: '#1c1f29',
             overflow: 'hidden',
             position: 'relative',
-        }}
+
+              }}
+            className="game-bg"
       >
         {!hash ? (
           <div style={{ color: '#aaa' }}>Loading...</div>

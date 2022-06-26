@@ -56,10 +56,10 @@ body {
     overflow-x: auto;
     width: 100%;
     padding: $turn-header-padding-top $turn-header-padding-right $turn-header-padding-bottom $turn-header-padding-left;
-    font-size: 24px;
+    font-size: $turn-header-text-font-size;
     font-family: 'Nunito';
     font-style: normal;
-    font-weight: 600;
+    font-weight: $turn-header-text-font-weight;
     flex-grow: 0;
     flex-shrink: 0;
     color: $turn-header-text-color;
