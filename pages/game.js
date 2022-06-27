@@ -13,6 +13,8 @@ const GamePage = () => {
 
       <link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet'></link>
 
+      <div className="circle"></div>
+
       <div
           style={{
             width: '100vw',
@@ -23,7 +25,7 @@ const GamePage = () => {
 
               }}
             className="game-bg"
-      >
+          >
         {!hash ? (
           <div style={{ color: '#aaa' }}>Loading...</div>
         ) : (
@@ -31,7 +33,9 @@ const GamePage = () => {
             <Game hash={hash} />
           </UserProvider>
         )}
-      </div>
+        </div>
+
+
     </>
   );
 };
