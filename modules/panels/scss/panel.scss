@@ -6,6 +6,7 @@
   border-radius: $corners-radius;
   transition: 0.2s;
   color: $white;
+  box-sizing: content-box;
 }
 
 .position_upper_center {
