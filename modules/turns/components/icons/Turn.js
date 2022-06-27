@@ -1,10 +1,14 @@
+import { TURN_ICON_WIDTH, TURN_ICON_HEIGHT  } from '@/config/ui';
+
+
+
 export const CopyIcon = () => {
     return (
 
         <svg
-            width={12}
-            height={14}
-            viewBox="0 0 12 14"
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -22,9 +26,9 @@ export const ScissorIcon = () => {
     return (
 
         <svg
-            width={14}
-            height={14}
-            viewBox="0 0 14 14"
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -42,9 +46,9 @@ export const DeleteIcon = () => {
     return (
 
         <svg
-            width={14}
-            height={14}
-            viewBox="0 0 14 14"
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
@@ -63,9 +67,9 @@ export const EditIcon = () => {
     return (
 
         <svg
-            width={14}
-            height={14}
-            viewBox="0 0 14 14"
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >

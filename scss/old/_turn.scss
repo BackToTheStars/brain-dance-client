@@ -18,8 +18,8 @@ $black-color: rgb(0, 0, 0);
     background-color: rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
-    border-top-left-radius: $turn-corners-radius + 1;
-    border-top-right-radius: $turn-corners-radius + 1;
+    border-top-left-radius: $turn-upper-corners-radius + 1;
+    border-top-right-radius: $turn-upper-corners-radius + 1;
 
 
     &.dont-show-header {
@@ -57,7 +57,7 @@ $black-color: rgb(0, 0, 0);
     .picture-content {
         z-index: 1;
         position: relative;
-        padding: 24px;
+        padding: $turn-pic-padding-top $turn-pic-padding-right $turn-pic-padding-bottom $turn-pic-padding-left;
 
         img {
             width: 100%;
@@ -186,10 +186,18 @@ $black-color: rgb(0, 0, 0);
 
 
 .wrapperParagraphText {
-    padding: 0 25px 0 0;
+    padding: 0 $turn-scrollbar-margin 0 0;
     display: block;
     overflow-y: scroll;
     background: $turn-main-color;
+    margin: 0;
+}
+
+.comment .wrapperParagraphText {
+    padding: 0 $turn-scrollbar-margin 0 0;
+    display: block;
+    overflow-y: scroll;
+    background: rgb(236, 237, 154);
     margin: 0;
 }
 
@@ -342,11 +350,11 @@ $black-color: rgb(0, 0, 0);
     // flex: 1;
     overflow-x: auto;
     overflow-y: scroll;
-    padding: 5px 15px 15px 25px;
+    padding: $turn-text-padding-top $turn-text-padding-right $turn-text-padding-bottom $turn-text-padding-left;
     font-size: 1.15rem;
     color: $turn-paragraph-text-color;
-    font-weight: 600;
-    font-size: 18px;
+    font-weight: $turn-main-text-font-weight;
+    font-size: $turn-main-text-font-size;
     line-height: 120%;
     // border-bottom-left-radius: 10px;
 }
@@ -452,7 +460,7 @@ $black-color: rgb(0, 0, 0);
 .flex_mod {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: $turn-header-url-date-margin-bottom;
     //flex-direction: column;
 }
 
@@ -470,6 +478,7 @@ $black-color: rgb(0, 0, 0);
     &:hover {
         opacity: 0.8;
         transition: 0.3s;
+        color: $turn-header-link-color-hover !important;
     }
 }
 
@@ -521,7 +530,7 @@ $black-color: rgb(0, 0, 0);
 }
 
 .turn-img {
-    border-radius: 10px;
+    border-radius: $turn-pic-radius;
 }
 
 
@@ -562,8 +571,8 @@ $black-color: rgb(0, 0, 0);
     //background: #8A8A8A;
     background: $turn-upper-menu-color;
     border-radius: 20px;
-    padding: 0 12px 0 12px;
-    top: -18px;
+    padding: 0 $turn-upper-menu-padding-right 0 $turn-upper-menu-padding-left;
+    top: -$turn-upper-menu-lift;
 }
 
 .mod_icon_wrap a {
@@ -588,11 +597,37 @@ $black-color: rgb(0, 0, 0);
     fill: $turn-copy-icon-color;
 }
 
+.clone-btn:hover path {
+    fill: white;
+}
 
+.edit-btn:hover path {
+    fill: white;
+}
 
+.delete-btn:hover path {
+    fill: red;
+}
+
+.cut-btn:hover path {
+    fill: red;
+}
+
+.hide-controls .mod_icon_wrap {
+    /*opacity: 0;
+    transform: translateY(-100%);*/
+    display: none;
+}
+
+.mod_icon_wrap {
+    /*opacity: 1;
+    transform: translateY(0%);
+    transition: all 0.3s;*/
+    display: block;
+}
 
 /* Ipad*/
-/*@media screen and (max-width: 768px) {
+    /*@media screen and (max-width: 768px) {
     .mod_wrap {
         width: 600px;
     }

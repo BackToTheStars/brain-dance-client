@@ -84,7 +84,7 @@ const Game = ({ hash }) => {
       <div className="gameFieldWrapper">
         <div
           id="gameBox"
-          className="ui-widget-content"
+          className={`ui-widget-content ${svgLayerZIndex ? "hide-controls" : ""}`}
           ref={gameBox}
           onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
         >

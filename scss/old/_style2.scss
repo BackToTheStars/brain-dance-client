@@ -25,7 +25,29 @@
 body {
   font-size: 1.3rem;
   /* 1.2rem; */
+
+
+
+
 }
+
+/*body {
+    background: #070D11 url(/images/blur.png) center 0 no-repeat;
+    background-size: cover;
+    position: relative;
+    z-index: 100;
+}*/
+
+
+.game-bg {
+    background: #070D11 url(/images/blur.png) center 0 no-repeat;
+    //background-size: 1600px 700px;
+    background-size: cover;
+    position: relative;
+    //z-index: 100;
+}
+
+
 
 .modal-overlay {
   position: fixed;

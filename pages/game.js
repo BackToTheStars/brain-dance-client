@@ -14,13 +14,15 @@ const GamePage = () => {
       <link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet'></link>
 
       <div
-        style={{
-          width: '100vw',
-          height: '100vh',
-          background: '#1c1f29',
-          overflow: 'hidden',
-          position: 'relative',
-        }}
+          style={{
+            width: '100vw',
+            height: '100vh',
+            //background: '#1c1f29',
+            overflow: 'hidden',
+            position: 'relative',
+
+              }}
+            className="game-bg"
       >
         {!hash ? (
           <div style={{ color: '#aaa' }}>Loading...</div>

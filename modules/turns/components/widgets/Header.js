@@ -10,8 +10,11 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cloneTurn, deleteTurn } from '../../redux/actions';
 import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
-// import { HEADER_HEIGHT } from '@/components/const';
-const HEADER_HEIGHT = 105;
+
+import { dateFormatter } from '../../../../old/components/helpers/formatters/dateFormatter';
+import { getShortLink } from '../../../../old/components/helpers/formatters/urlFormatter';
+import { HEADER_HEIGHT } from '@/config/ui';
+//const HEADER_HEIGHT = 105;
 
 const CloneButton = ({ handleClone }) => {
   // const { copyPasteActions: { clone } } = useTurnData();
@@ -34,6 +37,8 @@ const Header = ({
   backgroundColor,
   fontColor,
   dontShowHeader,
+  sourceUrl,
+  date
 }) => {
   const headerEl = useRef(null);
   const { can } = useUserContext();
@@ -125,13 +130,15 @@ const Header = ({
             <DeleteIcon />
           </a>
         )}
-      </div>
-      <div className="flex_mod">
-        <a href="#" className="flex_mod_site">
-          ceur-ws.org
-        </a>
-        <div className="mod_date">8 July 2021</div>
-      </div>
+          </div>
+          {!!(date || sourceUrl) && <div className="flex_mod">
+              {!!sourceUrl && <a href={sourceUrl} className="flex_mod_site" target="_blank">
+                  {getShortLink(sourceUrl)}
+              </a>}
+
+              {!!date && <div className="mod_date">{dateFormatter(date)}</div>}
+
+          </div>}
     </div>
   );
 };

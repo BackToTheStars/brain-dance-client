@@ -39,6 +39,8 @@ const Turn = ({ id }) => {
     backgroundColor,
     fontColor,
     dontShowHeader,
+    sourceUrl,
+    date,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
     //-- video
@@ -202,6 +204,8 @@ const Turn = ({ id }) => {
           fontColor,
           dontShowHeader,
           _id,
+          sourceUrl,
+          date
         }}
       />
       {!!videoUrl && (
