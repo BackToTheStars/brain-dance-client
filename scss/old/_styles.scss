@@ -37,32 +37,33 @@ body {
 }
 
 .headerTextTitle {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-top: $turn-header-text-padding-top;
-    padding-bottom: $turn-header-text-padding-bottom;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: $turn-header-text-padding-top;
+  padding-bottom: $turn-header-text-padding-bottom;
 }
 
 .headerText {
-    //background-color: lightgrey;
-    background-color: $turn-header-color;
-    border-top-left-radius: $turn-upper-corners-radius;
-    border-top-right-radius: $turn-upper-corners-radius;
-    margin-bottom: 0;
-    min-height: 0;
-    /* max-height: 30%;  */
-    overflow-y: auto;
-    overflow-x: auto;
-    width: 100%;
-    padding: $turn-header-padding-top $turn-header-padding-right $turn-header-padding-bottom $turn-header-padding-left;
-    font-size: $turn-header-text-font-size;
-    font-family: 'Nunito';
-    font-style: normal;
-    font-weight: $turn-header-text-font-weight;
-    flex-grow: 0;
-    flex-shrink: 0;
-    color: $turn-header-text-color;
+  //background-color: lightgrey;
+  background-color: $turn-header-color;
+  border-top-left-radius: $turn-upper-corners-radius;
+  border-top-right-radius: $turn-upper-corners-radius;
+  margin-bottom: 0;
+  min-height: 0;
+  /* max-height: 30%;  */
+  overflow-y: hidden;
+  overflow-x: auto;
+  width: 100%;
+  padding: $turn-header-padding-top $turn-header-padding-right
+    $turn-header-padding-bottom $turn-header-padding-left;
+  font-size: $turn-header-text-font-size;
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: $turn-header-text-font-weight;
+  flex-grow: 0;
+  flex-shrink: 0;
+  color: $turn-header-text-color;
 }
 
 .gameMenu {

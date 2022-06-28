@@ -13,7 +13,7 @@ import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
 
 import { dateFormatter } from '../../../../old/components/helpers/formatters/dateFormatter';
 import { getShortLink } from '../../../../old/components/helpers/formatters/urlFormatter';
-import { HEADER_HEIGHT } from '@/config/ui';
+import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 //const HEADER_HEIGHT = 105;
 
 const CloneButton = ({ handleClone }) => {
@@ -38,16 +38,17 @@ const Header = ({
   fontColor,
   dontShowHeader,
   sourceUrl,
-  date
+  date,
 }) => {
   const headerEl = useRef(null);
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[_id]);
+  const headerHeight = !!sourceUrl || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
 
   const style = useMemo(() => {
     let style = {
-      height: `${HEADER_HEIGHT}px`,
+      height: `${headerHeight}px`,
     };
     if (contentType === 'comment' && !dontShowHeader) {
       style = { ...style, backgroundColor, color: fontColor || 'black' };
@@ -96,8 +97,11 @@ const Header = ({
       type: 'header',
       id: 'header1',
       minWidthCallback: () => 300,
-      minHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),
-      maxHeightCallback: () => (dontShowHeader ? 0 : HEADER_HEIGHT),
+      minHeightCallback: () => {
+        console.log({ sourceUrl, date });
+        return dontShowHeader ? 0 : headerHeight;
+      },
+      maxHeightCallback: () => (dontShowHeader ? 0 : headerHeight),
     });
   }, [dontShowHeader]);
 
@@ -130,15 +134,18 @@ const Header = ({
             <DeleteIcon />
           </a>
         )}
-          </div>
-          {!!(date || sourceUrl) && <div className="flex_mod">
-              {!!sourceUrl && <a href={sourceUrl} className="flex_mod_site" target="_blank">
-                  {getShortLink(sourceUrl)}
-              </a>}
+      </div>
+      {!!(date || sourceUrl) && (
+        <div className="flex_mod">
+          {!!sourceUrl && (
+            <a href={sourceUrl} className="flex_mod_site" target="_blank">
+              {getShortLink(sourceUrl)}
+            </a>
+          )}
 
-              {!!date && <div className="mod_date">{dateFormatter(date)}</div>}
-
-          </div>}
+          {!!date && <div className="mod_date">{dateFormatter(date)}</div>}
+        </div>
+      )}
     </div>
   );
 };
