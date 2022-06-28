@@ -40,11 +40,50 @@ body {
 
 
 .game-bg {
-    background: #070D11 url(/images/blur.png) center 0 no-repeat;
+    //background: #070D11 url(/images/blur.png) center 0 no-repeat;
     //background-size: 1600px 700px;
-    background-size: cover;
+    //background-size: cover;
     position: relative;
     //z-index: 100;
+    background: #070D11;
+}
+
+.circle {
+    position: absolute;
+    background: $second-circle-color;
+    height: $second-circle-height;
+    width: $second-circle-width;
+    filter: blur($second-circle-blur);
+    border-radius: 50%;
+    top: $second-circle-top;
+    right: $second-circle-right;
+    z-index: 1;
+}
+
+.game-bg:before {
+    position: absolute;
+    top: $first-circle-top;
+    width: $first-circle-width;
+    height: $first-circle-height;
+    content: '';
+    left: $first-circle-left;
+    border-radius: 50%;
+    box-shadow: 0px 0px 8px 1px #143656;
+    background: $first-circle-color;
+    filter: blur($first-circle-blur);
+}
+
+.game-bg:after {
+    position: absolute;
+    right: $third-circle-right;
+    width: $third-circle-width;
+    height: $third-circle-height;
+    content: '';
+    bottom: $third-circle-bottom;
+    border-radius: 50%;
+    box-shadow: 0px 0px 8px 1px #143656;
+    background: $third-circle-color;
+    filter: blur($third-circle-blur);
 }
 
 
