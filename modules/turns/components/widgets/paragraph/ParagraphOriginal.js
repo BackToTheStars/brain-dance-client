@@ -131,7 +131,7 @@ const ParagraphOriginal = ({
   }, [paragraphEl]);
 
   return (
-    <p className="wrapperParagraphText">
+    <p className="wrapperParagraphText" style={style}>
       <p
         className="paragraphText original-text"
         ref={paragraphEl}

@@ -10,6 +10,7 @@ import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
+import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
@@ -205,7 +206,7 @@ const Turn = ({ id }) => {
           dontShowHeader,
           _id,
           sourceUrl,
-          date
+          date,
         }}
       />
       {!!videoUrl && (
@@ -232,6 +233,11 @@ const Turn = ({ id }) => {
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
         />
+      )}
+      {dontShowHeader && !!date && !!sourceUrl && (
+        <div className="bottom-date-and-sourceurl">
+          <DateAndSourceUrl {...{ date, sourceUrl }} />
+        </div>
       )}
     </div>
   );

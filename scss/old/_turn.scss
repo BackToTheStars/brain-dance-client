@@ -52,6 +52,12 @@ $black-color: rgb(0, 0, 0);
       margin-right: 20px;
     }
   }
+  .bottom-date-and-sourceurl {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    padding-top: $turn-date-and-url-bottom-spacer;
+  }
 
   .picture-content {
     z-index: 1;

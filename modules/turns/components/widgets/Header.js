@@ -11,9 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { cloneTurn, deleteTurn } from '../../redux/actions';
 import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../icons/Turn';
 
-import { dateFormatter } from '../../../../old/components/helpers/formatters/dateFormatter';
-import { getShortLink } from '../../../../old/components/helpers/formatters/urlFormatter';
 import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
+import DateAndSourceUrl from './header/DateAndSourceUrl';
 //const HEADER_HEIGHT = 105;
 
 const CloneButton = ({ handleClone }) => {
@@ -135,17 +134,7 @@ const Header = ({
           </a>
         )}
       </div>
-      {!!(date || sourceUrl) && (
-        <div className="flex_mod">
-          {!!sourceUrl && (
-            <a href={sourceUrl} className="flex_mod_site" target="_blank">
-              {getShortLink(sourceUrl)}
-            </a>
-          )}
-
-          {!!date && <div className="mod_date">{dateFormatter(date)}</div>}
-        </div>
-      )}
+      {!!(date || sourceUrl) && <DateAndSourceUrl {...{ date, sourceUrl }} />}
     </div>
   );
 };
