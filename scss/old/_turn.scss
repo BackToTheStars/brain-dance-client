@@ -20,6 +20,13 @@ $black-color: rgb(0, 0, 0);
   flex-direction: column;
   border-top-left-radius: $turn-upper-corners-radius + 1;
   border-top-right-radius: $turn-upper-corners-radius + 1;
+  border: 2px solid rgba(98, 143, 211, 0.623);
+
+  &:hover {
+    .mod_icon_wrap {
+      opacity: 1;
+    }
+  }
 
   &.dont-show-header {
     &:hover {
@@ -36,10 +43,12 @@ $black-color: rgb(0, 0, 0);
     .headerText {
       position: absolute;
       top: 0;
-      background-color: rgba(255, 255, 255, 0);
+      background-color: rgb(115, 148, 207);
       // transform: translateY(-100%);
       justify-content: flex-end;
+      display: none;
       z-index: 2;
+      font-weight: 500;
     }
 
     .headerTextTitle {
@@ -299,47 +308,6 @@ $black-color: rgb(0, 0, 0);
   /*display: flex;*/
   justify-content: space-between;
   align-items: center;
-
-  .info-btn,
-  .clone-btn,
-  .edit-btn,
-  .cut-btn,
-  .compress-btn,
-  .delete-btn {
-    transition: 0.2s;
-    // font-size: 22px;
-    display: inline-block;
-    //margin-left: 14px;
-    cursor: pointer;
-  }
-
-  a.info-btn,
-  a.delete-btn,
-  a.edit-btn,
-  a.cut-btn,
-  a.compress-btn,
-  a.clone-btn {
-    font-size: 21px;
-    position: relative;
-    top: -0.5px;
-    color: rgb(160, 160, 160);
-    margin-top: 0px;
-  }
-
-  a.info-btn:hover {
-    color: rgb(103, 103, 204);
-  }
-
-  a.clone-btn:hover,
-  a.edit-btn:hover,
-  a.compress-btn:hover {
-    color: rgb(58, 58, 58);
-  }
-
-  a.delete-btn:hover,
-  a.cut-btn:hover {
-    color: rgb(255, 92, 92);
-  }
 }
 .paragraphText {
   font-family: 'Nunito', sans-serif;
@@ -456,25 +424,24 @@ $black-color: rgb(0, 0, 0);
   bottom: 0px;
   transform: translate(100%, 50%);
 }
+.bottom-date-and-sourceurl {
+  .flex_mod {
+    margin-top: 4px;
+    margin-bottom: 0px;
+  }
+}
 
 .flex_mod {
   display: flex;
-  align-items: center;
   margin-bottom: $turn-header-url-date-margin-bottom;
-  //flex-direction: column;
+  align-items: center;
 }
-
 .flex_mod_site {
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 100%;
   color: $turn-header-link-color !important;
   text-decoration: none;
-  display: inline-block;
-  background: url(/images/mod_site.svg) 0 50% no-repeat;
-  padding: 0 0 1px 20px;
-  margin: 0 18px 0 0;
-
+  // background: url(/images/mod_site.svg) 0 50% no-repeat;
+  // padding: 0 0 1px 20px;
+  margin: 0 12px 0 0;
   &:hover {
     opacity: 0.8;
     transition: 0.3s;
@@ -483,12 +450,21 @@ $black-color: rgb(0, 0, 0);
 }
 
 .mod_date {
-  background: url(/images/mod_date.svg) 0 0 no-repeat;
-  padding: 0 0 1px 20px;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 100%;
+  // background: url(/images/mod_date.svg) 0 0 no-repeat;
+  // padding: 0 0 1px 20px;
+
   color: $turn-header-date-color;
+}
+
+.flex_mod_site,
+.mod_date {
+  font-weight: 500;
+  font-size: $turn-header-date-font-size;
+  line-height: 100%;
+  display: inline-block;
+  span {
+    padding-left: 4px;
+  }
 }
 
 .mod_wrap {
@@ -571,6 +547,55 @@ $black-color: rgb(0, 0, 0);
   border-radius: 20px;
   padding: 0 $turn-upper-menu-padding-right 0 $turn-upper-menu-padding-left;
   top: -$turn-upper-menu-lift;
+  opacity: 0;
+  transition: 0.25s;
+
+  font-size: 24px;
+  font-family: 'Nunito', 'sans-serif';
+  font-style: normal;
+  font-weight: 600;
+  color: #ffffff;
+
+  .info-btn,
+  .clone-btn,
+  .edit-btn,
+  .cut-btn,
+  .compress-btn,
+  .delete-btn {
+    transition: 0.2s;
+    // font-size: 22px;
+    display: inline-block;
+    //margin-left: 14px;
+    cursor: pointer;
+  }
+
+  a.info-btn,
+  a.delete-btn,
+  a.edit-btn,
+  a.cut-btn,
+  a.compress-btn,
+  a.clone-btn {
+    font-size: 21px;
+    position: relative;
+    top: -0.5px;
+    color: #6e7e90;
+    margin-top: 0px;
+  }
+
+  a.info-btn:hover {
+    color: rgb(103, 103, 204);
+  }
+
+  a.clone-btn:hover,
+  a.edit-btn:hover,
+  a.compress-btn:hover {
+    color: rgb(58, 58, 58);
+  }
+
+  a.delete-btn:hover,
+  a.cut-btn:hover {
+    color: #d72929;
+  }
 }
 
 .mod_icon_wrap a {
@@ -620,7 +645,9 @@ $black-color: rgb(0, 0, 0);
   /*opacity: 1;
     transform: translateY(0%);
     transition: all 0.3s;*/
-  display: block;
+  display: flex;
+  height: 30px;
+  align-items: center;
 }
 
 /* Ipad*/

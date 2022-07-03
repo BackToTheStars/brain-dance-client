@@ -10,17 +10,17 @@ $panels-spacer: 10px;
 
 // cтили turn
 
-$turn-menu-right-spacing: 27px;
-$turn-header-color: #1b3238;
+$turn-menu-right-spacing: 20px;
+$turn-header-color: #294377;
 $turn-main-color: #d3d3d3;
 $turn-header-text-color: #ffffff;
 $turn-paragraph-text-color: #654d33;
-$turn-upper-menu-color: #375e68;
-$turn-corners-radius: 20px;
+$turn-upper-menu-color: #ffffff;
+$turn-corners-radius: 5px;
 
-$turn-header-link-color: #6067f9;
+$turn-header-link-color: #78adff;
 $turn-header-link-color-hover: #add8e6;
-$turn-header-date-color: #b9c3c5;
+$turn-header-date-color: #ffffff;
 
 $turn-scrollbar-color: #a1a1a1;
 
@@ -32,7 +32,7 @@ $turn-copy-icon-color: #16272c;
 $turn-scrollbar-margin: 12px;
 $turn-upper-corners-radius: 14px;
 
-$turn-upper-menu-lift: 20px;
+$turn-upper-menu-lift: 15px; //    1/2 of height
 $turn-upper-menu-padding-left: 10px;
 $turn-upper-menu-padding-right: 10px;
 
@@ -45,6 +45,7 @@ $turn-header-text-padding-top: 10px;
 $turn-header-text-padding-bottom: 6px;
 
 $turn-header-url-date-margin-bottom: 5px;
+$turn-header-date-font-size: 16px;
 $turn-date-and-url-bottom-spacer: 2px;
 
 $turn-pic-padding-top: 18px;
@@ -60,10 +61,10 @@ $turn-text-padding-left: 20px;
 $turn-pic-radius: 10px;
 
 $turn-header-text-font-size: 24px;
-$turn-header-text-font-weight: 600;
+$turn-header-text-font-weight: 500;
 
 $turn-main-text-font-size: 18px;
-$turn-main-text-font-weight: 600;
+$turn-main-text-font-weight: 500;
 
 $first-circle-width: 300px;
 $first-circle-height: 300px;
