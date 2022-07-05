@@ -92,8 +92,10 @@ const Turn = ({ id }) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
 
-    const newHeight = Math.min(Math.max(height, minHeight), maxHeight);
-    const newWidth = Math.min(Math.max(width, minWidth), maxWidth);
+    const spaces = (widgets.length + 1) * 15;
+
+    const newHeight = Math.min(Math.max(height, minHeight), maxHeight) + spaces;
+    const newWidth = Math.min(Math.max(width, minWidth), maxWidth) + spaces;
 
     turnGeometryQueue.add(() => {
       dispatch(
@@ -209,6 +211,7 @@ const Turn = ({ id }) => {
           date,
         }}
       />
+      <div className="top-spaceholder" />
       {!!videoUrl && (
         <Video
           videoUrl={videoUrl}

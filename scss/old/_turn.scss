@@ -12,10 +12,14 @@ $black-color: rgb(0, 0, 0);
 }
 
 .react-turn-new {
+  &:last-child {
+    margin-bottom: 0;
+  }
   position: absolute;
   cursor: move;
   z-index: 2;
-  background-color: rgba(255, 255, 255, 0);
+  // background-color: rgba(255, 255, 255, 0);
+  background-color: rgb(53, 162, 212);
   display: flex;
   flex-direction: column;
   border-top-left-radius: $turn-upper-corners-radius + 1;
@@ -68,11 +72,22 @@ $black-color: rgb(0, 0, 0);
     padding-top: $turn-date-and-url-bottom-spacer;
   }
 
+  .top-spaceholder {
+    height: $turn-widget-bottom-spacer;
+  }
+
+  .picture-content,
+  .wrapperParagraphText,
+  .video {
+    margin-bottom: $turn-widget-bottom-spacer;
+  }
+
   .picture-content {
     z-index: 1;
     position: relative;
-    padding: $turn-pic-padding-top $turn-pic-padding-right
-      $turn-pic-padding-bottom $turn-pic-padding-left;
+    // padding: $turn-pic-padding-top $turn-pic-padding-right
+    //   $turn-pic-padding-bottom $turn-pic-padding-left;
+    padding: 0 $turn-pic-padding-right 0 $turn-pic-padding-left;
 
     img {
       width: 100%;
@@ -319,8 +334,9 @@ $black-color: rgb(0, 0, 0);
   // flex: 1;
   overflow-x: auto;
   overflow-y: scroll;
-  padding: $turn-text-padding-top $turn-text-padding-right
-    $turn-text-padding-bottom $turn-text-padding-left;
+  // padding: $turn-text-padding-top $turn-text-padding-right
+  //   $turn-text-padding-bottom $turn-text-padding-left;
+  padding: 0 $turn-text-padding-right 0 $turn-text-padding-left;
   font-size: 1.15rem;
   color: $turn-paragraph-text-color;
   font-weight: $turn-main-text-font-weight;
