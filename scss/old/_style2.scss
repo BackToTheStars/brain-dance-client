@@ -116,3 +116,59 @@ body {
     width: 15%;
   }
 }
+
+
+.map-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 8px;
+}
+
+.percent-map-wrap {
+    text-align: center;
+    color: #8097A1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0 5px 0;
+}
+
+.map-icon-main {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.map-icon-hover img {
+    display: block;
+    margin: 0 0 5px 0;
+}
+
+.map-icon-hover span {
+    color: #FFFFFF;
+}
+
+.map-focus {
+    background: rgba(0, 255, 255, 0.06);
+    rx: 2px;
+    backdrop-filter: blur(4px);
+    border-radius: 4px;
+}
+
+.map-wrap {
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.08)) drop-shadow(0px 2px 12px rgba(0, 0, 0, 0.32));
+    border-radius: 10px;
+    background: #181616;
+}
+
+.map-minus {
+    margin: 0 12px;
+}
+
+.map-plus {
+    margin: 0 12px;
+}
+
+.map-percent-value {
+    font-size: 16px !important;
+}
