@@ -1,3 +1,4 @@
+import { widgetSpacer } from '@/config/ui';
 import { useEffect, useState, useRef } from 'react';
 import YouTube from 'react-youtube';
 import { youtubeFormatter } from '../helpers/youtubeFormatter';
@@ -33,11 +34,11 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
         return 20;
       },
       minHeightCallback: (newWidth) => {
-        const newImgHeight = Math.floor((9 * newWidth) / 16);
+        const newImgHeight = Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
         return newImgHeight;
       },
       maxHeightCallback: (newWidth) => {
-        const newImgHeight = Math.floor((9 * newWidth) / 16);
+        const newImgHeight = Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
         return newImgHeight;
       },
     });
@@ -47,7 +48,7 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
     <div
       style={{
         width: newWidth,
-        height: Math.floor((9 * newWidth) / 16),
+        height: Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer,
       }}
       className="video"
       ref={videoEl}

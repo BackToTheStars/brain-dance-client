@@ -1,6 +1,7 @@
 import {
   TURNS_GEOMETRY_TIMEOUT_DELAY,
   TURNS_POSITION_TIMEOUT_DELAY,
+  widgetSpacer,
 } from '@/config/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -92,10 +93,8 @@ const Turn = ({ id }) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
 
-    const spaces = (widgets.length + 1) * 15;
-
-    const newHeight = Math.min(Math.max(height, minHeight), maxHeight) + spaces;
-    const newWidth = Math.min(Math.max(width, minWidth), maxWidth) + spaces;
+    const newHeight = Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer;
+    const newWidth = Math.min(Math.max(width, minWidth), maxWidth) + widgetSpacer;
 
     turnGeometryQueue.add(() => {
       dispatch(

@@ -35,7 +35,6 @@ const Header = ({
       id: 'header1',
       minWidthCallback: () => 300,
       minHeightCallback: () => {
-        console.log({ sourceUrl, date });
         return dontShowHeader ? 0 : headerHeight;
       },
       maxHeightCallback: () => (dontShowHeader ? 0 : headerHeight),

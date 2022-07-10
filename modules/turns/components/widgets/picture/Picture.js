@@ -1,3 +1,4 @@
+import { widgetSpacer } from '@/config/ui';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
   MODE_WIDGET_PICTURE,
@@ -70,17 +71,17 @@ const Picture = ({
         minHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
           const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * newWidth) /
+            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
               imgEl.current.naturalWidth
-          );
+          ) + widgetSpacer;
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
           const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * newWidth) /
+            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
               imgEl.current.naturalWidth
-          );
+          ) + widgetSpacer;
           return newImgHeight;
         },
         resizeCallback: () => {},

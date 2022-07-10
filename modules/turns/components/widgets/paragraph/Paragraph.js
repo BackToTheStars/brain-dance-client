@@ -1,3 +1,4 @@
+import { widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
@@ -46,7 +47,7 @@ const Paragraph = ({
         if (!paragraphElCurrent) {
           return 0;
         }
-        return paragraphElCurrent.scrollHeight + 5;
+        return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
       },
     });
     return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
