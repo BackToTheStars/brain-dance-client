@@ -93,8 +93,9 @@ const Turn = ({ id }) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
 
-    const newHeight = Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer;
-    const newWidth = Math.min(Math.max(width, minWidth), maxWidth) + widgetSpacer;
+    const newHeight = Math.min(Math.max(height, minHeight), maxHeight); // + widgetSpacer;
+    const newWidth =
+      Math.min(Math.max(width, minWidth), maxWidth) + widgetSpacer;
 
     turnGeometryQueue.add(() => {
       dispatch(

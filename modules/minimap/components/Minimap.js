@@ -47,8 +47,8 @@ const Minimap = () => {
   const isHidden = false; // @todo: remove
 
   const minimapPnlRef = useRef(null);
-  const widthPx = right - left; // ширина всего поля
-  const heightPx = bottom - top; // высота всего поля
+  const widthPx = Math.round(right - left) || 600; // ширина всего поля
+  const heightPx = Math.round(bottom - top) || 400; // высота всего поля
 
   const maxMinimapSizeWidthPlusHeight = 500;
   const minimapWidth =
@@ -391,7 +391,7 @@ const SVGMiniMap = ({
               // fill={fill}
               fill="#489BC1"
               height={turn.height}
-              clip-path="url(#viewPort)"
+              clipPath="url(#viewPort)"
             />
           );
         })}
