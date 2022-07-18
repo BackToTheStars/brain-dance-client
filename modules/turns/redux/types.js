@@ -5,6 +5,7 @@ export const TURNS_FIELD_WAS_MOVED = 'turns_field_was_moved';
 export const TURNS_SCROLL = 'turns_scroll';
 export const TURNS_SYNC_DONE = 'turns_sync_done';
 export const TURNS_LOAD_TO_PASTE = 'turns_load_to_paste';
+export const TURN_WAS_CHANGED = 'turn_was_changed';
 
 export const TURN_CREATE = 'turn_create';
 export const TURN_RESAVE = 'turn_resave';

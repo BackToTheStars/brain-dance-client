@@ -19,12 +19,13 @@ $black-color: rgb(0, 0, 0);
   cursor: move;
   z-index: 2;
   // background-color: rgba(255, 255, 255, 0);
-  background-color: rgb(53, 162, 212);
+  background-color: $turn-main-color;
   display: flex;
   flex-direction: column;
   border-top-left-radius: $turn-upper-corners-radius + 1;
   border-top-right-radius: $turn-upper-corners-radius + 1;
   border: 2px solid rgba(98, 143, 211, 0.623);
+  padding-bottom: $turn-widget-bottom-spacer;
 
   &:hover {
     .mod_icon_wrap {
@@ -79,7 +80,7 @@ $black-color: rgb(0, 0, 0);
   .picture-content,
   .wrapperParagraphText,
   .video {
-    margin-bottom: $turn-widget-bottom-spacer;
+    padding-top: $turn-widget-bottom-spacer;
   }
 
   .picture-content {
@@ -87,7 +88,8 @@ $black-color: rgb(0, 0, 0);
     position: relative;
     // padding: $turn-pic-padding-top $turn-pic-padding-right
     //   $turn-pic-padding-bottom $turn-pic-padding-left;
-    padding: 0 $turn-pic-padding-right 0 $turn-pic-padding-left;
+    padding: $turn-widget-bottom-spacer $turn-pic-padding-right 0
+      $turn-pic-padding-left;
 
     img {
       width: 100%;

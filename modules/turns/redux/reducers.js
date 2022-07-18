@@ -39,10 +39,21 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             ...payload,
-            wasChanged: true,
+            // wasChanged: true,
           },
         },
         updateGeometryTime: new Date().getTime(),
+      };
+    case types.TURN_WAS_CHANGED:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: {
+            ...state.d[payload._id],
+            wasChanged: true,
+          },
+        },
       };
     case types.TURNS_SCROLL: {
       return {

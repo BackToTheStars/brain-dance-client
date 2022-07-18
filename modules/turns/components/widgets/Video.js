@@ -11,12 +11,12 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
 
   // console.log({ width });
   useEffect(() => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      // if (width !== newWidth) {
+    // clearTimeout(timeoutId);
+    // timeoutId = setTimeout(() => {
+    if (width !== newWidth) {
       setNewWidth(width);
-      // }
-    }, 100);
+    }
+    // }, 100);
   }, [width]);
 
   if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -34,11 +34,13 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
         return 20;
       },
       minHeightCallback: (newWidth) => {
-        const newImgHeight = Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
+        const newImgHeight =
+          Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
         return newImgHeight;
       },
       maxHeightCallback: (newWidth) => {
-        const newImgHeight = Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
+        const newImgHeight =
+          Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;
         return newImgHeight;
       },
     });
@@ -48,7 +50,8 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
     <div
       style={{
         width: newWidth,
-        height: Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer,
+        height:
+          Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer,
       }}
       className="video"
       ref={videoEl}

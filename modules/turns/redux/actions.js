@@ -57,6 +57,14 @@ export const updateGeometry = (data) => (dispatch) =>
     payload: data,
   });
 
+export const markTurnAsChanged =
+  ({ _id }) =>
+  (dispatch) =>
+    dispatch({
+      type: types.TURN_WAS_CHANGED,
+      payload: { _id },
+    });
+
 export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,

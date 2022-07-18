@@ -6,7 +6,8 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { updateGeometry } from '../redux/actions';
+import { markTurnAsChanged, updateGeometry } from '../redux/actions';
+import { TURN_WAS_CHANGED } from '../redux/types';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
@@ -93,9 +94,12 @@ const Turn = ({ id }) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
 
-    const newHeight = Math.min(Math.max(height, minHeight), maxHeight); // + widgetSpacer;
-    const newWidth =
-      Math.min(Math.max(width, minWidth), maxWidth) + widgetSpacer;
+    const newHeight = Math.round(
+      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer
+    );
+    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
+
+    console.log({ height, width, newHeight, newWidth });
 
     turnGeometryQueue.add(() => {
       dispatch(
@@ -159,6 +163,7 @@ const Turn = ({ id }) => {
         $('#gameBox')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
+        dispatch(markTurnAsChanged({ _id }));
       },
     });
 
@@ -169,7 +174,8 @@ const Turn = ({ id }) => {
   useEffect(() => {
     $(wrapper.current).resizable({
       resize: (event, ui) => {
-        recalculateSize(ui.size.width, ui.size.height);
+        recalculateSize(Math.round(ui.size.width), Math.round(ui.size.height));
+        dispatch(markTurnAsChanged({ _id }));
       },
     });
     return () => $(wrapper.current).resizable('destroy');
@@ -183,7 +189,7 @@ const Turn = ({ id }) => {
       doesParagraphExist; // Paragraph
 
     if (widgetsCount === widgets.length) {
-      recalculateSize(width, height);
+      recalculateSize(Math.round(width), Math.round(height));
     }
   }, [widgets]);
 
@@ -211,7 +217,7 @@ const Turn = ({ id }) => {
           date,
         }}
       />
-      <div className="top-spaceholder" />
+      {/* <div className="top-spaceholder" /> */}
       {!!videoUrl && (
         <Video
           videoUrl={videoUrl}
