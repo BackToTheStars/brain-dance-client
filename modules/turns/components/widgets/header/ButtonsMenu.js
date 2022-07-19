@@ -51,14 +51,6 @@ const ButtonsMenu = ({ _id }) => {
 
   return (
     <div className="mod_icon_wrap">
-      {can(RULE_TURNS_CRUD) && (
-        <a key="cut" className="cut-btn" onClick={handleCut}>
-          {/*<img src="/images/scissor.svg" />*/}
-          {/*<i className="fas fa-cut"></i>*/}
-
-          <ScissorIcon />
-        </a>
-      )}
       <a key="clone" className="clone-btn" onClick={handleClone}>
         <CopyIcon />
       </a>
@@ -68,6 +60,14 @@ const ButtonsMenu = ({ _id }) => {
           {/*<i className="fas fa-pen-square"></i>*/}
 
           <EditIcon />
+        </a>
+      )}
+      {can(RULE_TURNS_CRUD) && (
+        <a key="cut" className="cut-btn" onClick={handleCut}>
+          {/*<img src="/images/scissor.svg" />*/}
+          {/*<i className="fas fa-cut"></i>*/}
+
+          <ScissorIcon />
         </a>
       )}
       {can(RULE_TURNS_CRUD) && (
