@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { markTurnAsChanged, updateGeometry } from '../redux/actions';
 import { TURN_WAS_CHANGED } from '../redux/types';
+import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
@@ -60,6 +61,10 @@ const Turn = ({ id }) => {
     width: `${width}px`,
     height: `${height}px`,
   };
+
+  if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {
+    wrapperStyles.backgroundColor = backgroundColor;
+  }
 
   const registerHandleResize = useCallback(
     (widget) => {

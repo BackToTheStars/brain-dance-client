@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
 import ButtonsMenu from './header/ButtonsMenu';
+import { getCommentHeaderColor } from '../helpers/colorHelper';
 //const HEADER_HEIGHT = 105;
 
 const Header = ({
@@ -24,7 +25,11 @@ const Header = ({
       height: `${headerHeight}px`,
     };
     if (contentType === 'comment' && !dontShowHeader) {
-      style = { ...style, backgroundColor, color: fontColor || 'black' };
+      style = {
+        ...style,
+        backgroundColor: getCommentHeaderColor(backgroundColor),
+        color: fontColor || 'black',
+      };
     }
     return style;
   }, [dontShowHeader, backgroundColor, fontColor, contentType]);

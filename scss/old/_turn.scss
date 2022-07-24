@@ -34,6 +34,13 @@ $black-color: rgb(0, 0, 0);
     background-image: url(/js/jquery-ui/images/ui-icons_ffffff_256x240.png);
   }
 
+  &.comment {
+    .ui-icon,
+    .ui-widget-content .ui-icon {
+      background-image: url(/js/jquery-ui/images/ui-icons_444444_256x240.png);
+    }
+  }
+
   &:hover {
     .mod_icon_wrap {
       opacity: 1;
@@ -239,7 +246,7 @@ $black-color: rgb(0, 0, 0);
 }
 
 .comment .wrapperParagraphText {
-  padding: 0 $turn-scrollbar-margin 0 0;
+  // padding: 0 $turn-scrollbar-margin 0 0;
   display: block;
   overflow-y: scroll;
   background: rgb(236, 237, 154);
