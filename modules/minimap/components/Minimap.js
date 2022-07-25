@@ -7,12 +7,19 @@ import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getScreenRect } from './helpers/screen';
 import Line from './line/Line';
+import MinimapButtons from './MinimapButtons';
 // import {
 // useTurnsCollectionContext,
 // ACTION_FIELD_WAS_MOVED,
 // } from '../contexts/TurnsCollectionContext';
 
 const Minimap = () => {
+  //
+  const [minimapSizePercents, setMinimapSizePercents] = useState(100);
+  const maxMinimapSizeWidthPlusHeight = Math.round(
+    (500 * minimapSizePercents) / 100
+  );
+
   const [gameBoxEl, setGameBoxEl] = useState(null);
   const turnsDictionary = useSelector((state) => state.turns.d);
   const turns = Object.values(turnsDictionary);
@@ -50,7 +57,6 @@ const Minimap = () => {
   const widthPx = Math.round(right - left) || 600; // ширина всего поля
   const heightPx = Math.round(bottom - top) || 400; // высота всего поля
 
-  const maxMinimapSizeWidthPlusHeight = 500;
   const minimapWidth =
     (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
@@ -213,14 +219,10 @@ const Minimap = () => {
   const style = { transform: `translateY(${isHidden ? '120%' : '0%'})` }; // контролируем стиль из компонента
 
   return (
-    // <div
-    //   // className={`${isHidden ? 'hidden' : ''} flex-minimap panel`}
-    //   style={style}
-    //   className="flex-minimap panel"
-    //   ref={minimapPnlRef}
-    // >
-    <SVGMiniMap {...value} />
-    // </div>
+    <>
+      <SVGMiniMap {...value} />
+      <MinimapButtons {...{ minimapSizePercents, setMinimapSizePercents }} />
+    </>
   );
 };
 
@@ -300,13 +302,14 @@ const SVGMiniMap = ({
   // }
 
   return (
-    <svg
-      viewBox={`${position.left} ${position.top} ${width} ${height}`}
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ width: `${minimapWidth}px` }}
-      onClick={(e) => onMapClick(e)}
-    >
-      {/* {!!zeroPoint && (
+    <>
+      <svg
+        viewBox={`${position.left} ${position.top} ${width} ${height}`}
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ width: `${minimapWidth}px` }}
+        onClick={(e) => onMapClick(e)}
+      >
+        {/* {!!zeroPoint && (
         <rect
           key={zeroPoint._id}
           x={zeroPoint.x - 20}
@@ -316,103 +319,104 @@ const SVGMiniMap = ({
           height={40}
         />
       )} */}
-      <g
-        filter="url(#blurMe)"
-        x={position.left}
-        y={position.top}
-        width={width}
-        height={height}
-      >
-        {turns.map((turn, i) => {
-          // viewport x y width height
-          // turn x y width height
+        <g
+          filter="url(#blurMe)"
+          x={position.left}
+          y={position.top}
+          width={width}
+          height={height}
+        >
+          {turns.map((turn, i) => {
+            // viewport x y width height
+            // turn x y width height
 
-          // const fill = turn.isTurnInsideViewport
-          //   ? 'blue'
-          //   : 'rgba(212, 213, 214, 1)';
+            // const fill = turn.isTurnInsideViewport
+            //   ? 'blue'
+            //   : 'rgba(212, 213, 214, 1)';
 
+            return (
+              <rect
+                key={turn._id}
+                x={turn.x}
+                y={turn.y}
+                width={turn.width}
+                rx={turnRadiusFactored}
+                // fill={fill}
+                fill="#489BC1"
+                height={turn.height}
+              />
+            );
+          })}
+        </g>
+        {lines.map(({ x1, y1, x2, y2, id }) => {
           return (
-            <rect
-              key={turn._id}
-              x={turn.x}
-              y={turn.y}
-              width={turn.width}
-              rx={turnRadiusFactored}
-              // fill={fill}
-              fill="#489BC1"
-              height={turn.height}
+            <Line
+              sourceCoords={{ left: x1, top: y1, height: 0, width: 0 }}
+              targetCoords={{ left: x2, top: y2, height: 0, width: 0 }}
+              key={id}
+              stroke="red"
+              strokeWidth={lineWidth}
             />
           );
         })}
-      </g>
-      {lines.map(({ x1, y1, x2, y2, id }) => {
-        return (
-          <Line
-            sourceCoords={{ left: x1, top: y1, height: 0, width: 0 }}
-            targetCoords={{ left: x2, top: y2, height: 0, width: 0 }}
-            key={id}
-            stroke="red"
-            strokeWidth={lineWidth}
-          />
-        );
-      })}
 
-      <rect
-        className="map-focus"
-        rx={turnRadiusFactored}
-        // ry={60}
-        stroke="#FFFFFF"
-        strokeWidth={Math.round(k * viewportRectangleThickness)}
-        x={viewport.x - viewportLineWidthCorrection}
-        y={viewport.y - viewportLineWidthCorrection}
-        width={viewport.width + 2 * viewportLineWidthCorrection}
-        height={viewport.height + 2 * viewportLineWidthCorrection}
-        // fill="rgba(0, 247, 255, 0.5)"
-        fill="transparent"
-      />
-
-      {turns
-        .filter((turn) => turn.isTurnInsideViewport)
-        .map((turn) => {
-          // viewport x y width height
-          // turn x y width height
-
-          const fill = turn.isTurnInsideViewport
-            ? 'blue'
-            : 'rgba(212, 213, 214, 1)';
-
-          return (
-            <rect
-              key={`viewport_${turn._id}`}
-              x={turn.x}
-              y={turn.y}
-              width={turn.width}
-              rx={turnRadiusFactored}
-              // fill={fill}
-              fill="#489BC1"
-              height={turn.height}
-              clipPath="url(#viewPort)"
-            />
-          );
-        })}
-      <filter id="blurMe">
-        <feGaussianBlur
-          in="SourceGraphic"
-          stdDeviation={Math.round((width * 3) / 1000)}
+        <rect
+          className="map-focus"
+          rx={turnRadiusFactored}
+          // ry={60}
+          stroke="#FFFFFF"
+          strokeWidth={Math.round(k * viewportRectangleThickness)}
+          x={viewport.x - viewportLineWidthCorrection}
+          y={viewport.y - viewportLineWidthCorrection}
+          width={viewport.width + 2 * viewportLineWidthCorrection}
+          height={viewport.height + 2 * viewportLineWidthCorrection}
+          // fill="rgba(0, 247, 255, 0.5)"
+          fill="transparent"
         />
-      </filter>
 
-      <defs>
-        <clipPath id="viewPort">
-          <rect
-            x={viewport.x}
-            y={viewport.y}
-            width={viewport.width}
-            height={viewport.height}
+        {turns
+          .filter((turn) => turn.isTurnInsideViewport)
+          .map((turn) => {
+            // viewport x y width height
+            // turn x y width height
+
+            const fill = turn.isTurnInsideViewport
+              ? 'blue'
+              : 'rgba(212, 213, 214, 1)';
+
+            return (
+              <rect
+                key={`viewport_${turn._id}`}
+                x={turn.x}
+                y={turn.y}
+                width={turn.width}
+                rx={turnRadiusFactored}
+                // fill={fill}
+                fill="#489BC1"
+                height={turn.height}
+                clipPath="url(#viewPort)"
+              />
+            );
+          })}
+        <filter id="blurMe">
+          <feGaussianBlur
+            in="SourceGraphic"
+            stdDeviation={Math.round((width * 3) / 1000)}
           />
-        </clipPath>
-      </defs>
-    </svg>
+        </filter>
+
+        <defs>
+          <clipPath id="viewPort">
+            <rect
+              x={viewport.x}
+              y={viewport.y}
+              width={viewport.width}
+              height={viewport.height}
+            />
+          </clipPath>
+        </defs>
+      </svg>
+    </>
   );
 };
 export default Minimap;

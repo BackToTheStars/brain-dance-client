@@ -25,10 +25,6 @@
 body {
   font-size: 1.3rem;
   /* 1.2rem; */
-
-
-
-
 }
 
 /*body {
@@ -38,55 +34,52 @@ body {
     z-index: 100;
 }*/
 
-
 .game-bg {
-    //background: #070D11 url(/images/blur.png) center 0 no-repeat;
-    //background-size: 1600px 700px;
-    //background-size: cover;
-    position: relative;
-    //z-index: 100;
-    background: #070D11;
+  //background: #070D11 url(/images/blur.png) center 0 no-repeat;
+  //background-size: 1600px 700px;
+  //background-size: cover;
+  position: relative;
+  //z-index: 100;
+  background: #070d11;
 }
 
 .circle {
-    position: absolute;
-    background: $second-circle-color;
-    height: $second-circle-height;
-    width: $second-circle-width;
-    filter: blur($second-circle-blur);
-    border-radius: 50%;
-    top: $second-circle-top;
-    right: $second-circle-right;
-    z-index: 1;
+  position: absolute;
+  background: $second-circle-color;
+  height: $second-circle-height;
+  width: $second-circle-width;
+  filter: blur($second-circle-blur);
+  border-radius: 50%;
+  top: $second-circle-top;
+  right: $second-circle-right;
+  z-index: 1;
 }
 
 .game-bg:before {
-    position: absolute;
-    top: $first-circle-top;
-    width: $first-circle-width;
-    height: $first-circle-height;
-    content: '';
-    left: $first-circle-left;
-    border-radius: 50%;
-    box-shadow: 0px 0px 8px 1px #143656;
-    background: $first-circle-color;
-    filter: blur($first-circle-blur);
+  position: absolute;
+  top: $first-circle-top;
+  width: $first-circle-width;
+  height: $first-circle-height;
+  content: '';
+  left: $first-circle-left;
+  border-radius: 50%;
+  box-shadow: 0px 0px 8px 1px #143656;
+  background: $first-circle-color;
+  filter: blur($first-circle-blur);
 }
 
 .game-bg:after {
-    position: absolute;
-    right: $third-circle-right;
-    width: $third-circle-width;
-    height: $third-circle-height;
-    content: '';
-    bottom: $third-circle-bottom;
-    border-radius: 50%;
-    box-shadow: 0px 0px 8px 1px #143656;
-    background: $third-circle-color;
-    filter: blur($third-circle-blur);
+  position: absolute;
+  right: $third-circle-right;
+  width: $third-circle-width;
+  height: $third-circle-height;
+  content: '';
+  bottom: $third-circle-bottom;
+  border-radius: 50%;
+  box-shadow: 0px 0px 8px 1px #143656;
+  background: $third-circle-color;
+  filter: blur($third-circle-blur);
 }
-
-
 
 .modal-overlay {
   position: fixed;
@@ -117,58 +110,78 @@ body {
   }
 }
 
-
 .map-icon {
-    position: absolute;
-    bottom: 5px;
-    right: 8px;
+  position: absolute;
+  bottom: 5px;
+  left: 8px;
+  cursor: pointer;
 }
 
 .percent-map-wrap {
-    text-align: center;
-    color: #8097A1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0 5px 0;
+  text-align: center;
+  color: #8097a1;
+  display: flex;
+  align-items: center;
+  // justify-content: start;
+  margin: 0px 0 5px 0;
+  padding-left: 30px;
 }
 
 .map-icon-main {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .map-icon-hover img {
-    display: block;
-    margin: 0 0 5px 0;
+  display: block;
+  margin: 0 0 5px 0;
 }
 
-.map-icon-hover span {
-    color: #FFFFFF;
+.map-icon path {
+  stroke: #8097a1;
+}
+.map-minus path,
+.map-plus path {
+  fill: #8097a1;
+}
+
+.map-icon:hover path {
+  stroke: #ffffff;
+}
+.map-minus,
+.map-plus {
+  &:hover {
+    path {
+      fill: #ffffff;
+    }
+  }
 }
 
 .map-focus {
-    background: rgba(0, 255, 255, 0.06);
-    rx: 2px;
-    backdrop-filter: blur(4px);
-    border-radius: 4px;
+  background: rgba(0, 255, 255, 0.06);
+  rx: 2px;
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
 }
 
 .map-wrap {
-    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.08)) drop-shadow(0px 2px 12px rgba(0, 0, 0, 0.32));
-    border-radius: 10px;
-    background: #181616;
+  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.08))
+    drop-shadow(0px 2px 12px rgba(0, 0, 0, 0.32));
+  border-radius: 10px;
+  background: $map-background-color;
 }
 
 .map-minus {
-    margin: 0 12px;
+  margin: 0 12px;
+  cursor: pointer;
 }
 
 .map-plus {
-    margin: 0 12px;
+  margin: 0 12px;
+  cursor: pointer;
 }
 
 .map-percent-value {
-    font-size: 16px !important;
+  font-size: 16px !important;
 }
