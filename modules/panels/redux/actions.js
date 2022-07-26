@@ -13,6 +13,13 @@ export const togglePanel = (payload) => (dispatch) => {
   });
 };
 
+export const toggleMinimizePanel = (payload) => (dispatch) => {
+  dispatch({
+    type: types.PANEL_TOGGLE_MINIMIZE,
+    payload: payload,
+  });
+};
+
 export const changePanelGeometry = (type, geometryData) => (dispatch) => {
   // const geometryData = {};
   // if (geometryRawData?.width) {

@@ -50,6 +50,26 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
       };
     }
 
+    case types.PANEL_TOGGLE_MINIMIZE: {
+      let minimize = null;
+      if (typeof payload.minimize === 'undefined') {
+        minimize = !state.d[payload.type].isMinimized;
+      } else {
+        minimize = payload.minimize;
+      }
+      return {
+        ...state,
+        ...payload.params,
+        d: {
+          ...state.d,
+          [payload.type]: {
+            ...state.d[payload.type],
+            isMinimized: minimize,
+          },
+        },
+      };
+    }
+
     case types.PANEL_CHANGE_GEOMETRY:
       return {
         ...state,

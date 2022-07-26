@@ -125,6 +125,10 @@ body {
   // justify-content: start;
   margin: 0px 0 5px 0;
   padding-left: 30px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .map-icon-main {

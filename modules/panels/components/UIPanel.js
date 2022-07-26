@@ -1,7 +1,7 @@
 import { panelSpacer } from '@/config/ui';
 import { POSITION_UPPER_LEFT } from '../settings';
 
-const UIPanel = ({ children, position, height, width }) => {
+const UIPanel = ({ children, position, height, width, isMinimized }) => {
   //
   const style = {};
 
@@ -18,7 +18,10 @@ const UIPanel = ({ children, position, height, width }) => {
   }
 
   return (
-    <div className={`${position} po panel`} style={style}>
+    <div
+      className={`${position} po panel ${isMinimized ? 'minimized' : ''}`}
+      style={style}
+    >
       {children}
     </div>
   );

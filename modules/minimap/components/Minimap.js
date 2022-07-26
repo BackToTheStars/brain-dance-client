@@ -13,20 +13,26 @@ import MinimapButtons from './MinimapButtons';
 // ACTION_FIELD_WAS_MOVED,
 // } from '../contexts/TurnsCollectionContext';
 
-const Minimap = () => {
+const Minimap = ({ settings }) => {
   //
   const [minimapSizePercents, setMinimapSizePercents] = useState(100);
   const maxMinimapSizeWidthPlusHeight = Math.round(
     (500 * minimapSizePercents) / 100
   );
 
+  const { isMinimized } = settings;
+
   const [gameBoxEl, setGameBoxEl] = useState(null);
   const turnsDictionary = useSelector((state) => state.turns.d);
   const turns = Object.values(turnsDictionary);
 
   const position = useSelector((state) => state.game.position);
-  useSelector((state) => state.turns.updateGeometryTime);
+  // useSelector((state) => state.turns.updateGeometryTime);
+
   const dispatch = useDispatch();
+  // const isMinimized = useSelector(
+  //   (state) => state.panels.d[PANEL_MINIMAP].isMinimized
+  // );
 
   useEffect(() => {
     setGameBoxEl(document.querySelector('#gameBox'));
@@ -220,8 +226,10 @@ const Minimap = () => {
 
   return (
     <>
-      <SVGMiniMap {...value} />
-      <MinimapButtons {...{ minimapSizePercents, setMinimapSizePercents }} />
+      {!isMinimized && <SVGMiniMap {...value} />}
+      <MinimapButtons
+        {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
+      />
     </>
   );
 };

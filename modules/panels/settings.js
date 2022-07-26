@@ -50,6 +50,8 @@ export const MODE_WIDGET_PICTURE_QUOTE_ACTIVE = 'widget-picture-quote-active';
 export const MODE_BUTTON_PICTURE_MODIFY_AREA = 'widget-picture-modify-area';
 export const MODE_OPERATION_PASTE = 'operation-paste';
 
+export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles';
+
 let id = 0;
 
 export const panels = [
@@ -99,11 +101,12 @@ export const panels = [
   },
   {
     type: PANEL_MINIMAP,
-    position: POSITION_BOTTOM_LEFT,
+    position: [POSITION_BOTTOM_LEFT, PANEL_MINIMAP_STYLES].join(' '),
     component: Minimap,
     isDisplayed: true,
     id: (id += 1),
     width: () => '600px',
+    isMinimized: false, // сворачивание в маленькую кнопку
   },
   {
     type: PANEL_LINES,
