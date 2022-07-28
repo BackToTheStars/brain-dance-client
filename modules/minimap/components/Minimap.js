@@ -177,6 +177,17 @@ const Minimap = ({ settings }) => {
   }, [value.minimapWidth]);
 
   useEffect(() => {
+    if (!value.minimapWidth) return;
+    if (!isMinimized) {
+      dispatch(
+        changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth })
+      );
+    } else {
+      dispatch(changePanelGeometry(PANEL_MINIMAP, { width: 38 }));
+    }
+  }, [isMinimized]);
+
+  useEffect(() => {
     if (!minimapPnlRef.current) return;
     // setTimeout(() => {
     const { left, top, width, height } =
@@ -222,11 +233,13 @@ const Minimap = ({ settings }) => {
   }, [uiLines, turns]);
 
   value.lines = getLinesByTurns(value.turns, lines);
+  value.isMinimized = isMinimized;
   const style = { transform: `translateY(${isHidden ? '120%' : '0%'})` }; // контролируем стиль из компонента
 
   return (
     <>
-      {!isMinimized && <SVGMiniMap {...value} />}
+      {/* {!isMinimized && <SVGMiniMap {...value} />} */}
+      <SVGMiniMap {...value} />
       <MinimapButtons
         {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
       />
@@ -289,6 +302,7 @@ const SVGMiniMap = ({
   zeroPoint,
   lines,
   onMapClick,
+  isMinimized,
 }) => {
   const k = width / minimapWidth;
   // 75 -> 1.5 (x1, y1)
@@ -314,7 +328,12 @@ const SVGMiniMap = ({
       <svg
         viewBox={`${position.left} ${position.top} ${width} ${height}`}
         xmlns="http://www.w3.org/2000/svg"
-        style={{ width: `${minimapWidth}px` }}
+        style={{
+          width: `${isMinimized ? '0' : minimapWidth}px`,
+          height: `${
+            isMinimized ? '0' : Math.round((minimapWidth * height) / width)
+          }px`,
+        }}
         onClick={(e) => onMapClick(e)}
       >
         {/* {!!zeroPoint && (
