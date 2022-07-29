@@ -54,7 +54,7 @@ const GameDetails = () => {
                   Delete Game
                 </button>
                 {!!codes.length && (
-                  <AccessCodesTable mode="light" codes={codes} />
+                  <AccessCodesTable mode="dark" codes={codes} />
                 )}
                 <hr />
                 <button

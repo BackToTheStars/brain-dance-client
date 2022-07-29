@@ -15,7 +15,7 @@ const CreateEnterGameBlock = ({ enterGame, onGameCreate }) => {
         </div>
         <div className="col-xl-3 pt-2 text-md-end">
           <button
-            className="btn btn-success"
+            className="btn-create"
             onClick={() => setShowCreateModal(true)}
           >
             Create New Game

@@ -1,4 +1,4 @@
-.table-games {
+/*.table-games {
   thead {
     position: sticky;
     top: 0;
@@ -42,4 +42,419 @@
       max-height: initial;
     }
   }  
+}*/
+
+
+@font-face {
+  font-family: 'SFPRODISPLAYREGULAR';
+  src:url('../fonts/SFPRODISPLAYREGULAR.OTF?-kwf309');
+  src:url('../fonts/SFPRODISPLAYREGULAR.OTF?#iefix-kwf309') format('embedded-opentype'),
+    url('../fonts/SFPRODISPLAYREGULAR.OTF?-kwf309') format('woff'),
+    url('../fonts/SFPRODISPLAYREGULAR.OTF?-kwf309') format('truetype'),
+    url('../fonts/SFPRODISPLAYREGULAR.OTF?-kwf309#AA-SFPRODISPLAYREGULAR') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}  
+
+@font-face {
+  font-family: 'SFPRODISPLAYBOLD';
+  src:url('../fonts/SFPRODISPLAYBOLD.OTF?-kwf309');
+  src:url('../fonts/SFPRODISPLAYBOLD.OTF?#iefix-kwf309') format('embedded-opentype'),
+    url('../fonts/SFPRODISPLAYBOLD.OTF?-kwf309') format('woff'),
+    url('../fonts/SFPRODISPLAYBOLD.OTF?-kwf309') format('truetype'),
+    url('../fonts/SFPRODISPLAYBOLD.OTF?-kwf309#AA-SFPRODISPLAYBOLD') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}  
+
+
+@font-face {
+  font-family: 'SFPRODISPLAYMEDIUM';
+  src:url('../fonts/SFPRODISPLAYMEDIUM.OTF?-kwf309');
+  src:url('../fonts/SFPRODISPLAYMEDIUM.OTF?#iefix-kwf309') format('embedded-opentype'),
+    url('../fonts/SFPRODISPLAYMEDIUM.OTF?-kwf309') format('woff'),
+    url('../fonts/SFPRODISPLAYMEDIUM.OTF?-kwf309') format('truetype'),
+    url('../fonts/SFPRODISPLAYMEDIUM.OTF?-kwf309#AA-SFPRODISPLAYMEDIUM') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}  
+
+
+
+
+html {
+  height: 100%;
 }
+
+body  {
+  padding: 0 0 0 0;
+  height: 100%;
+  letter-spacing: 0.5px;
+  background-color: #3C3C3C !important;
+}
+
+.card-body {
+  background: #1E1E1E;
+  padding: 20px 0 20px 0 !important;
+}
+
+.card {
+  border: none !important;
+  background: #1E1E1E!important;
+/* sh3 */
+  padding: 12px 16px;
+  border-radius: 30px !important;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
+
+}
+
+.sticky-top {
+ 
+}
+
+.card-img-top {
+  border-radius: 30px 30px 0 0 !important;
+}
+
+.card-body {
+
+}
+
+.card-title {
+  margin: 0 0 0 12px 0;
+  font-size: 20px;
+line-height: 20px;
+font-family: 'SFPRODISPLAYMEDIUM';
+color: #C7CACE;
+}
+
+.card-game-body {
+  font-size: 18px;
+  line-height: 20px;
+  margin: 0 0 22px 0;
+  color: #C7CACE;
+  font-family: 'SFPRODISPLAYREGULAR';
+}
+
+.col-form-label {
+  font-size: 20px !important;
+  font-family: 'SFPRODISPLAYBOLD';
+}
+
+.btn-success, .btn-primary, .btn-danger {
+  background: #393658 !important;
+border-radius: 8px !important;
+border: none !important;
+color: #FFFFFF !important;
+opacity: 1 !important;
+padding: 8px 17px 9px 17px !important;
+outline: none !important;
+
+}
+
+.table {
+  background: #131316;
+  margin: 0 !important;
+/* sh3 */
+
+box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
+
+}
+
+.main-table {
+  background: #1E1E1E;
+  padding: 24px 0 0 0;
+  border-radius: 30px 30px 30px 30px;
+}
+
+.mainTableWrapper::-webkit-scrollbar {
+    width: 0;
+    height: 8px;
+
+}
+
+.mainTableWrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.mainTableWrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 79px;
+}
+
+
+.form-control {
+ 
+}
+
+.table-primary {
+  font-family: 'SFPRODISPLAYBOLD';
+  background: #3429B0 !important;
+  --bs-table-bg: #3429B0 !important;
+  --bs-table-striped-bg: #3429B0 !important;
+}
+
+
+.table > :not(caption) > * > * {
+  color: #C7CACE;
+  border: none;
+  padding: 0.5rem 1rem !important;
+  font-family: 'SFPRODISPLAYREGULAR';
+  font-size: 20px !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: #252526;
+  color: #C7CACE !important;
+}
+
+.table-games .item {
+  border: none !important;
+}
+
+.table-games .item:hover {
+  font-family: 'SFPRODISPLAYBOLD';
+    background: #3429B0 !important;
+    --bs-table-bg: #3429B0 !important;
+    --bs-table-striped-bg: #3429B0 !important;
+}
+
+
+.table-games thead {
+  background: #1E1E1E !important;
+}
+
+
+.search-wr {
+  padding: 0 1rem;
+}
+
+.form-control {
+  background: #252526 url(/images/search.svg) 13px 50% no-repeat !important;
+  border-radius: 20px !important;
+  font-size: 16px;
+  font-family: 'SFPRODISPLAYREGULAR';
+  border: none !important;
+  color: #818C99 !important;
+  padding: 8px 20px 9px 36px !important;
+}
+
+.form-control:hover {
+  background: #3D3C3F url(/images/search.svg) 13px 50% no-repeat !important;
+}
+
+.form-control:focus {
+  background: #fff url(/images/search.svg) 13px 50% no-repeat !important;
+}
+
+.form-control::placeholder {
+  color: #818C99;
+}
+
+.head-wrap {
+  background: #1E1E1E;
+  padding: 14px 0;
+  margin: 0 0 20px 0;
+}
+
+.card-game-buttons .btn {
+  font-family: 'SFPRODISPLAYMEDIUM';
+  letter-spacing: 0.2px;
+  font-size: 15px;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  color: #C7CACE !important;
+  text-decoration: none;
+  font-family: 'SFPRODISPLAYBOLD';
+  font-size: 32px;
+}
+
+.enter-game {
+  background: #3429B0;
+  font-size: 15px;
+  line-height: 20px;
+  font-family: 'SFPRODISPLAYMEDIUM';
+  padding: 8px 16px 8px 16px;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.btn-create {
+text-transform: uppercase;
+font-size: 12px;
+border: 2px solid #FFFFFF;
+
+border-radius: 8px;
+float: right;
+background: #1E1E1E url(/images/create.svg) 13px 50% no-repeat !important;
+color: #FFFFFF;
+margin: 27px 0 24px 0;
+padding: 9px 20px 8px 40px;
+clear: both;
+}
+
+.modal-content {
+  background: #252526 !important;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32) !important;
+border-radius: 30px !important;
+}
+
+.modal-header {
+  background: #1E1E1E;
+  padding: 14px 0 15px 0 !important;
+border-radius: 30px 30px 0px 0px !important;
+border: none !important;
+}
+
+.modal-header .btn-close {
+    padding: 0.9rem 0 0 29px !important;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.modal-header .btn-close:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    margin: 0 -30px 0 0px;
+}
+
+.modal-body {
+  border: none;
+  padding: 32px 27px 10px 27px !important;
+}
+
+.cancel {
+    color: #FFFFFF !important;
+  font-size: 15px;
+   font-family: 'SFPRODISPLAYMEDIUM';
+}
+
+.enter-btn {
+  
+
+  background: #3429B0 !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    font-family: 'SFPRODISPLAYMEDIUM';
+    padding: 8px 16px 8px 16px !important;
+    letter-spacing: 1px !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+}
+
+.modal-title {
+  color: #fff;
+  text-align: center;
+  width: 100%;
+}
+
+.btn-close {
+  color: #Fff !important;
+  background: transparent url(/images//close.svg) 0px 13px no-repeat !important;
+  opacity: 1 !important;
+}
+
+.nickname {
+  background: #1E1E1E !important;
+  border-radius: 8px !important;
+  font-size: 18px !important;
+  color: #C7CACE !important;
+  margin-bottom: 24px;
+  padding: 10px 10px 10px 12px !important;
+}
+
+.nickname::placeholder {
+  color: #C7CACE !important;
+}
+
+.nickname:hover {
+background: #1E1E1E !important;
+}
+
+.nickname:focus {
+background: #1E1E1E !important;
+}
+
+
+.modal-content {
+
+  padding: 0 !important;
+}
+
+.modal-footer {
+  padding: 0 27px 32px 0 !important;
+  border: none !important;
+}
+
+.calculator_checkbox {
+  position: relative;
+  margin-bottom: 0;
+  height: 42px;
+  z-index: 12;
+}
+
+.calculator_checkbox input[type=checkbox] {
+  display: none;
+}
+
+.calculator_checkbox label {
+  padding-left: 31px;
+  color: #C7CACE;
+  font-size: 18px;
+  line-height: 24px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.calculator_checkbox label:hover {
+  text-decoration: none;
+}
+
+.calculator_checkbox label:after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 6px;
+  left: 0;
+}
+
+.calculator_checkbox input[type=checkbox]:checked + label:after {
+  background: url(/images/radio.svg) 50% 50% no-repeat;
+  border: 2px solid #3429B0;
+}
+
+@media screen and (max-width: 480px) {
+.modal-content {
+    width: 100% !important;
+    padding: 20px;
+}
+}
+
+.game-dashboard-list {
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-check-label {
+  color: #fff
+}
+
+

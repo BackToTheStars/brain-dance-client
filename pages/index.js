@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 
 import { useDispatch } from 'react-redux';
 import ErrorGameModal from '@/modules/game/components/modals/ErrorGameModal';
+import LastTurns from '@/modules/game/components/blocks/LastTurns';
 
 const MainDashboard = () => {
   const router = useRouter();
@@ -28,13 +29,14 @@ const MainDashboard = () => {
             enterGame={enterGame}
             onGameCreate={loadGamesAction}
           />
-          <div style={{ overflowY: 'auto', flex: '1' }}>
+          <div style={{ overflowY: 'auto', flex: '1',  }} className='mainTableWrapper'>
             <GameTable />
           </div>
         </div>
         <div className="col-sm-6 col-xl-4 game-dashboard-detail">
           <div className="sticky-top top-4">
             <GameDetails />
+            <LastTurns />
           </div>
         </div>
       </div>

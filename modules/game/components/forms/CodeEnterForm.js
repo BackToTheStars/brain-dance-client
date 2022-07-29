@@ -48,7 +48,7 @@ const CodeEnterForm = ({ hash }) => {
         />
       </div>
       <div className="col-auto mb-2">
-        <button type="submit" className="btn btn-primary mb-2 mr-3 ">
+        <button type="submit" className="enter-game">
           Enter Game
         </button>
       </div>

@@ -22,7 +22,7 @@ const GameListTable = () => {
     : games;
 
   return (
-    <table className="table table-striped mt-3 table-games">
+    <table className="table table-striped mt-3 table-games main-table">
       <thead>
         <tr style={{ boxShadow: '0 -1px 0 #aaa inset' }}>
           <th>
