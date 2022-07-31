@@ -5,11 +5,10 @@ const LastTurns = () => {
     return (
         <div>
             {
-                turn.map(turn => {
+                turn.filter(turn => turn.contentType !== "text").map(turn => {
                     return (
-
-
-                        <div className="sticky-top top-4">
+                        
+                            <div className="sticky-top top-4" key={turn._id}>
                             <br></br>
 
                             <div className="card">
@@ -36,11 +35,13 @@ const LastTurns = () => {
                                 </div>
                             </div>
                             
-                        </div>
+                            <br></br>
 
 
+                            </div>
 
-                    )
+                        )
+
                 })
             }
         </div>

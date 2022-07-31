@@ -32,7 +32,7 @@ const GameListTable = () => {
                 <input
                   onChange={(e) => setFilter(e.target.value)}
                   value={filter}
-                  className="form-control"
+                  className="form-control game-search"
                   type="text"
                   placeholder="Search"
                 />

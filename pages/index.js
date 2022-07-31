@@ -29,7 +29,7 @@ const MainDashboard = () => {
             enterGame={enterGame}
             onGameCreate={loadGamesAction}
           />
-          <div style={{ overflowY: 'auto', flex: '1',  }} className='mainTableWrapper'>
+          <div style={{ /*overflowY: 'auto',*/ flex: '1',  }} className='mainTableWrapper'>
             <GameTable />
           </div>
         </div>

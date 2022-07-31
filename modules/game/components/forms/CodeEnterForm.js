@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import CreateGameModal from '../modals/CreateGameModal';
 
 const CodeEnterForm = ({ hash }) => {
   const [accessCode, setAccessCode] = useState('');
@@ -14,13 +15,16 @@ const CodeEnterForm = ({ hash }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!accessCode) {
+    //setShowCreateModal(true)
+
+    /*if (!accessCode) {
       setErrorMessage('Enter access code');
     } else if (!userNickname) {
       setErrorMessage('Enter your nickname');
     } else {
-      enterGame(accessCode, userNickname);
-    }
+      //enterGame(accessCode, userNickname);
+      setShowCreateModal(true)
+    }*/
   };
 
   return (
@@ -48,7 +52,8 @@ const CodeEnterForm = ({ hash }) => {
         />
       </div>
       <div className="col-auto mb-2">
-        <button type="submit" className="enter-game">
+        <button type="submit" className="enter-game"   
+        >
           Enter Game
         </button>
       </div>

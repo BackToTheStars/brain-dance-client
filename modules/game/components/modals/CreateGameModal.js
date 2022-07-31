@@ -39,19 +39,21 @@ const CreateGameModal = ({ close, onCreate }) => {
           <label className="form-check-label">Private</label>
         </div>
         <div className="row">
-          <div className="col-sm-9 mb-3">
+          <div>
             <input
-              className="form-control"
+              className="form-control modal-field"
               name="name"
               type="text"
               placeholder="Name"
+              required
             />
+          </div>         
+
+          <div className="modal-footer">
+            <button type="button" className="btn cancel" onClick={close}>Cancel</button>
+            <button type="submit" className="btn enter-btn">Create Game</button>
           </div>
-          <div className="col-sm-3 mb-3 text-end">
-            <button type="submit" className="btn btn-primary">
-              Create
-            </button>
-          </div>
+        
         </div>
       </form>
     </Modal>
