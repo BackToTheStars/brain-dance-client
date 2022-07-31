@@ -14,10 +14,10 @@ const NewGameInfoModal = ({ close, newGameInfo, enterGame }) => {
   return (
     <Modal close={close} title="New Game Info">
       <div>
-        <p>
+        <p className='modal-text'>
           <b>Important!</b>
         </p>
-        <p>
+        <p className='modal-text'>
           Please, save the code <b>{hash}</b>
         </p>
         {!gameIsPublic && (
@@ -26,14 +26,14 @@ const NewGameInfoModal = ({ close, newGameInfo, enterGame }) => {
             again!
           </p>
         )}
-        <p>Type the nickname below.</p>
+        <p className='modal-text'>Type the nickname below.</p>
       </div>
       <form className="form-inline" onSubmit={handleSubmit}>
         <div className="form-group mb-2">
           <input
             type="text"
             name="nickname"
-            className="form-control mb-3"
+            className="form-control mb-3 modal-field"
             placeholder="Nickname"
           />
           <input className="btn btn-primary" type="submit" value="Enter the game" />
