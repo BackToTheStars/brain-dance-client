@@ -1,15 +1,19 @@
 import {
   TURNS_GEOMETRY_TIMEOUT_DELAY,
   TURNS_POSITION_TIMEOUT_DELAY,
+  widgetSpacer,
 } from '@/config/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { updateGeometry } from '../redux/actions';
+import { markTurnAsChanged, updateGeometry } from '../redux/actions';
+import { TURN_WAS_CHANGED } from '../redux/types';
+import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
+import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
@@ -58,6 +62,10 @@ const Turn = ({ id }) => {
     height: `${height}px`,
   };
 
+  if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {
+    wrapperStyles.backgroundColor = backgroundColor;
+  }
+
   const registerHandleResize = useCallback(
     (widget) => {
       setWidgets((widgets) => {
@@ -91,8 +99,12 @@ const Turn = ({ id }) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
 
-    const newHeight = Math.min(Math.max(height, minHeight), maxHeight);
-    const newWidth = Math.min(Math.max(width, minWidth), maxWidth);
+    const newHeight = Math.round(
+      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer
+    );
+    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
+
+    console.log({ height, width, newHeight, newWidth });
 
     turnGeometryQueue.add(() => {
       dispatch(
@@ -156,6 +168,7 @@ const Turn = ({ id }) => {
         $('#gameBox')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
+        dispatch(markTurnAsChanged({ _id }));
       },
     });
 
@@ -166,7 +179,8 @@ const Turn = ({ id }) => {
   useEffect(() => {
     $(wrapper.current).resizable({
       resize: (event, ui) => {
-        recalculateSize(ui.size.width, ui.size.height);
+        recalculateSize(Math.round(ui.size.width), Math.round(ui.size.height));
+        dispatch(markTurnAsChanged({ _id }));
       },
     });
     return () => $(wrapper.current).resizable('destroy');
@@ -180,7 +194,7 @@ const Turn = ({ id }) => {
       doesParagraphExist; // Paragraph
 
     if (widgetsCount === widgets.length) {
-      recalculateSize(width, height);
+      recalculateSize(Math.round(width), Math.round(height));
     }
   }, [widgets]);
 
@@ -205,9 +219,10 @@ const Turn = ({ id }) => {
           dontShowHeader,
           _id,
           sourceUrl,
-          date
+          date,
         }}
       />
+      {/* <div className="top-spaceholder" /> */}
       {!!videoUrl && (
         <Video
           videoUrl={videoUrl}
@@ -232,6 +247,11 @@ const Turn = ({ id }) => {
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
         />
+      )}
+      {dontShowHeader && !!date && !!sourceUrl && (
+        <div className="bottom-date-and-sourceurl">
+          <DateAndSourceUrl {...{ date, sourceUrl }} />
+        </div>
       )}
     </div>
   );

@@ -11,7 +11,12 @@ import {
   updateCoordinatesRequest,
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { loadTurns } from '@/modules/turns/redux/actions';
+import { loadTurns, moveField } from '@/modules/turns/redux/actions';
+import {
+  getLinesNotExpired,
+  getTimestampsNotExpired,
+  getTurnsFromBuffer,
+} from '@/modules/turns/components/helpers/dataCopier';
 
 export const loadFullGame = (hash) => (dispatch) => {
   // GET GAME DATA
@@ -66,8 +71,6 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
       };
     }); // ход был изменён, сохранить только его
 
-  console.log({ changedTurns });
-
   updateCoordinatesRequest(changedTurns).then((data) => {
     dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
@@ -75,3 +78,49 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
 
   saveGamePositionRequest(gamePosition);
 };
+
+export const loadTurnsAndLinesToPaste = () => (dispatch) => {
+  dispatch({
+    type: turnsTypes.TURNS_LOAD_TO_PASTE,
+    payload: { turnsToPaste: getTurnsFromBuffer() },
+  });
+  dispatch({
+    type: linesTypes.LINES_LOAD_TO_PASTE,
+    payload: { linesToPaste: getLinesNotExpired() },
+  });
+};
+
+export const centerViewportAtPosition =
+  ({ x, y }) =>
+  (dispatch, getState) => {
+    const state = getState();
+    const position = state.game.position;
+    const viewport = state.ui.viewport;
+
+    const left = position.left - x + Math.floor(viewport.width / 2);
+    const top = position.top - y + Math.floor(viewport.height / 2);
+
+    const gameBoxEl = $('#gameBox');
+
+    gameBoxEl.addClass('remove-line-transition');
+    gameBoxEl.animate(
+      {
+        left: `${left}px`,
+        top: `${top}px`,
+      },
+      300,
+      () => {
+        dispatch(
+          moveField({
+            left: -left,
+            top: -top,
+          })
+        );
+        gameBoxEl.css('left', 0);
+        gameBoxEl.css('top', 0);
+        setTimeout(() => {
+          gameBoxEl.removeClass('remove-line-transition');
+        }, 100);
+      }
+    );
+  };

@@ -14,7 +14,9 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
   // const { linesWithEndCoords } = useTurnsCollectionContext();
-  const linesWithEndCoords = useSelector(state => state.lines.linesWithEndCoords)
+  const linesWithEndCoords = useSelector(
+    (state) => state.lines.linesWithEndCoords
+  );
 
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
@@ -43,7 +45,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         <div className="rec-rectangle">
           <div className="rec-label"></div>
           <div className="rec-text">
-            <h2>EDIT</h2>
+            <h4>EDIT</h4>
           </div>
         </div>
       )}

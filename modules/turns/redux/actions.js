@@ -7,6 +7,23 @@ import {
   deleteTurnRequest,
   updateTurnRequest,
 } from '../requests';
+import {
+  dataCopy,
+  fieldRemover,
+  getTimeStamps,
+  getTurnFromBufferAndRemove,
+  saveTurnInBuffer,
+} from '../components/helpers/dataCopier';
+import turnSettings from '../settings';
+import { addNotification } from '@/modules/ui/redux/actions';
+import {
+  centerViewportAtPosition,
+  loadTurnsAndLinesToPaste,
+} from '@/modules/game/game-redux/actions';
+import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
+import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
+import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
+import { MODE_GAME, PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -40,6 +57,14 @@ export const updateGeometry = (data) => (dispatch) =>
     payload: data,
   });
 
+export const markTurnAsChanged =
+  ({ _id }) =>
+  (dispatch) =>
+    dispatch({
+      type: types.TURN_WAS_CHANGED,
+      payload: { _id },
+    });
+
 export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,
@@ -68,15 +93,19 @@ export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
       type: types.TURN_CREATE,
       payload: preparedTurn,
     });
-    callbacks?.success();
+    callbacks?.success(data.item);
   });
 };
 
-export const deleteTurn = (_id) => (dispatch) => {
-  deleteTurnRequest(_id).then((data) => {
-    dispatch({
-      type: types.TURN_DELETE,
-      payload: _id,
+export const deleteTurn = (_id) => (dispatch, getState) => {
+  const state = getState();
+  const lines = filterLinesByTurnId(state.lines.lines, _id);
+  dispatch(linesDelete(lines.map((line) => line._id))).then(() => {
+    deleteTurnRequest(_id).then((data) => {
+      dispatch({
+        type: types.TURN_DELETE,
+        payload: _id,
+      });
     });
   });
 };
@@ -100,4 +129,185 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
     });
     callbacks?.success();
   });
+};
+
+export const cloneTurn = (turn) => (dispatch, getState) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const state = getState();
+      const lines = state.lines.lines;
+
+      const copiedTurn = dataCopy(turn);
+      // @todo: проверить, откуда появляется _id в quotes
+      copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
+        id: quote.id,
+        type: quote.type,
+        text: quote.text, // @todo добавить это поле потом, сохранение по кнопке Save Turn
+        x: quote.x,
+        y: quote.y,
+        height: quote.height,
+        width: quote.width,
+      }));
+
+      copiedTurn.originalId = copiedTurn._id; // copiedTurn.originalId ||
+      const copiedTurnId = copiedTurn._id;
+
+      const { fieldsToClone } = turnSettings;
+
+      fieldRemover(copiedTurn, fieldsToClone); // передали {ход} и [сохраняемые поля]
+
+      const linesFieldsToKeep = [
+        'sourceMarker',
+        'sourceTurnId',
+        'targetMarker',
+        'targetTurnId',
+        'type',
+      ];
+
+      const copiedLines = dataCopy(
+        lines.filter(
+          (line) =>
+            line.sourceTurnId === copiedTurnId ||
+            line.targetTurnId === copiedTurnId
+        )
+      );
+      copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
+
+      saveTurnInBuffer({ copiedTurn, copiedLines }); // сохранили turn в LocalStorage
+
+      dispatch(loadTurnsAndLinesToPaste());
+
+      dispatch(
+        addNotification({
+          title: 'Info:',
+          text: 'Turn was copied, ready to paste',
+        })
+      );
+
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export const insertTurnFromBuffer =
+  (timeStamp, { successCallback, errorCallback }) =>
+  (dispatch, getState) => {
+    const state = getState();
+    const timeStamps = getTimeStamps();
+    const copiedTurn = getTurnFromBufferAndRemove(
+      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
+    );
+    const { pasteNextTurnPosition } = state.turns;
+    const position = state.game.position;
+    const viewport = state.ui.viewport;
+    if (!!pasteNextTurnPosition) {
+      copiedTurn.x = pasteNextTurnPosition.x;
+      copiedTurn.y = pasteNextTurnPosition.y;
+    } else {
+      copiedTurn.x =
+        position.left + Math.floor((viewport.width - copiedTurn.width) / 2);
+      copiedTurn.y =
+        position.top + Math.floor((viewport.height - copiedTurn.height) / 2);
+    }
+
+    if (!copiedTurn) {
+      errorCallback('No turn in buffer');
+      return false;
+    }
+
+    const zeroPointId = state.turns.zeroPointId;
+    const zeroPoint = state.turns.d[zeroPointId];
+    dispatch(loadTurnsAndLinesToPaste());
+
+    if (timeStamps.length === 1) {
+      dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
+      dispatch(setPanelMode({ mode: MODE_GAME }));
+    }
+
+    // // @todo: get lines, connected with copied turn and display them
+    dispatch(
+      createTurn(copiedTurn, zeroPoint, {
+        success: (turn) => {
+          dispatch({
+            type: types.TURN_NEXT_PASTE_POSITION,
+            payload: {
+              x: copiedTurn.x + copiedTurn.width + 40, // вставляет Paste Turn с промежутком от предыдущей вставки
+              y: copiedTurn.y,
+            },
+          });
+          dispatch(
+            centerViewportAtPosition({
+              x: copiedTurn.x + Math.floor(copiedTurn.width / 2),
+              y: copiedTurn.y + Math.floor(copiedTurn.height / 2),
+            })
+          );
+          const turnId = copiedTurn.originalId;
+          // оставить только те линии, которые связаны с turn по originalId
+          const savedLinesToPaste = state.lines.linesToPaste;
+          const sourceLines = [];
+          const targetLines = [];
+
+          const turnsDict = state.turns.d;
+          Object.keys(savedLinesToPaste)
+            .filter((lineKey) => lineKey.indexOf(`${turnId}`) !== -1)
+            .forEach((lineKey) => {
+              // составить набор id из противоположных концов линий
+              const line = savedLinesToPaste[lineKey];
+              if (line.sourceTurnId === turnId) {
+                sourceLines.push(line);
+              } else {
+                targetLines.push(line);
+              }
+            });
+          // найти все шаги игры, которые имеют id или originalId из набора
+
+          // ещё раз отфильтровать линии, оставить только те, что с двумя концами
+          const lines = [];
+          for (let sourceLine of sourceLines) {
+            if (turnsDict[sourceLine.targetTurnId]) {
+              // @learn массив есть и он не пустой
+
+              lines.push({
+                ...sourceLine,
+                sourceTurnId: turn._id,
+                targetTurnId: targetLine.sourceTurnId,
+              });
+            }
+          }
+          for (let targetLine of targetLines) {
+            if (turnsDict[targetLine.sourceTurnId]) {
+              // @learn массив есть и он не пустой
+
+              lines.push({
+                ...targetLine,
+                targetTurnId: turn._id,
+                sourceTurnId: targetLine.sourceTurnId,
+              });
+            }
+          }
+          if (!!lines.length) {
+            dispatch(linesCreate(lines));
+          }
+
+          // преобразовать sourceTurnId и targetTurnId и вставить линии
+        },
+        errorCallback,
+      })
+    );
+  };
+
+export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
+  const timeStamps = getTimeStamps();
+  getTurnFromBufferAndRemove(timeStamp);
+  dispatch(loadTurnsAndLinesToPaste());
+  if (timeStamps.length === 1) {
+    dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
+    dispatch(setPanelMode({ mode: MODE_GAME }));
+  }
+};
+
+export const resetTurnNextPastePosition = () => (dispatch) => {
+  dispatch({ type: types.TURN_NEXT_PASTE_POSITION, payload: null });
 };

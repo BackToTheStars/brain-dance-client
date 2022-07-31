@@ -25,6 +25,7 @@ const Panels = () => {
               position={panel.position}
               height={panel?.height}
               width={panel?.width}
+              isMinimized={panel.isMinimized}
             >
               <panel.component settings={panel} />
             </Wrapper>

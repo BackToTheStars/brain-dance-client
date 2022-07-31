@@ -9,77 +9,78 @@ $white: rgba(255, 255, 255, 0.842);
 $panels-spacer: 10px;
 
 // cтили turn
+$turn-widget-bottom-spacer: 14px; //15px;
 
-$turn-menu-right-spacing: 27px;
-$turn-header-color: #1b3238;
-$turn-main-color: #f0dec6;
+$turn-menu-right-spacing: 20px;
+$turn-header-color: #294377;
+$turn-main-color: #0c1e35;
 $turn-header-text-color: #ffffff;
-$turn-paragraph-text-color: #654d33;
-$turn-upper-menu-color: #375e68;
-$turn-corners-radius: 20px;
+$turn-paragraph-text-color: #c2c2c2;
+$turn-upper-menu-color: #ffffff;
+$turn-corners-radius: 5px;
+$turn-border-color: rgba(98, 143, 211, 0.623);
 
-$turn-header-link-color: #6067f9;
+$turn-header-link-color: #78adff;
 $turn-header-link-color-hover: #add8e6;
-$turn-header-date-color: #b9c3c5;
+$turn-header-date-color: #ffffff;
 
-$turn-scrollbar-color: #d1af81;
+$turn-scrollbar-color: #183968;
+$turn-scrollbar-margin: 8px;
 
 $turn-edit-icon-color: #16272c;
 $turn-delete-icon-color: #d72929;
 $turn-scissor-icon-color: #16272c;
 $turn-copy-icon-color: #16272c;
 
-$turn-scrollbar-margin: 12px;
 $turn-upper-corners-radius: 14px;
 
-$turn-upper-menu-lift: 20px;
+$turn-upper-menu-lift: 15px; //    1/2 of height
 $turn-upper-menu-padding-left: 10px;
 $turn-upper-menu-padding-right: 10px;
 
-$turn-header-padding-top: 6px;
+$turn-header-padding-top: 2px;
 $turn-header-padding-right: 15px;
 $turn-header-padding-bottom: 6px;
 $turn-header-padding-left: 15px;
 
-$turn-header-text-padding-top: 10px;
+$turn-header-text-padding-top: 5px;
 $turn-header-text-padding-bottom: 6px;
 
 $turn-header-url-date-margin-bottom: 5px;
+$turn-header-date-font-size: 16px;
+$turn-date-and-url-bottom-spacer: 2px;
 
-$turn-pic-padding-top: 24px;
-$turn-pic-padding-right: 24px;
-$turn-pic-padding-bottom: 24px;
-$turn-pic-padding-left: 24px;
+$turn-pic-padding-top: 14px; //15px;
+$turn-pic-padding-right: 14px; //15px;
+$turn-pic-padding-bottom: 14px; //15px;
+$turn-pic-padding-left: 14px; //15px;
 
-$turn-text-padding-top: 5px;
-$turn-text-padding-right: 15px;
+$turn-text-padding-top: 10px;
+$turn-text-padding-right: 10px;
 $turn-text-padding-bottom: 15px;
-$turn-text-padding-left: 25px;
+$turn-text-padding-left: 15px;
 
 $turn-pic-radius: 10px;
 
 $turn-header-text-font-size: 24px;
-$turn-header-text-font-weight: 600;
+$turn-header-text-font-weight: 500;
 
 $turn-main-text-font-size: 18px;
-$turn-main-text-font-weight: 600;
-
+$turn-main-text-font-weight: 500;
 
 $first-circle-width: 300px;
 $first-circle-height: 300px;
-$first-circle-color: #143656;
+$first-circle-color: #184269;
 $first-circle-top: 0px;
 $first-circle-left: 0px;
 $first-circle-blur: 130px;
 
-
 $second-circle-width: 300px;
 $second-circle-height: 300px;
-$second-circle-color: #143656;
+$second-circle-color: #183e63;
 $second-circle-top: -160px;
 $second-circle-right: 500px;
 $second-circle-blur: 130px;
-
 
 $third-circle-width: 300px;
 $third-circle-height: 300px;
@@ -88,18 +89,4 @@ $third-circle-bottom: 0px;
 $third-circle-right: 0px;
 $third-circle-blur: 130px;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$map-background-color: #181616;

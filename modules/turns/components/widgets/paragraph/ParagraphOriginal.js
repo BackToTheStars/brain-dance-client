@@ -131,7 +131,7 @@ const ParagraphOriginal = ({
   }, [paragraphEl]);
 
   return (
-    <p className="wrapperParagraphText">
+    <div className="wrapperParagraphText" style={style}>
       <p
         className="paragraphText original-text"
         ref={paragraphEl}
@@ -148,7 +148,7 @@ const ParagraphOriginal = ({
             <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
           )} */}
       </p>
-    </p>
+    </div>
   );
 };
 

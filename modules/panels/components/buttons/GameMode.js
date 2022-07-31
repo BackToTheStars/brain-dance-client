@@ -3,12 +3,14 @@ import { saveField } from '@/modules/game/game-redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { togglePanel } from '../../redux/actions';
+import { setPanelMode, togglePanel } from '../../redux/actions';
 import {
+  MODE_OPERATION_PASTE,
   PANEL_ADD_EDIT_TURN,
   PANEL_CLASSES,
   PANEL_INFO,
   PANEL_MINIMAP,
+  PANEL_TURNS_PASTE,
 } from '../../settings';
 import { Buttons } from '../ButtonsPanel';
 
@@ -16,7 +18,9 @@ const GameMode = () => {
   //
   const router = useRouter();
   const { can } = useUserContext();
-  const isTurnInBuffer = false;
+  const isTurnInBuffer = useSelector(
+    (state) => !!state.turns.turnsToPaste.length
+  );
   const d = useSelector((state) => state.turns.d);
   const zeroPointId = useSelector((state) => state.turns.zeroPointId);
   const zeroPoint = d[zeroPointId];
@@ -78,15 +82,8 @@ const GameMode = () => {
     {
       text: 'Paste Turn',
       callback: () => {
-        // insertTurnFromBuffer(null, {
-        //   successCallback: () => {
-        //     console.log('success inserted turn from buffer');
-        //   },
-        //   errorCallback: (message) => {
-        //     console.log(message);
-        //   },
-        // });
-        // setPanelType(PANEL_PASTE);
+        dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: true }));
+        dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));
       },
       show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer,
     },

@@ -1,11 +1,17 @@
 import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
-import { loadFullGame } from '@/modules/game/game-redux/actions';
+import {
+  loadFullGame,
+  loadTurnsAndLinesToPaste,
+} from '@/modules/game/game-redux/actions';
 import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
-import { moveField } from '@/modules/turns/redux/actions';
+import {
+  moveField,
+  resetTurnNextPastePosition,
+} from '@/modules/turns/redux/actions';
 import {
   addNotification,
   viewportGeometryUpdate,
@@ -46,6 +52,7 @@ const Game = ({ hash }) => {
       viewportGeometryUpdateQueue.add(update);
     });
     update();
+    dispatch(loadTurnsAndLinesToPaste());
   }, []);
 
   useEffect(() => {
@@ -59,10 +66,9 @@ const Game = ({ hash }) => {
             top: -ui.position.top,
           })
         );
-        // dispatch(ACTION_FIELD_WAS_MOVED, {
-        //   left: ui.position.left,
-        //   top: ui.position.top,
-        // });
+
+        dispatch(resetTurnNextPastePosition());
+
         $(gameBox.current).css('left', 0);
         $(gameBox.current).css('top', 0);
         setTimeout(() => {

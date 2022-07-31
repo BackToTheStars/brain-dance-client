@@ -7,6 +7,8 @@ const initialTurnsState = {
   error: null,
   zeroPointId: null,
   updateGeometryTime: 0,
+  turnsToPaste: [],
+  pasteNextTurnPosition: null,
 };
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
@@ -37,10 +39,21 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             ...payload,
-            wasChanged: true,
+            // wasChanged: true,
           },
         },
         updateGeometryTime: new Date().getTime(),
+      };
+    case types.TURN_WAS_CHANGED:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: {
+            ...state.d[payload._id],
+            wasChanged: true,
+          },
+        },
       };
     case types.TURNS_SCROLL: {
       return {
@@ -110,8 +123,16 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         turns: state.turns.filter((turn) => turn._id !== payload),
         d: preparedD,
-        updateGeometryTime: new Date().getTime(),
+        // updateGeometryTime: new Date().getTime(),
       };
+    }
+
+    case types.TURNS_LOAD_TO_PASTE: {
+      return { ...state, turnsToPaste: payload.turnsToPaste };
+    }
+
+    case types.TURN_NEXT_PASTE_POSITION: {
+      return { ...state, pasteNextTurnPosition: payload };
     }
 
     default:
