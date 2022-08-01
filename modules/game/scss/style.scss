@@ -124,12 +124,12 @@ body  {
 .card-title {
   margin: 0 0 0 12px 0;
   font-size: 20px;
-line-height: 20px;
-font-family: 'SFPRODISPLAYMEDIUM';
-color: #C7CACE;
+  line-height: 20px;
+  font-family: 'SFPRODISPLAYMEDIUM';
+  color: #C7CACE;
 }
 
-.card-game-body {
+.card-text, .card-game-body   {
   font-size: 18px;
   line-height: 20px;
   margin: 0 0 22px 0;
@@ -166,6 +166,7 @@ box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
   background: #1E1E1E;
   padding: 24px 0 0 0;
   border-radius: 30px 30px 30px 30px;
+  height: 100%;
 }
 
 
@@ -449,7 +450,7 @@ background: #1E1E1E !important;
 
 .main-table tbody {
   overflow-y: scroll;
-  height: 400px;
+  height: 100%;
   display: block;
 }
 
@@ -501,4 +502,8 @@ background: #1E1E1E !important;
 .game-dashboard-detail::-webkit-scrollbar {
   width: 6px;
   height: 79px;
+}
+
+.mainTableWrapper {
+  padding-bottom: 8px;
 }
