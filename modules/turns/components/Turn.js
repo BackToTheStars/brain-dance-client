@@ -104,7 +104,7 @@ const Turn = ({ id }) => {
     );
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
-    console.log({ height, width, newHeight, newWidth });
+    // console.log({ height, width, newHeight, newWidth });
 
     turnGeometryQueue.add(() => {
       dispatch(

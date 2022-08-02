@@ -63,8 +63,8 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
       const { _id, x, y, height, width, scrollPosition } = turn;
       return {
         _id,
-        x: x - zeroPoint.x,
-        y: y - zeroPoint.y,
+        x: x + gamePosition.left,
+        y: y + gamePosition.top,
         height,
         width,
         scrollPosition,
