@@ -63,6 +63,12 @@ export const getTurnsRequest = (hash) => {
   });
 };
 
+export const getGamesLastTurns = () => {
+  return request(`games/last-turns`, {
+    tokenFlag: true,
+  });
+};
+
 export const saveGamePositionRequest = (gamePosition) => {
   return request(`games/viewport?hash=${s.hash}`, {
     tokenFlag: true,

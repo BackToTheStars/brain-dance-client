@@ -4,6 +4,7 @@ import {
   editGameRequest,
   getGamesRequest,
 } from '@/modules/admin/requests';
+import { getGamesLastTurns } from '../requests';
 import * as types from './types';
 
 export const loadGames = (activeIndex) => (dispatch) => {
@@ -60,21 +61,31 @@ export const deleteGame = (hash) => (dispatch) => {
 };
 
 export const addCode = (hash) => (dispatch) => {
-  addCodeRequest(hash)
-      .then((data) => {
-        const { item, codes } = data;
-        dispatch({
-          type: types.SET_CODES_INFO,
-          payload: {
-            hash,
-            code: item.hash,
-            codes
-          }
-        });
-      })
-}
+  addCodeRequest(hash).then((data) => {
+    const { item, codes } = data;
+    dispatch({
+      type: types.SET_CODES_INFO,
+      payload: {
+        hash,
+        code: item.hash,
+        codes,
+      },
+    });
+  });
+};
 
 export const closeError = () => (dispatch) =>
   dispatch({
     type: types.REMOVE_ERROR,
   });
+
+export const loadLastGamesTurns = () => (dispatch) => {
+  return getGamesLastTurns().then((data) => {
+    dispatch({
+      type: types.GAMES_SET_LAST_TURNS,
+      payload: {
+        turns: data.items,
+      },
+    });
+  });
+};
