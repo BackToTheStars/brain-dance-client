@@ -1,4 +1,3 @@
-import Video from 'old/components/turn/Video';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadLastGamesTurns } from '../../games-redux/actions';
@@ -41,18 +40,26 @@ const LastTurns = () => {
                   alt="Game image"
                 />*/}
 
-                {!!turn.imageUrl && (
-                  <img
-                    className="card-img-top d-none d-sm-block"
-                    src={turn.imageUrl}
-                    alt="Game image"
-                  />
-                )}
+                {turn.contentType == 'picture' &&
+                  (turn.imageUrl ? (
+                    <img
+                      className="card-img-top d-none d-sm-block"
+                      src={turn.imageUrl}
+                      alt="Game image"
+                    />
+                  ) : (
+                    <img
+                      className="card-img-top d-none d-sm-block"
+                      src="img/game_screenshot.png"
+                      alt="Game image"
+                    />
+                  ))}
 
                 {!!turn.videoUrl && (
                   <iframe
-                    src={turn.videoUrl}
-                    frameborder="0"
+                    className="card-img-top d-none d-sm-block"
+                    src={turn.videoUrl.replace('watch?v=', 'embed/')}
+                    frameborder="1"
                     allowfullscreen
                   ></iframe>
                 )}
