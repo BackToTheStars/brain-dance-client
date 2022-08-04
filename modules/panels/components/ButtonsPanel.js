@@ -16,7 +16,7 @@ import PictureQuoteAdd from './buttons/picture/PictureQuoteAdd';
 
 export const Buttons = ({ buttons }) => {
   return (
-    <div className="actions panel">
+    <>
       {buttons.map((button, index) =>
         !!button && (!button.show || button.show()) ? (
           <button
@@ -30,7 +30,7 @@ export const Buttons = ({ buttons }) => {
           <div key={index} className="empty-button-space"></div>
         )
       )}
-    </div>
+    </>
   );
 };
 

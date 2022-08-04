@@ -1,12 +1,18 @@
-// $dark-grey: rgba(49, 51, 51, 1); // original
-// $dark-grey: rgba(37, 41, 46, 1);
+$panels-spacer: 10px;
+$panels-background: #040911;
+$panels-border-color: rgba(47, 69, 101, 0.623);
+$panels-spacer: 10px;
+
+$panel-notifications-bottom: 183px;
+
+$panel-buttons-font-color: rgb(255, 255, 255);
+$panel-buttons-bg-color: #1b4d76;
+$panel-buttons-border-color: #667480;
+
 $dark-grey: rgba(53, 58, 64, 1); // подогнал под bootstrap table-dark
 $additional-color: #424242;
-// $dark-grey: rgb(8, 103, 158);
-// $dark-table-color: $dark-grey;
 $light-grey: rgba(180, 180, 180, 0.705);
 $white: rgba(255, 255, 255, 0.842);
-$panels-spacer: 10px;
 
 // cтили turn
 $turn-widget-bottom-spacer: 14px; //15px;
@@ -90,3 +96,14 @@ $third-circle-right: 0px;
 $third-circle-blur: 130px;
 
 $map-background-color: #181616;
+
+$hovered-item-bg: rgba(59, 121, 163, 0.3);
+
+$dark-grey: rgba(53, 58, 64, 1); // подогнал под bootstrap table-dark
+$light-grey: rgba(180, 180, 180, 0.705);
+
+$table-dark-color1: blue; // #454d55;
+$table-dark-color2: red; // #554d55;
+
+$white: rgba(255, 255, 255, 0.842);
+$corners-radius: 9px;

@@ -10,9 +10,13 @@
 .btn-success,
 .btn-primary,
 .btn-danger {
-  color: #fff;
-  background-color: #6c757d;
-  border-color: #6c757d;
+  color: $panel-buttons-font-color;
+  background-color: $panel-buttons-bg-color;
+  border-color: $panel-buttons-border-color;
+
+  // color: #fff;
+  // background-color: #6c757d;
+  // border-color: #6c757d;
   opacity: 0.65;
 }
 

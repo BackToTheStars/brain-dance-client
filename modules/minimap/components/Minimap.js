@@ -27,6 +27,9 @@ const Minimap = ({ settings }) => {
   const turns = Object.values(turnsDictionary);
 
   const position = useSelector((state) => state.game.position);
+  const updateGeometryTime = useSelector(
+    (state) => state.turns.updateGeometryTime
+  );
   // useSelector((state) => state.turns.updateGeometryTime);
 
   const dispatch = useDispatch();
@@ -58,6 +61,7 @@ const Minimap = ({ settings }) => {
     // turns = [],
   } = getScreenRect(turns);
   const isHidden = false; // @todo: remove
+  console.log({ zeroX, zeroY });
 
   const minimapPnlRef = useRef(null);
   const widthPx = Math.round(right - left) || 600; // ширина всего поля
@@ -337,15 +341,15 @@ const SVGMiniMap = ({
         onClick={(e) => onMapClick(e)}
       >
         {/* {!!zeroPoint && (
-        <rect
-          key={zeroPoint._id}
-          x={zeroPoint.x - 20}
-          y={zeroPoint.y - 20}
-          width={40}
-          fill={'red'}
-          height={40}
-        />
-      )} */}
+          <rect
+            key={zeroPoint._id}
+            x={zeroPoint.x - 20}
+            y={zeroPoint.y - 20}
+            width={40}
+            fill={'red'}
+            height={40}
+          />
+        )} */}
         <g
           filter="url(#blurMe)"
           x={position.left}
@@ -369,7 +373,7 @@ const SVGMiniMap = ({
                 width={turn.width}
                 rx={turnRadiusFactored}
                 // fill={fill}
-                fill="#489BC1"
+                fill="gray"
                 height={turn.height}
               />
             );

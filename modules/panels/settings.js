@@ -51,6 +51,7 @@ export const MODE_BUTTON_PICTURE_MODIFY_AREA = 'widget-picture-modify-area';
 export const MODE_OPERATION_PASTE = 'operation-paste';
 
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles';
+export const PANEL_BUTTONS_STYLES = 'actions';
 
 let id = 0;
 
@@ -85,7 +86,7 @@ export const panels = [
   },
   {
     type: PANEL_BUTTONS,
-    position: POSITION_BOTTOM_RIGHT,
+    position: [POSITION_BOTTOM_RIGHT, PANEL_BUTTONS_STYLES].join(' '),
     component: ButtonsPanel,
     isDisplayed: true,
     id: (id += 1),
