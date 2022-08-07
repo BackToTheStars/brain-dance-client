@@ -61,7 +61,6 @@ const Minimap = ({ settings }) => {
     // turns = [],
   } = getScreenRect(turns);
   const isHidden = false; // @todo: remove
-  console.log({ zeroX, zeroY });
 
   const minimapPnlRef = useRef(null);
   const widthPx = Math.round(right - left) || 600; // ширина всего поля

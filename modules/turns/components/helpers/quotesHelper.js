@@ -117,24 +117,26 @@ export const getScrolledQuotes = (
     const outlineWidth = 2; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
 
-    if (top < scrollPosition) {
+    if (top + outlineWidth < scrollPosition) {
       // height / 2
       height = 0;
-      width = paragraphRect.width - outlineWidth; // 2 ширины рамки
+      width = paragraphRect.width + 2 * outlineWidth; // 2 ширины рамки
       left = outlineWidth; //left + outlineWidth;
       top = topGap; //top + outlineWidth;
       position = 'top';
-    } else if (top + height > paragraphRect.height + scrollPosition) {
+    } else if (
+      top + height - outlineWidth >
+      paragraphRect.height + scrollPosition
+    ) {
       // height / 2
       height = 0;
-      width = paragraphRect.width - outlineWidth;
+      width = paragraphRect.width + 2 * outlineWidth;
       left = outlineWidth;
       top = topGap + paragraphRect.height + outlineWidth;
       position = 'bottom';
     } else {
-      top = top + topGap - scrollPosition;
+      top = top + topGap - scrollPosition - outlineWidth;
     }
-
     return {
       ...quote,
       type: TYPE_QUOTE_TEXT,

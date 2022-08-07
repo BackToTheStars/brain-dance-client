@@ -351,7 +351,10 @@ $black-color: rgb(0, 0, 0);
   align-items: center;
 }
 .paragraphText {
-  font-family: 'Nunito', sans-serif;
+  // font-family: 'Nunito', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Apple Color Emoji',
+    'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   font-style: normal;
   background-color: $turn-main-color;
   min-height: 0;
@@ -367,7 +370,7 @@ $black-color: rgb(0, 0, 0);
   color: $turn-paragraph-text-color;
   font-weight: $turn-main-text-font-weight;
   font-size: $turn-main-text-font-size;
-  line-height: 120%;
+  line-height: 1.3125; //120%;
   // border-bottom-left-radius: 10px;
 }
 
@@ -593,7 +596,7 @@ $black-color: rgb(0, 0, 0);
   transition: 0.25s;
 
   font-size: 24px;
-  font-family: 'Nunito', 'sans-serif';
+  // font-family: 'Nunito', 'sans-serif';
   font-style: normal;
   font-weight: 600;
   color: #ffffff;
