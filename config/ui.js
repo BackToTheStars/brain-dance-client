@@ -1,5 +1,7 @@
 export const DEFAULT_GAME_IMG = '/img/game_screenshot.png';
 
+export const TURN_BORDER_THICKNESS = 40;
+
 export const panelSpacer = 10;
 export const widgetSpacer = 14;
 export const lineThickness = 3;

@@ -11,6 +11,7 @@
 //     let width = rect.width;
 //     let height = rect.height;
 
+import { TURN_BORDER_THICKNESS } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 //     let position = 'default';
@@ -114,7 +115,7 @@ export const getScrolledQuotes = (
     let { width, height, left, top } = quote.initialCoords;
 
     let position = 'default';
-    const outlineWidth = 2; // ещё в Turn.js строчка 466
+    const outlineWidth = TURN_BORDER_THICKNESS; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
 
     if (top + outlineWidth < scrollPosition) {

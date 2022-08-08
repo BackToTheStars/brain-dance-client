@@ -26,7 +26,7 @@ $black-color: rgb(0, 0, 0);
   border-top-right-radius: $turn-upper-corners-radius;
   border-bottom-left-radius: $turn-upper-corners-radius;
   border-bottom-right-radius: $turn-upper-corners-radius;
-  border: 2px solid $turn-border-color;
+  border: $turn-border-thickness solid $turn-border-color;
   padding-bottom: $turn-widget-bottom-spacer;
 
   .ui-icon,

@@ -70,18 +70,20 @@ const Picture = ({
         },
         minHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-              imgEl.current.naturalWidth
-          ) + widgetSpacer;
+          const newImgHeight =
+            Math.floor(
+              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+                imgEl.current.naturalWidth
+            ) + widgetSpacer;
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-              imgEl.current.naturalWidth
-          ) + widgetSpacer;
+          const newImgHeight =
+            Math.floor(
+              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+                imgEl.current.naturalWidth
+            ) + widgetSpacer;
           return newImgHeight;
         },
         resizeCallback: () => {},
@@ -121,7 +123,7 @@ const Picture = ({
         //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
         //     : quotes
         // }
-       />
+      />
 
       <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
 

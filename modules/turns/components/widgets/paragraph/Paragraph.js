@@ -12,7 +12,7 @@ const Paragraph = ({
   turn,
   registerHandleResize,
   unregisterHandleResize,
-  recalculatedTime,
+  stateIsReady,
 }) => {
   const {
     paragraph,
@@ -63,7 +63,6 @@ const Paragraph = ({
         {...{
           setParagraphElCurrent,
           setParagraphQuotes,
-
           paragraph,
           _id,
           backgroundColor,
@@ -72,6 +71,7 @@ const Paragraph = ({
           scrollPosition,
           width,
           height,
+          stateIsReady,
         }}
       />
       <ParagraphQuotes turnId={_id} paragraphQuotes={paragraphQuotes} />

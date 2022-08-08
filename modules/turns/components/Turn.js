@@ -27,6 +27,7 @@ const Turn = ({ id }) => {
 
   const [widgets, setWidgets] = useState([]);
   const [widgetD, setWidgetD] = useState({});
+  const [stateIsReady, setStateIsReady] = useState(false);
 
   const wrapper = useRef(null);
 
@@ -195,6 +196,7 @@ const Turn = ({ id }) => {
 
     if (widgetsCount === widgets.length) {
       recalculateSize(Math.round(width), Math.round(height));
+      setStateIsReady(true);
     }
   }, [widgets]);
 
@@ -246,6 +248,7 @@ const Turn = ({ id }) => {
           turn={turn}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
+          stateIsReady={stateIsReady}
         />
       )}
       {dontShowHeader && !!date && !!sourceUrl && (
