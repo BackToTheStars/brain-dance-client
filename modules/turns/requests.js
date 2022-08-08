@@ -1,5 +1,6 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
+import { API_URL } from '@/config/server';
 
 export const createTurnRequest = (body) => {
   return request(`turns/?hash=${s.hash}`, {
@@ -30,6 +31,16 @@ export const updateCoordinatesRequest = (changedTurns) => {
     method: 'PUT',
     body: {
       turns: changedTurns,
+    },
+  });
+};
+
+export const getTokenRequest = (action) => {
+  return request(`games/tokens?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'POST',
+    body: {
+      action: action,
     },
   });
 };

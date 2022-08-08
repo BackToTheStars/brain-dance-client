@@ -5,6 +5,7 @@ import * as quotesTypes from '@/modules/quotes/redux/types';
 import {
   createTurnRequest,
   deleteTurnRequest,
+  getTokenRequest,
   updateTurnRequest,
 } from '../requests';
 import {
@@ -24,6 +25,8 @@ import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
 import { MODE_GAME, PANEL_TURNS_PASTE } from '@/modules/panels/settings';
+
+import { STATIC_API_URL } from '@/config/server';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -310,4 +313,20 @@ export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
 
 export const resetTurnNextPastePosition = () => (dispatch) => {
   dispatch({ type: types.TURN_NEXT_PASTE_POSITION, payload: null });
+};
+
+export const uploadImage = (image) => () => {
+  return getTokenRequest('upload').then((data) => {
+    const token = data.item;
+
+    const formdata = new FormData();
+    formdata.append('file', image);
+    return fetch(`${STATIC_API_URL}/images/upload`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: 'POST',
+      body: formdata,
+    }).then((res) => res.json());
+  });
 };

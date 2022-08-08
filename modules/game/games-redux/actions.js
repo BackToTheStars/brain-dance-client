@@ -3,6 +3,7 @@ import {
   deleteGameRequest,
   editGameRequest,
   getGamesRequest,
+  getTokenRequest,
 } from '@/modules/admin/requests';
 import { getGamesLastTurns } from '../requests';
 import * as types from './types';
