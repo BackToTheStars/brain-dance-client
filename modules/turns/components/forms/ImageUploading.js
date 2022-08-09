@@ -1,5 +1,4 @@
-import { createImageUploadingRequest } from '@/modules/admin/requests';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { uploadImage } from '../../redux/actions';
 
 const ImageUploading = ({ setImageUrl }) => {

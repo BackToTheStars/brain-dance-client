@@ -1,6 +1,5 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
-import { API_URL } from '@/config/server';
 
 export const createTurnRequest = (body) => {
   return request(`turns/?hash=${s.hash}`, {
