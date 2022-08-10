@@ -1,5 +1,8 @@
 import { quoteRectangleThickness } from '@/config/ui';
-import { findLineByQuoteKey } from '@/modules/lines/components/helpers/line';
+import {
+  findLineByQuoteKey,
+  getActiveQuotesDictionary,
+} from '@/modules/lines/components/helpers/line';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,19 +15,7 @@ const ParagraphQuotes = ({ paragraphQuotes, turnId }) => {
   const activeQuoteKey = useSelector((store) => store.quotes.activeQuoteKey);
 
   const activeQuotesDictionary = useMemo(() => {
-    const d = {};
-    for (let paragraphQuote of paragraphQuotes) {
-      d[paragraphQuote._id] = false;
-      if (
-        findLineByQuoteKey(
-          lines,
-          `${paragraphQuote.turnId}_${paragraphQuote.quoteId}`
-        )
-      ) {
-        d[paragraphQuote.quoteId] = true;
-      }
-    }
-    return d;
+    return getActiveQuotesDictionary(paragraphQuotes, lines);
   }, [paragraphQuotes, lines]);
   return (
     <>

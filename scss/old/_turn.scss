@@ -255,10 +255,15 @@ $black-color: rgb(0, 0, 0);
 
 .picture-react-crop {
   position: absolute;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
+  // left: $turn-pic-padding-left;
+  // top: $turn-pic-padding-top;
+  // width: calc(100% - $turn-pic-padding-left - $turn-pic-padding-right);
+  // height: 100%;
+
   // @learn BEM block element modifier спецификация
   .ReactCrop__crop-selection {
     border: none;

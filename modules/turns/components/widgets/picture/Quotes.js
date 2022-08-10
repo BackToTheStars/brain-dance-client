@@ -1,4 +1,5 @@
 import { quoteRectangleThickness } from '@/config/ui';
+import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
@@ -36,10 +37,19 @@ const PictureQuotes = ({
   // const { bottomPanelSettings } = []; //useInteractionContext();
   // const { setPanelType } = bottomPanelSettings;
   const turn = useSelector((state) => state.turns.d[turnId]);
+  const lines = useSelector((store) => store.lines.lines);
 
   const quotes = useMemo(() => {
-    return turn.quotes.filter((quote) => quote.type === TYPE_QUOTE_PICTURE);
+    return turn.quotes
+      .filter((quote) => quote.type === TYPE_QUOTE_PICTURE)
+      .map((quote) => ({ ...quote, quoteId: quote.id, turnId: turn._id }));
   }, [turn.quotes]);
+
+  const activeQuotesDictionary = useMemo(() => {
+    return getActiveQuotesDictionary(quotes, lines);
+  }, [quotes, lines]);
+
+  console.log({ quotes, lines, activeQuotesDictionary });
 
   // const activeQuoteId = useSelector(
   //   (state) =>
@@ -80,7 +90,7 @@ const PictureQuotes = ({
   return (
     <div>
       {quotes.map((quote) => {
-        let bordered = false; // !!lineEnds[`${turnId}_${quote.id}`]; // проверка нужно показывать рамку или нет
+        let bordered = !!activeQuotesDictionary[quote.quoteId]; // !!lineEnds[`${turnId}_${quote.id}`]; // проверка нужно показывать рамку или нет
         const isQuoteActive = activeQuoteId === quote.id; // @todo: активен ли текущий виджет
         // activeQuote &&
         // activeQuote.turnId === turnId &&

@@ -1,3 +1,5 @@
+import { TURN_BORDER_THICKNESS } from '@/config/ui';
+
 export const filterLinesByQuoteKeys = (lines, quoteKeys) => {
   const d = {};
   for (let key of quoteKeys) {
@@ -24,10 +26,10 @@ export const findLineByQuoteKey = (lines, quoteKey) =>
       `${line.targetTurnId}_${line.targetMarker}` === quoteKey
   );
 
-export const filterLinesByTurnId = (lines, turnId) => 
+export const filterLinesByTurnId = (lines, turnId) =>
   lines.filter(
     (line) => line.sourceTurnId === turnId || line.targetTurnId === turnId
-  )
+  );
 
 export const getLinesCoords = (
   lines,
@@ -85,8 +87,14 @@ export const getLinesCoords = (
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
         sourceCoords = {
-          left: turnsDictionary[line.sourceTurnId].x + sourceQuoteCoords.left,
-          top: turnsDictionary[line.sourceTurnId].y + sourceQuoteCoords.top,
+          left:
+            turnsDictionary[line.sourceTurnId].x +
+            sourceQuoteCoords.left +
+            TURN_BORDER_THICKNESS,
+          top:
+            turnsDictionary[line.sourceTurnId].y +
+            sourceQuoteCoords.top +
+            TURN_BORDER_THICKNESS,
           width: sourceQuoteCoords.width,
           height: sourceQuoteCoords.height,
         };
@@ -107,8 +115,14 @@ export const getLinesCoords = (
       }
       if (targetQuoteCoords) {
         targetCoords = {
-          left: turnsDictionary[line.targetTurnId].x + targetQuoteCoords.left,
-          top: turnsDictionary[line.targetTurnId].y + targetQuoteCoords.top,
+          left:
+            turnsDictionary[line.targetTurnId].x +
+            targetQuoteCoords.left +
+            TURN_BORDER_THICKNESS,
+          top:
+            turnsDictionary[line.targetTurnId].y +
+            targetQuoteCoords.top +
+            TURN_BORDER_THICKNESS,
           width: targetQuoteCoords.width,
           height: targetQuoteCoords.height,
         };
@@ -156,4 +170,15 @@ export const getLineEnds = (resLines) => {
     }
   }
   return lineEnds;
+};
+
+export const getActiveQuotesDictionary = (quotes, lines) => {
+  const d = {};
+  for (let quote of quotes) {
+    d[quote._id] = false;
+    if (findLineByQuoteKey(lines, `${quote.turnId}_${quote.quoteId}`)) {
+      d[quote.quoteId] = true;
+    }
+  }
+  return d;
 };

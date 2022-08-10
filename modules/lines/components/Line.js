@@ -96,19 +96,15 @@ const Line = ({
   // console.log({ prevSourceCoords });
   const sourceCoords = {
     ...prevSourceCoords,
-    right:
-      prevSourceCoords.left + prevSourceCoords.width + TURN_BORDER_THICKNESS,
-    bottom:
-      prevSourceCoords.top + prevSourceCoords.height + TURN_BORDER_THICKNESS,
+    right: prevSourceCoords.left + prevSourceCoords.width,
+    bottom: prevSourceCoords.top + prevSourceCoords.height,
     centerX: Math.floor(prevSourceCoords.left + prevSourceCoords.width / 2),
     centerY: Math.floor(prevSourceCoords.top + prevSourceCoords.height / 2),
   };
   const targetCoords = {
     ...prevTargetCoords,
-    right:
-      prevTargetCoords.left + prevTargetCoords.width + TURN_BORDER_THICKNESS,
-    bottom:
-      prevTargetCoords.top + prevTargetCoords.height + TURN_BORDER_THICKNESS,
+    right: prevTargetCoords.left + prevTargetCoords.width,
+    bottom: prevTargetCoords.top + prevTargetCoords.height,
     centerX: Math.floor(prevTargetCoords.left + prevTargetCoords.width / 2),
     centerY: Math.floor(prevTargetCoords.top + prevTargetCoords.height / 2),
   };
