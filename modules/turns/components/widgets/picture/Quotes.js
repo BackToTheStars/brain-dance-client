@@ -3,6 +3,7 @@ import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/li
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
+  MODE_GAME,
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/modules/panels/settings';
@@ -27,6 +28,7 @@ const PictureQuotes = ({
   activeQuoteId,
   mode,
   widgetSettings = {},
+  wrapperEl,
   // quotes,
   // dispatch,
   // activeQuote,
@@ -49,7 +51,7 @@ const PictureQuotes = ({
     return getActiveQuotesDictionary(quotes, lines);
   }, [quotes, lines]);
 
-  console.log({ quotes, lines, activeQuotesDictionary });
+  // console.log({ quotes, lines, activeQuotesDictionary });
 
   // const activeQuoteId = useSelector(
   //   (state) =>
@@ -61,8 +63,6 @@ const PictureQuotes = ({
   // };
 
   useEffect(() => {
-    // console.log({ quotes });
-
     dispatch(
       quoteCoordsUpdate(
         turnId,
@@ -75,17 +75,49 @@ const PictureQuotes = ({
             quoteKey: `${turnId}_${quote.id}`,
             turnId,
             text: `pictureQuote_${quote.id}`,
-            width: Math.round((widgetSettings.width * quote.width) / 100),
-            height: Math.round((widgetSettings.minHeight * quote.height) / 100),
-            left: Math.round((widgetSettings.width * quote.x) / 100),
+            left: Math.round((widgetSettings.width * quote.x) / 100) + 2,
             top:
               Math.round((widgetSettings.minHeight * quote.y) / 100) +
+              2 +
               widgetSettings.minTop,
+            width: Math.round(
+              ((widgetSettings.width - 28) * quote.width) / 100
+            ),
+            height: Math.round(
+              ((widgetSettings.minHeight - 14) * quote.height) / 100
+            ),
           };
         })
       )
     );
   }, [quotes, widgetSettings]);
+
+  // useEffect(() => {
+  //   if (!wrapperEl) return;
+
+  //   const { height, left, top, width } = wrapperEl.getBoundingClientRect();
+  //   console.log({ height, left, top, width });
+  //   dispatch(
+  //     quoteCoordsUpdate(
+  //       turnId,
+  //       TYPE_QUOTE_PICTURE,
+  //       quotes.map((quote) => {
+  //         return {
+  //           type: TYPE_QUOTE_PICTURE,
+  //           initialCoords: {},
+  //           quoteId: quote.id,
+  //           quoteKey: `${turnId}_${quote.id}`,
+  //           turnId,
+  //           text: `pictureQuote_${quote.id}`,
+  //           left: Math.round((width * quote.x) / 100) + left,
+  //           top: Math.round((height * quote.y) / 100) + top,
+  //           width: Math.round((width * quote.width) / 100),
+  //           height: Math.round((height * quote.height) / 100),
+  //         };
+  //       })
+  //     )
+  //   );
+  // }, [quotes, wrapperEl, widgetSettings]);
 
   return (
     <div>
@@ -123,6 +155,11 @@ const PictureQuotes = ({
             key={quote.id}
             style={style}
             onClick={() => {
+              if (isQuoteActive) {
+                dispatch(setPanelMode({ mode: MODE_GAME }));
+                dispatch(processQuoteClicked(`${turnId}_${quote.id}`));
+                return;
+              }
               dispatch(
                 setPanelMode({
                   mode: MODE_WIDGET_PICTURE_QUOTE_ACTIVE,

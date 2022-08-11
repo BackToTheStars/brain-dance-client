@@ -119,6 +119,7 @@ const Picture = ({
           activeQuoteId={editWidgetParams?.activeQuoteId}
           mode={mode}
           widgetSettings={widgetSettings}
+          wrapperEl={imgWrapperEl?.current}
           // quotes={
           //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
           //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)

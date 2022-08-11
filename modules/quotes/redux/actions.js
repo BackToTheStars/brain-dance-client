@@ -78,10 +78,10 @@ export const processQuoteClicked =
         dispatch(setActiveQuoteKey(currentQuoteKey));
         return;
       }
-      if (activeQuoteKey.split('_')[0] === turnId) {
-        dispatch(setActiveQuoteKey(currentQuoteKey));
-        return;
-      }
+      // if (activeQuoteKey.split('_')[0] === turnId) {
+      //   dispatch(setActiveQuoteKey(currentQuoteKey));
+      //   return;
+      // }
       const connectedLines = filterLinesByQuoteKey(lines, currentQuoteKey);
       if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
         dispatch(setActiveQuoteKey(currentQuoteKey));
