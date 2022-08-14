@@ -1,4 +1,8 @@
-import { quoteRectangleThickness } from '@/config/ui';
+import {
+  quoteRectangleThickness,
+  TURN_BORDER_THICKNESS,
+  widgetSpacer,
+} from '@/config/ui';
 import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
@@ -63,6 +67,10 @@ const PictureQuotes = ({
   // };
 
   useEffect(() => {
+    const width =
+      widgetSettings.width - 2 * widgetSpacer - 2 * TURN_BORDER_THICKNESS;
+    const height =
+      widgetSettings.minHeight - widgetSpacer - TURN_BORDER_THICKNESS;
     dispatch(
       quoteCoordsUpdate(
         turnId,
@@ -75,17 +83,13 @@ const PictureQuotes = ({
             quoteKey: `${turnId}_${quote.id}`,
             turnId,
             text: `pictureQuote_${quote.id}`,
-            left: Math.round((widgetSettings.width * quote.x) / 100) + 2,
+            left: Math.round((width * quote.x) / 100) + widgetSpacer,
             top:
-              Math.round((widgetSettings.minHeight * quote.y) / 100) +
-              2 +
+              Math.round((height * quote.y) / 100) +
+              widgetSpacer +
               widgetSettings.minTop,
-            width: Math.round(
-              ((widgetSettings.width - 28) * quote.width) / 100
-            ),
-            height: Math.round(
-              ((widgetSettings.minHeight - 14) * quote.height) / 100
-            ),
+            width: Math.round((width * quote.width) / 100),
+            height: Math.round((height * quote.height) / 100),
           };
         })
       )

@@ -8,7 +8,8 @@ import {
   filterLinesByQuoteKeys,
   findLineByQuoteKey,
 } from '@/modules/lines/components/helpers/line';
-import { lineCreate } from '@/modules/lines/redux/actions';
+import { lineCreate, linesDelete } from '@/modules/lines/redux/actions';
+import { useSelector } from 'react-redux';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
@@ -101,8 +102,15 @@ export const processQuoteClicked =
 export const deleteQuote = () => (dispatch, getState) => {
   const state = getState();
   const { turn, editWidgetParams, zeroPoint } = getWidgetDataFromState(state);
+  const { lines } = state.lines;
 
   let id = editWidgetParams.activeQuoteId;
+
+  const linesToDelete = filterLinesByQuoteKey(lines, `${turn._id}_${id}`);
+
+  if (!!linesToDelete.length) {
+    dispatch(linesDelete(linesToDelete.map((l) => l._id)));
+  }
 
   return new Promise((resolve, reject) => {
     dispatch(
