@@ -4,7 +4,8 @@ const initialGamesState = {
   games: [],
   activeGame: null,
   error: null,
-  lastTurns: []
+  lastTurns: [],
+  lastTurnsGamesDictionary: [],
 };
 
 export const gamesReducer = (state = initialGamesState, { type, payload }) => {
@@ -96,7 +97,8 @@ export const gamesReducer = (state = initialGamesState, { type, payload }) => {
     case types.GAMES_SET_LAST_TURNS: {
       return {
         ...state,
-        lastTurns: payload.turns,        
+        lastTurns: payload.turns,
+        lastTurnsGamesDictionary: payload.lastTurnsGamesDictionary,
       };
     }
     default:

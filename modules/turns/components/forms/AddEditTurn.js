@@ -10,6 +10,7 @@ import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
 import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
+import ImageUploading from './ImageUploading';
 
 const {
   settings,
@@ -304,7 +305,6 @@ const AddEditTurnPopup = () => {
             })}
           </div>
           <input type="hidden" id="idInput" />
-
           {fieldsToShow
             .filter((field) => {
               if (!fieldSettings[field].special) {
@@ -328,6 +328,11 @@ const AddEditTurnPopup = () => {
                 />
               );
             })}
+          <ImageUploading
+            setImageUrl={(imageUrl) => {
+              setForm({ ...form, imageUrl });
+            }}
+          />
           {!!error && <div className="alert alert-danger">{error.message}</div>}
         </div>
       </div>

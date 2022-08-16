@@ -33,3 +33,13 @@ export const updateCoordinatesRequest = (changedTurns) => {
     },
   });
 };
+
+export const getTokenRequest = (action) => {
+  return request(`games/tokens?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'POST',
+    body: {
+      action: action,
+    },
+  });
+};
