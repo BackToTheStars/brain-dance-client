@@ -13,13 +13,13 @@ import { useSelector } from 'react-redux';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
-    type: panelTypes.PANEL_TOGGLE,
-    payload: { open: !!quoteKey, type: PANEL_LINES },
+    type: types.QUOTE_SET_ACTIVE,
+    payload: quoteKey,
   });
 
   dispatch({
-    type: types.QUOTE_SET_ACTIVE,
-    payload: quoteKey,
+    type: panelTypes.PANEL_TOGGLE,
+    payload: { open: !!quoteKey, type: PANEL_LINES },
   });
 };
 
@@ -96,6 +96,7 @@ export const processQuoteClicked =
           targetMarker: currentQuoteKey.split('_')[1],
         })
       );
+      dispatch(setActiveQuoteKey(null));
     }
   };
 

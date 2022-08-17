@@ -138,7 +138,7 @@ const ParagraphOriginal = ({
   return (
     <div className="wrapperParagraphText" style={style}>
       <p
-        className="paragraphText original-text"
+        className="paragraphText original-text noselect"
         ref={paragraphEl}
         style={style}
       >
