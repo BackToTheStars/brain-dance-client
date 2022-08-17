@@ -1,5 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { uploadImage } from '../../redux/actions';
+import { useDropzone } from 'react-dropzone';
+import { useCallback } from 'react';
 
 const ImageUploading = ({ setImageUrl }) => {
   const dispatch = useDispatch();
@@ -10,25 +12,29 @@ const ImageUploading = ({ setImageUrl }) => {
     });
   };
 
+  const onDrop = useCallback((acceptedFiles) => {
+    /*console.log({ acceptedFiles });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(acceptedFiles[0]);
+    inputRef.current.files = dataTransfer.files;*/
+    submitData({ image: acceptedFiles[0] });
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
   return (
-    <form
-      encType="multipart/form-data"
-      onSubmit={(e) => {
-        e.preventDefault();
-        submitData({
-          image: e.target.image.files[0],
-        });
-      }}
-    >
-      <label className="col-form-label">
-        Image
+    <>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+
+        {isDragActive ? (
+          <p>Drop the files here ...</p>
+        ) : (
+          <p>Drag 'n' drop an image here, or click to select it</p>
+        )}
         <p></p>
-        <input type="file" name="image" />
-      </label>
-      <p></p>
-      <input type="submit" defaultValue="Submit" />
-      <p></p>
-    </form>
+      </div>
+    </>
   );
 };
 
