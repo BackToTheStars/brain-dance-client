@@ -1,12 +1,37 @@
 import React, { useEffect, useRef, Fragment } from 'react';
 
-const ParagraphOriginalTexts = ({
-  arrText,
-  turnId,
-}) => {
+const modifyQuoteBackgrounds = (arrText) => {
+  const colors = {
+    '#ffd596': '#9855c2', // оранжевый - фиолетовый
+    '#d2d3d4': '#0a19a8', // серый - синий
+    '#fdc9ff': '#8a0c14', // розовый - красный
+    '#9cf5ff': '#0d7394', // голубой - голубой
+    '#8aff24': '#177807', // зелёный - зелёный
+    '#ffff00': '#5c5425', // жёлтый - жёлтый
+    // '': '', синий - синий
+    // оранжевый - оранжевый
+  };
+  return arrText.map((textItem, i) => {
+    if (!textItem?.attributes?.background) return textItem;
+    // console.log(textItem?.attributes?.background);
+    return {
+      ...textItem,
+      attributes: {
+        ...textItem.attributes,
+        background:
+          colors[textItem.attributes.background] ||
+          textItem.attributes.background,
+      },
+    };
+  });
+};
+
+const ParagraphOriginalTexts = ({ arrText, turnId }) => {
+  const modifiedArrText = modifyQuoteBackgrounds(arrText);
+
   return (
     <>
-      {arrText.map((textItem, i) => {
+      {modifiedArrText.map((textItem, i) => {
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
         const newInserts = [];
         for (let j = 0; j < arrInserts.length; j++) {
@@ -29,12 +54,9 @@ const ParagraphOriginalTexts = ({
   );
 };
 
-export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts)
+export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
-export const OriginalSpanTextPiece = ({
-  textItem,
-  newInserts,
-}) => {
+export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
   // const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
     ? !!textItem.attributes.background
