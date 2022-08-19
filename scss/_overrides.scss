@@ -1,0 +1,34 @@
+.btn-success,
+.btn-primary,
+.btn-danger {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+}
+
+.ui-widget-content {
+  background-color: initial;
+  border: initial;
+  color: initial;
+}
+
+.table > :not(:first-child) {
+  border-top: none;
+}
+
+.table {
+  overflow: hidden;
+}
+
+// .table-dark {
+//   background-color: $table-dark-color1;
+// }
+
+// .table > :not(caption) > * > * {
+//   background-color: $table-dark-color1;
+// }
+
+// .table-striped > tbody > tr:nth-of-type(odd) > * {
+//   box-shadow: inset 0 0 0 9999px $table-dark-color2; //rgba(41, 45, 49, 0.9921);
+// }

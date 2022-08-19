@@ -1,0 +1,188 @@
+html,
+body {
+  height: 100%;
+}
+
+.translucent .textBox {
+  opacity: 0.4;
+}
+
+.textBox {
+  cursor: move;
+  transition: opacity 0.25s;
+  min-width: 300px;
+  /* max-width: 2000px; */
+  min-height: 50px;
+  /* max-height: 3000px; */
+  /* width: 600px;
+    height: 600px; */
+  border: 1px black;
+  position: absolute !important;
+  background-color: rgba(0, 0, 0, 0) !important;
+  /* overflow: hidden; */
+  z-index: 1;
+}
+
+.textBox.ui-widget-content {
+  border: none;
+}
+
+#image-url-wrapper {
+  display: none;
+}
+
+.headerTextTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerText {
+  background-color: lightgrey;
+  border-top-left-radius: $corners-radius;
+  border-top-right-radius: $corners-radius;
+  margin-bottom: 0;
+  min-height: 0;
+  /* max-height: 30%;  */
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  padding: 6px 15px 6px 15px;
+  font-size: 1.45rem;
+}
+
+.gameMenu {
+  height: 100%;
+  margin: 0;
+  width: 90%;
+}
+
+#lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  &.front-elements {
+    z-index: 3;
+  }
+  path {
+    transition: 0.3s;
+  }
+}
+
+.remove-line-transition {
+  #lines {
+    path {
+      transition: 0s;
+    }
+  }
+}
+
+.red-border-to-quote {
+  outline: 3px solid red;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.p0 {
+  padding: 0;
+}
+
+/* #minimap {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  height: 25vh;
+  width: 20vw;
+  z-index: 4;
+}
+
+#minimap video {
+  height: 80%;
+  width: 100%;
+} */
+
+.game-info-table tbody tr:first-child td:first-child {
+  width: 25%;
+}
+
+.ml-12px {
+  margin-left: 12px;
+}
+
+.game-info-table .edit-btn {
+  transition: 0.2s;
+  font-size: 22px;
+  display: inline-block;
+  margin-left: 14px;
+  cursor: pointer;
+  transform: translateY(1px);
+}
+.game-info-table a.edit-btn {
+  color: rgb(160, 160, 160);
+  margin-top: 0px;
+}
+.game-info-table a.edit-btn:hover {
+  color: rgb(58, 58, 58);
+}
+
+/* .minimap-panel {
+  position: fixed;
+  width: 17vw; */
+/* height: 25vh; */
+/* right: 0;
+  bottom: 0;
+} */
+
+/* .minimap-panel__refresh-btn {
+  transform: translateY(-120%);
+  transform: translateX(-10%);
+  display: none; */
+/* Николай - пока скрыл кнопку Refresh */
+/* } */
+
+.rec-rectangle {
+  position: fixed;
+  background: rgba(255, 0, 0, 0.8);
+  transform: translateX(-50%);
+  left: 50%;
+  width: 100px;
+  height: 40px;
+  z-index: 4;
+  top: 10px;
+  border-radius: $corners-radius;
+}
+
+.rec-label {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  width: 30px;
+  height: 30px;
+  top: 15px;
+  right: 94px;
+  z-index: 5;
+}
+
+.rec-text {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  top: 9px;
+  right: 56px;
+  z-index: 5;
+  font-size: 1.4rem;
+
+  /* content: 'REC'; */
+  /* color: rgba(255, 0, 0, 0.8);
+  z-index: 5;
+  margin-left: 30px;
+  margin-top: -20px; */
+}
+
+.th-no-borders th,
+.td-no-borders td {
+  border-top: none;
+}

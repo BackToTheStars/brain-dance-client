@@ -1,15 +1,14 @@
-import '../scss/main.scss';
-import { StateInspector } from 'reinspect'; // connects Redux Dev Tools
-import { MainProvider } from '../components/contexts/MainContext';
+import '../scss/style.scss';
+import { Provider } from 'react-redux'
+import { useStore } from '../redux/store'
 
-export const App = ({ Component, pageProps }) => {
+const App = ({ Component, pageProps }) => {
+  const store = useStore(pageProps.initialReduxState)
+
   return (
-    <StateInspector>
-      <MainProvider>
-        <Component {...pageProps} />
-      </MainProvider>
-    </StateInspector>
+    <Provider store={store}>
+      <Component {...pageProps} />
+    </Provider>
   );
 };
-
 export default App;

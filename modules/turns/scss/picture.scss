@@ -1,0 +1,14 @@
+.picture-react-crop {
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  // @learn BEM block element modifier спецификация
+  .ReactCrop__crop-selection {
+    position: absolute;
+    border: none;
+    cursor: move;
+    @include red-border; // @learn mixin
+  }
+}

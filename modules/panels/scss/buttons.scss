@@ -1,0 +1,30 @@
+.actions.panel {
+  bottom: $panels-spacer;
+  right: $panels-spacer;
+  padding: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  button,
+  .empty-button-space {
+    height: 40px;
+    width: 105px;
+    text-align: center;
+    margin: 5px;
+  }
+}
+.panel-settings-btn {
+  position: fixed;
+  right: $panels-spacer;
+  top: 0;
+  font-size: 30px;
+  color: rgba(245, 245, 245, 0.76);
+  opacity: 0;
+  padding: 10px 10px 0px 0px;
+  transition: 0.3s;
+  cursor: pointer;
+  z-index: 10;
+  &:hover {
+    opacity: 1;
+  }
+}

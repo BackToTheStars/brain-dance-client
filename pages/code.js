@@ -1,8 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { API_URL } from '../components/config';
-
-import { setGameInfo } from '../components/lib/gameToken';
+import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
+import { getGameUserTokenRequest } from '@/modules/user/requests';
 
 const CodePage = () => {
   const router = useRouter();
@@ -10,24 +9,23 @@ const CodePage = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (hash) {
-      fetch(`${API_URL}/codes/login/${hash}?nickname=${nickname}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            // save info (hash, name, role)
-            const { info, token } = data;
-            setGameInfo(info.hash, {
-              info,
-              token,
-            });
-            // redirect
-            location.replace(`/game?hash=${info.hash}`);
-          } else {
-            setError(data.message);
-          }
-        });
-    }
+    if (!hash) return;
+
+    getGameUserTokenRequest(hash, nickname)
+      .then((data) => {
+        if (data.success) {
+          const { info, token } = data;
+          setGameInfoIntoStorage(info.hash, {
+            info,
+            token,
+          });
+          // для корректной работы кнопки "назад"
+          location.replace(`/game?hash=${info.hash}`);
+        } else {
+          setError(data.message);
+        }
+      })
+    
   }, [hash]);
 
   return error ? error : 'In progress...';

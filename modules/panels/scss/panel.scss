@@ -1,0 +1,55 @@
+.panel {
+  position: fixed;
+  z-index: 4;
+  background-color: $panels-background;
+  border: 2px solid $panels-border-color;
+  border-radius: $corners-radius;
+  transition: 0.5s;
+  color: $white;
+  box-sizing: content-box;
+}
+
+.panel-minimap-styles {
+  &.minimized {
+    svg {
+      transition: 0.5s;
+    }
+  }
+}
+
+.position_upper_center {
+  top: $panels-spacer;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.position_bottom_right {
+  right: $panels-spacer;
+  bottom: $panels-spacer;
+}
+
+.position_bottom_left {
+  left: $panels-spacer;
+  bottom: $panels-spacer;
+}
+
+.text-cut-to-size {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.position_flexible {
+  top: $panels-spacer;
+  left: $panels-spacer;
+  transition: 0s;
+  cursor: move;
+}
+
+.max-header {
+  max-width: 20vw;
+}
+
+.max-paragraph {
+  max-width: 20vw;
+}

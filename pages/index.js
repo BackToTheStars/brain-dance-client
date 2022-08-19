@@ -1,147 +1,58 @@
-import { useState, useEffect } from 'react';
-import GameTable from '../components/GameTable';
-import GameDetails from '../components/GameDetails';
-import CreateGameForm from '../components/forms/CreateGameForm';
-import EditGameForm from '../components/forms/EditGameForm';
-import CodeEnterForm from '../components/forms/CodeEnterForm';
-import useGameControl from '../components/hooks/game-control';
-import useGamePlayerCode from '../components/hooks/edit-game-code';
-import useEditCodeWarningPopup from '../components/hooks/edit-code-warning-popup';
-import useEditGame from '../components/hooks/edit-game';
-import NewGameWarningPopup from '../components/popups/NewGameWarningPopup';
+import CreateEnterGameBlock from '@/modules/game/components/blocks/CreateEnterGameBlock';
+import GameDetails from '@/modules/game/components/cards/GameDetails';
 
-import { API_URL } from '../components/config';
-import { getToken } from '../components/lib/token';
+import GameTable from '@/modules/game/components/tables/GameListTable';
 
-const IndexPage = () => {
-  const {
-    games,
-    setGames,
-    openEditGameForm,
-    onItemClick,
-    gameClicked,
-    setGameClicked,
-    toggleCreateForm,
-    setToggleCreateForm,
-    toggleEditForm,
-    setToggleEditForm,
-  } = useGameControl();
+import { loadGames } from '@/modules/game/games-redux/actions';
+import AdminMode from '@/modules/admin/components/profile/AdminMode';
+import { AdminProvider } from '@/modules/admin/contexts/AdminContext';
+import { useRouter } from 'next/router';
 
-  const { code, addCode } = useGamePlayerCode();
-  const {
-    code: popupCode,
-    createGame,
-    enterGame,
-    gameIsPublic,
-  } = useEditCodeWarningPopup();
+import { useDispatch } from 'react-redux';
+import ErrorGameModal from '@/modules/game/components/modals/ErrorGameModal';
+import LastTurns from '@/modules/game/components/blocks/LastTurns';
 
-  const [mode, setMode] = useState('visitor');
-
-  const { game, editGame } = useEditGame();
-
-  useEffect(() => {
-    if (getToken()) {
-      setMode('admin');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (game) {
-      const newGames = [...games];
-      const mutatedIndex = newGames.findIndex(
-        (item) => item.hash === game.hash
-      );
-      newGames[mutatedIndex] = game;
-      setGames(newGames);
-      setGameClicked(game);
-      setToggleEditForm(false);
-    }
-  }, [game]);
-
-  const deleteGame = (game) => {
-    fetch(`${API_URL}/game?hash=${game.hash}`, {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-      },
-    })
-      .then((res) => res.json()) // вернёт Promise
-      .then((data) => {
-        const { item, message } = data;
-        if (item) {
-          console.log({ item });
-        } else {
-          console.log({ message });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+const MainDashboard = () => {
+  const router = useRouter();
+  const enterGame = (hash, nickname) => {
+    router.push(`/code?hash=${hash}&nickname=${nickname}`);
   };
+  const dispatch = useDispatch();
+  const loadGamesAction = () => dispatch(loadGames());
 
   return (
-    <div className="container-fluid col-10 mt-4">
-      {!!popupCode && (
-        <NewGameWarningPopup
-          code={popupCode}
-          enterGame={enterGame}
-          gameIsPublic={gameIsPublic}
-        />
-      )}
-      {mode === 'admin' && <h4>User mode: {mode}</h4>}
-      <div className="row"></div>
-      <div className="row">
-        <div className="col-8">
-          <div className="row">
-            <div className="col-9">
-              <CodeEnterForm />
-            </div>
-            <div className="col-3 text-right">
-              {!toggleCreateForm && !toggleEditForm && (
-                <button
-                  className="btn btn-success"
-                  onClick={() => {
-                    setToggleCreateForm(true);
-                  }}
-                >
-                  Create New Game
-                </button>
-              )}
-            </div>
-            <hr />
-
-            {toggleCreateForm && (
-              <div className="col-12">
-                <CreateGameForm
-                  setToggleCreateForm={setToggleCreateForm}
-                  createGame={createGame}
-                />
-              </div>
-            )}
-          </div>
-          <GameTable
-            gameClicked={gameClicked}
-            games={games}
-            onItemClick={onItemClick}
+    <div className="container-fluid col-lg-10">
+      <div className="row h-100 vh-100 game-dashboard">
+        <div className="col-sm-6 col-xl-8 pt-4 game-dashboard-list">
+          <AdminMode />
+          <CreateEnterGameBlock
+            enterGame={enterGame}
+            onGameCreate={loadGamesAction}
           />
+          <div
+            style={{ /*overflowY: 'auto',*/ flex: '1' }}
+            className="mainTableWrapper"
+          >
+            <GameTable />
+          </div>
         </div>
-        <div className="col-4 ">
-          <div className="game-details">
-            <GameDetails
-              game={gameClicked}
-              {...{ mode, deleteGame, openEditGameForm, addCode, code }}
-            />
-            {toggleEditForm && (
-              <EditGameForm
-                setToggleEditForm={setToggleEditForm}
-                game={gameClicked}
-                editGame={editGame}
-              />
-            )}
+        <div className="col-sm-6 col-xl-4 game-dashboard-detail">
+          <div className="sticky-top top-4">
+            <GameDetails />
+            <LastTurns />
           </div>
         </div>
       </div>
     </div>
+  );
+};
+
+const IndexPage = () => {
+  return (
+    <AdminProvider>
+      <MainDashboard />
+      <ErrorGameModal />
+    </AdminProvider>
   );
 };
 
