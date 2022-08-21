@@ -1,17 +1,35 @@
+import { TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
 import React, { useEffect, useRef, Fragment } from 'react';
 
-const modifyQuoteBackgrounds = (arrText) => {
-  const colors = {
-    '#ffd596': '#9855c2', // оранжевый - фиолетовый
-    '#d2d3d4': '#0a19a8', // серый - синий
-    '#fdc9ff': '#8a0c14', // розовый - красный
-    '#9cf5ff': '#0d7394', // голубой - голубой
-    '#8aff24': '#177807', // зелёный - зелёный
-    '#ffff00': '#5c5425', // жёлтый - жёлтый
-    // '': '', синий - синий
-    // оранжевый - оранжевый
+const ORANGE = '#ffd596';
+const GRAY = '#d2d3d4';
+const PINK = '#fdc9ff';
+const LIGHT_BLUE = '#9cf5ff';
+const GREEN = '#8aff24';
+const YELLOW = '#ffff00';
+
+const modifyQuoteBackgrounds = (arrText, turnType) => {
+  const colorSet = {};
+  colorSet.turn = {
+    [ORANGE]: '#8f480d',
+    [GRAY]: '#525354',
+    [PINK]: '#85176d',
+    [LIGHT_BLUE]: '#1f717a',
+    [GREEN]: '#3f6e17',
+    [YELLOW]: '#87862b',
   };
-  return arrText.map((textItem, i) => {
+  colorSet.comment = {
+    [ORANGE]: '#edb193',
+    [GRAY]: '#d2d3d4',
+    [PINK]: '#fdc9ff',
+    [LIGHT_BLUE]: '#9cf5ff',
+    [GREEN]: '#8aff24',
+    [YELLOW]: '#ffff00',
+  };
+
+  const colors = colorSet?.[turnType] || colorSet.turn;
+
+  return arrText.map((textItem) => {
     if (!textItem?.attributes?.background) return textItem;
     // console.log(textItem?.attributes?.background);
     return {
@@ -21,13 +39,15 @@ const modifyQuoteBackgrounds = (arrText) => {
         background:
           colors[textItem.attributes.background] ||
           textItem.attributes.background,
+        borderRadius: TURN_QUOTE_BORDER_RADIUS,
       },
     };
   });
 };
 
-const ParagraphOriginalTexts = ({ arrText, turnId }) => {
-  const modifiedArrText = modifyQuoteBackgrounds(arrText);
+const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
+  //
+  const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
 
   return (
     <>

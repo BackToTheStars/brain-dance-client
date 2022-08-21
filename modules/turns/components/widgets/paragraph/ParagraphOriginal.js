@@ -148,6 +148,7 @@ const ParagraphOriginal = ({
         <ParagraphOriginalTextWrapper
           arrText={paragraph || []}
           turnId={turnId}
+          turnType={contentType}
         />
         {/* {!!bottomQuotesCount && (
             <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
