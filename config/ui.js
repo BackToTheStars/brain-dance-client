@@ -22,3 +22,4 @@ export const NOTIFICATION_TRANSITION = 500;
 
 export const TURN_ICON_WIDTH = 14;
 export const TURN_ICON_HEIGHT = 16;
+export const TURN_QUOTE_BORDER_RADIUS = '5px';

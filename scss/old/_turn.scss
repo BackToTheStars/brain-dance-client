@@ -453,7 +453,8 @@ $black-color: rgb(0, 0, 0);
 .quote-rectangle {
   position: absolute;
   cursor: pointer;
-  // transition: 1s;
+  transition: 0.2s;
+  border-radius: $turn-quote-border-radius; // дублируется кроме переменных SCSS в общих переменных config/ui.js
 }
 
 .top-quotes-counter,
