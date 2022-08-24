@@ -11,6 +11,10 @@ $black-color: rgb(0, 0, 0);
   }
 }
 
+// .hide-controls .ui-icon.ui-resizable-handle {
+//   visibility: hidden;
+// }
+
 .react-turn-new {
   &:last-child {
     margin-bottom: 0;
@@ -28,6 +32,14 @@ $black-color: rgb(0, 0, 0);
   border-bottom-right-radius: $turn-upper-corners-radius;
   border: $turn-border-thickness solid $turn-border-color;
   padding-bottom: $turn-widget-bottom-spacer;
+  .ui-icon {
+    visibility: hidden;
+  }
+  &:hover {
+    .ui-icon {
+      visibility: visible;
+    }
+  }
 
   .ui-icon,
   .ui-widget-content .ui-icon {

@@ -90,7 +90,7 @@ export const panels = [
     component: ButtonsPanel,
     isDisplayed: true,
     id: (id += 1),
-    width: () => '350px',
+    width: () => '300px',
   },
   {
     type: PANEL_INFO,
