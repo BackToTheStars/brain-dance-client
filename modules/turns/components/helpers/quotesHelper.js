@@ -11,7 +11,7 @@
 //     let width = rect.width;
 //     let height = rect.height;
 
-import { TURN_BORDER_THICKNESS } from '@/config/ui';
+import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 //     let position = 'default';
@@ -121,9 +121,9 @@ export const getScrolledQuotes = (
     if (top + outlineWidth < scrollPosition) {
       // height / 2
       height = 0;
-      width = paragraphRect.width + 2 * outlineWidth; // 2 ширины рамки
-      left = outlineWidth; //left + outlineWidth;
-      top = topGap; //top + outlineWidth;
+      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer; // 2 ширины рамки
+      left = outlineWidth + widgetSpacer; //left + outlineWidth;
+      top = topGap - widgetSpacer - 2; //top + outlineWidth;
       position = 'top';
     } else if (
       top + height - outlineWidth >
@@ -131,9 +131,9 @@ export const getScrolledQuotes = (
     ) {
       // height / 2
       height = 0;
-      width = paragraphRect.width + 2 * outlineWidth;
-      left = outlineWidth;
-      top = topGap + paragraphRect.height + outlineWidth;
+      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer;
+      left = outlineWidth + widgetSpacer;
+      top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
       position = 'bottom';
     } else {
       top = top + topGap - scrollPosition - outlineWidth;

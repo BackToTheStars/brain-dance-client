@@ -108,6 +108,8 @@ export const panels = [
     id: (id += 1),
     width: () => '600px',
     isMinimized: false, // сворачивание в маленькую кнопку
+    size: 100,
+    fieldsToSave: ['position', 'isDisplayed', 'isMinimized', 'size'],
   },
   {
     type: PANEL_LINES,
