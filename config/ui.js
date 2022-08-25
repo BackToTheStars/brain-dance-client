@@ -1,9 +1,9 @@
 export const DEFAULT_GAME_IMG = '/img/game_screenshot.png';
 
-export const TURN_BORDER_THICKNESS = 2; // такая же переменная дублируется в variables.js
+export const TURN_BORDER_THICKNESS = 2; // такая же переменная дублируется в variables.scss
 
 export const panelSpacer = 10;
-export const widgetSpacer = 14; // такая же переменная дублируется в variables.js
+export const widgetSpacer = 14; // такая же переменная дублируется в variables.scss
 export const lineThickness = 3;
 export const quoteRectangleThickness = 3;
 export const lineOffset = 50;

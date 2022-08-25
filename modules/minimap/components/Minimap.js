@@ -15,7 +15,9 @@ import MinimapButtons from './MinimapButtons';
 
 const Minimap = ({ settings }) => {
   //
-  const [minimapSizePercents, setMinimapSizePercents] = useState(100);
+  const [minimapSizePercents, setMinimapSizePercents] = useState(
+    settings.size || 100
+  );
   const maxMinimapSizeWidthPlusHeight = Math.round(
     (500 * minimapSizePercents) / 100
   );
