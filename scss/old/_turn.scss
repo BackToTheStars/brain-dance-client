@@ -11,6 +11,10 @@ $black-color: rgb(0, 0, 0);
   }
 }
 
+// .hide-controls .ui-icon.ui-resizable-handle {
+//   visibility: hidden;
+// }
+
 .react-turn-new {
   &:last-child {
     margin-bottom: 0;
@@ -26,8 +30,16 @@ $black-color: rgb(0, 0, 0);
   border-top-right-radius: $turn-upper-corners-radius;
   border-bottom-left-radius: $turn-upper-corners-radius;
   border-bottom-right-radius: $turn-upper-corners-radius;
-  border: 2px solid $turn-border-color;
+  border: $turn-border-thickness solid $turn-border-color;
   padding-bottom: $turn-widget-bottom-spacer;
+  .ui-icon {
+    visibility: hidden;
+  }
+  &:hover {
+    .ui-icon {
+      visibility: visible;
+    }
+  }
 
   .ui-icon,
   .ui-widget-content .ui-icon {
@@ -111,7 +123,7 @@ $black-color: rgb(0, 0, 0);
       width: 100%;
     }
 
-    &.active {
+    &.active > div {
       outline: 4px solid blue;
     }
     /* height: 100%; */
@@ -255,10 +267,15 @@ $black-color: rgb(0, 0, 0);
 
 .picture-react-crop {
   position: absolute;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
+  // left: $turn-pic-padding-left;
+  // top: $turn-pic-padding-top;
+  // width: calc(100% - $turn-pic-padding-left - $turn-pic-padding-right);
+  // height: 100%;
+
   // @learn BEM block element modifier спецификация
   .ReactCrop__crop-selection {
     border: none;
@@ -351,8 +368,12 @@ $black-color: rgb(0, 0, 0);
   align-items: center;
 }
 .paragraphText {
-  font-family: 'Nunito', sans-serif;
+  // font-family: 'Nunito', sans-serif;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Apple Color Emoji',
+    'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   font-style: normal;
+  // font-stretch: semi-condensed;
   background-color: $turn-main-color;
   min-height: 0;
   width: 100%;
@@ -367,7 +388,7 @@ $black-color: rgb(0, 0, 0);
   color: $turn-paragraph-text-color;
   font-weight: $turn-main-text-font-weight;
   font-size: $turn-main-text-font-size;
-  line-height: 120%;
+  line-height: 1.3125; //120%;
   // border-bottom-left-radius: 10px;
 }
 
@@ -444,7 +465,8 @@ $black-color: rgb(0, 0, 0);
 .quote-rectangle {
   position: absolute;
   cursor: pointer;
-  // transition: 1s;
+  transition: 0.2s;
+  border-radius: $turn-quote-border-radius; // дублируется кроме переменных SCSS в общих переменных config/ui.js
 }
 
 .top-quotes-counter,
@@ -593,7 +615,7 @@ $black-color: rgb(0, 0, 0);
   transition: 0.25s;
 
   font-size: 24px;
-  font-family: 'Nunito', 'sans-serif';
+  // font-family: 'Nunito', 'sans-serif';
   font-style: normal;
   font-weight: 600;
   color: #ffffff;

@@ -11,6 +11,7 @@
 //     let width = rect.width;
 //     let height = rect.height;
 
+import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 //     let position = 'default';
@@ -114,27 +115,29 @@ export const getScrolledQuotes = (
     let { width, height, left, top } = quote.initialCoords;
 
     let position = 'default';
-    const outlineWidth = 2; // ещё в Turn.js строчка 466
+    const outlineWidth = TURN_BORDER_THICKNESS; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
 
-    if (top < scrollPosition) {
+    if (top + outlineWidth < scrollPosition) {
       // height / 2
       height = 0;
-      width = paragraphRect.width - outlineWidth; // 2 ширины рамки
-      left = outlineWidth; //left + outlineWidth;
-      top = topGap; //top + outlineWidth;
+      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer; // 2 ширины рамки
+      left = outlineWidth + widgetSpacer; //left + outlineWidth;
+      top = topGap - widgetSpacer - 2; //top + outlineWidth;
       position = 'top';
-    } else if (top + height > paragraphRect.height + scrollPosition) {
+    } else if (
+      top + height - outlineWidth >
+      paragraphRect.height + scrollPosition
+    ) {
       // height / 2
       height = 0;
-      width = paragraphRect.width - outlineWidth;
-      left = outlineWidth;
-      top = topGap + paragraphRect.height + outlineWidth;
+      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer;
+      left = outlineWidth + widgetSpacer;
+      top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
       position = 'bottom';
     } else {
-      top = top + topGap - scrollPosition;
+      top = top + topGap - scrollPosition - outlineWidth;
     }
-
     return {
       ...quote,
       type: TYPE_QUOTE_TEXT,

@@ -191,12 +191,6 @@ const AddEditTurnPopup = () => {
 
     const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
 
-    console.log({
-      quotes,
-      prevQuotes,
-      quotesDeleted,
-    });
-
     const linesToDelete = filterLinesByQuoteKeys(
       lines,
       quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`)

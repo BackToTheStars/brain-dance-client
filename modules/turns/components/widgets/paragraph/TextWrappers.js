@@ -1,12 +1,57 @@
+import { TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
 import React, { useEffect, useRef, Fragment } from 'react';
 
-const ParagraphOriginalTexts = ({
-  arrText,
-  turnId,
-}) => {
+const ORANGE = '#ffd596';
+const GRAY = '#d2d3d4';
+const PINK = '#fdc9ff';
+const LIGHT_BLUE = '#9cf5ff';
+const GREEN = '#8aff24';
+const YELLOW = '#ffff00';
+
+const modifyQuoteBackgrounds = (arrText, turnType) => {
+  const colorSet = {};
+  colorSet.turn = {
+    [ORANGE]: '#8f480d',
+    [GRAY]: '#525354',
+    [PINK]: '#85176d',
+    [LIGHT_BLUE]: '#1f717a',
+    [GREEN]: '#3f6e17',
+    [YELLOW]: '#87862b',
+  };
+  colorSet.comment = {
+    [ORANGE]: '#edb193',
+    [GRAY]: '#d2d3d4',
+    [PINK]: '#fdc9ff',
+    [LIGHT_BLUE]: '#9cf5ff',
+    [GREEN]: '#8aff24',
+    [YELLOW]: '#ffff00',
+  };
+
+  const colors = colorSet?.[turnType] || colorSet.turn;
+
+  return arrText.map((textItem) => {
+    if (!textItem?.attributes?.background) return textItem;
+    // console.log(textItem?.attributes?.background);
+    return {
+      ...textItem,
+      attributes: {
+        ...textItem.attributes,
+        background:
+          colors[textItem.attributes.background] ||
+          textItem.attributes.background,
+        borderRadius: TURN_QUOTE_BORDER_RADIUS,
+      },
+    };
+  });
+};
+
+const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
+  //
+  const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
+
   return (
     <>
-      {arrText.map((textItem, i) => {
+      {modifiedArrText.map((textItem, i) => {
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
         const newInserts = [];
         for (let j = 0; j < arrInserts.length; j++) {
@@ -29,12 +74,9 @@ const ParagraphOriginalTexts = ({
   );
 };
 
-export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts)
+export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
-export const OriginalSpanTextPiece = ({
-  textItem,
-  newInserts,
-}) => {
+export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
   // const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
     ? !!textItem.attributes.background

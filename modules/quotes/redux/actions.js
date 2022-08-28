@@ -8,17 +8,18 @@ import {
   filterLinesByQuoteKeys,
   findLineByQuoteKey,
 } from '@/modules/lines/components/helpers/line';
-import { lineCreate } from '@/modules/lines/redux/actions';
+import { lineCreate, linesDelete } from '@/modules/lines/redux/actions';
+import { useSelector } from 'react-redux';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
-    type: panelTypes.PANEL_TOGGLE,
-    payload: { open: !!quoteKey, type: PANEL_LINES },
+    type: types.QUOTE_SET_ACTIVE,
+    payload: quoteKey,
   });
 
   dispatch({
-    type: types.QUOTE_SET_ACTIVE,
-    payload: quoteKey,
+    type: panelTypes.PANEL_TOGGLE,
+    payload: { open: !!quoteKey, type: PANEL_LINES },
   });
 };
 
@@ -78,10 +79,10 @@ export const processQuoteClicked =
         dispatch(setActiveQuoteKey(currentQuoteKey));
         return;
       }
-      if (activeQuoteKey.split('_')[0] === turnId) {
-        dispatch(setActiveQuoteKey(currentQuoteKey));
-        return;
-      }
+      // if (activeQuoteKey.split('_')[0] === turnId) {
+      //   dispatch(setActiveQuoteKey(currentQuoteKey));
+      //   return;
+      // }
       const connectedLines = filterLinesByQuoteKey(lines, currentQuoteKey);
       if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
         dispatch(setActiveQuoteKey(currentQuoteKey));
@@ -95,14 +96,22 @@ export const processQuoteClicked =
           targetMarker: currentQuoteKey.split('_')[1],
         })
       );
+      dispatch(setActiveQuoteKey(null));
     }
   };
 
 export const deleteQuote = () => (dispatch, getState) => {
   const state = getState();
   const { turn, editWidgetParams, zeroPoint } = getWidgetDataFromState(state);
+  const { lines } = state.lines;
 
   let id = editWidgetParams.activeQuoteId;
+
+  const linesToDelete = filterLinesByQuoteKey(lines, `${turn._id}_${id}`);
+
+  if (!!linesToDelete.length) {
+    dispatch(linesDelete(linesToDelete.map((l) => l._id)));
+  }
 
   return new Promise((resolve, reject) => {
     dispatch(

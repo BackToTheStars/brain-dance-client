@@ -1,8 +1,15 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { filterLinesByQuoteKey, filterLinesByQuoteKeys, filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
+import {
+  filterLinesByQuoteKey,
+  filterLinesByQuoteKeys,
+  filterLinesByTurnId,
+} from '@/modules/lines/components/helpers/line';
+import * as panelTypes from '@/modules/panels/redux/types';
 import { lineDelete } from '@/modules/lines/redux/actions';
+import { useEffect } from 'react';
+import { PANEL_LINES } from '../settings';
 
 const cutTextToSize = (text, size) => {
   if (text.length < size + 3) return text;
@@ -43,12 +50,13 @@ const LineRow = ({ line, can, handleDelete }) => {
 };
 
 const LinesPanel = () => {
-  const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const turn = useSelector((state) => state.turns.d[editTurnId])
+  // const editTurnId = useSelector((state) => state.panels.editTurnId);
+  // const turn = useSelector((state) => state.turns.d[editTurnId])
 
   const lines = useSelector((state) => state.lines.lines);
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
-  const preparedLines = turn ? filterLinesByTurnId(lines, turn._id) : filterLinesByQuoteKey(lines, activeQuoteKey);
+  // const preparedLines = turn ? filterLinesByTurnId(lines, turn._id) : filterLinesByQuoteKey(lines, activeQuoteKey);
+  const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
 
   const dispatch = useDispatch();
   const { can } = useUserContext();
@@ -60,8 +68,18 @@ const LinesPanel = () => {
     }
   };
 
+  useEffect(() => {
+    if (!preparedLines.length) {
+      dispatch({
+        type: panelTypes.PANEL_TOGGLE,
+        payload: { open: false, type: PANEL_LINES },
+      });
+    }
+  }, [preparedLines]);
+
   if (!preparedLines.length) {
-    return 'no preparedLines';
+    // return 'no preparedLines';
+    return null;
   }
 
   return (

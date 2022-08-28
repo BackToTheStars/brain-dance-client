@@ -7,6 +7,16 @@ body {
   height: 100%;
 }
 
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 .translucent .textBox {
   opacity: 0.4;
 }
@@ -57,7 +67,10 @@ body {
   padding: $turn-header-padding-top $turn-header-padding-right
     $turn-header-padding-bottom $turn-header-padding-left;
   font-size: $turn-header-text-font-size;
-  font-family: 'Nunito';
+  // font-family: 'Nunito';
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Apple Color Emoji',
+    'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   font-style: normal;
   font-weight: $turn-header-text-font-weight;
   flex-grow: 0;

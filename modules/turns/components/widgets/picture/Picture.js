@@ -70,18 +70,20 @@ const Picture = ({
         },
         minHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-              imgEl.current.naturalWidth
-          ) + widgetSpacer;
+          const newImgHeight =
+            Math.floor(
+              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+                imgEl.current.naturalWidth
+            ) + widgetSpacer;
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight = Math.floor(
-            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-              imgEl.current.naturalWidth
-          ) + widgetSpacer;
+          const newImgHeight =
+            Math.floor(
+              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+                imgEl.current.naturalWidth
+            ) + widgetSpacer;
           return newImgHeight;
         },
         resizeCallback: () => {},
@@ -97,50 +99,53 @@ const Picture = ({
   }, [imageLoaded]);
 
   return (
-    <div
-      className={`picture-content ${isActive ? 'active' : ''}`}
-      ref={imgWrapperEl}
-    >
-      {/* {displayCrop &&  */}
-      {isActive && mode === MODE_WIDGET_PICTURE_QUOTE_ADD && (
-        <PictureCrop
-          imageUrl={imageUrlToRender}
-          widgetKey={`${turnId}_${widgetId}`}
-          stateCrop={editWidgetParams?.crop}
-          activeQuoteId={editWidgetParams?.activeQuoteId}
-        />
-      )}
-      <PictureQuotes
-        turnId={turnId}
-        widgetId={widgetId}
-        activeQuoteId={editWidgetParams?.activeQuoteId}
-        mode={mode}
-        widgetSettings={widgetSettings}
-        // quotes={
-        //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
-        //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
-        //     : quotes
-        // }
-       />
-
-      <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
-
-      <a
-        className="widget-button"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          // setDisplayCrop(true);
-          dispatch(
-            setPanelMode({
-              mode: MODE_WIDGET_PICTURE,
-              params: { editTurnId: turnId, editWidgetId: widgetId },
-            })
-          );
-        }}
+    <div className={`picture-content ${isActive ? 'active' : ''}`}>
+      <div
+        style={{ width: '100%', height: '100%', position: 'relative' }}
+        ref={imgWrapperEl}
       >
-        <i className="fas fa-highlighter"></i>
-      </a>
+        {/* {displayCrop &&  */}
+        {isActive && mode === MODE_WIDGET_PICTURE_QUOTE_ADD && (
+          <PictureCrop
+            imageUrl={imageUrlToRender}
+            widgetKey={`${turnId}_${widgetId}`}
+            stateCrop={editWidgetParams?.crop}
+            activeQuoteId={editWidgetParams?.activeQuoteId}
+          />
+        )}
+        <PictureQuotes
+          turnId={turnId}
+          widgetId={widgetId}
+          activeQuoteId={editWidgetParams?.activeQuoteId}
+          mode={mode}
+          widgetSettings={widgetSettings}
+          wrapperEl={imgWrapperEl?.current}
+          // quotes={
+          //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
+          //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
+          //     : quotes
+          // }
+        />
+
+        <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
+
+        <a
+          className="widget-button"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            // setDisplayCrop(true);
+            dispatch(
+              setPanelMode({
+                mode: MODE_WIDGET_PICTURE,
+                params: { editTurnId: turnId, editWidgetId: widgetId },
+              })
+            );
+          }}
+        >
+          <i className="fas fa-highlighter"></i>
+        </a>
+      </div>
     </div>
   );
 };

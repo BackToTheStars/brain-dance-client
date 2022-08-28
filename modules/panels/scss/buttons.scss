@@ -7,10 +7,12 @@
   justify-content: space-around;
   button,
   .empty-button-space {
-    height: 40px;
-    width: 105px;
+    height: 30px;
+    width: 90px;
     text-align: center;
     margin: 5px;
+    font-size: 14px;
+    line-height: 1;
   }
 }
 .panel-settings-btn {

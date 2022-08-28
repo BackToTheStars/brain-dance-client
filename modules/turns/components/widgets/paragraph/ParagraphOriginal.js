@@ -1,5 +1,8 @@
 import { PARAGRAPH_SCROLL_TIMEOUT_DELAY } from '@/config/ui';
-import { updateScrollPosition } from '@/modules/turns/redux/actions';
+import {
+  markTurnAsChanged,
+  updateScrollPosition,
+} from '@/modules/turns/redux/actions';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
@@ -32,6 +35,7 @@ const ParagraphOriginal = ({
   scrollPosition,
   width,
   height,
+  stateIsReady,
 }) => {
   //
   // const { lineEnds, dispatch } = useTurnData() || {};
@@ -83,7 +87,8 @@ const ParagraphOriginal = ({
     setParagraphQuotes(
       getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
     );
-  }, [height, scrollTop]);
+    dispatch(markTurnAsChanged({ _id: turnId }));
+  }, [height, scrollTop, stateIsReady]);
 
   useEffect(() => {
     if (paragraphEl?.current) setParagraphElCurrent(paragraphEl.current);
@@ -133,7 +138,7 @@ const ParagraphOriginal = ({
   return (
     <div className="wrapperParagraphText" style={style}>
       <p
-        className="paragraphText original-text"
+        className="paragraphText original-text noselect"
         ref={paragraphEl}
         style={style}
       >
@@ -143,6 +148,7 @@ const ParagraphOriginal = ({
         <ParagraphOriginalTextWrapper
           arrText={paragraph || []}
           turnId={turnId}
+          turnType={contentType}
         />
         {/* {!!bottomQuotesCount && (
             <span className="bottom-quotes-counter">{bottomQuotesCount}</span>

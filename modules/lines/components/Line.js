@@ -1,4 +1,9 @@
-import { kBezier, lineOffset, lineThickness } from '@/config/ui';
+import {
+  kBezier,
+  lineOffset,
+  lineThickness,
+  TURN_BORDER_THICKNESS,
+} from '@/config/ui';
 import {
   SIDE_RIGHT,
   SIDE_LEFT,
