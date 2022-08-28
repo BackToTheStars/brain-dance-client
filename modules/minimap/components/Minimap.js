@@ -1,6 +1,7 @@
 // import { useUiContext } from '../contexts/UI_Context';
 import { panelSpacer } from '@/config/ui';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
+import { PANEL_CHANGE_GEOMETRY } from '@/modules/panels/redux/types';
 import { PANEL_MINIMAP } from '@/modules/panels/settings';
 import { moveField } from '@/modules/turns/redux/actions';
 import { useEffect, useState, useRef } from 'react';
@@ -15,14 +16,16 @@ import MinimapButtons from './MinimapButtons';
 
 const Minimap = ({ settings }) => {
   //
-  const [minimapSizePercents, setMinimapSizePercents] = useState(
-    settings.size || 100
-  );
+  const dispatch = useDispatch();
+
+  const minimapSizePercents =
+    useSelector((state) => state.panels.d[PANEL_MINIMAP].size) || 100;
+
+  const { isMinimized } = settings;
+
   const maxMinimapSizeWidthPlusHeight = Math.round(
     (500 * minimapSizePercents) / 100
   );
-
-  const { isMinimized } = settings;
 
   const [gameBoxEl, setGameBoxEl] = useState(null);
   const turnsDictionary = useSelector((state) => state.turns.d);
@@ -34,10 +37,15 @@ const Minimap = ({ settings }) => {
   );
   // useSelector((state) => state.turns.updateGeometryTime);
 
-  const dispatch = useDispatch();
   // const isMinimized = useSelector(
   //   (state) => state.panels.d[PANEL_MINIMAP].isMinimized
   // );
+  const setMinimapSizePercents = (size) => {
+    dispatch({
+      type: PANEL_CHANGE_GEOMETRY,
+      payload: { geometryData: { size }, type: PANEL_MINIMAP },
+    });
+  };
 
   useEffect(() => {
     setGameBoxEl(document.querySelector('#gameBox'));
@@ -68,8 +76,9 @@ const Minimap = ({ settings }) => {
   const widthPx = Math.round(right - left) || 600; // ширина всего поля
   const heightPx = Math.round(bottom - top) || 400; // высота всего поля
 
-  const minimapWidth =
-    (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
+  const minimapWidth = isMinimized
+    ? 38
+    : (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
 
   // console.log({
   //   maxMinimapSizeWidthPlusHeight,
@@ -181,16 +190,19 @@ const Minimap = ({ settings }) => {
     dispatch(changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth }));
   }, [value.minimapWidth]);
 
-  useEffect(() => {
-    if (!value.minimapWidth) return;
-    if (!isMinimized) {
-      dispatch(
-        changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth })
-      );
-    } else {
-      dispatch(changePanelGeometry(PANEL_MINIMAP, { width: 38 }));
-    }
-  }, [isMinimized]);
+  // useEffect(() => {
+  //   if (!value.minimapWidth) return;
+  //   if (!isMinimized) {
+  //     console.log('Width whatever');
+  //     dispatch(
+  //       changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth })
+  //     );
+  //   } else {
+  //     console.log('Width 38');
+  //     dispatch(changePanelGeometry(PANEL_MINIMAP, { width: 38 }));
+  //   }
+  //   console.log({ isMinimized, value });
+  // }, [isMinimized]);
 
   useEffect(() => {
     if (!minimapPnlRef.current) return;
