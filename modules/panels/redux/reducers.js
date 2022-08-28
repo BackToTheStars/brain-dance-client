@@ -1,5 +1,8 @@
-import { MODE_GAME, panels } from '../settings';
+import { MODE_GAME, panels as panelState } from '../settings';
+import { getInitialPanels } from './storage';
 import * as types from './types';
+
+const panels = getInitialPanels(panelState);
 
 const d = {};
 for (let panel of panels) {
