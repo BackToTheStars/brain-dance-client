@@ -2,12 +2,8 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { savePictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { setPanelMode } from '../../../redux/actions';
-import {
-  MODE_GAME,
-  MODE_WIDGET_PICTURE,
-  MODE_WIDGET_PICTURE_QUOTE_ADD,
-} from '../../../settings';
+import { resetAndExit, setPanelMode } from '../../../redux/actions';
+import { MODE_WIDGET_PICTURE } from '../../../settings';
 import { Buttons } from '../../ButtonsPanel';
 
 const PictureQuoteAdd = () => {
@@ -20,7 +16,8 @@ const PictureQuoteAdd = () => {
       text: 'Save Area',
       callback: () => {
         dispatch(savePictureQuoteByCrop()).then(() => {
-          dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+          dispatch(resetAndExit());
+          console.log('сброс произведён!');
         });
         // performActions({
         //   info: MODE_BUTTON_PICTURE_SAVE_AREA,
