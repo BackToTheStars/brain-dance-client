@@ -101,6 +101,15 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         },
       };
 
+    case types.PANELS_WIDGETS_QUOTES_RESET:
+      return {
+        ...state,
+        editTurnId: null,
+        editWidgetId: null,
+        editWidgetParams: {},
+        mode: MODE_GAME,
+      };
+
     default:
       return state;
   }

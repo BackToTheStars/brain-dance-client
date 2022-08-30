@@ -2,6 +2,7 @@ import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
   loadTurnsAndLinesToPaste,
+  switchEditMode,
 } from '@/modules/game/game-redux/actions';
 import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
@@ -19,14 +20,18 @@ import {
 import { VIEWPORT_UPDATE } from '@/modules/ui/redux/types';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
 const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
-  const [svgLayerZIndex, setSvgLayerZIndex] = useState(true);
+  const svgLayerZIndex = useSelector((state) => !state.game.editMode);
+  console.log(svgLayerZIndex);
+  const setSvgLayerZIndex = (booleanValue) => {
+    dispatch(switchEditMode(booleanValue));
+  };
 
   const { info } = useUserContext();
   const { nickname } = info;
@@ -84,9 +89,11 @@ const Game = ({ hash }) => {
       <div className="gameFieldWrapper">
         <div
           id="gameBox"
-          className={`ui-widget-content ${svgLayerZIndex ? "hide-controls" : ""}`}
+          className={`ui-widget-content ${
+            svgLayerZIndex ? 'hide-controls' : ''
+          }`}
           ref={gameBox}
-          onDoubleClick={(e) => setSvgLayerZIndex(!svgLayerZIndex)}
+          onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
         >
           <Turns />
           <LinesCalculator />

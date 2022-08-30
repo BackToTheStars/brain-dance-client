@@ -124,3 +124,7 @@ export const centerViewportAtPosition =
       }
     );
   };
+
+export const switchEditMode = (booleanValue) => (dispatch) => {
+  dispatch({ type: types.GAME_EDIT_MODE_SWITCH, payload: booleanValue });
+};

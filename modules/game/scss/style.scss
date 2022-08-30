@@ -97,14 +97,14 @@ body {
 
 .card-body {
   background: #1e1e1e;
-  padding: 20px 0 20px 0 !important;
+  padding: 14px 0 0 0 !important;
 }
 
 .card {
   border: none !important;
   background: #1e1e1e !important;
   /* sh3 */
-  padding: 12px 16px;
+  padding: 14px;
   border-radius: 14px !important;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
 }
@@ -114,7 +114,7 @@ body {
 // }
 
 .card-img-top {
-  border-radius: 10px 10px 10px 10px !important;
+  border-radius: 14px !important;
 }
 
 // .card-body {
@@ -163,13 +163,15 @@ body {
   /* sh3 */
 
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
+  margin-top: 10px !important;
 }
 
 .main-table {
   background: #1e1e1e;
   padding: 24px 0 0 0;
-  border-radius: 30px 30px 30px 30px;
+  border-radius: 14px;
   height: 100%;
+  margin-top: 0 !important;
 }
 
 
@@ -244,6 +246,7 @@ body {
   font-family: 'SFPRODISPLAYMEDIUM';
   letter-spacing: 0.2px;
   font-size: 15px;
+  margin-bottom: 0 !important;
 }
 
 .logo-wrap {
@@ -279,7 +282,7 @@ body {
   float: right;
   background: #1e1e1e url(/images/create.svg) 13px 50% no-repeat !important;
   color: #ffffff;
-  margin: 27px 0 24px 0;
+  margin: 27px 0 14px 0;
   padding: 9px 20px 8px 40px;
   clear: both;
 }
@@ -287,13 +290,13 @@ body {
 .modal-content {
   background: #252526 !important;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32) !important;
-  border-radius: 30px !important;
+  border-radius: 14px !important;
 }
 
 .modal-header {
   background: #1e1e1e;
   padding: 14px 0 15px 0 !important;
-  border-radius: 30px 30px 0px 0px !important;
+  border-radius: 14px 14px 0px 0px !important;
   border: none !important;
 }
 

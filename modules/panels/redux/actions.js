@@ -1,3 +1,6 @@
+import { switchEditMode } from '@/modules/game/game-redux/actions';
+import { GAME_EDIT_MODE_SWITCH } from '@/modules/game/game-redux/types';
+import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 import {
   MODE_GAME,
@@ -5,6 +8,12 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '../settings';
 import * as types from './types';
+
+export const resetAndExit = () => (dispatch) => {
+  dispatch(switchEditMode(false));
+  dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
+  dispatch(setActiveQuoteKey(null));
+};
 
 export const togglePanel = (payload) => (dispatch) => {
   dispatch({
