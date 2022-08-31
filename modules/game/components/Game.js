@@ -7,6 +7,7 @@ import {
 import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
+import { resetAndExit } from '@/modules/panels/redux/actions';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import {
@@ -28,7 +29,6 @@ const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
   const svgLayerZIndex = useSelector((state) => !state.game.editMode);
-  console.log(svgLayerZIndex);
   const setSvgLayerZIndex = (booleanValue) => {
     dispatch(switchEditMode(booleanValue));
   };
@@ -58,6 +58,7 @@ const Game = ({ hash }) => {
     });
     update();
     dispatch(loadTurnsAndLinesToPaste());
+    dispatch(resetAndExit());
   }, []);
 
   useEffect(() => {

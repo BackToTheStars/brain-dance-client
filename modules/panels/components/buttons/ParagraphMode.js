@@ -1,7 +1,7 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { setPanelMode } from '../../redux/actions';
+import { resetAndExit, setPanelMode } from '../../redux/actions';
 import { MODE_GAME } from '../../settings';
 import { Buttons } from '../ButtonsPanel';
 
@@ -36,7 +36,7 @@ const ParagraphMode = () => {
     {
       text: 'Cancel',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_GAME }));
+        dispatch(resetAndExit());
         // makeWidgetActive(null);
       },
       show: () => can(RULE_TURNS_CRUD),

@@ -17,16 +17,7 @@ const PictureQuoteAdd = () => {
       callback: () => {
         dispatch(savePictureQuoteByCrop()).then(() => {
           dispatch(resetAndExit());
-          console.log('сброс произведён!');
         });
-        // performActions({
-        //   info: MODE_BUTTON_PICTURE_SAVE_AREA,
-        //   func: () => {
-        //     setInteractionMode(MODE_GAME); // переходим в общий режим игры для панели кнопок
-        //     setInteractionType(null); // говорим, что никакой виджет теперь не активен
-        //   },
-        // });
-        // savePictureCrop();
       },
       show: () => can(RULE_TURNS_CRUD),
     },
@@ -40,8 +31,8 @@ const PictureQuoteAdd = () => {
     {
       text: 'Cancel',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
-        // makeWidgetActive(null);
+        // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+        dispatch(resetAndExit());
       },
       show: () => can(RULE_TURNS_CRUD),
     },

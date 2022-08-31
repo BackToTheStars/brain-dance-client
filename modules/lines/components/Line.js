@@ -128,6 +128,10 @@ const Line = ({
     kBezier
   );
 
+  for (let coord of [x1, y1, x2, y2, x1b, y1b, x2b, y2b]) {
+    if (Number.isNaN(coord)) return '';
+  }
+
   return (
     <path
       d={`M${x1} ${y1} C ${x1b} ${y1b}, ${x2b} ${y2b}, ${x2} ${y2}`}

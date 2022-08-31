@@ -5,7 +5,6 @@ export const getInitialPanels = (panels) => {
   // обойти panels
   // замиксовать с LocalStorage
   const fields = loadFromLocalStorage(localStorageKey);
-  console.log(panels);
   return panels.map((panel) => {
     if (!fields[panel.type]) {
       return panel;
@@ -27,7 +26,6 @@ export const setInitialPanels = (d) => {
       }
     }
   }
-  console.log(fields);
   saveIntoLocalStorage(fields, localStorageKey);
 };
 

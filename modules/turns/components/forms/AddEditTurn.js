@@ -259,28 +259,7 @@ const AddEditTurnPopup = () => {
   return (
     <>
       <div className="row my-4 flex-1">
-        <div className="col-8 quill-wrapper">
-          <div id="toolbar-container-new">
-            <span className="ql-formats">
-              <select className="ql-background">
-                {[
-                  '',
-                  'rgb(255, 255, 0)',
-                  'rgb(138, 255, 36)',
-                  'rgb(253, 201, 255)',
-                  'rgb(156, 245, 255)',
-                  'rgb(210, 211, 212)',
-                  'rgb(255, 213, 150)',
-                ].map((val, i) => (
-                  <option value={val} key={i} />
-                ))}
-              </select>
-            </span>
-          </div>
-          <div id="editor-container-new" />
-          {/* class="h-85"> */}
-        </div>
-        <div className="col-4">
+        <div className="col-12">
           <div className="radio-group">
             {templatesToShow.map((el) => {
               const templateSettings = settings[el];
@@ -334,6 +313,27 @@ const AddEditTurnPopup = () => {
             }}
           />
           {!!error && <div className="alert alert-danger">{error.message}</div>}
+        </div>
+        <div className="col-12 quill-wrapper">
+          <div id="toolbar-container-new">
+            <span className="ql-formats">
+              <select className="ql-background">
+                {[
+                  '',
+                  'rgb(255, 255, 0)',
+                  'rgb(138, 255, 36)',
+                  'rgb(253, 201, 255)',
+                  'rgb(156, 245, 255)',
+                  'rgb(210, 211, 212)',
+                  'rgb(255, 213, 150)',
+                ].map((val, i) => (
+                  <option value={val} key={i} />
+                ))}
+              </select>
+            </span>
+          </div>
+          <div id="editor-container-new" />
+          {/* class="h-85"> */}
         </div>
       </div>
       <div className="row mb-4">

@@ -10,7 +10,6 @@ const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   const dispatch = useDispatch();
 
-  console.log({ stateCrop });
   const [crop, setCrop] = useState(
     stateCrop || {
       unit: '%',

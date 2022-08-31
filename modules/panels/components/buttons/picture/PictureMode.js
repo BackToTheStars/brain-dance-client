@@ -1,8 +1,8 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { setPanelMode } from '../../../redux/actions';
-import { MODE_GAME, MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
+import { resetAndExit, setPanelMode } from '../../../redux/actions';
+import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
 import { Buttons } from '../../ButtonsPanel';
 
 const PictureMode = () => {
@@ -14,8 +14,6 @@ const PictureMode = () => {
     {
       text: 'Add Area',
       callback: () => {
-        // dispatch({ type: ACTION_QUOTE_CANCEL });
-        // setInteractionType(INTERACTION_ADD_OR_EDIT_QUOTE);
         dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE_QUOTE_ADD }));
       },
       show: () => can(RULE_TURNS_CRUD),
@@ -30,8 +28,7 @@ const PictureMode = () => {
     {
       text: 'Cancel',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_GAME }));
-        // makeWidgetActive(null);
+        dispatch(resetAndExit());
       },
       show: () => can(RULE_TURNS_CRUD),
     },

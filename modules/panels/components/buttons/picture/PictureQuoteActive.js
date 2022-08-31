@@ -2,9 +2,8 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { deleteQuote } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { setPanelMode } from '../../../redux/actions';
+import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import {
-  MODE_GAME,
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '../../../settings';
@@ -27,19 +26,9 @@ const PictureQuoteActive = () => {
       text: 'Delete',
       callback: () => {
         dispatch(deleteQuote()).then(() => {
-          dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+          // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+          dispatch(resetAndExit());
         });
-
-        // const linesToDelete = filterLinesByQuoteKeys(
-        //   lines,
-        //   quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`)
-        // );
-
-        // if (!!quotesDeleted.length) {
-        //   dispatch(linesDelete(linesToDelete.map((l) => l._id)));
-        // }
-
-        // dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
       },
       show: () => can(RULE_TURNS_CRUD),
     },
@@ -52,8 +41,7 @@ const PictureQuoteActive = () => {
     {
       text: 'Cancel',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_GAME }));
-        // makeWidgetActive(null);
+        dispatch(resetAndExit());
       },
       show: () => can(RULE_TURNS_CRUD),
     },

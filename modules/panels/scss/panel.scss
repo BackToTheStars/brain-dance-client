@@ -17,6 +17,12 @@
   }
 }
 
+.position_upper_right {
+  top: $panels-spacer;
+  bottom: 150px;
+  right: $panels-spacer;
+}
+
 .position_upper_center {
   top: $panels-spacer;
   left: 50%;
