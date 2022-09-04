@@ -11,6 +11,7 @@ import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line'
 import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import ImageUploading from './ImageUploading';
+import DropdownTemplate from '../inputs/DropdownTemplate';
 
 const {
   settings,
@@ -260,30 +261,16 @@ const AddEditTurnPopup = () => {
     <>
       <div className="row my-4 flex-1">
         <div className="col-12">
-          <div className="radio-group">
-            {templatesToShow.map((el) => {
-              const templateSettings = settings[el];
-              return (
-                <div className="form-check" key={el}>
-                  <input
-                    type="radio"
-                    name="template"
-                    className="form-check-input"
-                    value={templateSettings.value}
-                    checked={activeTemplate === el}
-                    onChange={(e) => {
-                      setActiveTemplate(el);
-                      setError(null);
-                    }}
-                  />
-                  <label className="form-check-label">
-                    {templateSettings.label}
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-          <input type="hidden" id="idInput" />
+          <DropdownTemplate
+            {...{
+              templatesToShow,
+              settings,
+              activeTemplate,
+              setError,
+              setActiveTemplate,
+            }}
+          />
+          {/* <input type="hidden" id="idInput" /> */}
           {fieldsToShow
             .filter((field) => {
               if (!fieldSettings[field].special) {

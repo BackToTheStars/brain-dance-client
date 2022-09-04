@@ -86,6 +86,19 @@ const fieldSettings = {
     label: 'Image Url',
     prefixClass: 'image-url',
     special: true,
+    inputType: 'component',
+    widgetSettings: {
+      render: ({ changeHandler, label, prefixClass, value }) => {
+        return (
+          <input
+            type="text"
+            className="form-control"
+            value={value}
+            onChange={(e) => changeHandler(e.target.value)}
+          />
+        );
+      },
+    },
   },
   [FIELD_VIDEO]: {
     label: 'Video Url',
