@@ -10,8 +10,8 @@ import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
 import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
-import ImageUploading from './ImageUploading';
 import DropdownTemplate from '../inputs/DropdownTemplate';
+import { DatePicker, Input, Switch } from 'antd';
 
 const {
   settings,
@@ -19,6 +19,10 @@ const {
   fieldSettings,
   fieldsToShow,
   TEMPLATE_PICTURE,
+  FIELD_DONT_SHOW_HEADER,
+  FIELD_HEADER,
+  FIELD_SOURCE,
+  FIELD_DATE,
 } = turnSettings;
 
 const AddEditTurnPopup = () => {
@@ -95,9 +99,6 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
-    console.log({
-      textArr,
-    });
 
     let incId = Math.floor(new Date().getTime() / 1000);
 
@@ -220,29 +221,6 @@ const AddEditTurnPopup = () => {
       turnObj._id = turnToEdit._id;
       turnObj.x = -zeroPoint.x + turnToEdit.x;
       turnObj.y = -zeroPoint.y + turnToEdit.y;
-      // const prevQuotes = turnToEdit.quotes; // цитаты, которые пришли из базы данных
-
-      // if (prevQuotes.length > quotes.length) {
-      //   const deletedQuotes = prevQuotes.slice(quotes.length);
-      //   // @todo: удалить связи, которые содержат эти цитаты
-      // }
-
-      // updateTurn(turnToEdit._id, turnObj, {
-      //   successCallback: (data) => {
-      //     hidePanel(); // закрыть popup
-      //     dispatch({
-      //       type: ACTION_TURN_WAS_CHANGED,
-      //       payload: {
-      //         ...data.item,
-      //         x: data.item.x + zeroPointX,
-      //         y: data.item.y + zeroPointY,
-      //       },
-      //     });
-      //   },
-      //   errorCallback: (message) => {
-      //     setError({ message });
-      //   },
-      // });
 
       dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
     } else {
@@ -261,19 +239,59 @@ const AddEditTurnPopup = () => {
     <>
       <div className="row my-4 flex-1">
         <div className="col-12">
-          <DropdownTemplate
-            {...{
-              templatesToShow,
-              settings,
-              activeTemplate,
-              setError,
-              setActiveTemplate,
-            }}
-          />
+          <div className="form-group row mb-3">
+            <div className="col-sm-9">
+              <Input
+                placeholder="Header:"
+                value={form[FIELD_HEADER]}
+                onChange={(e) => {
+                  if (!!error) setError(null);
+                  setForm({ ...form, [FIELD_HEADER]: e.target.value });
+                }}
+              />
+            </div>
+            <div className="col-sm-3">
+              <Switch
+                defaultChecked={true}
+                checked={!form[FIELD_DONT_SHOW_HEADER]}
+                onChange={(checked) => {
+                  if (!!error) setError(null);
+                  setForm({
+                    ...form,
+                    [FIELD_DONT_SHOW_HEADER]: !checked,
+                  });
+                }}
+              />
+            </div>
+          </div>
           {/* <input type="hidden" id="idInput" /> */}
+          <div className="form-group row mb-3">
+            <div className="col-sm-6">
+              <Input
+                placeholder="Source URL:"
+                value={form[FIELD_SOURCE]}
+                onChange={(e) => {
+                  if (!!error) setError(null);
+                  setForm({ ...form, [FIELD_SOURCE]: e.target.value });
+                }}
+              />
+            </div>
+            <div className="col-sm-6">
+              <DatePicker
+                value={form[FIELD_DATE]}
+                onChange={(moment) => {
+                  if (!!error) setError(null);
+                  setForm({ ...form, [FIELD_DATE]: moment });
+                }}
+              />
+            </div>
+          </div>
           {fieldsToShow
             .filter((field) => {
-              if (!fieldSettings[field].special) {
+              if (
+                !fieldSettings[field].special &&
+                !fieldSettings[field].separate
+              ) {
                 return true;
               }
               return availableFields.includes(field);
@@ -294,13 +312,9 @@ const AddEditTurnPopup = () => {
                 />
               );
             })}
-          <ImageUploading
-            setImageUrl={(imageUrl) => {
-              setForm({ ...form, imageUrl });
-            }}
-          />
           {!!error && <div className="alert alert-danger">{error.message}</div>}
         </div>
+
         <div className="col-12 quill-wrapper">
           <div id="toolbar-container-new">
             <span className="ql-formats">
@@ -325,6 +339,15 @@ const AddEditTurnPopup = () => {
       </div>
       <div className="row mb-4">
         <div className="col">
+          <DropdownTemplate
+            {...{
+              templatesToShow,
+              settings,
+              activeTemplate,
+              setError,
+              setActiveTemplate,
+            }}
+          />
           <button onClick={(e) => saveHandler(e)}>Save</button>
           <button id="cancel-turn-modal" onClick={(e) => hidePanel()}>
             Cancel

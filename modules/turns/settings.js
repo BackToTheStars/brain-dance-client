@@ -1,5 +1,7 @@
 // все переменные для работы Turn
 
+import ImageUploading from './components/forms/ImageUploading';
+
 const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
@@ -56,11 +58,13 @@ const fieldSettings = {
   [FIELD_HEADER]: {
     label: 'Header',
     prefixClass: 'header',
+    separate: true,
   },
   [FIELD_DONT_SHOW_HEADER]: {
     label: "Don't show header",
     prefixClass: 'dont-show-header',
     inputType: 'checkbox',
+    separate: true,
   },
   [FIELD_BACKGROUND_COLOR]: {
     label: 'Background',
@@ -90,12 +94,20 @@ const fieldSettings = {
     widgetSettings: {
       render: ({ changeHandler, label, prefixClass, value }) => {
         return (
-          <input
-            type="text"
-            className="form-control"
-            value={value}
-            onChange={(e) => changeHandler(e.target.value)}
-          />
+          <>
+            <input
+              type="text"
+              className="form-control"
+              value={value}
+              onChange={(e) => changeHandler(e.target.value)}
+            />
+            <ImageUploading
+              setImageUrl={(imageUrl) => {
+                // setForm({ ...form, imageUrl });
+                changeHandler(imageUrl);
+              }}
+            />
+          </>
         );
       },
     },
@@ -110,10 +122,12 @@ const fieldSettings = {
     prefixClass: 'date',
     inputType: 'date',
     valueCallback: (value) => value.date.slice(0, 10),
+    separate: true,
   },
   [FIELD_SOURCE]: {
     label: 'Source Url',
     prefixClass: 'source-url',
+    separate: true,
   },
 };
 
@@ -150,6 +164,7 @@ const turnSettings = {
   TEMPLATE_NEWS,
 
   FIELD_HEADER,
+  FIELD_DONT_SHOW_HEADER,
   FIELD_PICTURE,
   FIELD_VIDEO,
   FIELD_DATE,
