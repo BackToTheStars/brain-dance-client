@@ -1,5 +1,6 @@
 // все переменные для работы Turn
 
+import { Input } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
 
 const TEMPLATE_ZERO_POINT = 'zero-point';
@@ -87,7 +88,7 @@ const fieldSettings = {
     special: true,
   },
   [FIELD_PICTURE]: {
-    label: 'Image Url',
+    label: 'Image URL:',
     prefixClass: 'image-url',
     special: true,
     inputType: 'component',
@@ -95,9 +96,8 @@ const fieldSettings = {
       render: ({ changeHandler, label, prefixClass, value }) => {
         return (
           <>
-            <input
-              type="text"
-              className="form-control"
+            <Input
+              placeholder={label}
               value={value}
               onChange={(e) => changeHandler(e.target.value)}
             />

@@ -7,6 +7,10 @@
   transition: 0.5s;
   color: $white;
   box-sizing: content-box;
+  .quill-wrapper {
+    color: initial;
+    background-color: white;
+  }
 }
 
 .panel-minimap-styles {
