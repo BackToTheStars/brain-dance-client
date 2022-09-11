@@ -26,7 +26,7 @@ const DropdownTemplate = ({
 
   return (
     <Dropdown overlay={menu} placement="bottomLeft">
-      <Button>{settings[activeTemplate].label}</Button>
+      <Button className="w-100">{settings[activeTemplate].label}</Button>
     </Dropdown>
   );
 };

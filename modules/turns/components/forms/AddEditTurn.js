@@ -11,7 +11,7 @@ import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line'
 import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
-import { DatePicker, Input, Switch } from 'antd';
+import { Button, DatePicker, Input, Switch } from 'antd';
 import moment from 'moment';
 
 const {
@@ -246,9 +246,9 @@ const AddEditTurnPopup = () => {
 
   return (
     <>
-      <div className="d-flex flex-column h-100 flex-1 p-2">
-        <div>
-          <div className="form-group row mb-3">
+      <div className="panel-inner d-flex flex-column h-100 flex-1">
+        <div className="panel-cell">
+          <div className="form-group panel-flex mb-2">
             <div className="col-sm-2">
               <DropdownTemplate
                 {...{
@@ -260,7 +260,7 @@ const AddEditTurnPopup = () => {
                 }}
               />
             </div>
-            <div className="col-sm-7">
+            <div className="col-sm-8">
               <Input
                 placeholder="Header:"
                 value={form[FIELD_HEADER]}
@@ -270,7 +270,7 @@ const AddEditTurnPopup = () => {
                 }}
               />
             </div>
-            <div className="col-sm-3">
+            <div className="col-sm-2">
               <Switch
                 defaultChecked={true}
                 checked={!form[FIELD_DONT_SHOW_HEADER]}
@@ -285,8 +285,8 @@ const AddEditTurnPopup = () => {
             </div>
           </div>
           {/* <input type="hidden" id="idInput" /> */}
-          <div className="form-group row mb-3">
-            <div className="col-sm-6">
+          <div className="form-group panel-flex mb-2">
+            <div className="col-sm-7">
               <Input
                 placeholder="Source URL:"
                 value={form[FIELD_SOURCE]}
@@ -296,9 +296,10 @@ const AddEditTurnPopup = () => {
                 }}
               />
             </div>
-            <div className="col-sm-6">
+            <div className="col-sm-3">
               <DatePicker
                 value={moment(form[FIELD_DATE], 'YYYY-MM-DD')}
+                style={{ width: '100%' }}
                 onChange={(moment) => {
                   if (!!error) setError(null);
                   setForm({
@@ -338,7 +339,7 @@ const AddEditTurnPopup = () => {
           {!!error && <div className="alert alert-danger">{error.message}</div>}
         </div>
 
-        <div className="flex-1 quill-wrapper">
+        <div className="flex-1 quill-wrapper panel-cell">
           <div id="toolbar-container-new">
             <span className="ql-formats">
               <select className="ql-background">
@@ -359,14 +360,20 @@ const AddEditTurnPopup = () => {
           <div id="editor-container-new" />
           {/* class="h-85"> */}
         </div>
-        {/* <div className="row mb-4">
-          <div className="col">
-            <button onClick={(e) => saveHandler(e)}>Save</button>
-            <button id="cancel-turn-modal" onClick={(e) => hidePanel()}>
+        <div className="panel-cell">
+          <div className="panel-flex panel-buttons">
+            <button className="btn btn-primary" onClick={(e) => saveHandler(e)}>
+              Save
+            </button>
+            <button
+              className="btn btn-primary"
+              // id="cancel-turn-modal"
+              onClick={(e) => hidePanel()}
+            >
               Cancel
             </button>
           </div>
-        </div> */}
+        </div>
       </div>
     </>
   );

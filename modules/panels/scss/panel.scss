@@ -11,6 +11,28 @@
     color: initial;
     background-color: white;
   }
+  .panel-inner {
+    padding: 3px;
+    .panel-cell {
+      margin: 5px;
+    }
+    .panel-flex {
+      gap: 10px;
+      display: flex;
+    }
+  }
+  input,
+  .ant-picker,
+  .ant-btn {
+    border-radius: 0.25rem;
+  }
+  .panel-buttons .btn {
+    height: 30px;
+    width: 70px;
+    // text-align: center;
+    font-size: 14px;
+    line-height: 1;
+  }
 }
 
 .panel-minimap-styles {
