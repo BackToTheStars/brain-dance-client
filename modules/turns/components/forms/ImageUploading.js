@@ -23,18 +23,15 @@ const ImageUploading = ({ setImageUrl }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <>
-      <div {...getRootProps()}>
-        <input {...getInputProps()} />
+    <div className="drag-n-drop" {...getRootProps()}>
+      <input {...getInputProps()} />
 
-        {isDragActive ? (
-          <p>Drop the files here ...</p>
-        ) : (
-          <p>Drag 'n' drop an image here, or click to select it</p>
-        )}
-        <p></p>
-      </div>
-    </>
+      {isDragActive ? (
+        <p>Drop the files here ...</p>
+      ) : (
+        <p>Drag 'n' drop an image, or click to add</p>
+      )}
+    </div>
   );
 };
 

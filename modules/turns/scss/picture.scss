@@ -12,3 +12,14 @@
     @include red-border; // @learn mixin
   }
 }
+.drag-n-drop {
+  border: 1px solid white;
+  border-radius: 0.25rem;
+  margin-top: 0.75rem;
+  padding: 10px;
+  font-size: medium;
+  cursor: pointer;
+  p {
+    margin-bottom: 0px;
+  }
+}

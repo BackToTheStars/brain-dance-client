@@ -244,6 +244,9 @@ const AddEditTurnPopup = () => {
     }
   };
 
+  console.log({ form });
+  // console.log(form[FIELD_DATE], moment(form[FIELD_DATE]?.value));
+
   return (
     <>
       <div className="panel-inner d-flex flex-column h-100 flex-1">
@@ -298,13 +301,14 @@ const AddEditTurnPopup = () => {
             </div>
             <div className="col-sm-3">
               <DatePicker
-                value={moment(form[FIELD_DATE], 'YYYY-MM-DD')}
+                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : moment()}
                 style={{ width: '100%' }}
                 onChange={(moment) => {
                   if (!!error) setError(null);
+                  console.log(moment.format('YYYY-MM-DD'));
                   setForm({
                     ...form,
-                    [FIELD_DATE]: moment,
+                    [FIELD_DATE]: moment.format('YYYY-MM-DD'),
                   });
                 }}
               />
@@ -339,7 +343,7 @@ const AddEditTurnPopup = () => {
           {!!error && <div className="alert alert-danger">{error.message}</div>}
         </div>
 
-        <div className="flex-1 quill-wrapper panel-cell">
+        <div className="flex-1 quill-wrapper panel-cell mt-0">
           <div id="toolbar-container-new">
             <span className="ql-formats">
               <select className="ql-background">

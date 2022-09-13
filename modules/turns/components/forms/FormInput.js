@@ -9,7 +9,7 @@ const FormInput = ({
   widgetSettings = {},
 }) => {
   return (
-    <div className={`form-group row ${prefixClass}-row mb-3`}>
+    <div className={`form-group row ${prefixClass}-row mb-2`}>
       <div className="col-sm-9">
         {inputType === 'component' &&
           widgetSettings.render({ changeHandler, label, prefixClass, value })}

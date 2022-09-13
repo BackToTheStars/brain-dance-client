@@ -122,6 +122,11 @@ const fieldSettings = {
     prefixClass: 'date',
     inputType: 'date',
     valueCallback: (value) => value.date.slice(0, 10),
+    // valueCallback: (value) => {
+    //   // console.log({ value });
+    //   console.log(value.date);
+    //   return value.date;
+    // },
     separate: true,
   },
   [FIELD_SOURCE]: {

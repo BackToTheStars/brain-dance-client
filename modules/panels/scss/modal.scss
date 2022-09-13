@@ -51,6 +51,8 @@
 .quill-wrapper {
   display: flex;
   flex-direction: column;
+  border-radius: 0.25rem;
+  overflow: hidden;
 }
 
 #editor-container {
