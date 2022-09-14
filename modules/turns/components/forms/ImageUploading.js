@@ -12,13 +12,16 @@ const ImageUploading = ({ setImageUrl }) => {
     });
   };
 
-  const onDrop = useCallback((acceptedFiles) => {
-    /*console.log({ acceptedFiles });
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      /*console.log({ acceptedFiles });
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(acceptedFiles[0]);
     inputRef.current.files = dataTransfer.files;*/
-    submitData({ image: acceptedFiles[0] });
-  }, []);
+      submitData({ image: acceptedFiles[0] });
+    },
+    [submitData]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 

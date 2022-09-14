@@ -7,12 +7,19 @@ const FormInput = ({
   changeHandler = () => {},
   value,
   widgetSettings = {},
+  form,
 }) => {
   return (
     <div className={`form-group row ${prefixClass}-row mb-2`}>
       <div className="col-sm-9">
         {inputType === 'component' &&
-          widgetSettings.render({ changeHandler, label, prefixClass, value })}
+          widgetSettings.render({
+            form,
+            changeHandler,
+            label,
+            prefixClass,
+            value,
+          })}
         {inputType === 'color-picker' && (
           <Tooltip title={label}>
             <ColorPicker

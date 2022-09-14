@@ -47,13 +47,16 @@ const AddEditTurnPopup = () => {
   const availableFields = settings[activeTemplate].availableFields;
   const requiredFields = settings[activeTemplate].requiredFields || [];
   const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({
+    check: true,
+  });
 
   const dispatch = useDispatch();
   const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
   const lines = useSelector((state) => state.lines.lines);
 
   useEffect(() => {
+    return false;
     if (!quillConstants.quill) return;
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
@@ -244,8 +247,17 @@ const AddEditTurnPopup = () => {
     }
   };
 
+  console.log('render');
   console.log({ form });
   // console.log(form[FIELD_DATE], moment(form[FIELD_DATE]?.value));
+
+  const formChangeHandler = (field, value) => {
+    console.log('formChangeHandler');
+    console.log({ form });
+    if (!!error) setError(null);
+
+    setForm({ ...form, [field]: value });
+  };
 
   return (
     <>
@@ -267,10 +279,13 @@ const AddEditTurnPopup = () => {
               <Input
                 placeholder="Header:"
                 value={form[FIELD_HEADER]}
-                onChange={(e) => {
-                  if (!!error) setError(null);
-                  setForm({ ...form, [FIELD_HEADER]: e.target.value });
-                }}
+                // onChange={(e) => {
+                //   if (!!error) setError(null);
+                //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
+                // }}
+                onChange={(e) =>
+                  formChangeHandler(FIELD_HEADER, e.target.value)
+                }
               />
             </div>
             <div className="col-sm-2">
@@ -301,14 +316,14 @@ const AddEditTurnPopup = () => {
             </div>
             <div className="col-sm-3">
               <DatePicker
-                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : moment()}
+                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
                 style={{ width: '100%' }}
                 onChange={(moment) => {
                   if (!!error) setError(null);
-                  console.log(moment.format('YYYY-MM-DD'));
+                  // console.log(moment.format('YYYY-MM-DD'));
                   setForm({
                     ...form,
-                    [FIELD_DATE]: moment.format('YYYY-MM-DD'),
+                    [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
                   });
                 }}
               />
@@ -327,16 +342,14 @@ const AddEditTurnPopup = () => {
             .map((field) => {
               return (
                 <FormInput
-                  changeHandler={(value) => {
-                    if (!!error) setError(null);
-                    setForm({ ...form, [field]: value });
-                  }}
+                  changeHandler={(value) => formChangeHandler(field, value)}
                   label={fieldSettings[field].label}
                   prefixClass={fieldSettings[field].prefixClass}
                   inputType={fieldSettings[field].inputType}
                   key={field}
                   value={form[field] || ''}
                   widgetSettings={fieldSettings[field].widgetSettings}
+                  form={form}
                 />
               );
             })}

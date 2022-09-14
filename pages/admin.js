@@ -6,11 +6,17 @@ const AdminPage = () => {
   const router = useRouter();
   return (
     <AdminProvider>
-      <div className="container">
-        <div className="row">
-          <div className="col-md-4 offset-md-4">
-            <AdminSigninForm onSuccessSubmit={() => router.push('/')} />
-          </div>
+      <div
+        className="container"
+        style={{
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div className="col-md-2">
+          <AdminSigninForm onSuccessSubmit={() => router.push('/')} />
         </div>
       </div>
     </AdminProvider>
