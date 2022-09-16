@@ -1,8 +1,9 @@
 .panel.position_notifications {
   position: fixed;
-  width: calc(min(25vw, 360px));
+  // width: calc(min(25vw, 360px));
+  width: $panel-notifications-width;
   bottom: $panel-notifications-bottom;
-  right: 10px;
+  right: $panel-notifications-right;
   border: none;
   border-radius: unset;
   background: rgba(0, 0, 0, 0.7);

@@ -187,26 +187,23 @@ body {
   width: 20px;
   height: 20px;
   top: 10px;
-  right: 67px;
+  right: 68px;
   z-index: 5;
 }
 
 .rec-text {
   position: absolute;
-  color: rgba(255, 255, 255, 0.9);
+
   border-radius: 10px;
   width: 20px;
   height: 15px;
-  top: 5px;
-  right: 42px;
+  top: 4px;
+  right: 43px;
   z-index: 5;
   font-size: 1.2rem;
-
-  /* content: 'REC'; */
-  /* color: rgba(255, 0, 0, 0.8);
-  z-index: 5;
-  margin-left: 30px;
-  margin-top: -20px; */
+  h4 {
+    color: rgba(255, 255, 255, 0.9);
+  }
 }
 
 .th-no-borders th,

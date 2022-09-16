@@ -126,7 +126,7 @@ export const panels = [
     component: Notifications,
     isDisplayed: true,
     id: (id += 1),
-    width: () => `calc(min(25vw, 360px))`,
+    // width: () => `calc(min(25vw, 360px))`,
   },
   {
     type: PANEL_TURN_INFO,

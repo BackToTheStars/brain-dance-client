@@ -3,7 +3,10 @@ $panels-background: #040911;
 $panels-border-color: rgba(47, 69, 101, 0.623);
 $panels-spacer: 10px;
 
-$panel-notifications-bottom: 174px;
+// $panel-notifications-width: calc(min(25vw, 360px));
+$panel-notifications-width: 308px;
+$panel-notifications-bottom: 146px;
+$panel-notifications-right: 11px;
 
 $panel-buttons-font-color: rgb(255, 255, 255);
 $panel-buttons-bg-color: #1b4d76;

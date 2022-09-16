@@ -56,7 +56,6 @@ const AddEditTurnPopup = () => {
   const lines = useSelector((state) => state.lines.lines);
 
   useEffect(() => {
-    return false;
     if (!quillConstants.quill) return;
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
@@ -246,10 +245,6 @@ const AddEditTurnPopup = () => {
       dispatch(createTurn(turnObj, zeroPoint, saveCallbacks));
     }
   };
-
-  console.log('render');
-  console.log({ form });
-  // console.log(form[FIELD_DATE], moment(form[FIELD_DATE]?.value));
 
   const formChangeHandler = (field, value) => {
     console.log('formChangeHandler');

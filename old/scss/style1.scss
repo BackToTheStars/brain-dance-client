@@ -153,34 +153,34 @@ body {
   border-radius: $corners-radius;
 }
 
-.rec-label {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  width: 30px;
-  height: 30px;
-  top: 15px;
-  right: 94px;
-  z-index: 5;
-}
+// .rec-label {
+//   position: absolute;
+//   background: rgba(255, 255, 255, 0.9);
+//   border-radius: 15px;
+//   width: 30px;
+//   height: 30px;
+//   top: 15px;
+//   right: 94px;
+//   z-index: 5;
+// }
 
-.rec-text {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  width: 30px;
-  height: 30px;
-  top: 9px;
-  right: 56px;
-  z-index: 5;
-  font-size: 1.4rem;
+// .rec-text {
+//   position: absolute;
+//   color: rgba(255, 255, 255, 0.9);
+//   border-radius: 10px;
+//   width: 30px;
+//   height: 30px;
+//   top: 9px;
+//   right: 56px;
+//   z-index: 5;
+//   font-size: 1.4rem;
 
-  /* content: 'REC'; */
-  /* color: rgba(255, 0, 0, 0.8);
+/* content: 'REC'; */
+/* color: rgba(255, 0, 0, 0.8);
   z-index: 5;
   margin-left: 30px;
   margin-top: -20px; */
-}
+// }
 
 .th-no-borders th,
 .td-no-borders td {

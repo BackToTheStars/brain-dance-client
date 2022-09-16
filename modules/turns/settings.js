@@ -100,19 +100,10 @@ const fieldSettings = {
               placeholder={label}
               value={value}
               onChange={(e) => {
-                console.log('input form');
-                console.log({ form });
                 changeHandler(e.target.value);
               }}
             />
-            <ImageUploading
-              setImageUrl={(imageUrl) => {
-                console.log('input form');
-                console.log({ form });
-                // setForm({ ...form, imageUrl });
-                // changeHandler(imageUrl);
-              }}
-            />
+            <ImageUploading setImageUrl={changeHandler} />
           </>
         );
       },

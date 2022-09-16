@@ -35,10 +35,14 @@ const Picture = ({
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {
+    setImageUrlToRender(imageUrl);
+  }, [imageUrl]);
+
+  useEffect(() => {
     if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
     const loadImage = () => {
       if (imgEl && imgEl.current) {
-        setImageLoaded(true);
+        setImageLoaded(Date.now());
       }
     };
 
