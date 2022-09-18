@@ -83,7 +83,7 @@ export const panels = [
     component: AddEditTurnPopup,
     isDisplayed: false,
     id: (id += 1),
-    width: () => '700px',
+    width: () => '900px',
   },
   {
     type: PANEL_BUTTONS,

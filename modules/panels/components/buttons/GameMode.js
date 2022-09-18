@@ -80,7 +80,7 @@ const GameMode = () => {
     },
     { text: 'Lobby', callback: () => router.push('/') },
     {
-      text: 'Paste Turn',
+      text: 'Paste\u00A0Turn',
       callback: () => {
         dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: true }));
         dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));

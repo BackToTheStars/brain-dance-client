@@ -8,6 +8,7 @@ import { cloneTurn, deleteTurn } from '../../../redux/actions';
 import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../../icons/Turn';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
+import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 
 const ButtonsMenu = ({ _id }) => {
   // const handleInfo = (e) => {
@@ -17,6 +18,8 @@ const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[_id]);
+  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
+  const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
 
   const handleCut = (e) => {
     e.preventDefault();
@@ -40,7 +43,18 @@ const ButtonsMenu = ({ _id }) => {
   const handleEdit = (e) => {
     e.preventDefault();
     dispatch(
-      togglePanel({ type: PANEL_ADD_EDIT_TURN, params: { editTurnId: _id } })
+      togglePanel({
+        type: PANEL_ADD_EDIT_TURN,
+        open: true,
+        params: { editTurnId: _id },
+      })
+    );
+
+    dispatch(
+      centerViewportAtPosition({
+        x: turn.x - zeroPoint.x + Math.floor(turn.width / 2) + 450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
+        y: turn.y - zeroPoint.y + Math.floor(turn.height / 2),
+      })
     );
   };
 

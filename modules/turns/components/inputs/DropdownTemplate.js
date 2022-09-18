@@ -1,4 +1,5 @@
 import { Button, Dropdown, Menu, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import React from 'react';
 
 const DropdownTemplate = ({
@@ -18,7 +19,11 @@ const DropdownTemplate = ({
         const templateSettings = settings[el];
         return {
           key: i,
-          label: <a href="#">{templateSettings.label}</a>,
+          label: (
+            <a href="#" style={{ paddingLeft: '10px' }}>
+              {templateSettings.label}
+            </a>
+          ),
         };
       })}
     />
@@ -26,7 +31,19 @@ const DropdownTemplate = ({
 
   return (
     <Dropdown overlay={menu} placement="bottomLeft">
-      <Button className="w-100">{settings[activeTemplate].label}</Button>
+      <Button
+        className="w-100"
+        style={{
+          color: 'rgb(255, 255, 255)',
+          backgroundColor: '#1b4d76',
+          borderColor: '#667480',
+          opacity: 0.65,
+        }}
+        // style={{ color: '#1b4d76' }}
+      >
+        {settings[activeTemplate].label}
+        <DownOutlined style={{ fontSize: '15px' }} />
+      </Button>
     </Dropdown>
   );
 };
