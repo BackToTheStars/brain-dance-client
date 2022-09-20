@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-const ColorPicker = ({ value, changeHandler, widgetSettings }) => {
+const ColorPicker = ({ value, changeHandler, widgetSettings, label }) => {
   // @todo: проверить, почему настройки по умолчанию устанавливаются только
   // для последнего ColorPicker
   useEffect(() => {
@@ -11,15 +11,20 @@ const ColorPicker = ({ value, changeHandler, widgetSettings }) => {
   }, [widgetSettings.defaultColor]);
 
   return (
-    <div className="color-picker-widget">
-      {widgetSettings.colors.map((color, index) => (
-        <div
-          key={index}
-          className={`color-picker-square ${value === color ? 'active' : ''}`}
-          style={{ backgroundColor: color }}
-          onClick={() => changeHandler(color)}
-        />
-      ))}
+    <div className="d-flex align-items-center">
+      <label className="me-2" style={{ fontSize: '16px', width: '95px' }}>
+        {label}:
+      </label>
+      <div className="color-picker-widget">
+        {widgetSettings.colors.map((color, index) => (
+          <div
+            key={index}
+            className={`color-picker-square ${value === color ? 'active' : ''}`}
+            style={{ backgroundColor: color }}
+            onClick={() => changeHandler(color)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

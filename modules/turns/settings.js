@@ -88,7 +88,7 @@ const fieldSettings = {
     special: true,
   },
   [FIELD_PICTURE]: {
-    label: 'Image URL:',
+    label: 'Image URL',
     prefixClass: 'image-url',
     special: true,
     inputType: 'component',
@@ -97,7 +97,7 @@ const fieldSettings = {
         return (
           <>
             <Input
-              placeholder={label}
+              placeholder={`${label}:`}
               value={value}
               onChange={(e) => {
                 changeHandler(e.target.value);
@@ -110,7 +110,7 @@ const fieldSettings = {
     },
   },
   [FIELD_VIDEO]: {
-    label: 'Video Url',
+    label: 'Video URL',
     prefixClass: 'video-url',
     special: true,
   },

@@ -1,4 +1,4 @@
-import { Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 import ColorPicker from './ColorPicker';
 const FormInput = ({
   label,
@@ -11,7 +11,7 @@ const FormInput = ({
 }) => {
   return (
     <div className={`form-group row ${prefixClass}-row mb-2`}>
-      <div className="col-sm-9">
+      <div className="col-sm-10" style={{ width: '770px', maxWidth: '100%' }}>
         {inputType === 'component' &&
           widgetSettings.render({
             form,
@@ -26,10 +26,18 @@ const FormInput = ({
               value={value}
               changeHandler={changeHandler}
               widgetSettings={widgetSettings}
+              label={label}
             />
           </Tooltip>
         )}
-        {!['color-picker', 'component'].includes(inputType) && (
+        {inputType === 'text' && (
+          <Input
+            value={value}
+            onChange={(e) => changeHandler(e.target.value)}
+            placeholder={`${label}:`}
+          />
+        )}
+        {!['color-picker', 'component', 'text'].includes(inputType) && (
           <Tooltip title={label}>
             <input
               type={inputType}
