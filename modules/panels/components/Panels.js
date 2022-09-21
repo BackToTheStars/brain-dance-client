@@ -33,6 +33,7 @@ const Panels = () => {
               height={panel?.height}
               width={panel?.width}
               isMinimized={panel.isMinimized}
+              priorityStyle={panel?.priorityStyle}
             >
               <panel.component settings={panel} />
             </Wrapper>

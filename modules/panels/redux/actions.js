@@ -6,6 +6,8 @@ import {
   MODE_GAME,
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
+  PANEL_ADD_EDIT_TURN,
+  PANEL_BUTTONS,
 } from '../settings';
 import * as types from './types';
 
@@ -93,4 +95,13 @@ export const changeWidgetParams = (payload) => (dispatch) => {
     type: types.PANEL_CHANGE_WIDGET_PARAMS,
     payload: payload, // widgetKey, params
   });
+};
+
+export const toggleMaximizeQuill = (isMaximized) => (dispatch) => {
+  dispatch(
+    changePanelGeometry(PANEL_ADD_EDIT_TURN, {
+      priorityStyle: isMaximized ? { bottom: '10px' } : { bottom: null },
+    })
+  );
+  dispatch(togglePanel({ type: PANEL_BUTTONS, open: !isMaximized }));
 };

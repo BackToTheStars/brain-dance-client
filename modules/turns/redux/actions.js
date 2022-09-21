@@ -23,10 +23,20 @@ import {
 } from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
-import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
-import { MODE_GAME, PANEL_TURNS_PASTE } from '@/modules/panels/settings';
+import {
+  setPanelMode,
+  toggleMinimizePanel,
+  togglePanel,
+} from '@/modules/panels/redux/actions';
+import {
+  MODE_GAME,
+  PANEL_ADD_EDIT_TURN,
+  PANEL_BUTTONS,
+  PANEL_TURNS_PASTE,
+} from '@/modules/panels/settings';
 
 import { STATIC_API_URL } from '@/config/server';
+import { panelReducer } from '@/modules/panels/redux/reducers';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {

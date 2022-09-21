@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 import turnSettings from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
-import { togglePanel } from '@/modules/panels/redux/actions';
+import {
+  toggleMaximizeQuill,
+  togglePanel,
+} from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
@@ -50,10 +53,16 @@ const AddEditTurnPopup = () => {
   const [form, setForm] = useState({
     check: true,
   });
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const dispatch = useDispatch();
   const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
   const lines = useSelector((state) => state.lines.lines);
+
+  const toggleMaximize = (value) => {
+    setIsMaximized(value);
+    dispatch(toggleMaximizeQuill(value));
+  };
 
   useEffect(() => {
     if (!quillConstants.quill) return;
@@ -257,100 +266,105 @@ const AddEditTurnPopup = () => {
   return (
     <>
       <div className="panel-inner d-flex flex-column h-100 flex-1">
-        <div className="panel-cell">
-          <div className="form-group panel-flex mb-2">
-            <div className="col-sm-2">
-              <DropdownTemplate
-                {...{
-                  templatesToShow,
-                  settings,
-                  activeTemplate,
-                  setError,
-                  setActiveTemplate,
-                }}
-              />
+        {!isMaximized && (
+          <>
+            <div className="panel-cell">
+              <div className="form-group panel-flex mb-2">
+                <div className="col-sm-2">
+                  <DropdownTemplate
+                    {...{
+                      templatesToShow,
+                      settings,
+                      activeTemplate,
+                      setError,
+                      setActiveTemplate,
+                    }}
+                  />
+                </div>
+                <div className="col-sm-8">
+                  <Input
+                    placeholder="Header:"
+                    value={form[FIELD_HEADER]}
+                    // onChange={(e) => {
+                    //   if (!!error) setError(null);
+                    //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
+                    // }}
+                    onChange={(e) =>
+                      formChangeHandler(FIELD_HEADER, e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-sm-2">
+                  <Switch
+                    defaultChecked={true}
+                    checked={!form[FIELD_DONT_SHOW_HEADER]}
+                    onChange={(checked) => {
+                      if (!!error) setError(null);
+                      setForm({
+                        ...form,
+                        [FIELD_DONT_SHOW_HEADER]: !checked,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              {/* <input type="hidden" id="idInput" /> */}
+              <div className="form-group panel-flex mb-2">
+                <div className="col-sm-7">
+                  <Input
+                    placeholder="Source URL:"
+                    value={form[FIELD_SOURCE]}
+                    onChange={(e) => {
+                      if (!!error) setError(null);
+                      setForm({ ...form, [FIELD_SOURCE]: e.target.value });
+                    }}
+                  />
+                </div>
+                <div className="col-sm-3">
+                  <DatePicker
+                    value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
+                    style={{ width: '100%' }}
+                    onChange={(moment) => {
+                      if (!!error) setError(null);
+                      // console.log(moment.format('YYYY-MM-DD'));
+                      setForm({
+                        ...form,
+                        [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+              {fieldsToShow
+                .filter((field) => {
+                  if (
+                    !fieldSettings[field].special &&
+                    !fieldSettings[field].separate
+                  ) {
+                    return true;
+                  }
+                  return availableFields.includes(field);
+                })
+                .map((field) => {
+                  return (
+                    <FormInput
+                      changeHandler={(value) => formChangeHandler(field, value)}
+                      label={fieldSettings[field].label}
+                      prefixClass={fieldSettings[field].prefixClass}
+                      inputType={fieldSettings[field].inputType}
+                      key={field}
+                      value={form[field] || ''}
+                      widgetSettings={fieldSettings[field].widgetSettings}
+                      form={form}
+                    />
+                  );
+                })}
+              {!!error && (
+                <div className="alert alert-danger">{error.message}</div>
+              )}
             </div>
-            <div className="col-sm-8">
-              <Input
-                placeholder="Header:"
-                value={form[FIELD_HEADER]}
-                // onChange={(e) => {
-                //   if (!!error) setError(null);
-                //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
-                // }}
-                onChange={(e) =>
-                  formChangeHandler(FIELD_HEADER, e.target.value)
-                }
-              />
-            </div>
-            <div className="col-sm-2">
-              <Switch
-                defaultChecked={true}
-                checked={!form[FIELD_DONT_SHOW_HEADER]}
-                onChange={(checked) => {
-                  if (!!error) setError(null);
-                  setForm({
-                    ...form,
-                    [FIELD_DONT_SHOW_HEADER]: !checked,
-                  });
-                }}
-              />
-            </div>
-          </div>
-          {/* <input type="hidden" id="idInput" /> */}
-          <div className="form-group panel-flex mb-2">
-            <div className="col-sm-7">
-              <Input
-                placeholder="Source URL:"
-                value={form[FIELD_SOURCE]}
-                onChange={(e) => {
-                  if (!!error) setError(null);
-                  setForm({ ...form, [FIELD_SOURCE]: e.target.value });
-                }}
-              />
-            </div>
-            <div className="col-sm-3">
-              <DatePicker
-                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
-                style={{ width: '100%' }}
-                onChange={(moment) => {
-                  if (!!error) setError(null);
-                  // console.log(moment.format('YYYY-MM-DD'));
-                  setForm({
-                    ...form,
-                    [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
-                  });
-                }}
-              />
-            </div>
-          </div>
-          {fieldsToShow
-            .filter((field) => {
-              if (
-                !fieldSettings[field].special &&
-                !fieldSettings[field].separate
-              ) {
-                return true;
-              }
-              return availableFields.includes(field);
-            })
-            .map((field) => {
-              return (
-                <FormInput
-                  changeHandler={(value) => formChangeHandler(field, value)}
-                  label={fieldSettings[field].label}
-                  prefixClass={fieldSettings[field].prefixClass}
-                  inputType={fieldSettings[field].inputType}
-                  key={field}
-                  value={form[field] || ''}
-                  widgetSettings={fieldSettings[field].widgetSettings}
-                  form={form}
-                />
-              );
-            })}
-          {!!error && <div className="alert alert-danger">{error.message}</div>}
-        </div>
-
+          </>
+        )}
         <div className="flex-1 quill-wrapper panel-cell mt-0">
           <div id="toolbar-container-new">
             <span className="ql-formats">
@@ -383,6 +397,14 @@ const AddEditTurnPopup = () => {
               onClick={(e) => hidePanel()}
             >
               Cancel
+            </button>
+            <div className="flex-1" />
+            <button
+              className="btn btn-primary"
+              style={{ width: '90px' }}
+              onClick={(e) => toggleMaximize(isMaximized ? false : true)}
+            >
+              {!isMaximized ? 'Maximize' : 'Back'}
             </button>
           </div>
         </div>

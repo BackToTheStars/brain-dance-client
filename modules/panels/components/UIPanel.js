@@ -1,9 +1,16 @@
 import { panelSpacer } from '@/config/ui';
 import { POSITION_UPPER_LEFT } from '../settings';
 
-const UIPanel = ({ children, position, height, width, isMinimized }) => {
+const UIPanel = ({
+  children,
+  position,
+  height,
+  width,
+  isMinimized,
+  priorityStyle,
+}) => {
   //
-  const style = {};
+  let style = {};
 
   if (!!width) {
     if (+width == width) {
@@ -15,6 +22,9 @@ const UIPanel = ({ children, position, height, width, isMinimized }) => {
   }
   if (!!height) {
     style.height = height();
+  }
+  if (priorityStyle) {
+    style = { ...style, ...priorityStyle };
   }
 
   return (
