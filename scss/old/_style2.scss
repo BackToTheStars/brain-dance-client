@@ -13,10 +13,6 @@
   color: $panel-buttons-font-color;
   background-color: $panel-buttons-bg-color;
   border-color: $panel-buttons-border-color;
-
-  // color: #fff;
-  // background-color: #6c757d;
-  // border-color: #6c757d;
   opacity: 0.65;
 }
 
@@ -24,6 +20,17 @@
 .btn-primary:hover,
 .btn-danger:hover {
   opacity: 0.9;
+}
+
+.btn-accent {
+  color: white;
+  background-color: #ff8503;
+  border-color: $panel-buttons-border-color;
+  opacity: 1;
+  &:hover {
+    background-color: #d27512;
+    color: white;
+  }
 }
 
 body {

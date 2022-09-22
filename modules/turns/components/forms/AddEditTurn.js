@@ -265,7 +265,11 @@ const AddEditTurnPopup = () => {
 
   return (
     <>
-      <div className="panel-inner d-flex flex-column h-100 flex-1">
+      <div
+        className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
+          isMaximized ? 'maximized' : ''
+        }`}
+      >
         {!isMaximized && (
           <>
             <div className="panel-cell">
@@ -388,7 +392,10 @@ const AddEditTurnPopup = () => {
         </div>
         <div className="panel-cell">
           <div className="panel-flex panel-buttons">
-            <button className="btn btn-primary" onClick={(e) => saveHandler(e)}>
+            <button
+              className="btn btn-primary btn-accent"
+              onClick={(e) => saveHandler(e)}
+            >
               Save
             </button>
             <button

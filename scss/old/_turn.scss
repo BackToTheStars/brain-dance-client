@@ -1,5 +1,11 @@
 /* REACT TURN */
 
+.add-edit-form.maximized {
+  .panel-cell.mt-0 {
+    margin-top: 5px !important;
+  }
+}
+
 $black-color: rgb(0, 0, 0);
 
 .translucent-field {
@@ -437,7 +443,7 @@ $black-color: rgb(0, 0, 0);
 .ql-container {
   font-size: 1.35rem;
   overflow-y: auto;
-  max-height: 65vh;
+  // max-height: 65vh;
 }
 /* подписи для ссылки и для даты */
 .left-bottom-label,
@@ -491,7 +497,7 @@ $black-color: rgb(0, 0, 0);
 }
 .bottom-date-and-sourceurl {
   .flex_mod {
-    margin-top: 4px;
+    margin-top: 6px;
     margin-bottom: 0px;
   }
 }
