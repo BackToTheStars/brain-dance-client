@@ -22,6 +22,20 @@ $black-color: rgb(0, 0, 0);
 // }
 
 .react-turn-new {
+  &.picture-only {
+    background: rgba(0, 0, 0, 0);
+    border-width: 0;
+    .picture-content {
+      padding: 0;
+      .turn-img {
+        border-radius: 0;
+      }
+    }
+    .ui-icon {
+      transform: translateY(-10px);
+    }
+  }
+
   &:last-child {
     margin-bottom: 0;
   }

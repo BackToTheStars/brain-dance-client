@@ -52,6 +52,7 @@ const Turn = ({ id }) => {
     videoUrl,
     //-- image
     imageUrl,
+    pictureOnly,
   } = turn;
 
   const doesParagraphExist = checkIfParagraphExists(paragraph);
@@ -202,12 +203,19 @@ const Turn = ({ id }) => {
 
   // console.log({ widgets });
 
+  const wrapperClasses = [contentType, 'react-turn-new'];
+
+  if (dontShowHeader) {
+    wrapperClasses.push('dont-show-header');
+  }
+  if (pictureOnly) {
+    wrapperClasses.push('picture-only');
+  }
+
   return (
     <div
       ref={wrapper}
-      className={`${contentType} react-turn-new ${
-        dontShowHeader ? 'dont-show-header' : ''
-      }`}
+      className={wrapperClasses.join(' ')}
       style={wrapperStyles}
     >
       <Header

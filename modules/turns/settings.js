@@ -1,6 +1,6 @@
 // все переменные для работы Turn
 
-import { Input } from 'antd';
+import { Input, Switch } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
 
 const TEMPLATE_ZERO_POINT = 'zero-point';
@@ -21,6 +21,7 @@ const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
 const FIELD_FONT_COLOR = 'fontColor';
+const FIELD_PICTURE_ONLY = 'pictureOnly';
 
 export const WIDGET_PICTURE = 'picture';
 export const WIDGET_PARAGRAPH = 'paragraph';
@@ -34,7 +35,7 @@ const settings = {
   //   label: 'Picture',
   // },
   [TEMPLATE_PICTURE]: {
-    availableFields: [FIELD_PICTURE],
+    availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
     value: 'picture',
     label: 'Text / picture',
     requiredFields: [],
@@ -104,6 +105,37 @@ const fieldSettings = {
               }}
             />
             <ImageUploading setImageUrl={changeHandler} />
+          </>
+        );
+      },
+    },
+  },
+  [FIELD_PICTURE_ONLY]: {
+    label: 'Pic only',
+    prefixClass: 'pic-only',
+    special: true,
+    inputType: 'component',
+    // separate: true,
+    widgetSettings: {
+      render: ({ changeHandler, label, prefixClass, value, form }) => {
+        return (
+          <>
+            <Switch
+              defaultChecked={false}
+              checked={value}
+              onChange={(checked) => {
+                changeHandler(checked);
+              }}
+            />{' '}
+            <span style={{ fontSize: '1rem' }}>Picture only</span>
+            {/* <Input
+              placeholder={`${label}:`}
+              value={value}
+              onChange={(e) => {
+                changeHandler(e.target.value);
+              }}
+            />
+            <ImageUploading setImageUrl={changeHandler} /> */}
           </>
         );
       },
