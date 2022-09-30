@@ -43,7 +43,7 @@ const Turn = ({ id }) => {
     contentType,
     backgroundColor,
     fontColor,
-    dontShowHeader,
+    dontShowHeader: dontShowHeaderOriginal,
     sourceUrl,
     date,
     //-- paragraph
@@ -55,7 +55,9 @@ const Turn = ({ id }) => {
     pictureOnly,
   } = turn;
 
-  const doesParagraphExist = checkIfParagraphExists(paragraph);
+  const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
+
+  const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
 
   const wrapperStyles = {
     left: `${x}px`,
@@ -249,6 +251,7 @@ const Turn = ({ id }) => {
           widgetType="picture"
           turnId={_id}
           widgetSettings={widgetD['picture1']}
+          pictureOnly={pictureOnly}
         />
       )}
       {doesParagraphExist && (

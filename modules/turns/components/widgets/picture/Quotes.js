@@ -13,18 +13,8 @@ import {
 } from '@/modules/panels/settings';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
-import { useDebugValue, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-// import { quoteRectangleThickness } from '../../const';
-// const quoteRectangleThickness = 2;
-// import { ACTION_QUOTE_CLICKED } from '../../contexts/TurnsCollectionContext';
-// import {
-//   MODE_GAME,
-//   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
-//   PANEL_LINES,
-//   useInteractionContext,
-// } from '../../contexts/InteractionContext';
 
 const PictureQuotes = ({
   turnId,
@@ -32,12 +22,7 @@ const PictureQuotes = ({
   activeQuoteId,
   mode,
   widgetSettings = {},
-  wrapperEl,
-  // quotes,
-  // dispatch,
-  // activeQuote,
-  // lineEnds,
-  // setInteractionMode,
+  pictureOnly,
 }) => {
   const dispatch = useDispatch();
   // const { bottomPanelSettings } = []; //useInteractionContext();
@@ -55,22 +40,15 @@ const PictureQuotes = ({
     return getActiveQuotesDictionary(quotes, lines);
   }, [quotes, lines]);
 
-  // console.log({ quotes, lines, activeQuotesDictionary });
-
-  // const activeQuoteId = useSelector(
-  //   (state) =>
-  //     state.panels.editWidgetParams[`${turnId}_${widgetId}`]?.activeQuoteId
-  // );
-  //
-  // const onQuoteClick = (quoteId) => {
-  //   dispatch({ type: ACTION_QUOTE_CLICKED, payload: { turnId, quoteId } });
-  // };
-
   useEffect(() => {
-    const width =
-      widgetSettings.width - 2 * widgetSpacer - 2 * TURN_BORDER_THICKNESS;
-    const height =
-      widgetSettings.minHeight - widgetSpacer - TURN_BORDER_THICKNESS;
+    let width = widgetSettings.width;
+    let height = widgetSettings.minHeight;
+
+    if (!pictureOnly) {
+      width = widgetSettings.width - 2 * widgetSpacer; // - TURN_BORDER_THICKNESS;
+      height = widgetSettings.minHeight - widgetSpacer; // - TURN_BORDER_THICKNESS;
+    }
+
     dispatch(
       quoteCoordsUpdate(
         turnId,
@@ -83,11 +61,17 @@ const PictureQuotes = ({
             quoteKey: `${turnId}_${quote.id}`,
             turnId,
             text: `pictureQuote_${quote.id}`,
-            left: Math.round((width * quote.x) / 100) + widgetSpacer,
+            left:
+              Math.round((width * quote.x) / 100) +
+              (pictureOnly ? 0 : widgetSpacer) +
+              2,
+            // quoteRectangleThickness
             top:
               Math.round((height * quote.y) / 100) +
-              widgetSpacer +
+              (pictureOnly ? 0 : widgetSpacer) +
+              2 +
               widgetSettings.minTop,
+            // + quoteRectangleThickness,
             width: Math.round((width * quote.width) / 100),
             height: Math.round((height * quote.height) / 100),
           };

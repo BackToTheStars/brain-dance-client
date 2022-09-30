@@ -1,4 +1,4 @@
-import { widgetSpacer } from '@/config/ui';
+import { widgetSpacer as widgetSpacerOriginal } from '@/config/ui';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
   MODE_WIDGET_PICTURE,
@@ -17,7 +17,11 @@ const Picture = ({
   widgetType,
   turnId,
   widgetSettings,
+  pictureOnly,
 }) => {
+  //
+  const widgetSpacer = pictureOnly ? 0 : widgetSpacerOriginal;
+
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
 
@@ -124,6 +128,7 @@ const Picture = ({
           mode={mode}
           widgetSettings={widgetSettings}
           wrapperEl={imgWrapperEl?.current}
+          pictureOnly={pictureOnly}
           // quotes={
           //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
           //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
