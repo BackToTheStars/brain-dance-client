@@ -63,9 +63,12 @@ export const panels = [
     component: ClassList,
     isDisplayed: false,
     id: (id += 1),
-    height: () => {
+    height: (d) => {
+      const minimapHeight = d[PANEL_MINIMAP].isDisplayed
+        ? d[PANEL_MINIMAP].calculatedHeight + panelSpacer + 30
+        : 0;
       console.log(window.innerHeight, panelSpacer);
-      return `${window.innerHeight - 2 * panelSpacer}px`;
+      return `${window.innerHeight - 2 * panelSpacer - minimapHeight}px`;
     },
     width: () => '500px',
   },
@@ -91,7 +94,7 @@ export const panels = [
     component: ButtonsPanel,
     isDisplayed: true,
     id: (id += 1),
-    width: () => '300px',
+    width: () => '310px',
   },
   {
     type: PANEL_INFO,

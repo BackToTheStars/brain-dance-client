@@ -6,7 +6,7 @@
   border-radius: $corners-radius;
   transition: 0.5s;
   color: $white;
-  box-sizing: content-box;
+  // box-sizing: content-box;
   .quill-wrapper {
     color: initial;
     background-color: white;
@@ -34,6 +34,12 @@
     font-size: 14px;
     line-height: 1;
   }
+}
+
+.panel-button {
+  height: 32px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .panel-minimap-styles {

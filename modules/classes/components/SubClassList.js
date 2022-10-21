@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Input } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addClass } from '../redux/actions';
 import SubClassComponent from './SubClassComponent';
@@ -12,6 +13,7 @@ const SubClassList = ({
 }) => {
   const maxId = useSelector((state) => state.classes.maxId);
   const dispatch = useDispatch();
+  const inputRef = useRef();
 
   const [subClassTitle, setSubClassTitle] = useState('');
 
@@ -22,6 +24,13 @@ const SubClassList = ({
     setSubClassTitle('');
   };
 
+  useEffect(() => {
+    if (!editSubclassMode) return;
+    setTimeout(() => {
+      inputRef?.current?.focus();
+    }, 200);
+  }, [editSubclassMode]);
+
   return (
     <>
       {subClasses.map((subClass) => (
@@ -30,13 +39,13 @@ const SubClassList = ({
       {editSubclassMode && (
         <div className="p-2">
           <form className="form-inline d-flex" onSubmit={addSubClass}>
-            <input
-              className="mr-2 flex-grow-1"
-              type="text"
+            <Input
+              ref={inputRef}
+              className="me-2 flex-grow-1"
               value={subClassTitle}
               onChange={(e) => setSubClassTitle(e.target.value)}
             />
-            <button className="btn btn-success">Add</button>
+            <button className="btn btn-success panel-button">Add</button>
           </form>
         </div>
       )}

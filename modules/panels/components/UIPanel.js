@@ -1,4 +1,6 @@
 import { panelSpacer } from '@/config/ui';
+import useSelection from 'antd/lib/table/hooks/useSelection';
+import { useSelector } from 'react-redux';
 import { POSITION_UPPER_LEFT } from '../settings';
 
 const UIPanel = ({
@@ -12,6 +14,8 @@ const UIPanel = ({
   //
   let style = {};
 
+  const d = useSelector((state) => state.panels.d);
+
   if (!!width) {
     if (+width == width) {
       style.width = `${width}px`;
@@ -21,7 +25,7 @@ const UIPanel = ({
     }
   }
   if (!!height) {
-    style.height = height();
+    style.height = height(d);
   }
   if (priorityStyle) {
     style = { ...style, ...priorityStyle };

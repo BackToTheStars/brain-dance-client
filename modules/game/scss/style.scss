@@ -174,7 +174,6 @@ body {
   margin-top: 0 !important;
 }
 
-
 .table-primary {
   font-family: 'SFPRODISPLAYBOLD';
   background: #3429b0 !important;
@@ -191,8 +190,25 @@ body {
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
-  background: #252526;
+  // background: #252526;
+  background: #070e1b !important;
   color: #c7cace !important;
+  --bs-table-accent-bg: #070e1b !important;
+}
+.table-striped > tbody > tr:nth-of-type(even) > * {
+  background: #040911;
+  color: #c7cace !important;
+}
+
+.table-striped > tbody > tr {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #c7cace;
+  }
 }
 
 .table-games .item {

@@ -1,3 +1,4 @@
+import { Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addClass, loadClasses } from '../redux/actions';
@@ -25,7 +26,7 @@ const ClassList = () => {
   }, []);
 
   return (
-    <div className="p-2 d-flex flex-column h-100">
+    <div className="class-list p-2 d-flex flex-column h-100">
       {classes.map((classItem, i) => (
         <ClassComponent
           key={classItem.id}
@@ -35,15 +36,15 @@ const ClassList = () => {
       ))}
       <div className="flex-grow-1"></div>
       <form className="add-class form-inline d-flex" onSubmit={submitAddClass}>
-        <input
-          type="text"
+        <Input
           value={title}
-          className="form-group mr-2 flex-grow-1"
+          className="form-group me-2 flex-grow-1"
           onChange={(e) => {
             setTitle(e.target.value);
           }}
+          placeholder="Enter class name..."
         />
-        <button className="btn btn-primary">Add</button>
+        <button className="btn btn-primary panel-button">Add</button>
       </form>
     </div>
   );

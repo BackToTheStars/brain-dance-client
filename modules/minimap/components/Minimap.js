@@ -321,6 +321,7 @@ const SVGMiniMap = ({
   onMapClick,
   isMinimized,
 }) => {
+  const dispatch = useDispatch();
   const k = width / minimapWidth;
   // 75 -> 1.5 (x1, y1)
   // 6 -> 4 (x2, y2)
@@ -340,6 +341,16 @@ const SVGMiniMap = ({
   //   if (turn.height < 50) console.log({ id: turn._id, h: turn.height });
   // }
 
+  const minimapHeight = isMinimized
+    ? '0'
+    : Math.round((minimapWidth * height) / width);
+
+  useEffect(() => {
+    dispatch(
+      changePanelGeometry(PANEL_MINIMAP, { calculatedHeight: minimapHeight })
+    );
+  }, [minimapHeight]);
+
   return (
     <>
       <svg
@@ -347,9 +358,7 @@ const SVGMiniMap = ({
         xmlns="http://www.w3.org/2000/svg"
         style={{
           width: `${isMinimized ? '0' : minimapWidth}px`,
-          height: `${
-            isMinimized ? '0' : Math.round((minimapWidth * height) / width)
-          }px`,
+          height: `${minimapHeight}px`,
         }}
         onClick={(e) => onMapClick(e)}
       >

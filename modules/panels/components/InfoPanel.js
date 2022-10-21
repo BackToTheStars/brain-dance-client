@@ -50,7 +50,7 @@ const InfoPanel = ({ setGame }) => {
   return (
     <>
       {!viewMode && <EditGameForm />}
-      <table className="table game-info-table table-dark">
+      <table className="table game-info-table table-dark table-striped">
         <tbody>
           {viewMode && (
             <>
@@ -93,9 +93,11 @@ const InfoPanel = ({ setGame }) => {
               </tr>
             </>
           )}
-          {can(RULE_GAME_EDIT) && viewMode && (
-            <tr>
-              {/* <td>
+          {/* {can(RULE_GAME_EDIT) &&
+            viewMode &&
+            // <tr> */}
+          {
+            /* <td>
                 <p>Invite admin / player</p>
                 <a
                   href="#"
@@ -111,9 +113,9 @@ const InfoPanel = ({ setGame }) => {
                   newAccessCode={code}
                   codes={newGameAccessCodes.length ? newGameAccessCodes : codes}
                 />
-              </td>*/}
-            </tr>
-          )}
+              </td>*/
+            // </tr>
+          }
           <tr className="td-no-borders">
             <td>Your nickname:</td>
             <td>{nickname}</td>

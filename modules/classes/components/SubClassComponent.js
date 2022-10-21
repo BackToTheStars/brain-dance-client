@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { Input } from 'antd';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClass, updateClass } from '../redux/actions';
 
 const SubClassComponent = ({ subClassItemId }) => {
   const dispatch = useDispatch();
+  const inputRef = useRef();
   const subClassItem = useSelector((state) => state.classes.d[subClassItemId]);
   const hash = useSelector((state) => state.game.game.hash);
   const [editTitleMode, setEditTitleMode] = useState(false);
@@ -20,23 +22,30 @@ const SubClassComponent = ({ subClassItemId }) => {
     setTitle(subClassItem.title);
   }, [subClassItem]);
 
+  useEffect(() => {
+    if (!editTitleMode) return;
+    setTimeout(() => {
+      inputRef?.current?.focus();
+    }, 200);
+  }, [editTitleMode]);
+
   return (
     <div className="class-item ml-3">
       {editTitleMode ? (
         <form onSubmit={updateTitle} className="d-flex pt-1 class-title-row">
-          <input
-            className="mr-2 flex-grow-1"
-            type="text"
+          <Input
+            ref={inputRef}
+            className="me-2 flex-grow-1"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button className="btn btn-success btn-sm">
+          <button className="btn btn-success btn-sm panel-button">
             {/* <img src="/icons/ok.svg" /> */}Ok
           </button>
         </form>
       ) : (
         <div className="d-flex class-title-row">
-          <div className="mr-3 pt-1">
+          <div className="me-3 pt-1 ps-2">
             {'- '}
             {title}
           </div>
@@ -45,16 +54,16 @@ const SubClassComponent = ({ subClassItemId }) => {
               <img src="/icons/add.svg" />
             </button> */}
             <button
-              className="btn btn-success btn-sm"
+              className="btn btn-success btn-sm panel-button"
               onClick={(e) => setEditTitleMode(true)}
             >
-              <img src="/icons/edit.svg" />
+              <img src="/icons/white/edit.svg" />
             </button>
             <button
-              className="btn btn-success btn-sm"
+              className="btn btn-success btn-sm panel-button"
               onClick={() => dispatch(removeClass(subClassItem.id))}
             >
-              <img src="/icons/delete.svg" />
+              <img src="/icons/white/delete.svg" />
             </button>
           </div>
         </div>
