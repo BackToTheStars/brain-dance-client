@@ -102,7 +102,7 @@ export const panels = [
     component: InfoPanel,
     isDisplayed: false,
     id: (id += 1),
-    width: () => '600px',
+    width: () => '630px',
   },
   {
     type: PANEL_MINIMAP,

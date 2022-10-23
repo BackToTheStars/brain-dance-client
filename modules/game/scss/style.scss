@@ -96,13 +96,13 @@ body {
 }
 
 .card-body {
-  background: #1e1e1e;
-  padding: 14px 0 0 0 !important;
+  background: #040911;
+  padding: 0 0 0 0 !important;
 }
 
 .card {
   border: none !important;
-  background: #1e1e1e !important;
+  background: #040911 !important;
   /* sh3 */
   padding: 14px;
   border-radius: 14px !important;
@@ -160,10 +160,8 @@ body {
 .table {
   background: #131316;
   margin: 0 !important;
-  /* sh3 */
-
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.08), 0px 2px 12px rgba(0, 0, 0, 0.32);
-  margin-top: 10px !important;
+  // margin-top: 10px !important;
 }
 
 .main-table {
@@ -187,6 +185,15 @@ body {
   padding: 0.5rem 1rem !important;
   font-family: 'SFPRODISPLAYREGULAR';
   font-size: 20px !important;
+}
+
+.table > :not(caption) > * > * {
+  background-color: #040911;
+  vertical-align: middle;
+}
+
+.table > thead > * > * {
+  padding-top: 0rem !important;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
@@ -231,7 +238,8 @@ body {
 }
 
 .form-control.game-search {
-  background: #252526 url(/images/search.svg) 13px 50% no-repeat !important;
+  margin-top: 8px;
+  background: #112242 url(/images/search.svg) 13px 50% no-repeat !important;
   border-radius: 20px !important;
   font-size: 16px;
   font-family: 'SFPRODISPLAYREGULAR';
@@ -241,7 +249,7 @@ body {
 }
 
 .form-control.game-search:hover {
-  background: #3d3c3f url(/images/search.svg) 13px 50% no-repeat !important;
+  background: #203f78 url(/images/search.svg) 13px 50% no-repeat !important;
 }
 
 .form-control.game-search:focus {
@@ -463,6 +471,10 @@ body {
   overflow-y: scroll;
   height: 100%;
   display: block;
+}
+
+.main-table > * > tr > *:first-child {
+  width: 60%;
 }
 
 .main-table thead {

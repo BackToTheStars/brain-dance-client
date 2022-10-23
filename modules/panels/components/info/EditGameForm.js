@@ -40,7 +40,7 @@ const EditGameForm = () => {
   };
 
   return (
-    <form className="card mt-3" onSubmit={(e) => handleSubmit(e)}>
+    <form className="card" onSubmit={(e) => handleSubmit(e)}>
       <div className="card-body ">
         <div className="form-group">
           <div className="form-check form-check-inline">
@@ -98,7 +98,7 @@ const EditGameForm = () => {
         <button
           style={{ minWidth: '75px' }}
           type="submit"
-          className="btn btn-primary mr-3"
+          className="btn btn-primary mt-3"
         >
           Save
         </button>

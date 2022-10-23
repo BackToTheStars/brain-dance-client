@@ -27,7 +27,9 @@ const GameListTable = () => {
         <tr style={{ boxShadow: '0 -1px 0 #aaa inset' }}>
           <th>
             <div className="row">
-              <label className="col-auto col-form-label">Name</label>
+              <label className="col-auto col-form-label d-flex align-items-center">
+                Name
+              </label>
               <div className="col">
                 <input
                   onChange={(e) => setFilter(e.target.value)}

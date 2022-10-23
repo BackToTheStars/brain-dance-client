@@ -48,7 +48,7 @@ const InfoPanel = ({ setGame }) => {
   const { name, description, public: publicStatus, codes = [] } = game;
 
   return (
-    <>
+    <div className="pb-3">
       {!viewMode && <EditGameForm />}
       <table className="table game-info-table table-dark table-striped">
         <tbody>
@@ -57,20 +57,18 @@ const InfoPanel = ({ setGame }) => {
               <tr className="td-no-borders">
                 <td>Game name:</td>
                 <td>
-                  <h4>
-                    {name}{' '}
-                    {can(RULE_GAME_EDIT) && (
-                      <a
-                        className="edit-btn"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setViewMode(false);
-                        }}
-                      >
-                        <i className="fas fa-pen-square"></i>
-                      </a>
-                    )}
-                  </h4>
+                  {name}{' '}
+                  {can(RULE_GAME_EDIT) && (
+                    <a
+                      className="edit-btn"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setViewMode(false);
+                      }}
+                    >
+                      <i className="fas fa-pen-square"></i>
+                    </a>
+                  )}
                 </td>
               </tr>
               <tr>
@@ -123,7 +121,7 @@ const InfoPanel = ({ setGame }) => {
           <tr>
             <td>Your role:</td>
             <td>
-              <h4>{ROLES[role].name}</h4>
+              {ROLES[role].name}
               {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
             </td>
           </tr>
@@ -132,14 +130,14 @@ const InfoPanel = ({ setGame }) => {
       {viewMode ? (
         <button
           onClick={() => dispatch(togglePanel({ type: PANEL_INFO }))}
-          className="btn btn-secondary"
+          className="btn btn-primary ms-3"
         >
           Close
         </button>
       ) : (
         <button
           style={{ minWidth: '75px' }}
-          className="btn btn-danger"
+          className="btn btn-danger ms-3"
           onClick={() => {
             setViewMode(true);
           }}
@@ -147,7 +145,7 @@ const InfoPanel = ({ setGame }) => {
           Cancel
         </button>
       )}
-    </>
+    </div>
   );
 };
 
