@@ -11,11 +11,13 @@ import {
 } from '../settings';
 import * as types from './types';
 
-export const resetAndExit = () => (dispatch) => {
-  dispatch(switchEditMode(false));
-  dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
-  dispatch(setActiveQuoteKey(null));
-};
+export const resetAndExit =
+  ({ exitEditMode = true } = {}) =>
+  (dispatch) => {
+    if (exitEditMode) dispatch(switchEditMode(false));
+    dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
+    dispatch(setActiveQuoteKey(null));
+  };
 
 export const togglePanel = (payload) => (dispatch) => {
   dispatch({

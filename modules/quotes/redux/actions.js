@@ -66,38 +66,41 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
 export const processQuoteClicked =
   (currentQuoteKey) => (dispatch, getState) => {
     const state = getState();
+    const cancelCallback = state.game.cancelCallback;
     const activeQuoteKey = state.quotes.activeQuoteKey;
     const turnId = currentQuoteKey.split('_')[0];
     const lines = state.lines.lines;
-
-    if (activeQuoteKey === currentQuoteKey) {
-      dispatch(setActiveQuoteKey(null));
-      // setInteractionMode(MODE_GAME);
-      // setPanelType(null);
-    } else {
-      if (!activeQuoteKey) {
-        dispatch(setActiveQuoteKey(currentQuoteKey));
-        return;
+    cancelCallback();
+    setTimeout(() => {
+      if (activeQuoteKey === currentQuoteKey) {
+        dispatch(setActiveQuoteKey(null));
+        // setInteractionMode(MODE_GAME);
+        // setPanelType(null);
+      } else {
+        if (!activeQuoteKey) {
+          dispatch(setActiveQuoteKey(currentQuoteKey));
+          return;
+        }
+        // if (activeQuoteKey.split('_')[0] === turnId) {
+        //   dispatch(setActiveQuoteKey(currentQuoteKey));
+        //   return;
+        // }
+        const connectedLines = filterLinesByQuoteKey(lines, currentQuoteKey);
+        if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
+          dispatch(setActiveQuoteKey(currentQuoteKey));
+          return;
+        }
+        dispatch(
+          lineCreate({
+            sourceTurnId: activeQuoteKey.split('_')[0],
+            sourceMarker: activeQuoteKey.split('_')[1],
+            targetTurnId: currentQuoteKey.split('_')[0],
+            targetMarker: currentQuoteKey.split('_')[1],
+          })
+        );
+        dispatch(setActiveQuoteKey(null));
       }
-      // if (activeQuoteKey.split('_')[0] === turnId) {
-      //   dispatch(setActiveQuoteKey(currentQuoteKey));
-      //   return;
-      // }
-      const connectedLines = filterLinesByQuoteKey(lines, currentQuoteKey);
-      if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
-        dispatch(setActiveQuoteKey(currentQuoteKey));
-        return;
-      }
-      dispatch(
-        lineCreate({
-          sourceTurnId: activeQuoteKey.split('_')[0],
-          sourceMarker: activeQuoteKey.split('_')[1],
-          targetTurnId: currentQuoteKey.split('_')[0],
-          targetMarker: currentQuoteKey.split('_')[1],
-        })
-      );
-      dispatch(setActiveQuoteKey(null));
-    }
+    }, 100);
   };
 
 export const deleteQuote = () => (dispatch, getState) => {

@@ -130,3 +130,7 @@ export const centerViewportAtPosition =
 export const switchEditMode = (booleanValue) => (dispatch) => {
   dispatch({ type: types.GAME_EDIT_MODE_SWITCH, payload: booleanValue });
 };
+
+export const createCancelCallback = (callback) => (dispatch) => {
+  dispatch({ type: types.GAME_CREATE_CANCEL_CALLBACK, payload: callback });
+};

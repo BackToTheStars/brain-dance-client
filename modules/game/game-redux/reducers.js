@@ -5,6 +5,7 @@ const initialGameState = {
   position: { left: 0, top: 0 },
   error: null,
   editMode: false,
+  cancelCallback: () => {},
 };
 
 export const gameReducer = (state = initialGameState, { type, payload }) => {
@@ -31,6 +32,12 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
       return {
         ...state,
         editMode: payload,
+      };
+
+    case types.GAME_CREATE_CANCEL_CALLBACK:
+      return {
+        ...state,
+        cancelCallback: payload,
       };
 
     default:

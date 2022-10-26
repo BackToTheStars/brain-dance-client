@@ -1,4 +1,6 @@
+import { createCancelCallback } from '@/modules/game/game-redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   resetAndExit,
@@ -13,6 +15,15 @@ const TurnPasteMode = () => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
 
+  const cancelCallback = () => {
+    dispatch(resetAndExit());
+    dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
+  };
+
+  useEffect(() => {
+    dispatch(createCancelCallback(cancelCallback));
+  }, []);
+
   const buttons = [
     null,
     null,
@@ -24,10 +35,7 @@ const TurnPasteMode = () => {
     null,
     {
       text: 'Cancel',
-      callback: () => {
-        dispatch(resetAndExit());
-        dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
-      },
+      callback: cancelCallback,
     },
   ];
 

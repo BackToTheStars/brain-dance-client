@@ -65,7 +65,9 @@ export const panels = [
     id: (id += 1),
     height: (d) => {
       const minimapHeight = d[PANEL_MINIMAP].isDisplayed
-        ? d[PANEL_MINIMAP].calculatedHeight + panelSpacer + 30
+        ? +d[PANEL_MINIMAP].calculatedHeight +
+          panelSpacer +
+          (d[PANEL_MINIMAP].isMinimized ? 40 : 33)
         : 0;
       console.log(window.innerHeight, panelSpacer);
       return `${window.innerHeight - 2 * panelSpacer - minimapHeight}px`;
