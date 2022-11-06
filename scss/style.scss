@@ -2,9 +2,8 @@
 @import 'mixins';
 @import '../node_modules/bootstrap/scss/bootstrap';
 @import 'overrides';
-@import 'extra';
 
-@import 'tmp';
+@import 'common';
 @import '../modules/game/scss/style.scss';
 @import '../modules/panels/scss/style.scss';
 @import '../modules/turns/scss/style.scss';

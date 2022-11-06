@@ -5,6 +5,7 @@ import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
 
@@ -13,6 +14,7 @@ const Paragraph = ({
   registerHandleResize,
   unregisterHandleResize,
   stateIsReady,
+  widgetId,
 }) => {
   const {
     paragraph,
@@ -34,7 +36,7 @@ const Paragraph = ({
     if (!paragraphElCurrent) return;
     registerHandleResize({
       type: 'paragraph',
-      id: 'paragraph1',
+      id: widgetId,
       // этот виджет является гибким
       variableHeight: true,
       minWidthCallback: () => {
@@ -59,21 +61,24 @@ const Paragraph = ({
 
   return (
     <>
-      <ParagraphOriginal
-        {...{
-          setParagraphElCurrent,
-          setParagraphQuotes,
-          paragraph,
-          _id,
-          backgroundColor,
-          fontColor,
-          contentType,
-          scrollPosition,
-          width,
-          height,
-          stateIsReady,
-        }}
-      />
+      <div className="position-relative">
+        <Compressor {...{ _id, widgetId }} />
+        <ParagraphOriginal
+          {...{
+            setParagraphElCurrent,
+            setParagraphQuotes,
+            paragraph,
+            _id,
+            backgroundColor,
+            fontColor,
+            contentType,
+            scrollPosition,
+            width,
+            height,
+            stateIsReady,
+          }}
+        />
+      </div>
       <ParagraphQuotes turnId={_id} paragraphQuotes={paragraphQuotes} />
       <a
         className="widget-button"
@@ -83,7 +88,7 @@ const Paragraph = ({
           dispatch(
             setPanelMode({
               mode: MODE_WIDGET_PARAGRAPH,
-              params: { editTurnId: _id },
+              params: { editTurnId: _id, editWidgetId: widgetId },
             })
           );
         }}

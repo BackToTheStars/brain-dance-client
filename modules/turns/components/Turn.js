@@ -205,7 +205,7 @@ const Turn = ({ id }) => {
 
   // console.log({ widgets });
 
-  const wrapperClasses = [contentType, 'react-turn-new'];
+  const wrapperClasses = [contentType, 'react-turn-new', 'noselect'];
 
   if (dontShowHeader) {
     wrapperClasses.push('dont-show-header');
@@ -260,6 +260,7 @@ const Turn = ({ id }) => {
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
           stateIsReady={stateIsReady}
+          widgetId="paragraph1"
         />
       )}
       {dontShowHeader && !!date && !!sourceUrl && (
