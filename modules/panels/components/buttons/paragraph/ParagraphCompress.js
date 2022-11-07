@@ -1,29 +1,20 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { deleteQuote } from '@/modules/quotes/redux/actions';
+import { savePictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
+import { resetAndExit } from '../../../redux/actions';
 import { Buttons } from '../../ButtonsPanel';
 
-const PictureQuoteActive = () => {
+const ParagraphCompress = () => {
   //
   const { can } = useUserContext();
   const dispatch = useDispatch();
 
   const buttons = [
     {
-      text: 'Modify',
+      text: 'Save Area',
       callback: () => {
-        dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE_QUOTE_ADD }));
-      },
-      show: () => can(RULE_TURNS_CRUD),
-    },
-    {
-      text: 'Delete',
-      callback: () => {
-        dispatch(deleteQuote()).then(() => {
-          // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
+        dispatch(savePictureQuoteByCrop()).then(() => {
           dispatch(resetAndExit());
         });
       },
@@ -35,9 +26,11 @@ const PictureQuoteActive = () => {
     null,
     null,
     null,
+    null,
     {
       text: 'Cancel',
       callback: () => {
+        // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
         dispatch(resetAndExit());
       },
       show: () => can(RULE_TURNS_CRUD),
@@ -47,4 +40,4 @@ const PictureQuoteActive = () => {
   return <Buttons buttons={buttons} />;
 };
 
-export default PictureQuoteActive;
+export default ParagraphCompress;

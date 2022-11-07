@@ -4,7 +4,7 @@ import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
@@ -25,7 +25,11 @@ const Paragraph = ({
     scrollPosition,
     width,
     height,
+    compressed,
   } = turn;
+
+  const panels = useSelector((state) => state.panels);
+  const { editTurnId, editWidgetId, editWidgetParams } = panels;
 
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
   const [paragraphQuotes, setParagraphQuotes] = useState([]);
@@ -61,8 +65,9 @@ const Paragraph = ({
 
   return (
     <>
-      <div className="position-relative">
-        <Compressor {...{ _id, widgetId }} />
+      {compressed ? (
+        <Compressor className="compressor" {...{ _id, widgetId }} />
+      ) : (
         <ParagraphOriginal
           {...{
             setParagraphElCurrent,
@@ -78,7 +83,7 @@ const Paragraph = ({
             stateIsReady,
           }}
         />
-      </div>
+      )}
       <ParagraphQuotes turnId={_id} paragraphQuotes={paragraphQuotes} />
       <a
         className="widget-button"

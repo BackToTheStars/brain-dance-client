@@ -78,6 +78,14 @@ export const markTurnAsChanged =
       payload: { _id },
     });
 
+export const compressParagraph = () => (dispatch, getState) => {
+  const state = getState();
+  const editTurnId = state.panels.editTurnId;
+
+  dispatch(updateGeometry({ _id: editTurnId, compressed: true }));
+  dispatch(markTurnAsChanged({ _id: editTurnId }));
+};
+
 export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,

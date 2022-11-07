@@ -1,9 +1,10 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { compressParagraph } from '@/modules/turns/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
-import { resetAndExit, setPanelMode } from '../../redux/actions';
-import { MODE_GAME } from '../../settings';
-import { Buttons } from '../ButtonsPanel';
+import { resetAndExit, setPanelMode } from '../../../redux/actions';
+import { MODE_WIDGET_PARAGRAPH_COMPRESS } from '../../../settings';
+import { Buttons } from '../../ButtonsPanel';
 
 const ParagraphMode = () => {
   //
@@ -14,10 +15,9 @@ const ParagraphMode = () => {
     {
       text: 'Compress',
       callback: () => {
-        // console.log({ INTERACTION_COMPRESS_PARAGRAPH });
-        // setInteractionType(INTERACTION_COMPRESS_PARAGRAPH);
-        // setInteractionMode(MODE_GAME);
-        // makeWidgetActive(null);
+        dispatch(compressParagraph());
+        // dispatch(setPanelMode({ mode: MODE_WIDGET_PARAGRAPH_COMPRESS }));
+        // dispatch(markTurnAsChanged({ _id: turnId }));
       },
     },
     {
