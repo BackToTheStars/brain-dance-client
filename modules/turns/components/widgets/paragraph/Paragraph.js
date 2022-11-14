@@ -3,6 +3,7 @@ import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
+import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Compressor from './Compressor';
@@ -30,9 +31,18 @@ const Paragraph = ({
 
   const panels = useSelector((state) => state.panels);
   const { editTurnId, editWidgetId, editWidgetParams } = panels;
+  const [compressedHeight, setCompressedHeight] = useState(0);
 
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
+  // const [textPieces, setTextPieces] = useState([]); // элементы именно для сжатого параграфа
+
   const [paragraphQuotes, setParagraphQuotes] = useState([]);
+  // console.log(paragraphQuotes);
+
+  const textPieces = calculateTextPiecesFromQuotes(
+    paragraphQuotes,
+    paragraphElCurrent
+  );
 
   const dispatch = useDispatch();
 
@@ -53,20 +63,49 @@ const Paragraph = ({
         if (!paragraphElCurrent) {
           return 0;
         }
-        return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
+        // return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
+        return (
+          (!!compressedHeight
+            ? compressedHeight
+            : paragraphElCurrent.scrollHeight) +
+          widgetSpacer +
+          5
+        );
       },
     });
     return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
-  }, [paragraphElCurrent]);
+  }, [paragraphElCurrent, compressedHeight]);
 
   useEffect(() => {
     dispatch(quoteCoordsUpdate(_id, TYPE_QUOTE_TEXT, paragraphQuotes));
   }, [paragraphQuotes]);
 
+  // useEffect(() => {
+  //   if (!compressed) return;
+  //   const textPieces = calculateTextPiecesFromQuotes(
+  //     paragraphQuotes,
+  //     paragraphElCurrent
+  //   );
+
+  //   // consoleLogLines(textPieces, updateDebugLines);
+  //   // сообщаем шагу, что у нас есть настройки параграфа для операции Compress
+  //   setTextPieces(textPieces);
+  // }, [compressed]);
+
+  // <Compressor className="compressor" {...{ turn, textPieces }} />
   return (
     <>
       {compressed ? (
-        <Compressor className="compressor" {...{ _id, widgetId }} />
+        <Compressor
+          {...{
+            turn,
+            textPieces,
+            paragraphElCurrent,
+            setParagraphElCurrent,
+            compressedHeight: 600,
+            setCompressedHeight,
+          }}
+        />
       ) : (
         <ParagraphOriginal
           {...{

@@ -172,12 +172,17 @@ export const TextAroundQuote = ({
   const paragraphEl = useRef(null);
 
   useEffect(() => {
+    // @todo: check if no quotes
     paragraphEl.current.scrollTop = scrollPosition;
     setTimeout(() => {
       paragraphEl.current.scrollTop = scrollPosition;
       const quotes = [
         ...paragraphEl.current.querySelectorAll('.compressed-quote'),
       ];
+      if (!quotes?.length) {
+        console.log('no quotes in TextAroundQuote');
+        return;
+      }
 
       const { top } = quotes[0].getBoundingClientRect();
       const { bottom } = quotes[quotes.length - 1].getBoundingClientRect();
