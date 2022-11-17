@@ -81,8 +81,32 @@ export const markTurnAsChanged =
 export const compressParagraph = () => (dispatch, getState) => {
   const state = getState();
   const editTurnId = state.panels.editTurnId;
+  const activeTurn = state.turns.d[editTurnId];
 
-  dispatch(updateGeometry({ _id: editTurnId, compressed: true }));
+  dispatch(
+    updateGeometry({
+      _id: editTurnId,
+      compressed: true,
+      unCompressedHeight: activeTurn.height,
+      // height: activeTurn.compressedHeight
+    })
+  );
+  dispatch(markTurnAsChanged({ _id: editTurnId }));
+};
+
+export const unCompressParagraph = () => (dispatch, getState) => {
+  const state = getState();
+  const editTurnId = state.panels.editTurnId;
+  const activeTurn = state.turns.d[editTurnId];
+
+  dispatch(
+    updateGeometry({
+      _id: editTurnId,
+      compressed: false,
+      compressedHeight: activeTurn.height,
+      height: activeTurn.unCompressedHeight,
+    })
+  );
   dispatch(markTurnAsChanged({ _id: editTurnId }));
 };
 

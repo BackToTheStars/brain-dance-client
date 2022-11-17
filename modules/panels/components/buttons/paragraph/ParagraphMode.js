@@ -1,32 +1,39 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { compressParagraph } from '@/modules/turns/redux/actions';
+import {
+  compressParagraph,
+  unCompressParagraph,
+} from '@/modules/turns/redux/actions';
+import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useDispatch } from 'react-redux';
-import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { MODE_WIDGET_PARAGRAPH_COMPRESS } from '../../../settings';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetAndExit } from '../../../redux/actions';
 import { Buttons } from '../../ButtonsPanel';
 
 const ParagraphMode = () => {
   //
+  const editTurnId = useSelector((state) => state.panels.editTurnId);
+  const activeTurn = useSelector((state) => state.turns.d[editTurnId]);
+
   const { can } = useUserContext();
   const dispatch = useDispatch();
 
   const buttons = [
-    {
-      text: 'Compress',
-      callback: () => {
-        dispatch(compressParagraph());
-        // dispatch(setPanelMode({ mode: MODE_WIDGET_PARAGRAPH_COMPRESS }));
-        // dispatch(markTurnAsChanged({ _id: turnId }));
-      },
-    },
-    {
-      text: 'Uncompress',
-      callback: () => {
-        // console.log({ INTERACTION_UNCOMPRESS_PARAGRAPH });
-        // setInteractionType(INTERACTION_UNCOMPRESS_PARAGRAPH);
-      },
-    },
+    !activeTurn.compressed
+      ? {
+          text: 'Compress',
+          callback: () => {
+            dispatch(setCallsQueueIsBlocked(true));
+            dispatch(compressParagraph());
+          },
+        }
+      : {
+          text: 'Uncompress',
+          callback: () => {
+            dispatch(setCallsQueueIsBlocked(true));
+            dispatch(unCompressParagraph());
+          },
+        },
+    null,
     null,
     null,
     null,
@@ -37,7 +44,6 @@ const ParagraphMode = () => {
       text: 'Cancel',
       callback: () => {
         dispatch(resetAndExit());
-        // makeWidgetActive(null);
       },
       show: () => can(RULE_TURNS_CRUD),
     },

@@ -3,6 +3,7 @@ import * as types from './types';
 const initialUIState = {
   notifications: [],
   viewport: { width: 1600, height: 1200 },
+  callsQueueIsBlocked: false,
 };
 
 export const UIReducer = (state = initialUIState, { type, payload }) => {
@@ -40,6 +41,11 @@ export const UIReducer = (state = initialUIState, { type, payload }) => {
       return {
         ...state,
         viewport: payload.viewport,
+      };
+    case types.SET_CALLS_QUEUE_IS_BLOCKED:
+      return {
+        ...state,
+        callsQueueIsBlocked: payload,
       };
     default:
       return state;

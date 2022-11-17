@@ -48,6 +48,7 @@ const Turn = ({ id }) => {
     date,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
+    compressed,
     //-- video
     videoUrl,
     //-- image
@@ -116,6 +117,7 @@ const Turn = ({ id }) => {
           _id,
           width: newWidth,
           height: newHeight,
+          [compressed ? 'compressedHeight' : 'unCompressedHeight']: newHeight,
         })
       );
     });

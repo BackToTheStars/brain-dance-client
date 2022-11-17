@@ -1,4 +1,6 @@
+import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { Fragment, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
 import {
   ParagraphCompressorTextWrapper,
@@ -24,8 +26,11 @@ const Compressor = ({
 }) => {
   //
   // const { turn } = useTurnContext();
+  const dispatch = useDispatch();
   const { width, paragraph: originalParagraph, y } = turn;
   const [compressedTexts, setCompressedTexts] = useState([]);
+  const [textsReadyCount, setTextsReadyCount] = useState(0);
+
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
     ...paragraphItem,
@@ -45,6 +50,8 @@ const Compressor = ({
     .map((textItem) => textItem.insert)
     .join(' ')
     .split(' '); // слили всё в один большой текст и разделили по словам
+
+  const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
 
   useEffect(() => {
     if (!wrapperRef.current) return false;
@@ -157,6 +164,12 @@ const Compressor = ({
     // }, 300);
   }, [width, wrapperRef]);
 
+  useEffect(() => {
+    if (!textsReadyCount) return;
+    if (textsReadyCount === compressedTexts.length)
+      dispatch(setCallsQueueIsBlocked(false));
+  }, [textsReadyCount, compressedTexts]);
+
   return (
     <div className="wrapperParagraphText">
       <div style={{ position: 'relative' }}>
@@ -192,7 +205,7 @@ const Compressor = ({
                 // registerHandleResize,
                 // unregisterHandleResize,
                 // variableHeight,
-
+                setTextIsReady,
                 paragraph: text.paragraph,
                 scrollPosition: text.scrollTop + text.delta,
                 // scrollPosition: text.scrollTop,

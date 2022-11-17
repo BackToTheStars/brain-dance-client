@@ -3,6 +3,7 @@ import {
   markTurnAsChanged,
   updateScrollPosition,
 } from '@/modules/turns/redux/actions';
+import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
@@ -96,6 +97,11 @@ const ParagraphOriginal = ({
 
   useEffect(() => {
     paragraphEl.current.scrollTop = scrollPosition;
+    // @todo: дождаться сигналы завершения от всех внутренних компонентов
+    // проверить что очередь заблокирована
+    setTimeout(() => {
+      dispatch(setCallsQueueIsBlocked(false));
+    }, 300);
   }, []);
 
   useEffect(() => {

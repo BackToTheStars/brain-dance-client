@@ -95,9 +95,10 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
 
 export const ParagraphCompressorTextWrapper = ({ arrText }) => {
   // console.log({ arrText });
+  const modifiedArrText = modifyQuoteBackgrounds(arrText, 'turn');
   return (
     <>
-      {(arrText || []).map((textItem, i) => {
+      {(modifiedArrText || []).map((textItem, i) => {
         // @todo: refactoring
         const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
         const newInserts = [];
@@ -167,6 +168,7 @@ export const TextAroundQuote = ({
   paragraph,
   scrollPosition,
   height, // через этот viewport смотрим на кусок текста
+  setTextIsReady,
 }) => {
   //
   const paragraphEl = useRef(null);
@@ -192,6 +194,7 @@ export const TextAroundQuote = ({
       const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
       const fixScroll = Math.floor(middleLineParagraph - middleLine);
       paragraphEl.current.scrollTop -= fixScroll;
+      setTextIsReady();
       // for (let quote of quotes) {
       // const { top, bottom } = quote.getBoundingClientRect();
       // }

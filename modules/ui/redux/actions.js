@@ -36,3 +36,7 @@ export const viewportGeometryUpdate =
       type: turnTypes.TURNS_UPDATE_GEOMETRY_TIME,
     });
   };
+
+export const setCallsQueueIsBlocked = (value) => (dispatch) => {
+  dispatch({ type: types.SET_CALLS_QUEUE_IS_BLOCKED, payload: value });
+};

@@ -65,9 +65,7 @@ const Paragraph = ({
         }
         // return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
         return (
-          (!!compressedHeight
-            ? compressedHeight
-            : paragraphElCurrent.scrollHeight) +
+          (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
           widgetSpacer +
           5
         );
