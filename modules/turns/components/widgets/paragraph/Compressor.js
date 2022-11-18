@@ -2,6 +2,7 @@ import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { Fragment, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
+import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
 import {
   ParagraphCompressorTextWrapper,
   TextAroundQuote,
@@ -15,6 +16,7 @@ const Compressor = ({
   textPieces: originalTextPieces,
   compressedHeight,
   setCompressedHeight,
+  stateIsReady,
   // contentType,
   // backgroundColor,
   // fontColor,
@@ -27,7 +29,7 @@ const Compressor = ({
   //
   // const { turn } = useTurnContext();
   const dispatch = useDispatch();
-  const { width, paragraph: originalParagraph, y } = turn;
+  const { _id: turnId, width, paragraph: originalParagraph, y } = turn;
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
 
@@ -36,7 +38,6 @@ const Compressor = ({
     ...paragraphItem,
   }));
   const wrapperRef = useRef(null); // @learn null это мы, undefined, это система
-  console.log({ wrapperRef });
 
   // let paragraphTop = y + 40; // @todo: верх виджета параграфа под header, picture
   // if (wrapperRef?.current) {
@@ -54,7 +55,21 @@ const Compressor = ({
   const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
 
   useEffect(() => {
+    // console.log({ compressedHeight });
+    // console.log({ originalTextPieces });
+    // console.log({ wrapperRef });
+
     if (!wrapperRef.current) return false;
+    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+    console.log({ quotes });
+
+    // setQuotesWithoutScroll(quotes);
+    // setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
+  }, [stateIsReady, wrapperRef]);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return false;
+    if (!originalTextPieces?.length) return false;
 
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
@@ -162,7 +177,7 @@ const Compressor = ({
     // setTimeout(() => {
     //   if (!!compressedHeight) setCompressedHeight(null);
     // }, 300);
-  }, [width, wrapperRef]);
+  }, [width, wrapperRef, originalTextPieces]);
 
   useEffect(() => {
     if (!textsReadyCount) return;
@@ -179,18 +194,6 @@ const Compressor = ({
           // style={{ width: `${width}px` }}
         >
           <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
-          {/* {words.map((word, i) => {
-            const arrWords = word ? word.split('\n') : [];
-            const newWords = [];
-            for (let j = 0; j < arrWords.length; j++) {
-              newWords.push(<span key={j * 3}>{arrWords[j]}</span>);
-              newWords.push(<span key={j * 3 + 1}> </span>);
-              newWords.push(<br key={j * 3 + 2} />);
-            }
-            newWords.pop();
-            // newWords.pop();
-            return <Fragment key={`${i}`}>{newWords}</Fragment>;
-          })} */}
         </div>
       </div>
       <div className="compressed-paragraph-widget">

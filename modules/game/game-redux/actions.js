@@ -61,12 +61,25 @@ export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
     .filter((turn) => turn.wasChanged === true)
 
     .map((turn) => {
-      const { _id, x, y, height, width, scrollPosition } = turn;
+      const {
+        _id,
+        x,
+        y,
+        height,
+        compressed,
+        compressedHeight,
+        uncompressedHeight,
+        width,
+        scrollPosition,
+      } = turn;
       return {
         _id,
         x: x + gamePosition.left,
         y: y + gamePosition.top,
         height,
+        compressed,
+        compressedHeight,
+        uncompressedHeight,
         width,
         scrollPosition,
       };

@@ -80,6 +80,7 @@ const ParagraphOriginal = ({
     const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
     setQuotesWithoutScroll(quotes);
     setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
+    dispatch(markTurnAsChanged({ _id: turnId }));
   }, [width]);
 
   useEffect(() => {

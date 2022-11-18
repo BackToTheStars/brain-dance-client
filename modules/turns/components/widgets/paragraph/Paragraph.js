@@ -31,7 +31,9 @@ const Paragraph = ({
 
   const panels = useSelector((state) => state.panels);
   const { editTurnId, editWidgetId, editWidgetParams } = panels;
-  const [compressedHeight, setCompressedHeight] = useState(0);
+  const [compressedHeight, setCompressedHeight] = useState(
+    turn.compressedHeight
+  );
 
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
   // const [textPieces, setTextPieces] = useState([]); // элементы именно для сжатого параграфа
@@ -100,8 +102,9 @@ const Paragraph = ({
             textPieces,
             paragraphElCurrent,
             setParagraphElCurrent,
-            compressedHeight: 600,
+            compressedHeight,
             setCompressedHeight,
+            stateIsReady,
           }}
         />
       ) : (
