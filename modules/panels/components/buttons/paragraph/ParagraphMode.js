@@ -18,7 +18,7 @@ const ParagraphMode = () => {
   const dispatch = useDispatch();
 
   const buttons = [
-    !activeTurn.compressed
+    !activeTurn?.compressed
       ? {
           text: 'Compress',
           callback: () => {

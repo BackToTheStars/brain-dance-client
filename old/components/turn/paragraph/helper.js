@@ -68,7 +68,8 @@ export const calculateTextPiecesFromQuotes = (
     if (i === textQuotesVerticalPositions.length - 1) {
       // если это последний фрагмент, то
       const realScrollHeight = paragraphElCurrent.scrollHeight - textPiece.top;
-
+      // console.log(paragraphElCurrent.scrollHeight, textPiece.top);
+      // console.log({ realScrollHeight, scrollHeight2: textPiece.scrollHeight });
       textPiece.height += Math.min(
         realScrollHeight - textPiece.scrollHeight,
         freeSpaceRequired

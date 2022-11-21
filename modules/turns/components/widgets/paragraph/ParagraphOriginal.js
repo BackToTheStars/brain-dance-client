@@ -13,7 +13,10 @@ import {
 } from '../../helpers/quotesHelper';
 
 // import { ACTION_TURN_WAS_CHANGED } from '@/components/contexts/TurnsCollectionContext';
-import { ParagraphOriginalTextWrapper } from './TextWrappers';
+import {
+  ParagraphOriginalTexts,
+  // ParagraphOriginalTextWrapper,
+} from './TextWrappers';
 // import { useTurnData } from '../contexts/TurnData';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
@@ -152,7 +155,8 @@ const ParagraphOriginal = ({
         {/* {!!topQuotesCount && (
             <span className="top-quotes-counter">{topQuotesCount}</span>
           )} */}
-        <ParagraphOriginalTextWrapper
+        {/* <ParagraphOriginalTextWrapper */}
+        <ParagraphOriginalTexts
           arrText={paragraph || []}
           turnId={turnId}
           turnType={contentType}

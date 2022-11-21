@@ -45,8 +45,10 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
   });
 };
 
-const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
+export const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
   //
+  // console.log({ arrText });
+
   const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
 
   return (
@@ -74,7 +76,7 @@ const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
   );
 };
 
-export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
+// export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
 export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
   // const spanFragment = useRef(null);
@@ -94,8 +96,9 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
 };
 
 export const ParagraphCompressorTextWrapper = ({ arrText }) => {
+  // if (!arrText) return;
   // console.log({ arrText });
-  const modifiedArrText = modifyQuoteBackgrounds(arrText, 'turn');
+  const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
   return (
     <>
       {(modifiedArrText || []).map((textItem, i) => {

@@ -23,8 +23,8 @@ const Compressor = ({
   // registerHandleResize,
   // unregisterHandleResize,
   // variableHeight,
-  paragraphElCurrent,
-  setParagraphElCurrent,
+  // paragraphElCurrent,
+  // setParagraphElCurrent,
 }) => {
   //
   // const { turn } = useTurnContext();
@@ -170,6 +170,13 @@ const Compressor = ({
       paragraph.slice(paragraphIndex);
     setCompressedTexts(textPieces);
 
+    console.log(
+      'textPieces',
+      textPieces.reduce((sum, textPiece) => {
+        console.log(textPiece);
+        return sum + textPiece.height;
+      }, 0)
+    );
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
       // + (textPieces.length - 1) * 11 // todo: const

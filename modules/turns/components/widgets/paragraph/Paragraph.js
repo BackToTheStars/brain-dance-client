@@ -45,6 +45,7 @@ const Paragraph = ({
     paragraphQuotes,
     paragraphElCurrent
   );
+  console.log({ paragraphElCurrent });
 
   const dispatch = useDispatch();
 
@@ -100,8 +101,8 @@ const Paragraph = ({
           {...{
             turn,
             textPieces,
-            paragraphElCurrent,
-            setParagraphElCurrent,
+            // paragraphElCurrent,
+            // setParagraphElCurrent,
             compressedHeight,
             setCompressedHeight,
             stateIsReady,
