@@ -56,6 +56,10 @@ const Turn = ({ id }) => {
     pictureOnly,
   } = turn;
 
+  const callsQueueIsBlockedFlag = useSelector(
+    (state) => state.ui.callsQueueIsBlocked
+  );
+
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
 
   const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
@@ -193,6 +197,7 @@ const Turn = ({ id }) => {
   }, [widgets]);
 
   useEffect(() => {
+    if (callsQueueIsBlockedFlag) return;
     const widgetsCount =
       1 + // header
       !!imageUrl + // Picture
@@ -203,7 +208,7 @@ const Turn = ({ id }) => {
       recalculateSize(Math.round(width), Math.round(height));
       setStateIsReady(true);
     }
-  }, [widgets]);
+  }, [widgets, callsQueueIsBlockedFlag]);
 
   // console.log({ widgets });
 

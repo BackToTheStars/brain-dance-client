@@ -40,6 +40,7 @@ const ParagraphOriginal = ({
   width,
   height,
   stateIsReady,
+  compressed,
 }) => {
   //
   // const { lineEnds, dispatch } = useTurnData() || {};
@@ -65,6 +66,10 @@ const ParagraphOriginal = ({
   if (contentType === 'comment') {
     style.backgroundColor = backgroundColor;
     style.color = fontColor || 'black';
+  }
+  if (compressed) {
+    style.visibility = 'hidden';
+    style.position = 'absolute';
   }
   // if (!!variableHeight) {
   //   style.height = `${variableHeight}px`;

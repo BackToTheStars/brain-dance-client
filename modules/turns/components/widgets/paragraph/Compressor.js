@@ -1,4 +1,5 @@
 import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
+import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { Fragment, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
@@ -13,7 +14,7 @@ import {
 
 const Compressor = ({
   turn,
-  textPieces: originalTextPieces,
+  // textPieces: compressedTextPieces,
   compressedHeight,
   setCompressedHeight,
   stateIsReady,
@@ -32,6 +33,7 @@ const Compressor = ({
   const { _id: turnId, width, paragraph: originalParagraph, y } = turn;
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
+  const [compressedTextPieces, setCompressedTextPieces] = useState([]);
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -56,12 +58,21 @@ const Compressor = ({
 
   useEffect(() => {
     // console.log({ compressedHeight });
-    // console.log({ originalTextPieces });
+    // console.log({ compressedTextPieces });
     // console.log({ wrapperRef });
 
     if (!wrapperRef.current) return false;
     const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
     console.log({ quotes });
+
+    const textPieces = calculateTextPiecesFromQuotes(
+      quotes,
+      wrapperRef?.current
+    );
+    console.log('==============================');
+    console.log({ textPieces });
+
+    setCompressedTextPieces(textPieces);
 
     // setQuotesWithoutScroll(quotes);
     // setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
@@ -69,7 +80,7 @@ const Compressor = ({
 
   useEffect(() => {
     if (!wrapperRef.current) return false;
-    if (!originalTextPieces?.length) return false;
+    if (!compressedTextPieces?.length) return false;
 
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
@@ -79,7 +90,7 @@ const Compressor = ({
     let lettersCount = 0;
     let textPieceIndex = 0;
 
-    const textPieces = originalTextPieces.map((textPiece) => ({
+    const textPieces = compressedTextPieces.map((textPiece) => ({
       ...textPiece,
     }));
 
@@ -184,12 +195,15 @@ const Compressor = ({
     // setTimeout(() => {
     //   if (!!compressedHeight) setCompressedHeight(null);
     // }, 300);
-  }, [width, wrapperRef, originalTextPieces]);
+  }, [width, wrapperRef, compressedTextPieces]);
 
   useEffect(() => {
     if (!textsReadyCount) return;
-    if (textsReadyCount === compressedTexts.length)
+    if (textsReadyCount === compressedTexts.length) {
+      // setTimeout(() => {
       dispatch(setCallsQueueIsBlocked(false));
+      // }, 2000);
+    }
   }, [textsReadyCount, compressedTexts]);
 
   return (

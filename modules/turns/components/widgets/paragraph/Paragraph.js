@@ -39,7 +39,7 @@ const Paragraph = ({
   // const [textPieces, setTextPieces] = useState([]); // элементы именно для сжатого параграфа
 
   const [paragraphQuotes, setParagraphQuotes] = useState([]);
-  // console.log(paragraphQuotes);
+  console.log({ paragraphQuotes });
 
   const textPieces = calculateTextPiecesFromQuotes(
     paragraphQuotes,
@@ -111,6 +111,7 @@ const Paragraph = ({
       ) : (
         <ParagraphOriginal
           {...{
+            compressed,
             setParagraphElCurrent,
             setParagraphQuotes,
             paragraph,

@@ -125,14 +125,17 @@ export const ParagraphCompressorTextWrapper = ({ arrText }) => {
 };
 
 export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
+  const isTextQuote =
+    !!textItem && textItem.attributes && textItem.attributes.background;
+  const additionalAttributes = {};
+  if (isTextQuote && textItem.attributes?.id) {
+    additionalAttributes['data-id'] = textItem.attributes.id;
+  }
   return (
     <span
       style={textItem.attributes}
-      className={
-        !!textItem && textItem.attributes && textItem.attributes.background
-          ? 'compressed-quote'
-          : ''
-      }
+      className={isTextQuote ? 'compressed-quote' : ''}
+      {...additionalAttributes}
     >
       {newInserts.map((item, index) => {
         if (typeof item === 'string') {
