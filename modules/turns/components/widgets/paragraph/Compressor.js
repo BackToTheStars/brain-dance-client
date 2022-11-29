@@ -18,6 +18,9 @@ const Compressor = ({
   compressedHeight,
   setCompressedHeight,
   stateIsReady,
+  setWrapperElCurrent,
+  registerHandleResizeWithParams,
+  setParagraphIsReady,
   // contentType,
   // backgroundColor,
   // fontColor,
@@ -69,13 +72,23 @@ const Compressor = ({
       quotes,
       wrapperRef?.current
     );
-    console.log('==============================');
-    console.log({ textPieces });
+    // console.log('==============================');
+    // console.log({ textPieces });
 
     setCompressedTextPieces(textPieces);
 
     // setQuotesWithoutScroll(quotes);
     // setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
+
+    const widgetMinHeight = textPieces.reduce(
+      (acc, textPiece) => acc + textPiece.height,
+      0
+    );
+    const widgetMaxHeight = textPieces.reduce(
+      (acc, textPiece) => acc + textPiece.scrollHeight,
+      0
+    );
+    registerHandleResizeWithParams({ widgetMinHeight, widgetMaxHeight });
   }, [stateIsReady, wrapperRef]);
 
   useEffect(() => {
@@ -107,7 +120,6 @@ const Compressor = ({
         return false;
       return true;
     });
-    console.log({ textPieces, filteredSpans });
 
     // const tempTurnTop = 26;
     for (let span of filteredSpans) {
@@ -181,15 +193,17 @@ const Compressor = ({
       paragraph.slice(paragraphIndex);
     setCompressedTexts(textPieces);
 
-    console.log(
-      'textPieces',
-      textPieces.reduce((sum, textPiece) => {
-        console.log(textPiece);
-        return sum + textPiece.height;
-      }, 0)
-    );
+    // console.log(
+    //   'textPieces',
+    //   textPieces.reduce((sum, textPiece) => {
+    //     console.log(textPiece);
+    //     return sum + textPiece.height;
+    //   }, 0)
+    // );
+
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
+
       // + (textPieces.length - 1) * 11 // todo: const
     );
     // setTimeout(() => {
@@ -205,6 +219,10 @@ const Compressor = ({
       // }, 2000);
     }
   }, [textsReadyCount, compressedTexts]);
+
+  useEffect(() => {
+    if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
+  }, [wrapperRef]);
 
   return (
     <div className="wrapperParagraphText">

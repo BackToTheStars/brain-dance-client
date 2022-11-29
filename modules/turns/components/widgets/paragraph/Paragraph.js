@@ -1,11 +1,8 @@
 import { widgetSpacer } from '@/config/ui';
-import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
-import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
-import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
@@ -16,41 +13,70 @@ const Paragraph = ({
   unregisterHandleResize,
   stateIsReady,
   widgetId,
+  setParagraphIsReady,
 }) => {
-  const {
-    paragraph,
-    _id,
-    backgroundColor,
-    fontColor,
-    contentType,
-    scrollPosition,
-    width,
-    height,
-    compressed,
-  } = turn;
+  const { _id, compressed } = turn;
 
-  const panels = useSelector((state) => state.panels);
-  const { editTurnId, editWidgetId, editWidgetParams } = panels;
   const [compressedHeight, setCompressedHeight] = useState(
     turn.compressedHeight
   );
 
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
-  // const [textPieces, setTextPieces] = useState([]); // элементы именно для сжатого параграфа
-
-  const [paragraphQuotes, setParagraphQuotes] = useState([]);
-  console.log({ paragraphQuotes });
-
-  const textPieces = calculateTextPiecesFromQuotes(
-    paragraphQuotes,
-    paragraphElCurrent
-  );
-  console.log({ paragraphElCurrent });
+  const [wrapperElCurrent, setWrapperElCurrent] = useState(null);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!paragraphElCurrent) return;
+    // console.log({
+    //   wrapperElCurrent,
+    //   paragraphElCurrent,
+    //   compressedHeight,
+    //   compressed,
+    // });
+
+    if (!compressed) {
+      if (paragraphElCurrent) {
+        registerHandleResize({
+          type: 'paragraph',
+          id: widgetId,
+          // этот виджет является гибким
+          variableHeight: true,
+          minWidthCallback: () => {
+            return 300;
+          },
+          minHeightCallback: () => {
+            return 40;
+          },
+          maxHeightCallback: () => {
+            // if (!!compressed) {
+            // } else if (!paragraphElCurrent) {
+            //   return 0;
+            // }
+            return (
+              // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
+              // widgetSpacer +
+              // 5
+              paragraphElCurrent.scrollHeight + widgetSpacer + 5
+            );
+          },
+        });
+        return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
+      }
+      return;
+    }
+
+    //******************
+    if (!!compressed) {
+      if (wrapperElCurrent) {
+        return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
+      }
+    }
+  }, [wrapperElCurrent, paragraphElCurrent, compressed]);
+
+  const registerHandleResizeWithParams = ({
+    widgetMinHeight,
+    widgetMaxHeight,
+  }) => {
     registerHandleResize({
       type: 'paragraph',
       id: widgetId,
@@ -60,73 +86,49 @@ const Paragraph = ({
         return 300;
       },
       minHeightCallback: () => {
-        return 40;
+        return widgetMinHeight;
       },
       maxHeightCallback: () => {
-        if (!paragraphElCurrent) {
-          return 0;
-        }
-        // return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
-        return (
-          (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
-          widgetSpacer +
-          5
-        );
+        return widgetMaxHeight;
+        // if (!!compressed) {
+        // } else if (!paragraphElCurrent) {
+        //   return 0;
+        // }
+        // return (
+        //   // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
+        //   // widgetSpacer +
+        //   // 5
+        //   wrapperElCurrent.scrollHeight + widgetSpacer + 5
+        // );
       },
     });
-    return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
-  }, [paragraphElCurrent, compressedHeight]);
+  };
 
-  useEffect(() => {
-    dispatch(quoteCoordsUpdate(_id, TYPE_QUOTE_TEXT, paragraphQuotes));
-  }, [paragraphQuotes]);
-
-  // useEffect(() => {
-  //   if (!compressed) return;
-  //   const textPieces = calculateTextPiecesFromQuotes(
-  //     paragraphQuotes,
-  //     paragraphElCurrent
-  //   );
-
-  //   // consoleLogLines(textPieces, updateDebugLines);
-  //   // сообщаем шагу, что у нас есть настройки параграфа для операции Compress
-  //   setTextPieces(textPieces);
-  // }, [compressed]);
-
-  // <Compressor className="compressor" {...{ turn, textPieces }} />
   return (
     <>
       {compressed ? (
         <Compressor
           {...{
             turn,
-            textPieces,
-            // paragraphElCurrent,
-            // setParagraphElCurrent,
             compressedHeight,
             setCompressedHeight,
             stateIsReady,
+            setWrapperElCurrent,
+            registerHandleResizeWithParams,
+            setParagraphIsReady,
           }}
         />
       ) : (
         <ParagraphOriginal
           {...{
-            compressed,
+            turn,
             setParagraphElCurrent,
-            setParagraphQuotes,
-            paragraph,
-            _id,
-            backgroundColor,
-            fontColor,
-            contentType,
-            scrollPosition,
-            width,
-            height,
             stateIsReady,
+            setParagraphIsReady,
           }}
         />
       )}
-      <ParagraphQuotes turnId={_id} paragraphQuotes={paragraphQuotes} />
+      <ParagraphQuotes turnId={_id} />
       <a
         className="widget-button"
         href="#"

@@ -1,15 +1,19 @@
 import { quoteRectangleThickness } from '@/config/ui';
-import {
-  findLineByQuoteKey,
-  getActiveQuotesDictionary,
-} from '@/modules/lines/components/helpers/line';
+import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
+import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-const ParagraphQuotes = ({ paragraphQuotes, turnId }) => {
+const ParagraphQuotes = ({ turnId }) => {
   //
   const dispatch = useDispatch();
+  const allQuotes =
+    useSelector((state) => state.lines.quotesInfo[turnId]) || [];
+  const paragraphQuotes = useMemo(() => {
+    // экономия вычислений на filter allQuotes
+    return allQuotes.filter((quote) => quote.type === TYPE_QUOTE_TEXT);
+  }, [allQuotes]);
 
   const lines = useSelector((store) => store.lines.lines);
   const activeQuoteKey = useSelector((store) => store.quotes.activeQuoteKey);

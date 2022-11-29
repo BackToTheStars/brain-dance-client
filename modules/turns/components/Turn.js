@@ -28,6 +28,9 @@ const Turn = ({ id }) => {
   const [widgets, setWidgets] = useState([]);
   const [widgetD, setWidgetD] = useState({});
   const [stateIsReady, setStateIsReady] = useState(false);
+  const [paragraphIsReady, setParagraphIsReady] = useState(false);
+
+  console.log({ widgetD, id });
 
   const wrapper = useRef(null);
 
@@ -121,7 +124,7 @@ const Turn = ({ id }) => {
           _id,
           width: newWidth,
           height: newHeight,
-          [compressed ? 'compressedHeight' : 'unCompressedHeight']: newHeight,
+          [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
         })
       );
     });
@@ -268,6 +271,7 @@ const Turn = ({ id }) => {
           unregisterHandleResize={unregisterHandleResize}
           stateIsReady={stateIsReady}
           widgetId="paragraph1"
+          setParagraphIsReady={setParagraphIsReady}
         />
       )}
       {dontShowHeader && !!date && !!sourceUrl && (

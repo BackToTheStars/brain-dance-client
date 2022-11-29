@@ -87,7 +87,7 @@ export const compressParagraph = () => (dispatch, getState) => {
     updateGeometry({
       _id: editTurnId,
       compressed: true,
-      unCompressedHeight: activeTurn.height,
+      uncompressedHeight: activeTurn.height,
       // height: activeTurn.compressedHeight
     })
   );
@@ -104,7 +104,7 @@ export const unCompressParagraph = () => (dispatch, getState) => {
       _id: editTurnId,
       compressed: false,
       compressedHeight: activeTurn.height,
-      height: activeTurn.unCompressedHeight,
+      height: activeTurn.uncompressedHeight,
     })
   );
   dispatch(markTurnAsChanged({ _id: editTurnId }));

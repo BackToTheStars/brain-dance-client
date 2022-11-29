@@ -1,4 +1,6 @@
 import { PARAGRAPH_SCROLL_TIMEOUT_DELAY } from '@/config/ui';
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import {
   markTurnAsChanged,
   updateScrollPosition,
@@ -22,38 +24,22 @@ import {
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
-  // updateSizeTime = 0,
-  // setQuotesWithCoords = () => {},
-  // quotesWithCoords= [],
-  // setQuotesLoaded = () => {},
-  // setUpdateSizeTime = () => {},
-  setParagraphQuotes,
-  // turn,
   setParagraphElCurrent,
-
-  paragraph,
-  _id: turnId,
-  backgroundColor,
-  fontColor,
-  contentType,
-  scrollPosition,
-  width,
-  height,
   stateIsReady,
-  compressed,
+  turn,
+  setParagraphIsReady,
 }) => {
-  //
-  // const { lineEnds, dispatch } = useTurnData() || {};
-  // const {
-  //   paragraph,
-  //   _id: turnId,
-  //   backgroundColor,
-  //   fontColor,
-  //   contentType,
-  //   scrollPosition,
-  //   width,
-  //   height,
-  // } = turn;
+  const {
+    compressed,
+    paragraph,
+    _id: turnId,
+    backgroundColor,
+    fontColor,
+    contentType,
+    scrollPosition,
+    width,
+    height,
+  } = turn;
 
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
@@ -87,15 +73,25 @@ const ParagraphOriginal = ({
     // полностью пересчитываем расположение цитат
     const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
     setQuotesWithoutScroll(quotes);
-    setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
+    dispatch(
+      quoteCoordsUpdate(
+        turnId,
+        TYPE_QUOTE_TEXT,
+        getScrolledQuotes(quotes, paragraphEl, scrollTop)
+      )
+    );
     dispatch(markTurnAsChanged({ _id: turnId }));
   }, [width]);
 
   useEffect(() => {
     if (!quotesWithoutScroll.length) return;
     // обновляем только вертикальное расположение цитат
-    setParagraphQuotes(
-      getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
+    dispatch(
+      quoteCoordsUpdate(
+        turnId,
+        TYPE_QUOTE_TEXT,
+        getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
+      )
     );
     dispatch(markTurnAsChanged({ _id: turnId }));
   }, [height, scrollTop, stateIsReady]);
