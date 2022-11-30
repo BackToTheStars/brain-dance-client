@@ -216,6 +216,7 @@ const Compressor = ({
     if (textsReadyCount === compressedTexts.length) {
       // setTimeout(() => {
       dispatch(setCallsQueueIsBlocked(false));
+      setParagraphIsReady(true);
       // }, 2000);
     }
   }, [textsReadyCount, compressedTexts]);

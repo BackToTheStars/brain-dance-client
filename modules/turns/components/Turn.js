@@ -21,6 +21,27 @@ import Video from './widgets/Video';
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
+const getParagraphHeight = ({
+  widgetId,
+  widgetD,
+  height,
+  compressed,
+  paragraphIsReady,
+  compressedHeight,
+  uncompressedHeight,
+}) => {
+  console.log({
+    widgetId,
+    widgetD,
+    height,
+    compressed,
+    paragraphIsReady,
+    compressedHeight,
+    uncompressedHeight,
+  });
+  console.log(height);
+};
+
 const Turn = ({ id }) => {
   const turn = useSelector((store) => store.turns.d[id]);
   const dispatch = useDispatch();
@@ -52,6 +73,8 @@ const Turn = ({ id }) => {
     //-- paragraph
     paragraph, // contentType, dontShowHeader
     compressed,
+    compressedHeight,
+    uncompressedHeight,
     //-- video
     videoUrl,
     //-- image
@@ -110,9 +133,10 @@ const Turn = ({ id }) => {
   const recalculateSize = (width, height) => {
     const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
       getTurnMinMaxHeight(widgets, width);
+    console.log({ widgetD });
 
     const newHeight = Math.round(
-      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer
+      Math.min(Math.max(height, minHeight), maxHeight) // + widgetSpacer
     );
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
@@ -272,6 +296,15 @@ const Turn = ({ id }) => {
           stateIsReady={stateIsReady}
           widgetId="paragraph1"
           setParagraphIsReady={setParagraphIsReady}
+          height={getParagraphHeight({
+            widgetId: 'paragraph1',
+            widgetD,
+            height,
+            compressed,
+            paragraphIsReady,
+            compressedHeight,
+            uncompressedHeight,
+          })}
         />
       )}
       {dontShowHeader && !!date && !!sourceUrl && (
