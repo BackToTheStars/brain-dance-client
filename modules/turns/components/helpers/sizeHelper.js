@@ -3,6 +3,7 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
   let minHeight = 0;
   let maxHeight = 0;
   let minHeightBasic = 0;
+  let desiredHeight = 0;
 
   const widgetD = {};
 
@@ -14,12 +15,22 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
     widgetD[widget.id] = {
       minHeight: widget.minHeightCallback(newTurnWidth),
       maxHeight: widget.maxHeightCallback(newTurnWidth),
+      desiredHeight:
+        (widget.desiredHeightCallback &&
+          widget.desiredHeightCallback(newTurnWidth)) ||
+        0,
     };
   }
 
   for (let widget of widgets) {
     minHeight = minHeight + widget.minHeightCallback(newTurnWidth);
     maxHeight = maxHeight + widget.maxHeightCallback(newTurnWidth);
+    desiredHeight =
+      desiredHeight +
+        (widget.desiredHeightCallback &&
+          widget.desiredHeightCallback(newTurnWidth)) ||
+      widget.minHeightCallback(newTurnWidth);
+
     if (!widget.variableHeight) {
       minHeightBasic = minHeightBasic + widget.minHeightCallback(newTurnWidth);
     }
@@ -29,6 +40,7 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
     minHeight,
     maxHeight,
     minWidth,
+    desiredHeight,
     maxWidth: Math.max(minWidth, newTurnWidth), // @todo: ограничить ширину
     widgetD,
   };

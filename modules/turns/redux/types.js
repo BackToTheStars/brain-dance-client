@@ -12,3 +12,5 @@ export const TURN_RESAVE = 'turn_resave';
 export const TURN_DELETE = 'turn_delete';
 
 export const TURN_NEXT_PASTE_POSITION = 'turn_next_paste_position';
+
+export const TURN_PARAGRAPH_SET_IS_READY = 'turn_paragraph_set_is_ready';

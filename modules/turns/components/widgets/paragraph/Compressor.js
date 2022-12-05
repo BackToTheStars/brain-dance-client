@@ -21,6 +21,8 @@ const Compressor = ({
   setWrapperElCurrent,
   registerHandleResizeWithParams,
   setParagraphIsReady,
+  height,
+  paragraphIsReady,
   // contentType,
   // backgroundColor,
   // fontColor,
@@ -88,8 +90,12 @@ const Compressor = ({
       (acc, textPiece) => acc + textPiece.scrollHeight,
       0
     );
-    registerHandleResizeWithParams({ widgetMinHeight, widgetMaxHeight });
-  }, [stateIsReady, wrapperRef]);
+    registerHandleResizeWithParams({
+      widgetMinHeight,
+      widgetMaxHeight,
+      widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+    });
+  }, [stateIsReady, wrapperRef, height, paragraphIsReady]);
 
   useEffect(() => {
     if (!wrapperRef.current) return false;
@@ -214,10 +220,10 @@ const Compressor = ({
   useEffect(() => {
     if (!textsReadyCount) return;
     if (textsReadyCount === compressedTexts.length) {
-      // setTimeout(() => {
-      dispatch(setCallsQueueIsBlocked(false));
-      setParagraphIsReady(true);
-      // }, 2000);
+      setTimeout(() => {
+        dispatch(setCallsQueueIsBlocked(false));
+        setParagraphIsReady(true);
+      }, 400);
     }
   }, [textsReadyCount, compressedTexts]);
 

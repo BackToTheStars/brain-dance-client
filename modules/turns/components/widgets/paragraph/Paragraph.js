@@ -13,8 +13,13 @@ const Paragraph = ({
   unregisterHandleResize,
   stateIsReady,
   widgetId,
+  paragraphIsReady,
   setParagraphIsReady,
+  height,
 }) => {
+  console.log('paragraph height');
+  console.log({ height });
+
   const { _id, compressed } = turn;
 
   const [compressedHeight, setCompressedHeight] = useState(
@@ -76,12 +81,16 @@ const Paragraph = ({
   const registerHandleResizeWithParams = ({
     widgetMinHeight,
     widgetMaxHeight,
+    widgetDesiredHeight,
   }) => {
     registerHandleResize({
       type: 'paragraph',
       id: widgetId,
       // этот виджет является гибким
       variableHeight: true,
+      desiredHeightCallback: () => {
+        return widgetDesiredHeight;
+      },
       minWidthCallback: () => {
         return 300;
       },
@@ -90,6 +99,7 @@ const Paragraph = ({
       },
       maxHeightCallback: () => {
         return widgetMaxHeight;
+
         // if (!!compressed) {
         // } else if (!paragraphElCurrent) {
         //   return 0;
@@ -116,6 +126,8 @@ const Paragraph = ({
             setWrapperElCurrent,
             registerHandleResizeWithParams,
             setParagraphIsReady,
+            height,
+            paragraphIsReady,
           }}
         />
       ) : (

@@ -44,6 +44,17 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
         updateGeometryTime: new Date().getTime(),
       };
+    case types.TURN_PARAGRAPH_SET_IS_READY:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: {
+            ...state.d[payload._id],
+            paragraphIsReady: payload.value,
+          },
+        },
+      };
     case types.TURN_WAS_CHANGED:
       return {
         ...state,

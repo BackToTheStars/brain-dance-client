@@ -6,7 +6,11 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { markTurnAsChanged, updateGeometry } from '../redux/actions';
+import {
+  markTurnAsChanged,
+  setParagraphIsReady,
+  updateGeometry,
+} from '../redux/actions';
 import { TURN_WAS_CHANGED } from '../redux/types';
 import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
@@ -39,7 +43,91 @@ const getParagraphHeight = ({
     compressedHeight,
     uncompressedHeight,
   });
-  console.log(height);
+
+  const widget = widgetD[widgetId];
+  if (!widget) return 0;
+  const { minHeight, maxHeight } = widget;
+  if (!compressed) return 0;
+
+  // ветка для Compressed Paragraph
+  if (paragraphIsReady) {
+    // параграф уже готов
+    // ещё выясняем первоначальную высоту параграфа
+    if (!!compressedHeight) {
+      // есть сохранённая высота
+      let paragraphHeight = compressedHeight;
+      for (const key in widgetD) {
+        if (key === widgetId) continue;
+        if (widgetD[key].minHeight !== widgetD[key].maxHeight) {
+          console.log({
+            key,
+            minHeight: widgetD[key].minHeight,
+            maxHeight: widgetD[key].maxHeight,
+          });
+        }
+        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
+      }
+      // compressedHeight:3000
+      // minHeight:2000
+      // maxHeight:8000
+      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
+        return paragraphHeight;
+      }
+
+      // compressedHeight:1000
+      // minHeight:2000
+      // maxHeight:8000
+      if (compressedHeight <= minHeight)
+        return paragraphHeight - (minHeight - compressedHeight);
+
+      // compressedHeight:9000
+      // minHeight:2000
+      // maxHeight:8000
+      if (compressedHeight >= maxHeight)
+        return paragraphHeight - (maxHeight - compressedHeight);
+    } else {
+      // до этого момента параграф не сжимался
+      return widget.minHeight;
+    }
+  } else {
+    // ещё выясняем первоначальную высоту параграфа
+    if (!!compressedHeight) {
+      // есть сохранённая высота
+      let paragraphHeight = compressedHeight;
+      for (const key in widgetD) {
+        if (key === widgetId) continue;
+        if (widgetD[key].minHeight !== widgetD[key].maxHeight) {
+          console.log({
+            key,
+            minHeight: widgetD[key].minHeight,
+            maxHeight: widgetD[key].maxHeight,
+          });
+        }
+        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
+      }
+      // compressedHeight:3000
+      // minHeight:2000
+      // maxHeight:8000
+      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
+        return paragraphHeight;
+      }
+
+      // compressedHeight:1000
+      // minHeight:2000
+      // maxHeight:8000
+      if (compressedHeight <= minHeight)
+        return paragraphHeight - (minHeight - compressedHeight);
+
+      // compressedHeight:9000
+      // minHeight:2000
+      // maxHeight:8000
+      if (compressedHeight >= maxHeight)
+        return paragraphHeight - (maxHeight - compressedHeight);
+    } else {
+      // до этого момента параграф не сжимался
+      return widget.minHeight;
+    }
+  }
 };
 
 const Turn = ({ id }) => {
@@ -49,9 +137,9 @@ const Turn = ({ id }) => {
   const [widgets, setWidgets] = useState([]);
   const [widgetD, setWidgetD] = useState({});
   const [stateIsReady, setStateIsReady] = useState(false);
-  const [paragraphIsReady, setParagraphIsReady] = useState(false);
+  // const [paragraphIsReady, setParagraphIsReady] = useState(false);
 
-  console.log({ widgetD, id });
+  // console.log({ widgetD, id });
 
   const wrapper = useRef(null);
 
@@ -72,6 +160,7 @@ const Turn = ({ id }) => {
     date,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
+    paragraphIsReady,
     compressed,
     compressedHeight,
     uncompressedHeight,
@@ -85,6 +174,10 @@ const Turn = ({ id }) => {
   const callsQueueIsBlockedFlag = useSelector(
     (state) => state.ui.callsQueueIsBlocked
   );
+
+  const dispatchParagraphIsReady = (value) => {
+    dispatch(setParagraphIsReady(_id, value));
+  };
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
 
@@ -131,16 +224,24 @@ const Turn = ({ id }) => {
   );
 
   const recalculateSize = (width, height) => {
-    const { minHeight, maxHeight, minWidth, maxWidth, widgetD } =
+    const { minHeight, maxHeight, minWidth, maxWidth, widgetD, desiredHeight } =
       getTurnMinMaxHeight(widgets, width);
-    console.log({ widgetD });
+    // console.log({ widgetD });
 
-    const newHeight = Math.round(
+    let newHeight = Math.round(
       Math.min(Math.max(height, minHeight), maxHeight) // + widgetSpacer
     );
+
+    // @todo: desiredHeight > minHeight
+    if (desiredHeight >= minHeight && desiredHeight <= maxHeight) {
+      newHeight = desiredHeight;
+    }
+
+    console.log({ desiredHeight, minHeight, newHeight });
+
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
-    console.log({ height, width, newHeight, newWidth });
+    // console.log({ height, width, newHeight, newWidth });
 
     turnGeometryQueue.add(() => {
       dispatch(
@@ -295,7 +396,8 @@ const Turn = ({ id }) => {
           unregisterHandleResize={unregisterHandleResize}
           stateIsReady={stateIsReady}
           widgetId="paragraph1"
-          setParagraphIsReady={setParagraphIsReady}
+          paragraphIsReady={paragraphIsReady}
+          setParagraphIsReady={dispatchParagraphIsReady}
           height={getParagraphHeight({
             widgetId: 'paragraph1',
             widgetD,
