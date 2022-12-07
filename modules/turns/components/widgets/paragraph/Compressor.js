@@ -1,3 +1,4 @@
+import { widgetSpacer } from '@/config/ui';
 import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { Fragment, useRef, useState } from 'react';
@@ -209,7 +210,6 @@ const Compressor = ({
 
     setCompressedHeight(
       textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
-
       // + (textPieces.length - 1) * 11 // todo: const
     );
     // setTimeout(() => {
@@ -223,7 +223,7 @@ const Compressor = ({
       setTimeout(() => {
         dispatch(setCallsQueueIsBlocked(false));
         setParagraphIsReady(true);
-      }, 400);
+      }, 50);
     }
   }, [textsReadyCount, compressedTexts]);
 
