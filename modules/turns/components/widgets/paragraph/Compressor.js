@@ -1,10 +1,12 @@
 import { widgetSpacer } from '@/config/ui';
+import { changeParagraphStage } from '@/modules/turns/redux/actions';
 import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { Fragment, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
+import { COMP_LOADING, COMP_READY } from './settings';
 import {
   ParagraphCompressorTextWrapper,
   TextAroundQuote,
@@ -61,6 +63,11 @@ const Compressor = ({
     .split(' '); // слили всё в один большой текст и разделили по словам
 
   const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
+
+  // PARAGRAPH STAGE OF STATE MACHINE (same in ParagraphOriginal.js)
+  useEffect(() => {
+    dispatch(changeParagraphStage(turnId, COMP_LOADING));
+  }, []);
 
   useEffect(() => {
     // console.log({ compressedHeight });
@@ -223,6 +230,7 @@ const Compressor = ({
       setTimeout(() => {
         dispatch(setCallsQueueIsBlocked(false));
         setParagraphIsReady(true);
+        dispatch(changeParagraphStage(turnId, COMP_READY));
       }, 50);
     }
   }, [textsReadyCount, compressedTexts]);

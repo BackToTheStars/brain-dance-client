@@ -380,3 +380,10 @@ export const uploadImage = (image) => () => {
     }).then((res) => res.json());
   });
 };
+
+export const changeParagraphStage = (_id, stage) => (dispatch) => {
+  dispatch({
+    type: types.TURN_PARAGRAPH_SET_STAGE,
+    payload: { _id, stage },
+  });
+};

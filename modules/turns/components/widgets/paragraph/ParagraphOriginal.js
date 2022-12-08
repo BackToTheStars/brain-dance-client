@@ -2,6 +2,7 @@ import { PARAGRAPH_SCROLL_TIMEOUT_DELAY } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import {
+  changeParagraphStage,
   markTurnAsChanged,
   updateScrollPosition,
 } from '@/modules/turns/redux/actions';
@@ -13,6 +14,7 @@ import {
   getParagraphQuotesWithoutScroll,
   getScrolledQuotes,
 } from '../../helpers/quotesHelper';
+import { ORIG_LOADING } from './settings';
 
 // import { ACTION_TURN_WAS_CHANGED } from '@/components/contexts/TurnsCollectionContext';
 import {
@@ -68,6 +70,11 @@ const ParagraphOriginal = ({
   // const bottomQuotesCount = quotesWithCoords.filter((quote) => {
   //   return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
   // }).length;
+
+  // PARAGRAPH STAGE OF STATE MACHINE (same in Compressor.js)
+  useEffect(() => {
+    dispatch(changeParagraphStage(turnId, ORIG_LOADING));
+  }, []);
 
   useEffect(() => {
     // полностью пересчитываем расположение цитат

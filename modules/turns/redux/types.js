@@ -1,16 +1,17 @@
-export const LOAD_TURNS = 'load_turns';
-export const TURNS_UPDATE_GEOMETRY = 'turns_update_geometry';
-export const TURNS_UPDATE_GEOMETRY_TIME = 'turns_update_geometry_time';
-export const TURNS_FIELD_WAS_MOVED = 'turns_field_was_moved';
-export const TURNS_SCROLL = 'turns_scroll';
-export const TURNS_SYNC_DONE = 'turns_sync_done';
-export const TURNS_LOAD_TO_PASTE = 'turns_load_to_paste';
-export const TURN_WAS_CHANGED = 'turn_was_changed';
+export const LOAD_TURNS = 'LOAD_TURNS';
+export const TURNS_UPDATE_GEOMETRY = 'TURNS_UPDATE_GEOMETRY';
+export const TURNS_UPDATE_GEOMETRY_TIME = 'TURNS_UPDATE_GEOMETRY_TIME';
+export const TURNS_FIELD_WAS_MOVED = 'TURNS_FIELD_WAS_MOVED';
+export const TURNS_SCROLL = 'TURNS_SCROLL';
+export const TURNS_SYNC_DONE = 'TURNS_SYNC_DONE';
+export const TURNS_LOAD_TO_PASTE = 'TURNS_LOAD_TO_PASTE';
+export const TURN_WAS_CHANGED = 'TURN_WAS_CHANGED';
 
-export const TURN_CREATE = 'turn_create';
-export const TURN_RESAVE = 'turn_resave';
-export const TURN_DELETE = 'turn_delete';
+export const TURN_CREATE = 'TURN_CREATE';
+export const TURN_RESAVE = 'TURN_RESAVE';
+export const TURN_DELETE = 'TURN_DELETE';
 
-export const TURN_NEXT_PASTE_POSITION = 'turn_next_paste_position';
+export const TURN_NEXT_PASTE_POSITION = 'TURN_NEXT_PASTE_POSITION';
 
-export const TURN_PARAGRAPH_SET_IS_READY = 'turn_paragraph_set_is_ready';
+export const TURN_PARAGRAPH_SET_IS_READY = 'TURN_PARAGRAPH_SET_IS_READY';
+export const TURN_PARAGRAPH_SET_STAGE = 'TURN_PARAGRAPH_SET_STAGE';

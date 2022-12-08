@@ -19,6 +19,11 @@ import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
+import {
+  COMP_ACTIVE,
+  NOT_EXISTS,
+  ORIG_ACTIVE,
+} from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
 
@@ -130,6 +135,14 @@ const getParagraphHeight = ({
   }
 };
 
+const getParagraphStage = (turn) => {
+  if (!!turn.paragraphStage) return turn.paragraphStage;
+  if (!!turn.pictureOnly || !checkIfParagraphExists(turn.paragraph))
+    return NOT_EXISTS;
+  if (turn.compressed) return COMP_ACTIVE;
+  return ORIG_ACTIVE;
+};
+
 const Turn = ({ id }) => {
   const turn = useSelector((store) => store.turns.d[id]);
   const dispatch = useDispatch();
@@ -170,6 +183,8 @@ const Turn = ({ id }) => {
     imageUrl,
     pictureOnly,
   } = turn;
+
+  const paragraphStage = getParagraphStage(turn);
 
   const callsQueueIsBlockedFlag = useSelector(
     (state) => state.ui.callsQueueIsBlocked

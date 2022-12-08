@@ -55,6 +55,19 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           },
         },
       };
+    case types.TURN_PARAGRAPH_SET_STAGE:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: {
+            ...state.d[payload._id],
+            paragraphStage: payload.stage,
+            // @todo: id параграфа
+          },
+        },
+      };
+
     case types.TURN_WAS_CHANGED:
       return {
         ...state,
