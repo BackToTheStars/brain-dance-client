@@ -16,6 +16,7 @@ import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
+import { getParagraphStage } from './helpers/stageHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
@@ -135,14 +136,6 @@ const getParagraphHeight = ({
   }
 };
 
-const getParagraphStage = (turn) => {
-  if (!!turn.paragraphStage) return turn.paragraphStage;
-  if (!!turn.pictureOnly || !checkIfParagraphExists(turn.paragraph))
-    return NOT_EXISTS;
-  if (turn.compressed) return COMP_ACTIVE;
-  return ORIG_ACTIVE;
-};
-
 const Turn = ({ id }) => {
   const turn = useSelector((store) => store.turns.d[id]);
   const dispatch = useDispatch();
@@ -185,6 +178,7 @@ const Turn = ({ id }) => {
   } = turn;
 
   const paragraphStage = getParagraphStage(turn);
+  console.log({ paragraphStage, _id });
 
   const callsQueueIsBlockedFlag = useSelector(
     (state) => state.ui.callsQueueIsBlocked

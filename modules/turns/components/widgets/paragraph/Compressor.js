@@ -6,6 +6,7 @@ import { Fragment, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
+import { getParagraphStage } from '../../helpers/stageHelper';
 import { COMP_LOADING, COMP_READY } from './settings';
 import {
   ParagraphCompressorTextWrapper,
@@ -39,6 +40,7 @@ const Compressor = ({
   // const { turn } = useTurnContext();
   const dispatch = useDispatch();
   const { _id: turnId, width, paragraph: originalParagraph, y } = turn;
+  const stage = getParagraphStage(turn);
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
@@ -70,11 +72,9 @@ const Compressor = ({
   }, []);
 
   useEffect(() => {
-    // console.log({ compressedHeight });
-    // console.log({ compressedTextPieces });
-    // console.log({ wrapperRef });
-
     if (!wrapperRef.current) return false;
+    if (stage !== COMP_LOADING) return false;
+    console.log({ wrapperRef, height, stage, turnId });
     const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
     console.log({ quotes });
 
@@ -82,13 +82,8 @@ const Compressor = ({
       quotes,
       wrapperRef?.current
     );
-    // console.log('==============================');
-    // console.log({ textPieces });
 
     setCompressedTextPieces(textPieces);
-
-    // setQuotesWithoutScroll(quotes);
-    // setParagraphQuotes(getScrolledQuotes(quotes, paragraphEl, scrollTop));
 
     const widgetMinHeight = textPieces.reduce(
       (acc, textPiece) => acc + textPiece.height,
@@ -103,7 +98,7 @@ const Compressor = ({
       widgetMaxHeight,
       widgetDesiredHeight: !!paragraphIsReady ? height : 0,
     });
-  }, [stateIsReady, wrapperRef, height, paragraphIsReady]);
+  }, [wrapperRef, stage, height]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
     if (!wrapperRef.current) return false;
