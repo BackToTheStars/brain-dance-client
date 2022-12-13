@@ -19,14 +19,14 @@ import {
 const Compressor = ({
   turn,
   // textPieces: compressedTextPieces,
-  compressedHeight,
+  // compressedHeight,
   setCompressedHeight,
-  stateIsReady,
+  // stateIsReady,
   setWrapperElCurrent,
   registerHandleResizeWithParams,
-  setParagraphIsReady,
+  // setParagraphIsReady,
   height,
-  paragraphIsReady,
+  // paragraphIsReady,
   // contentType,
   // backgroundColor,
   // fontColor,
@@ -96,7 +96,8 @@ const Compressor = ({
     registerHandleResizeWithParams({
       widgetMinHeight,
       widgetMaxHeight,
-      widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+      // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+      widgetDesiredHeight: stage === COMP_READY ? height : 0,
     });
   }, [wrapperRef, stage, height]); //, height, stateIsReady, paragraphIsReady]);
 
@@ -224,7 +225,7 @@ const Compressor = ({
     if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
         dispatch(setCallsQueueIsBlocked(false));
-        setParagraphIsReady(true);
+        // setParagraphIsReady(true);
         dispatch(changeParagraphStage(turnId, COMP_READY));
       }, 50);
     }

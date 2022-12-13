@@ -14,6 +14,7 @@ import {
   getParagraphQuotesWithoutScroll,
   getScrolledQuotes,
 } from '../../helpers/quotesHelper';
+import { getParagraphStage } from '../../helpers/stageHelper';
 import { ORIG_LOADING, ORIG_READY } from './settings';
 
 // import { ACTION_TURN_WAS_CHANGED } from '@/components/contexts/TurnsCollectionContext';
@@ -27,9 +28,9 @@ const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
   setParagraphElCurrent,
-  stateIsReady,
+  // stateIsReady,
   turn,
-  setParagraphIsReady,
+  // setParagraphIsReady,
 }) => {
   const {
     compressed,
@@ -42,6 +43,8 @@ const ParagraphOriginal = ({
     width,
     height,
   } = turn;
+
+  const stage = getParagraphStage(turn);
 
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
@@ -101,7 +104,7 @@ const ParagraphOriginal = ({
       )
     );
     dispatch(markTurnAsChanged({ _id: turnId }));
-  }, [height, scrollTop, stateIsReady]);
+  }, [height, scrollTop, stage]); // stateIsReady
 
   useEffect(() => {
     if (paragraphEl?.current) setParagraphElCurrent(paragraphEl.current);

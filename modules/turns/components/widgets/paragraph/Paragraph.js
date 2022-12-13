@@ -11,10 +11,10 @@ const Paragraph = ({
   turn,
   registerHandleResize,
   unregisterHandleResize,
-  stateIsReady,
+  // stateIsReady,
   widgetId,
-  paragraphIsReady,
-  setParagraphIsReady,
+  // paragraphIsReady,
+  // setParagraphIsReady,
   height,
 }) => {
   console.log('paragraph height');
@@ -122,12 +122,12 @@ const Paragraph = ({
             turn,
             compressedHeight,
             setCompressedHeight,
-            stateIsReady,
+            // stateIsReady,
             setWrapperElCurrent,
             registerHandleResizeWithParams,
-            setParagraphIsReady,
+            // setParagraphIsReady,
             height,
-            paragraphIsReady,
+            // paragraphIsReady,
           }}
         />
       ) : (
@@ -135,8 +135,8 @@ const Paragraph = ({
           {...{
             turn,
             setParagraphElCurrent,
-            stateIsReady,
-            setParagraphIsReady,
+            // stateIsReady,
+            // setParagraphIsReady,
           }}
         />
       )}

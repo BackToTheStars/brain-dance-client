@@ -1,3 +1,9 @@
+- Команда "Create game" создаёт две игры вместо одной
+- В игре один ход,таблица показывает 0 ходов
+
+
+
+
 Настройка background поля: field.scss => свойства .gameFieldWrapper
     
 https://github.com/DominicTobias/react-image-crop

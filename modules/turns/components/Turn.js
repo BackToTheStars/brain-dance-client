@@ -22,6 +22,7 @@ import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import {
   COMP_ACTIVE,
+  COMP_READY,
   NOT_EXISTS,
   ORIG_ACTIVE,
 } from './widgets/paragraph/settings';
@@ -184,9 +185,9 @@ const Turn = ({ id }) => {
     (state) => state.ui.callsQueueIsBlocked
   );
 
-  const dispatchParagraphIsReady = (value) => {
-    dispatch(setParagraphIsReady(_id, value));
-  };
+  // const dispatchParagraphIsReady = (value) => {
+  //   dispatch(setParagraphIsReady(_id, value));
+  // };
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
 
@@ -403,16 +404,16 @@ const Turn = ({ id }) => {
           turn={turn}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
-          stateIsReady={stateIsReady}
+          // stateIsReady={stateIsReady}
           widgetId="paragraph1"
-          paragraphIsReady={paragraphIsReady}
-          setParagraphIsReady={dispatchParagraphIsReady}
+          // paragraphIsReady={paragraphIsReady}
+          // setParagraphIsReady={dispatchParagraphIsReady}
           height={getParagraphHeight({
             widgetId: 'paragraph1',
             widgetD,
             height,
             compressed,
-            paragraphIsReady,
+            paragraphIsReady: paragraphStage === COMP_READY,
             compressedHeight,
             uncompressedHeight,
           })}
