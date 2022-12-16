@@ -4,7 +4,7 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
   let minWidth = 0;
   let minHeight = 0;
   let maxHeight = 0;
-  let minHeightBasic = 0;
+  let minHeightBasic = 0; // все высоты суммарно кроме высоты параграфа
   let desiredHeight = 0;
 
   const widgetD = {};
@@ -36,7 +36,7 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
     if (!widget.variableHeight) {
       minHeightBasic = minHeightBasic + widget.minHeightCallback(newTurnWidth);
     }
-    console.log(desiredHeight);
+    // console.log({ desiredHeight });
   }
 
   // if (!!desiredHeight) desiredHeight = desiredHeight + 2 * widgetSpacer;
@@ -48,5 +48,6 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
     desiredHeight,
     maxWidth: Math.max(minWidth, newTurnWidth), // @todo: ограничить ширину
     widgetD,
+    minHeightBasic,
   };
 };

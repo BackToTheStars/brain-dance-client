@@ -17,8 +17,8 @@ const Paragraph = ({
   // setParagraphIsReady,
   height,
 }) => {
-  console.log('paragraph height');
-  console.log({ height });
+  // console.log('paragraph height');
+  // console.log({ height });
 
   const { _id, compressed } = turn;
 
@@ -51,6 +51,15 @@ const Paragraph = ({
           },
           minHeightCallback: () => {
             return 40;
+          },
+          getDesiredTurnHeight: ({
+            minHeightBasic,
+            newHeight,
+            minHeight,
+            maxHeight,
+          }) => {
+            // это для случая не-compressed
+            return newHeight;
           },
           maxHeightCallback: () => {
             // if (!!compressed) {
@@ -96,6 +105,33 @@ const Paragraph = ({
       },
       minHeightCallback: () => {
         return widgetMinHeight;
+      },
+      getDesiredTurnHeight: ({
+        minHeightBasic,
+        newHeight,
+        minHeight,
+        maxHeight,
+      }) => {
+        console.log('CHECK');
+        // это для случая compressed
+        if (compressedHeight) {
+          return newHeight;
+        } else {
+          const resultHeight = minHeightBasic + widgetMinHeight;
+          if (resultHeight >= minHeight && resultHeight <= maxHeight) {
+            console.log('returned', { resultHeight });
+            return resultHeight;
+          } else {
+            console.log({
+              minHeightBasic,
+              newHeight,
+              minHeight,
+              maxHeight,
+              resultHeight,
+            });
+            return newHeight;
+          }
+        }
       },
       maxHeightCallback: () => {
         return widgetMaxHeight;

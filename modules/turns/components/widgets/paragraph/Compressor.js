@@ -74,9 +74,9 @@ const Compressor = ({
   useEffect(() => {
     if (!wrapperRef.current) return false;
     if (stage !== COMP_LOADING) return false;
-    console.log({ wrapperRef, height, stage, turnId });
+    // console.log({ wrapperRef, height, stage, turnId });
     const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-    console.log({ quotes });
+    // console.log({ quotes });
 
     const textPieces = calculateTextPiecesFromQuotes(
       quotes,

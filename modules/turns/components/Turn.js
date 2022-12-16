@@ -25,6 +25,7 @@ import {
   COMP_READY,
   NOT_EXISTS,
   ORIG_ACTIVE,
+  ORIG_READY,
 } from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
@@ -41,15 +42,15 @@ const getParagraphHeight = ({
   compressedHeight,
   uncompressedHeight,
 }) => {
-  console.log({
-    widgetId,
-    widgetD,
-    height,
-    compressed,
-    paragraphIsReady,
-    compressedHeight,
-    uncompressedHeight,
-  });
+  // console.log({
+  //   widgetId,
+  //   widgetD,
+  //   height,
+  //   compressed,
+  //   paragraphIsReady,
+  //   compressedHeight,
+  //   uncompressedHeight,
+  // });
 
   const widget = widgetD[widgetId];
   if (!widget) return 0;
@@ -179,7 +180,9 @@ const Turn = ({ id }) => {
   } = turn;
 
   const paragraphStage = getParagraphStage(turn);
-  console.log({ paragraphStage, _id });
+  if (contentType !== 'zero-point') {
+    console.log({ paragraphStage, _id });
+  }
 
   const callsQueueIsBlockedFlag = useSelector(
     (state) => state.ui.callsQueueIsBlocked
@@ -234,18 +237,36 @@ const Turn = ({ id }) => {
   );
 
   const recalculateSize = (width, height) => {
-    const { minHeight, maxHeight, minWidth, maxWidth, widgetD, desiredHeight } =
-      getTurnMinMaxHeight(widgets, width);
+    const {
+      minHeight,
+      maxHeight,
+      minWidth,
+      maxWidth,
+      widgetD,
+      desiredHeight,
+      minHeightBasic,
+    } = getTurnMinMaxHeight(widgets, width);
     // console.log({ widgetD });
 
     let newHeight = Math.round(
       Math.min(Math.max(height, minHeight), maxHeight) // + widgetSpacer
     );
 
-    // @todo: desiredHeight > minHeight
-    if (desiredHeight >= minHeight && desiredHeight <= maxHeight) {
-      newHeight = desiredHeight;
+    if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
+      newHeight = widgets
+        .find((w) => w.variableHeight)
+        .getDesiredTurnHeight({
+          minHeightBasic,
+          newHeight,
+          minHeight,
+          maxHeight,
+        });
     }
+
+    // @todo: desiredHeight > minHeight
+    // if (desiredHeight >= minHeight && desiredHeight <= maxHeight) {
+    //   newHeight = desiredHeight;
+    // }
 
     console.log({ desiredHeight, minHeight, newHeight });
 
@@ -327,15 +348,25 @@ const Turn = ({ id }) => {
   useEffect(() => {
     $(wrapper.current).resizable({
       resize: (event, ui) => {
-        recalculateSize(Math.round(ui.size.width), Math.round(ui.size.height));
-        dispatch(markTurnAsChanged({ _id }));
+        const widgetsCount =
+          1 + // header
+          !!imageUrl + // Picture
+          !!videoUrl + // Video
+          doesParagraphExist; // Paragraph
+        if (widgetsCount === widgets.length) {
+          recalculateSize(
+            Math.round(ui.size.width),
+            Math.round(ui.size.height)
+          );
+          dispatch(markTurnAsChanged({ _id }));
+        }
       },
     });
     return () => $(wrapper.current).resizable('destroy');
   }, [widgets]);
 
   useEffect(() => {
-    if (callsQueueIsBlockedFlag) return;
+    // if (callsQueueIsBlockedFlag) return;
     const widgetsCount =
       1 + // header
       !!imageUrl + // Picture
@@ -346,7 +377,10 @@ const Turn = ({ id }) => {
       recalculateSize(Math.round(width), Math.round(height));
       setStateIsReady(true);
     }
-  }, [widgets, callsQueueIsBlockedFlag]);
+  }, [
+    widgets,
+    // callsQueueIsBlockedFlag
+  ]);
 
   // console.log({ widgets });
 
