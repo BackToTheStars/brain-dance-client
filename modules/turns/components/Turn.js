@@ -7,16 +7,21 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
+  changeTurnStage,
   markTurnAsChanged,
-  setParagraphIsReady,
+  // setParagraphIsReady,
   updateGeometry,
 } from '../redux/actions';
 import { TURN_WAS_CHANGED } from '../redux/types';
-import turnSettings from '../settings';
+import turnSettings, {
+  TURN_INIT,
+  TURN_LOADING,
+  TURN_LOADING_FIXED,
+} from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
-import { getParagraphStage } from './helpers/stageHelper';
+import { getParagraphStage, getTurnStage } from './helpers/stageHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
@@ -144,7 +149,7 @@ const Turn = ({ id }) => {
 
   const [widgets, setWidgets] = useState([]);
   const [widgetD, setWidgetD] = useState({});
-  const [stateIsReady, setStateIsReady] = useState(false);
+  // const [stateIsReady, setStateIsReady] = useState(false);
   // const [paragraphIsReady, setParagraphIsReady] = useState(false);
 
   // console.log({ widgetD, id });
@@ -180,8 +185,9 @@ const Turn = ({ id }) => {
   } = turn;
 
   const paragraphStage = getParagraphStage(turn);
+  const turnStage = getTurnStage(turn);
   if (contentType !== 'zero-point') {
-    console.log({ paragraphStage, _id });
+    console.log({ turnStage, paragraphStage, _id });
   }
 
   const callsQueueIsBlockedFlag = useSelector(
@@ -375,12 +381,17 @@ const Turn = ({ id }) => {
 
     if (widgetsCount === widgets.length) {
       recalculateSize(Math.round(width), Math.round(height));
-      setStateIsReady(true);
+      // setStateIsReady(true);
+      dispatch(changeTurnStage(_id, TURN_LOADING_FIXED));
     }
   }, [
     widgets,
     // callsQueueIsBlockedFlag
   ]);
+
+  useEffect(() => {
+    dispatch(changeTurnStage(_id, TURN_LOADING));
+  }, []);
 
   // console.log({ widgets });
 

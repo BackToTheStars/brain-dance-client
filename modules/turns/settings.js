@@ -3,6 +3,11 @@
 import { Input, Switch } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
 
+export const TURN_INIT = 'TURN_INIT';
+export const TURN_LOADING = 'TURN_LOADING';
+export const TURN_LOADING_FIXED = 'TURN_LOADING_FIXED';
+export const TURN_READY = 'TURN_READY';
+
 const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';

@@ -64,11 +64,11 @@ export const loadTurns = (hash, viewport) => (dispatch) => {
   });
 };
 
-export const setParagraphIsReady = (_id, value) => (dispatch) =>
-  dispatch({
-    type: types.TURN_PARAGRAPH_SET_IS_READY,
-    payload: { _id, value },
-  });
+// export const setParagraphIsReady = (_id, value) => (dispatch) =>
+//   dispatch({
+//     type: types.TURN_PARAGRAPH_SET_IS_READY,
+//     payload: { _id, value },
+//   });
 
 export const updateGeometry = (data) => (dispatch) =>
   dispatch({
@@ -378,6 +378,13 @@ export const uploadImage = (image) => () => {
       method: 'POST',
       body: formdata,
     }).then((res) => res.json());
+  });
+};
+
+export const changeTurnStage = (_id, turnStage, params) => (dispatch) => {
+  dispatch({
+    type: types.TURN_SET_STAGE,
+    payload: { _id, turnStage, ...params },
   });
 };
 
