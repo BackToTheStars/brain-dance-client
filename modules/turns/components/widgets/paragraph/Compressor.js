@@ -7,7 +7,11 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
 import { getParagraphStage } from '../../helpers/stageHelper';
-import { COMP_LOADING, COMP_READY } from './settings';
+import {
+  COMP_LOADING,
+  COMP_READY,
+  COMP_READY_TO_RECEIVE_PARAMS,
+} from './settings';
 import {
   ParagraphCompressorTextWrapper,
   TextAroundQuote,
@@ -226,7 +230,7 @@ const Compressor = ({
       setTimeout(() => {
         dispatch(setCallsQueueIsBlocked(false));
         // setParagraphIsReady(true);
-        dispatch(changeParagraphStage(turnId, COMP_READY));
+        dispatch(changeParagraphStage(turnId, COMP_READY_TO_RECEIVE_PARAMS));
       }, 50);
     }
   }, [textsReadyCount, compressedTexts]);

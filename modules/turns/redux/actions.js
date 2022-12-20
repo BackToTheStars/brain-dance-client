@@ -15,7 +15,7 @@ import {
   getTurnFromBufferAndRemove,
   saveTurnInBuffer,
 } from '../components/helpers/dataCopier';
-import turnSettings from '../settings';
+import turnSettings, { TURN_LOADING_FIXED } from '../settings';
 import { addNotification } from '@/modules/ui/redux/actions';
 import {
   centerViewportAtPosition,
@@ -37,6 +37,10 @@ import {
 
 import { STATIC_API_URL } from '@/config/server';
 import { panelReducer } from '@/modules/panels/redux/reducers';
+import {
+  COMP_ACTIVE,
+  ORIG_ACTIVE,
+} from '../components/widgets/paragraph/settings';
 
 export const loadTurns = (hash, viewport) => (dispatch) => {
   getTurnsRequest(hash).then((data) => {
@@ -90,11 +94,11 @@ export const compressParagraph = () => (dispatch, getState) => {
   const activeTurn = state.turns.d[editTurnId];
 
   dispatch(
-    updateGeometry({
-      _id: editTurnId,
+    changeTurnStage(editTurnId, TURN_LOADING_FIXED, {
       compressed: true,
       uncompressedHeight: activeTurn.height,
-      paragraphIsReady: false,
+      paragraphStage: COMP_ACTIVE,
+      // paragraphIsReady: false,
       // height: activeTurn.compressedHeight
     })
   );
@@ -107,14 +111,23 @@ export const unCompressParagraph = () => (dispatch, getState) => {
   const activeTurn = state.turns.d[editTurnId];
 
   dispatch(
-    updateGeometry({
-      _id: editTurnId,
+    changeTurnStage(editTurnId, TURN_LOADING_FIXED, {
       compressed: false,
       compressedHeight: activeTurn.height,
+      paragraphStage: ORIG_ACTIVE,
       height: activeTurn.uncompressedHeight,
-      paragraphIsReady: false,
+      // paragraphIsReady: false,
     })
   );
+  // dispatch(
+  //   updateGeometry({
+  //     _id: editTurnId,
+  //     compressed: false,
+  //     compressedHeight: activeTurn.height,
+  //     height: activeTurn.uncompressedHeight,
+  //     paragraphIsReady: false,
+  //   })
+  //   );
   dispatch(markTurnAsChanged({ _id: editTurnId }));
 };
 

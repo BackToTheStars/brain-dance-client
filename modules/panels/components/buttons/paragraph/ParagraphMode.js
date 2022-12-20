@@ -22,14 +22,14 @@ const ParagraphMode = () => {
       ? {
           text: 'Compress',
           callback: () => {
-            dispatch(setCallsQueueIsBlocked(true));
+            // dispatch(setCallsQueueIsBlocked(true));
             dispatch(compressParagraph());
           },
         }
       : {
           text: 'Uncompress',
           callback: () => {
-            dispatch(setCallsQueueIsBlocked(true));
+            // dispatch(setCallsQueueIsBlocked(true));
             dispatch(unCompressParagraph());
           },
         },

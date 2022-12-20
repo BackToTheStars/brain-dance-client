@@ -15,7 +15,11 @@ import {
   getScrolledQuotes,
 } from '../../helpers/quotesHelper';
 import { getParagraphStage } from '../../helpers/stageHelper';
-import { ORIG_LOADING, ORIG_READY } from './settings';
+import {
+  ORIG_LOADING,
+  ORIG_READY,
+  ORIG_READY_TO_RECEIVE_PARAMS,
+} from './settings';
 
 // import { ACTION_TURN_WAS_CHANGED } from '@/components/contexts/TurnsCollectionContext';
 import {
@@ -116,7 +120,7 @@ const ParagraphOriginal = ({
     // проверить что очередь заблокирована
     setTimeout(() => {
       dispatch(setCallsQueueIsBlocked(false));
-      dispatch(changeParagraphStage(turnId, ORIG_READY));
+      dispatch(changeParagraphStage(turnId, ORIG_READY_TO_RECEIVE_PARAMS));
     }, 300);
   }, []);
 

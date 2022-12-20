@@ -17,6 +17,7 @@ import turnSettings, {
   TURN_INIT,
   TURN_LOADING,
   TURN_LOADING_FIXED,
+  TURN_READY,
 } from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
@@ -28,9 +29,11 @@ import Paragraph from './widgets/paragraph/Paragraph';
 import {
   COMP_ACTIVE,
   COMP_READY,
+  COMP_READY_TO_RECEIVE_PARAMS,
   NOT_EXISTS,
   ORIG_ACTIVE,
   ORIG_READY,
+  ORIG_READY_TO_RECEIVE_PARAMS,
 } from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
@@ -319,6 +322,22 @@ const Turn = ({ id }) => {
 
     setWidgetD(newWidgetD);
   };
+
+  useEffect(() => {
+    if (turnStage === TURN_LOADING_FIXED) {
+      if (paragraphStage === ORIG_READY_TO_RECEIVE_PARAMS) {
+        // @todo: проверить необходимо ли передать высоту
+        dispatch(
+          changeTurnStage(_id, TURN_READY, { paragraphStage: ORIG_READY })
+        );
+      }
+      if (paragraphStage === COMP_READY_TO_RECEIVE_PARAMS) {
+        dispatch(
+          changeTurnStage(_id, TURN_READY, { paragraphStage: COMP_READY })
+        );
+      }
+    }
+  }, [turnStage, paragraphStage]);
 
   // DRAGGABLE
   useEffect(() => {
