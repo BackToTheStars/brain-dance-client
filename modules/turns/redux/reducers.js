@@ -64,6 +64,11 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
             ...state.d[payload._id],
             turnStage: payload.turnStage,
             ...payload,
+            turnStages: state.d[payload._id].turnStages
+              ? [...state.d[payload._id].turnStages, payload.turnStage].slice(
+                  -4
+                )
+              : [payload.turnStage],
             // @todo: id параграфа
           },
         },

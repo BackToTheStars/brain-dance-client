@@ -183,6 +183,7 @@ export const TextAroundQuote = ({
     // @todo: check if no quotes
     paragraphEl.current.scrollTop = scrollPosition;
     setTimeout(() => {
+      if (!paragraph?.current) return;
       paragraphEl.current.scrollTop = scrollPosition;
       const quotes = [
         ...paragraphEl.current.querySelectorAll('.compressed-quote'),

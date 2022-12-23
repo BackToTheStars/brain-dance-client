@@ -28,10 +28,12 @@ import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import {
   COMP_ACTIVE,
+  COMP_LOADING,
   COMP_READY,
   COMP_READY_TO_RECEIVE_PARAMS,
   NOT_EXISTS,
   ORIG_ACTIVE,
+  ORIG_LOADING,
   ORIG_READY,
   ORIG_READY_TO_RECEIVE_PARAMS,
 } from './widgets/paragraph/settings';
@@ -283,23 +285,27 @@ const Turn = ({ id }) => {
 
     // console.log({ height, width, newHeight, newWidth });
 
-    turnGeometryQueue.add(() => {
-      dispatch(
-        updateGeometry({
-          _id,
-          width: newWidth,
-          height: newHeight,
-          [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
-        })
-      );
-    });
-
-    if (newHeight !== height || newWidth !== width) {
-      $(wrapper.current).css({
-        height: `${newHeight}px`,
-        width: `${newWidth}px`,
+    if (paragraphStage !== ORIG_LOADING) {
+      //  && paragraphStage !== COMP_LOADING) {
+      turnGeometryQueue.add(() => {
+        dispatch(
+          updateGeometry({
+            _id,
+            width: newWidth,
+            height: newHeight,
+            [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
+          })
+        );
       });
+
+      if (newHeight !== height || newWidth !== width) {
+        $(wrapper.current).css({
+          height: `${newHeight}px`,
+          width: `${newWidth}px`,
+        });
+      }
     }
+
     const newWidgetD = {};
     const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1'];
 
