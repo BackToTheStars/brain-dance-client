@@ -11,6 +11,13 @@ const initialTurnsState = {
   pasteNextTurnPosition: null,
 };
 
+export const getStageHistory = (currentStages, newStage) => {
+  if (!currentStages) return [newStage];
+  if (!newStage) return currentStages;
+  if (currentStages.slice(-1)[0] === newStage) return currentStages;
+  return [...currentStages, newStage].slice(-7);
+};
+
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
     case types.TURNS_UPDATE_GEOMETRY_TIME:
@@ -63,12 +70,15 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             turnStage: payload.turnStage,
+            turnStages: getStageHistory(
+              state.d[payload._id].turnStages,
+              payload.turnStage
+            ),
+            paragraphStages: getStageHistory(
+              state.d[payload._id].paragraphStages,
+              payload.paragraphStage
+            ),
             ...payload,
-            turnStages: state.d[payload._id].turnStages
-              ? [...state.d[payload._id].turnStages, payload.turnStage].slice(
-                  -4
-                )
-              : [payload.turnStage],
             // @todo: id параграфа
           },
         },
@@ -81,7 +91,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             paragraphStage: payload.stage,
-            // @todo: id параграфа
+            paragraphStages: getStageHistory(
+              state.d[payload._id].paragraphStages,
+              payload.stage
+            ),
           },
         },
       };

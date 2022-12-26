@@ -225,12 +225,16 @@ const Compressor = ({
   }, [width, wrapperRef, compressedTextPieces]);
 
   useEffect(() => {
+    console.log(
+      `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
+    );
     if (!textsReadyCount) return;
     if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
         dispatch(setCallsQueueIsBlocked(false));
         // setParagraphIsReady(true);
         dispatch(changeParagraphStage(turnId, COMP_READY_TO_RECEIVE_PARAMS));
+        console.log('COMP_READY_TO_RECEIVE_PARAMS');
       }, 50);
     }
   }, [textsReadyCount, compressedTexts]);

@@ -284,19 +284,18 @@ const Turn = ({ id }) => {
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
     // console.log({ height, width, newHeight, newWidth });
-
     if (paragraphStage !== ORIG_LOADING) {
       //  && paragraphStage !== COMP_LOADING) {
-      turnGeometryQueue.add(() => {
-        dispatch(
-          updateGeometry({
-            _id,
-            width: newWidth,
-            height: newHeight,
-            [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
-          })
-        );
-      });
+      // turnGeometryQueue.add(() => {
+      dispatch(
+        updateGeometry({
+          _id,
+          width: newWidth,
+          height: newHeight,
+          [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
+        })
+      );
+      // });
 
       if (newHeight !== height || newWidth !== width) {
         $(wrapper.current).css({
