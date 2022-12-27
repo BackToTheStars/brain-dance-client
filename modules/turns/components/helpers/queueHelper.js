@@ -1,9 +1,10 @@
 export const getQueue = (delay = 50) => {
   let timeoutId = null;
   let lastTime = 0;
-  const MIN_INTERVAL_GAP = 10;
+  const MIN_INTERVAL_GAP = 30;
   return {
-    add: (callback) => { // 20 изменений в секунду
+    add: (callback) => {
+      // 20 изменений в секунду
       const currentTime = new Date().getTime();
       const deltaTime = Math.max(currentTime - lastTime, MIN_INTERVAL_GAP);
       clearTimeout(timeoutId);
@@ -17,8 +18,8 @@ export const getQueue = (delay = 50) => {
       timeoutId = setTimeout(() => {
         lastTime = new Date().getTime();
         callback();
-      }, deltaTime)
+      }, deltaTime);
     },
-    clear: () => clearTimeout(timeoutId)
-  }
-}
+    clear: () => clearTimeout(timeoutId),
+  };
+};

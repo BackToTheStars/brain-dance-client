@@ -52,16 +52,6 @@ const getParagraphHeight = ({
   compressedHeight,
   uncompressedHeight,
 }) => {
-  // console.log({
-  //   widgetId,
-  //   widgetD,
-  //   height,
-  //   compressed,
-  //   paragraphIsReady,
-  //   compressedHeight,
-  //   uncompressedHeight,
-  // });
-
   const widget = widgetD[widgetId];
   if (!widget) return 0;
   const { minHeight, maxHeight } = widget;
@@ -76,13 +66,6 @@ const getParagraphHeight = ({
       let paragraphHeight = compressedHeight;
       for (const key in widgetD) {
         if (key === widgetId) continue;
-        if (widgetD[key].minHeight !== widgetD[key].maxHeight) {
-          console.log({
-            key,
-            minHeight: widgetD[key].minHeight,
-            maxHeight: widgetD[key].maxHeight,
-          });
-        }
         paragraphHeight = paragraphHeight - widgetD[key].minHeight;
       }
       // compressedHeight:3000
@@ -114,13 +97,6 @@ const getParagraphHeight = ({
       let paragraphHeight = compressedHeight;
       for (const key in widgetD) {
         if (key === widgetId) continue;
-        if (widgetD[key].minHeight !== widgetD[key].maxHeight) {
-          console.log({
-            key,
-            minHeight: widgetD[key].minHeight,
-            maxHeight: widgetD[key].maxHeight,
-          });
-        }
         paragraphHeight = paragraphHeight - widgetD[key].minHeight;
       }
       // compressedHeight:3000
@@ -154,10 +130,6 @@ const Turn = ({ id }) => {
 
   const [widgets, setWidgets] = useState([]);
   const [widgetD, setWidgetD] = useState({});
-  // const [stateIsReady, setStateIsReady] = useState(false);
-  // const [paragraphIsReady, setParagraphIsReady] = useState(false);
-
-  // console.log({ widgetD, id });
 
   const wrapper = useRef(null);
 
@@ -191,9 +163,6 @@ const Turn = ({ id }) => {
 
   const paragraphStage = getParagraphStage(turn);
   const turnStage = getTurnStage(turn);
-  if (contentType !== 'zero-point') {
-    console.log({ turnStage, paragraphStage, _id });
-  }
 
   const callsQueueIsBlockedFlag = useSelector(
     (state) => state.ui.callsQueueIsBlocked
@@ -257,7 +226,6 @@ const Turn = ({ id }) => {
       desiredHeight,
       minHeightBasic,
     } = getTurnMinMaxHeight(widgets, width);
-    // console.log({ widgetD });
 
     let newHeight = Math.round(
       Math.min(Math.max(height, minHeight), maxHeight) // + widgetSpacer
@@ -279,23 +247,26 @@ const Turn = ({ id }) => {
     //   newHeight = desiredHeight;
     // }
 
-    console.log({ desiredHeight, minHeight, newHeight });
-
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
-    // console.log({ height, width, newHeight, newWidth });
-    if (paragraphStage !== ORIG_LOADING) {
-      //  && paragraphStage !== COMP_LOADING) {
-      // turnGeometryQueue.add(() => {
-      dispatch(
-        updateGeometry({
-          _id,
-          width: newWidth,
-          height: newHeight,
-          [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
-        })
-      );
-      // });
+    // if (paragraphStage !== ORIG_LOADING) {
+    //  && paragraphStage !== COMP_LOADING) {
+
+    const isLocked = // transition from compressed to uncompressed
+      paragraphStage === ORIG_LOADING &&
+      turn.paragraphStages.slice(-3, -2)[0] === COMP_READY;
+
+    if (!isLocked) {
+      turnGeometryQueue.add(() => {
+        dispatch(
+          updateGeometry({
+            _id,
+            width: newWidth,
+            height: newHeight,
+            [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
+          })
+        );
+      });
 
       if (newHeight !== height || newWidth !== width) {
         $(wrapper.current).css({
@@ -393,7 +364,7 @@ const Turn = ({ id }) => {
       },
     });
     return () => $(wrapper.current).resizable('destroy');
-  }, [widgets]);
+  }, [widgets, turnStage]);
 
   useEffect(() => {
     // if (callsQueueIsBlockedFlag) return;
