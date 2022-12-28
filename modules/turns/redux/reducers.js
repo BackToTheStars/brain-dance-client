@@ -1,8 +1,10 @@
+import { isTurnInsideRenderArea } from '../components/helpers/sizeHelper';
 import turnSettings from '../settings';
 import * as types from './types';
 
 const initialTurnsState = {
   turns: [],
+  turnsToRender: [],
   d: {},
   error: null,
   zeroPointId: null,
@@ -123,16 +125,21 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     }
     case types.TURNS_FIELD_WAS_MOVED: {
-      const { left, top } = payload;
+      const { left, top, viewport } = payload;
       const newState = { ...state };
+      const turnsToRender = [];
       for (let id in state.d) {
         newState.d[id] = {
           ...newState.d[id],
           x: newState.d[id].x - left,
           y: newState.d[id].y - top,
         };
+        if (isTurnInsideRenderArea(newState.d[id], viewport)) {
+          turnsToRender.push(id);
+        }
       }
       newState.updateGeometryTime = new Date().getTime();
+      newState.turnsToRender = turnsToRender;
       return newState;
     }
 

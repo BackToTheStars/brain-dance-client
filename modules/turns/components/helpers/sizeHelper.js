@@ -1,5 +1,23 @@
 import { widgetSpacer } from '@/config/ui';
 
+export const areRectanglesIntersect = (rect1, rect2) => {
+  return (
+    rect1.x + rect1.width >= rect2.x &&
+    rect1.x <= rect2.x + rect2.width &&
+    rect1.y + rect1.height >= rect2.y &&
+    rect1.y <= rect2.y + rect2.height
+  );
+};
+
+export const isTurnInsideRenderArea = (turn, viewport) => {
+  return areRectanglesIntersect(turn, {
+    x: viewport.x - viewport.width,
+    width: 3 * viewport.width,
+    y: viewport.y - viewport.height,
+    height: 3 * viewport.height,
+  });
+};
+
 export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
   let minWidth = 0;
   let minHeight = 0;

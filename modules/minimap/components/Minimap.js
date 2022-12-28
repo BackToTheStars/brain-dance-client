@@ -256,7 +256,7 @@ const Minimap = ({ settings }) => {
   return (
     <>
       {/* {!isMinimized && <SVGMiniMap {...value} />} */}
-      <SVGMiniMap {...value} />
+      <SVGMiniMap {...value} turnsToRender={turnsToRender} />
       <MinimapButtons
         {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
       />
@@ -320,6 +320,7 @@ const SVGMiniMap = ({
   lines,
   onMapClick,
   isMinimized,
+  turnsToRender,
 }) => {
   const dispatch = useDispatch();
   const k = width / minimapWidth;
@@ -386,6 +387,9 @@ const SVGMiniMap = ({
             // const fill = turn.isTurnInsideViewport
             //   ? 'blue'
             //   : 'rgba(212, 213, 214, 1)';
+            const fill = turnsToRender.includes(turn._id)
+              ? 'blue'
+              : 'rgba(212, 213, 214, 1)';
 
             return (
               <rect
@@ -394,8 +398,8 @@ const SVGMiniMap = ({
                 y={turn.y}
                 width={turn.width}
                 rx={turnRadiusFactored}
-                // fill={fill}
-                fill="gray"
+                fill={fill}
+                // fill="gray"
                 height={turn.height}
               />
             );

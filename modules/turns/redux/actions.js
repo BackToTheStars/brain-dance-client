@@ -137,14 +137,33 @@ export const updateScrollPosition = (data) => (dispatch) =>
     payload: data,
   });
 
-export const moveField = (data) => (dispatch) => {
+export const moveField = (data) => (dispatch, getState) => {
+  // getState сюда придёт сам, через механизм Redux Thunk
+
+  // dispatch(moveField(123))
+
+  // const dispatch = (arg) => {
+  //   if (argIsObj) {
+  //     //
+  //   } else if (callable) {
+  //     arg(dispatch, getState)
+  //   }
+  // }
+
+  const state = getState();
+  const viewport = {
+    x: state.game.position.left,
+    y: state.game.position.top,
+    width: state.ui.viewport.width,
+    height: state.ui.viewport.height,
+  };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
     payload: data,
   });
   dispatch({
     type: types.TURNS_FIELD_WAS_MOVED,
-    payload: data,
+    payload: { ...data, viewport },
   });
 };
 
