@@ -63,6 +63,7 @@ const Game = ({ hash }) => {
 
   useEffect(() => {
     if (!gameBox.current) return;
+
     $(gameBox.current).draggable({
       stop: (event, ui) => {
         $(gameBox.current).addClass('remove-line-transition');

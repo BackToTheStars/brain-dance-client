@@ -42,7 +42,7 @@ import {
   ORIG_ACTIVE,
 } from '../components/widgets/paragraph/settings';
 
-export const loadTurns = (hash, viewport) => (dispatch) => {
+export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
     const quotesD = {};
     for (let turn of data.items) {
@@ -65,6 +65,21 @@ export const loadTurns = (hash, viewport) => (dispatch) => {
       type: quotesTypes.QUOTES_SET_DICTIONARY,
       payload: quotesD,
     });
+
+    const state = getState();
+    const viewportNew = {
+      // временный только для первой загрузки
+      // x: state.game.position.left,
+      x: -viewport.x,
+      // y: state.game.position.top,
+      y: -viewport.y,
+      width: state.ui.viewport.width,
+      height: state.ui.viewport.height,
+    };
+    // dispatch({
+    //   type: types.TURNS_FIELD_WAS_MOVED,
+    //   payload: { left: 0, top: 0, viewport: viewportNew },
+    // });
   });
 };
 
