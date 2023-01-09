@@ -167,8 +167,10 @@ export const moveField = (data) => (dispatch, getState) => {
 
   const state = getState();
   const viewport = {
-    x: state.game.position.left,
-    y: state.game.position.top,
+    // x: state.game.position.left,
+    // y: state.game.position.top,
+    x: 0,
+    y: 0,
     width: state.ui.viewport.width,
     height: state.ui.viewport.height,
   };
