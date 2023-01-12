@@ -1,10 +1,10 @@
 import { widgetSpacer } from '@/config/ui';
+import { increment } from '@/modules/telemetry/utils/logger';
 import { changeParagraphStage } from '@/modules/turns/redux/actions';
 import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { useEffect } from 'react/cjs/react.development';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
 import { getParagraphStage } from '../../helpers/stageHelper';
 import {
@@ -48,6 +48,16 @@ const Compressor = ({
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
+  // console.log({
+  //   turnId,
+  //   width,
+  //   height,
+  //   originalParagraph,
+  //   y,
+  //   compressedTexts,
+  //   textsReadyCount,
+  //   compressedTextPieces,
+  // });
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -63,16 +73,17 @@ const Compressor = ({
   // console.log({ paragraphTop })
 
   // @fixme: цитата делит одно слово на несколько слов
-  const words = paragraph
-    .map((textItem) => textItem.insert)
-    .join(' ')
-    .split(' '); // слили всё в один большой текст и разделили по словам
+  // const words = paragraph
+  //   .map((textItem) => textItem.insert)
+  //   .join(' ')
+  //   .split(' '); // слили всё в один большой текст и разделили по словам
 
   const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
 
   // PARAGRAPH STAGE OF STATE MACHINE (same in ParagraphOriginal.js)
   useEffect(() => {
     dispatch(changeParagraphStage(turnId, COMP_LOADING));
+    increment('CompressorInit');
   }, []);
 
   useEffect(() => {
@@ -101,12 +112,12 @@ const Compressor = ({
       widgetMinHeight,
       widgetMaxHeight,
       // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
-      widgetDesiredHeight: stage === COMP_READY ? height : 0,
+      widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
     });
-  }, [wrapperRef, stage, height]); //, height, stateIsReady, paragraphIsReady]);
+  }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
-    if (!wrapperRef.current) return false;
+    // if (!wrapperRef.current) return false;
     if (!compressedTextPieces?.length) return false;
 
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
@@ -222,12 +233,12 @@ const Compressor = ({
     // setTimeout(() => {
     //   if (!!compressedHeight) setCompressedHeight(null);
     // }, 300);
-  }, [width, wrapperRef, compressedTextPieces]);
+  }, [width, compressedTextPieces]); // , wrapperRef
 
   useEffect(() => {
-    console.log(
-      `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
-    );
+    // console.log(
+    //   `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
+    // );
     if (!textsReadyCount) return;
     if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
@@ -243,6 +254,30 @@ const Compressor = ({
     if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
 
+  const textsAroundQutes = useMemo(() => {
+    return compressedTexts.map((text, i) => {
+      return (
+        <TextAroundQuote
+          key={i}
+          {...{
+            // contentType,
+            // backgroundColor,
+            // fontColor,
+            // registerHandleResize,
+            // unregisterHandleResize,
+            // variableHeight,
+            setTextIsReady,
+            paragraph: text.paragraph,
+            scrollPosition: text.scrollTop + text.delta,
+            // scrollPosition: text.scrollTop,
+            height: text.height, // через этот viewport смотрим на кусок текста
+            // height: text.scrollHeight,
+          }}
+        />
+      );
+    });
+  }, [compressedTexts]);
+
   return (
     <div className="wrapperParagraphText">
       <div style={{ position: 'relative' }}>
@@ -254,29 +289,7 @@ const Compressor = ({
           <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
         </div>
       </div>
-      <div className="compressed-paragraph-widget">
-        {compressedTexts.map((text, i) => {
-          return (
-            <TextAroundQuote
-              key={i}
-              {...{
-                // contentType,
-                // backgroundColor,
-                // fontColor,
-                // registerHandleResize,
-                // unregisterHandleResize,
-                // variableHeight,
-                setTextIsReady,
-                paragraph: text.paragraph,
-                scrollPosition: text.scrollTop + text.delta,
-                // scrollPosition: text.scrollTop,
-                height: text.height, // через этот viewport смотрим на кусок текста
-                // height: text.scrollHeight,
-              }}
-            />
-          );
-        })}
-      </div>
+      <div className="compressed-paragraph-widget">{textsAroundQutes}</div>
     </div>
   );
 };

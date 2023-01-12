@@ -398,6 +398,72 @@ const Turn = ({ id }) => {
   if (pictureOnly) {
     wrapperClasses.push('picture-only');
   }
+  return (
+    <div
+      ref={wrapper}
+      className={wrapperClasses.join(' ')}
+      style={wrapperStyles}
+    >
+      <Header
+        registerHandleResize={registerHandleResize}
+        // copyPasteActions={copyPasteActions}
+        {...{
+          header,
+          contentType,
+          backgroundColor,
+          fontColor,
+          dontShowHeader,
+          _id,
+          sourceUrl,
+          date,
+        }}
+      />
+      {!!videoUrl && (
+        <Video
+          videoUrl={videoUrl}
+          registerHandleResize={registerHandleResize}
+          width={width}
+        />
+      )}
+      {!!imageUrl && (
+        <Picture
+          imageUrl={imageUrl}
+          registerHandleResize={registerHandleResize}
+          unregisterHandleResize={unregisterHandleResize}
+          widgetId="picture1"
+          widgetType="picture"
+          turnId={_id}
+          widgetSettings={widgetD['picture1']}
+          pictureOnly={pictureOnly}
+        />
+      )}
+      {doesParagraphExist && (
+        <Paragraph
+          turn={turn}
+          registerHandleResize={registerHandleResize}
+          unregisterHandleResize={unregisterHandleResize}
+          // stateIsReady={stateIsReady}
+          widgetId="paragraph1"
+          // paragraphIsReady={paragraphIsReady}
+          // setParagraphIsReady={dispatchParagraphIsReady}
+          height={getParagraphHeight({
+            widgetId: 'paragraph1',
+            widgetD,
+            height,
+            compressed,
+            paragraphIsReady: paragraphStage === COMP_READY,
+            compressedHeight,
+            uncompressedHeight,
+          })}
+        />
+      )}
+      {dontShowHeader && !!date && !!sourceUrl && (
+        <div className="bottom-date-and-sourceurl">
+          <DateAndSourceUrl {...{ date, sourceUrl }} />
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div
@@ -419,6 +485,7 @@ const Turn = ({ id }) => {
           date,
         }}
       />
+
       {/* <div className="top-spaceholder" /> */}
       {!!videoUrl && (
         <Video

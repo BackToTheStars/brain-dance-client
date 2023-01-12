@@ -1,4 +1,5 @@
 import { TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
+import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment } from 'react';
 
 const ORANGE = '#ffd596';
@@ -99,6 +100,7 @@ export const ParagraphCompressorTextWrapper = ({ arrText }) => {
   // if (!arrText) return;
   // console.log({ arrText });
   const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
+  console.log('ParagraphCompressorTextWrapper');
   return (
     <>
       {(modifiedArrText || []).map((textItem, i) => {
@@ -144,6 +146,7 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
             return (
               <Fragment key={'item' + index}>
                 {words.map((word, index2) => {
+                  increment('WordMap');
                   return (
                     <span key={`item-${index}-${index2}`}>
                       {word}
