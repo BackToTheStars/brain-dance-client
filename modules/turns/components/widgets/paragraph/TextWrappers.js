@@ -100,7 +100,8 @@ export const ParagraphCompressorTextWrapper = ({ arrText }) => {
   // if (!arrText) return;
   // console.log({ arrText });
   const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
-  console.log('ParagraphCompressorTextWrapper');
+  console.log('ParagraphCompressorTextWrapper', arrText.length);
+  // return 'check';
   return (
     <>
       {(modifiedArrText || []).map((textItem, i) => {
@@ -186,7 +187,8 @@ export const TextAroundQuote = ({
     // @todo: check if no quotes
     paragraphEl.current.scrollTop = scrollPosition;
     setTimeout(() => {
-      console.log(`${!paragraph?.current}, []`);
+      // console.log(`${!paragraph?.current}, []`);
+      increment('txt_textAroundQuote');
       if (!paragraphEl?.current) return;
       paragraphEl.current.scrollTop = scrollPosition;
       const quotes = [

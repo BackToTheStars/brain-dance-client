@@ -255,6 +255,7 @@ const Compressor = ({
   }, [wrapperRef]);
 
   const textsAroundQutes = useMemo(() => {
+    increment('txt_compressor', { turnId, count: compressedTexts.length });
     return compressedTexts.map((text, i) => {
       return (
         <TextAroundQuote
@@ -278,6 +279,10 @@ const Compressor = ({
     });
   }, [compressedTexts]);
 
+  const paragraphCompressorTextWrapper = useMemo(() => {
+    return <ParagraphCompressorTextWrapper arrText={paragraph} />;
+  }, []);
+
   return (
     <div className="wrapperParagraphText">
       <div style={{ position: 'relative' }}>
@@ -286,7 +291,7 @@ const Compressor = ({
           className="compressor paragraphText"
           // style={{ width: `${width}px` }}
         >
-          <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
+          {paragraphCompressorTextWrapper}
         </div>
       </div>
       <div className="compressed-paragraph-widget">{textsAroundQutes}</div>
