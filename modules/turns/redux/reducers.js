@@ -27,19 +27,29 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         updateGeometryTime: new Date().getTime(),
       };
-    case types.LOAD_TURNS:
+    case types.LOAD_TURNS: {
+      const d = payload.turns.reduce((a, turn) => {
+        a[turn._id] = turn;
+        return a;
+      }, {});
+      const turnsToRender = [];
+      for (let id in d) {
+        if (isTurnInsideRenderArea(d[id], payload.viewport)) {
+          turnsToRender.push(id);
+        }
+      }
+      console.log({ d, turnsToRender, payload });
       return {
         ...state,
         turns: payload.turns,
         zeroPointId: payload.turns.find(
           (turn) => turn.contentType === turnSettings.TEMPLATE_ZERO_POINT
         )._id,
-        d: payload.turns.reduce((a, turn) => {
-          a[turn._id] = turn;
-          return a;
-        }, {}),
+        d,
         updateGeometryTime: new Date().getTime(),
+        turnsToRender,
       };
+    }
     case types.TURNS_UPDATE_GEOMETRY:
       return {
         ...state,
@@ -138,8 +148,8 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           turnsToRender.push(id);
         }
       }
-      newState.updateGeometryTime = new Date().getTime();
       newState.turnsToRender = turnsToRender;
+      newState.updateGeometryTime = new Date().getTime();
       return newState;
     }
 

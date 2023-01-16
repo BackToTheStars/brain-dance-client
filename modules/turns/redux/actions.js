@@ -44,6 +44,7 @@ import {
 
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
+    const state = getState();
     const quotesD = {};
     for (let turn of data.items) {
       if (!turn.quotes) continue;
@@ -54,6 +55,12 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
     dispatch({
       type: types.LOAD_TURNS,
       payload: {
+        viewport: {
+          x: 0,
+          y: 0,
+          width: state.ui.viewport.width,
+          height: state.ui.viewport.height,
+        },
         turns: data.items.map((turn) => ({
           ...turn,
           x: turn.x - viewport.x,
@@ -66,7 +73,6 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
       payload: quotesD,
     });
 
-    const state = getState();
     const viewportNew = {
       // временный только для первой загрузки
       // x: state.game.position.left,
