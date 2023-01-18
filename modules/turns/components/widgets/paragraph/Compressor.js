@@ -14,6 +14,7 @@ import {
 } from './settings';
 import {
   ParagraphCompressorTextWrapper,
+  ParagraphOriginalTexts,
   TextAroundQuote,
 } from './TextWrappers';
 // import { useTurnContext } from '../../contexts/TurnContext';
@@ -43,8 +44,15 @@ const Compressor = ({
   //
   // const { turn } = useTurnContext();
   const dispatch = useDispatch();
-  const { _id: turnId, width, paragraph: originalParagraph, y } = turn;
+  const {
+    _id: turnId,
+    width,
+    paragraph: originalParagraph,
+    y,
+    contentType,
+  } = turn;
   const stage = getParagraphStage(turn);
+  const stageIsCompReady = stage === COMP_READY;
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
@@ -256,6 +264,24 @@ const Compressor = ({
 
   const textsAroundQutes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
+    console.log({ compressedTexts });
+    if (stageIsCompReady)
+      return compressedTexts.map((text, i) => {
+        return (
+          <div
+            key={i}
+            className="paragraphText"
+            // ref={paragraphEl}
+            style={{ height: `${text.height}px` }}
+          >
+            <ParagraphOriginalTexts
+              arrText={text.paragraph || []}
+              turnId={turnId}
+              turnType={contentType}
+            />
+          </div>
+        );
+      });
     return compressedTexts.map((text, i) => {
       return (
         <TextAroundQuote
@@ -277,7 +303,7 @@ const Compressor = ({
         />
       );
     });
-  }, [compressedTexts]);
+  }, [compressedTexts, stageIsCompReady]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
     return <ParagraphCompressorTextWrapper arrText={paragraph} />;
@@ -291,7 +317,7 @@ const Compressor = ({
           className="compressor paragraphText"
           // style={{ width: `${width}px` }}
         >
-          {paragraphCompressorTextWrapper}
+          {stage !== COMP_READY ? paragraphCompressorTextWrapper : ''}
         </div>
       </div>
       <div className="compressed-paragraph-widget">{textsAroundQutes}</div>

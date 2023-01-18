@@ -347,6 +347,8 @@ const Turn = ({ id }) => {
 
   // RESIZABLE
   useEffect(() => {
+    if (paragraphStage === COMP_READY) return;
+
     $(wrapper.current).resizable({
       resize: (event, ui) => {
         const widgetsCount =
@@ -363,8 +365,17 @@ const Turn = ({ id }) => {
         }
       },
     });
-    return () => $(wrapper.current).resizable('destroy');
+    return () => {
+      $(wrapper.current).resizable('destroy');
+    };
   }, [widgets, turnStage]);
+
+  useEffect(() => {
+    if (!wrapper.current) return;
+    if (paragraphStage === COMP_READY) {
+      $(wrapper.current).resizable({ disabled: true });
+    } // @todo: else if previous paragraphStage === COMP_READY then enable
+  }, [paragraphStage]);
 
   useEffect(() => {
     // if (callsQueueIsBlockedFlag) return;

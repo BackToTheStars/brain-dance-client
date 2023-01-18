@@ -100,7 +100,7 @@ export const ParagraphCompressorTextWrapper = ({ arrText }) => {
   // if (!arrText) return;
   // console.log({ arrText });
   const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
-  console.log('ParagraphCompressorTextWrapper', arrText.length);
+  // console.log('ParagraphCompressorTextWrapper', arrText.length);
   // return 'check';
   return (
     <>
