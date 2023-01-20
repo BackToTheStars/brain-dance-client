@@ -46,10 +46,15 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
   });
 };
 
-export const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
+export const ParagraphOriginalTexts = ({
+  arrText,
+  turnId,
+  turnType,
+  compressed = false,
+  // setTextIsReady = () => {},
+  // scrollPosition = -1, // специально ненастоящее значение, чтобы проверять
+}) => {
   //
-  // console.log({ arrText });
-
   const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
 
   return (
@@ -69,6 +74,7 @@ export const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
               textItem,
               newInserts,
               turnId,
+              compressed,
             }}
           />
         );
@@ -79,7 +85,7 @@ export const ParagraphOriginalTexts = ({ arrText, turnId, turnType }) => {
 
 // export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
-export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
+export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   // const spanFragment = useRef(null);
   const isItQuote = textItem.attributes
     ? !!textItem.attributes.background
@@ -89,6 +95,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts }) => {
     <span
       style={textItem.attributes}
       data-id={isItQuote ? textItem.attributes.id : ''}
+      className={isItQuote && compressed ? 'compressed-quote' : ''}
       // ref={spanFragment}
     >
       {newInserts}
@@ -222,6 +229,60 @@ export const TextAroundQuote = ({
       style={{ height: `${height}px` }}
     >
       <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
+    </div>
+  );
+};
+
+export const TextAroundQuoteOptimized = ({
+  scrollPosition,
+  height, // через этот viewport смотрим на кусок текста
+  setTextIsReady,
+  arrText,
+  turnId,
+  turnType,
+}) => {
+  //
+  const paragraphEl = useRef(null);
+
+  useEffect(() => {
+    // @todo: check if no quotes
+    paragraphEl.current.scrollTop = scrollPosition;
+    setTimeout(() => {
+      if (!paragraphEl?.current) return;
+      paragraphEl.current.scrollTop = scrollPosition;
+      const quotes = [
+        ...paragraphEl.current.querySelectorAll('.compressed-quote'),
+      ];
+      if (!quotes?.length) {
+        console.log('no quotes in TextAroundQuote');
+        return;
+      }
+
+      const { top } = quotes[0].getBoundingClientRect();
+      const { bottom } = quotes[quotes.length - 1].getBoundingClientRect();
+      const middleLine = (top + bottom) / 2;
+      const { top: paragraphTop, bottom: paragraphBottom } =
+        paragraphEl.current.getBoundingClientRect();
+      const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
+      const fixScroll = Math.floor(middleLineParagraph - middleLine);
+      paragraphEl.current.scrollTop -= fixScroll;
+      setTextIsReady();
+      // for (let quote of quotes) {
+      // const { top, bottom } = quote.getBoundingClientRect();
+      // }
+      // console.log(middleLine, ' ', middleLineParagraph);
+    }, 300);
+  }, []);
+
+  return (
+    <div
+      className="paragraphText"
+      ref={paragraphEl}
+      style={{ height: `${height}px` }}
+    >
+      <ParagraphOriginalTexts
+        {...{ arrText, turnId, turnType, compressed: true }}
+      />
     </div>
   );
 };

@@ -16,6 +16,7 @@ import {
   ParagraphCompressorTextWrapper,
   ParagraphOriginalTexts,
   TextAroundQuote,
+  TextAroundQuoteOptimized,
 } from './TextWrappers';
 // import { useTurnContext } from '../../contexts/TurnContext';
 // import { ParagraphTextWrapper } from '../ParagraphTextWrapper';
@@ -105,6 +106,7 @@ const Compressor = ({
       quotes,
       wrapperRef?.current
     );
+    console.log({ quotes, textPieces });
 
     setCompressedTextPieces(textPieces);
 
@@ -262,47 +264,44 @@ const Compressor = ({
     if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
 
-  const textsAroundQutes = useMemo(() => {
+  const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
     console.log({ compressedTexts });
-    if (stageIsCompReady)
-      return compressedTexts.map((text, i) => {
-        return (
-          <div
-            key={i}
-            className="paragraphText"
-            // ref={paragraphEl}
-            style={{ height: `${text.height}px` }}
-          >
-            <ParagraphOriginalTexts
-              arrText={text.paragraph || []}
-              turnId={turnId}
-              turnType={contentType}
-            />
-          </div>
-        );
-      });
+    // if (stageIsCompReady)
     return compressedTexts.map((text, i) => {
       return (
-        <TextAroundQuote
+        <TextAroundQuoteOptimized
           key={i}
-          {...{
-            // contentType,
-            // backgroundColor,
-            // fontColor,
-            // registerHandleResize,
-            // unregisterHandleResize,
-            // variableHeight,
-            setTextIsReady,
-            paragraph: text.paragraph,
-            scrollPosition: text.scrollTop + text.delta,
-            // scrollPosition: text.scrollTop,
-            height: text.height, // через этот viewport смотрим на кусок текста
-            // height: text.scrollHeight,
-          }}
+          arrText={text.paragraph || []}
+          turnId={turnId}
+          turnType={contentType}
+          setTextIsReady={setTextIsReady}
+          scrollPosition={text.scrollTop + text.delta}
+          height={text.height}
         />
       );
     });
+    // return compressedTexts.map((text, i) => {
+    //   return (
+    //     <TextAroundQuote
+    //       key={i}
+    //       {...{
+    //         // contentType,
+    //         // backgroundColor,
+    //         // fontColor,
+    //         // registerHandleResize,
+    //         // unregisterHandleResize,
+    //         // variableHeight,
+    //         setTextIsReady,
+    //         paragraph: text.paragraph,
+    //         scrollPosition: text.scrollTop + text.delta,
+    //         // scrollPosition: text.scrollTop,
+    //         height: text.height, // через этот viewport смотрим на кусок текста
+    //         // height: text.scrollHeight,
+    //       }}
+    //     />
+    //   );
+    // });
   }, [compressedTexts, stageIsCompReady]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
@@ -320,7 +319,7 @@ const Compressor = ({
           {stage !== COMP_READY ? paragraphCompressorTextWrapper : ''}
         </div>
       </div>
-      <div className="compressed-paragraph-widget">{textsAroundQutes}</div>
+      <div className="compressed-paragraph-widget">{textsAroundQuotes}</div>
     </div>
   );
 };
