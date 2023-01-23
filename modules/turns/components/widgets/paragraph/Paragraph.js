@@ -66,6 +66,9 @@ const Paragraph = ({
             // } else if (!paragraphElCurrent) {
             //   return 0;
             // }
+            console.log({
+              maxHeight: paragraphElCurrent.scrollHeight + widgetSpacer + 5,
+            });
             return (
               // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
               // widgetSpacer +

@@ -227,10 +227,19 @@ const Turn = ({ id }) => {
       minHeightBasic,
     } = getTurnMinMaxHeight(widgets, width);
 
-    let newHeight = Math.round(
-      Math.min(Math.max(height, minHeight), maxHeight) // + widgetSpacer
-    );
+    console.log({
+      minHeight,
+      maxHeight,
+      minWidth,
+      maxWidth,
+      widgetD,
+      desiredHeight,
+      minHeightBasic,
+    });
 
+    let newHeight = Math.round(
+      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer // @todo: для компрессора проверить
+    );
     if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
       newHeight = widgets
         .find((w) => w.variableHeight)
