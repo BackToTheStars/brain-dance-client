@@ -22,6 +22,7 @@ import { VIEWPORT_UPDATE } from '@/modules/ui/redux/types';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { registerMoveScene } from './helpers/game';
 
 const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
@@ -60,6 +61,13 @@ const Game = ({ hash }) => {
     dispatch(loadTurnsAndLinesToPaste());
     dispatch(resetAndExit());
   }, []);
+
+  useEffect(() => {
+    if (!window) return;
+    // if (!dispatch) return;
+    if (!gameBox.current) return;
+    registerMoveScene(dispatch, gameBox.current);
+  }, [gameBox.current]);
 
   useEffect(() => {
     if (!gameBox.current) return;

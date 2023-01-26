@@ -173,6 +173,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: payload,
         },
         updateGeometryTime: new Date().getTime(),
+        turnsToRender: [...state.turnsToRender, payload._id],
       };
     }
 

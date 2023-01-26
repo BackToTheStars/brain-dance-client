@@ -7,7 +7,7 @@ import {
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
@@ -56,7 +56,11 @@ const AddEditTurnPopup = () => {
   const [isMaximized, setIsMaximized] = useState(false);
 
   const dispatch = useDispatch();
-  const hidePanel = () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+
+  const hidePanel = () => {
+    dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+    dispatch(toggleMaximizeQuill(false));
+  };
   const lines = useSelector((state) => state.lines.lines);
 
   const toggleMaximize = (value) => {
@@ -234,7 +238,10 @@ const AddEditTurnPopup = () => {
 
     const saveCallbacks = {
       // @todo: передавать в виджет через props
-      success: () => dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN })),
+      success: () => {
+        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+        dispatch(toggleMaximizeQuill(false));
+      },
     };
 
     if (!!turnToEdit) {

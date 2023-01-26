@@ -1,5 +1,6 @@
 // import { useUiContext } from '../contexts/UI_Context';
 import { panelSpacer } from '@/config/ui';
+import { utils } from '@/modules/game/components/helpers/game';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import { PANEL_CHANGE_GEOMETRY } from '@/modules/panels/redux/types';
 import { PANEL_MINIMAP } from '@/modules/panels/settings';
@@ -149,27 +150,29 @@ const Minimap = ({ settings }) => {
       const top =
         viewport.y - targetYMap + Math.floor(viewport.height / 2) + zeroY;
 
-      $(gameBoxEl).addClass('remove-line-transition');
-      $(gameBoxEl).animate(
-        {
-          left: `${left}px`,
-          top: `${top}px`,
-        },
-        300,
-        () => {
-          dispatch(
-            moveField({
-              left: -left,
-              top: -top,
-            })
-          );
-          $(gameBoxEl).css('left', 0);
-          $(gameBoxEl).css('top', 0);
-          setTimeout(() => {
-            $(gameBoxEl).removeClass('remove-line-transition');
-          }, 100);
-        }
-      );
+      utils.moveScene(left, -top, 0);
+
+      // $(gameBoxEl).addClass('remove-line-transition');
+      // $(gameBoxEl).animate(
+      //   {
+      //     left: `${left}px`,
+      //     top: `${top}px`,
+      //   },
+      //   300,
+      //   () => {
+      //     dispatch(
+      //       moveField({
+      //         left: -left,
+      //         top: -top,
+      //       })
+      //     );
+      //     $(gameBoxEl).css('left', 0);
+      //     $(gameBoxEl).css('top', 0);
+      //     setTimeout(() => {
+      //       $(gameBoxEl).removeClass('remove-line-transition');
+      //     }, 100);
+      //   }
+      // );
     },
     turns: preparedTurns.filter((turn) => turn.contentType !== 'zero-point'),
     zeroPoint: preparedTurns.find((turn) => turn.contentType === 'zero-point'),

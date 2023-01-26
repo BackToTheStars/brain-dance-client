@@ -3,7 +3,8 @@
 //   MODE_GAME,
 // } from '../contexts/InteractionContext';
 // import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
-import { useRef, useState } from 'react';
+import { utils } from '@/modules/game/components/helpers/game';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Line from './Line';
 // import { useUiContext } from '../contexts/UI_Context';
@@ -20,6 +21,20 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
 
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
+
+  useEffect(() => {
+    if (!svgLayer?.current) return;
+
+    const scrollMove = (e) => {
+      const delta = Math.round(e.deltaY * 0.3);
+      e.shiftKey ? utils.moveScene(2 * delta, 0) : utils.moveScene(0, delta);
+    };
+
+    svgLayer.current.addEventListener('wheel', scrollMove);
+    return () => {
+      svgLayer?.current?.removeEventListener('wheel', scrollMove);
+    };
+  }, [svgLayer?.current]);
 
   return (
     <>
