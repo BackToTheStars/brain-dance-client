@@ -7,6 +7,7 @@ import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
 import { getParagraphStage } from '../../helpers/stageHelper';
+import { paragraphStateSaveToLocalStorage } from '../../helpers/store';
 import {
   COMP_LOADING,
   COMP_READY,
@@ -51,6 +52,7 @@ const Compressor = ({
     paragraph: originalParagraph,
     y,
     contentType,
+    compressedParagraphState,
   } = turn;
   const stage = getParagraphStage(turn);
   const stageIsCompReady = stage === COMP_READY;
@@ -98,35 +100,115 @@ const Compressor = ({
   useEffect(() => {
     if (!wrapperRef.current) return false;
     if (stage !== COMP_LOADING) return false;
-    // console.log({ wrapperRef, height, stage, turnId });
-    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-    // console.log({ quotes });
+    if (compressedParagraphState) {
+      const widgetMinHeight = compressedParagraphState.textPieces.reduce(
+        (acc, textPiece) => acc + textPiece.height,
+        0
+      );
+      const widgetMaxHeight = compressedParagraphState.textPieces.reduce(
+        (acc, textPiece) => acc + textPiece.scrollHeight,
+        0
+      );
+      registerHandleResizeWithParams({
+        widgetMinHeight,
+        widgetMaxHeight,
+        // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+        widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
+      });
+    } else {
+      // console.log({ wrapperRef, height, stage, turnId });
+      const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+      // console.log({ quotes });
 
-    const textPieces = calculateTextPiecesFromQuotes(
-      quotes,
-      wrapperRef?.current
-    );
-    console.log({ quotes, textPieces });
+      const textPieces = calculateTextPiecesFromQuotes(
+        quotes,
+        wrapperRef?.current
+      );
+      console.log({ quotes, textPieces });
 
-    setCompressedTextPieces(textPieces);
+      setCompressedTextPieces(textPieces);
 
-    const widgetMinHeight = textPieces.reduce(
-      (acc, textPiece) => acc + textPiece.height,
-      0
-    );
-    const widgetMaxHeight = textPieces.reduce(
-      (acc, textPiece) => acc + textPiece.scrollHeight,
-      0
-    );
-    registerHandleResizeWithParams({
-      widgetMinHeight,
-      widgetMaxHeight,
-      // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
-      widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
-    });
+      const widgetMinHeight = textPieces.reduce(
+        (acc, textPiece) => acc + textPiece.height,
+        0
+      );
+      const widgetMaxHeight = textPieces.reduce(
+        (acc, textPiece) => acc + textPiece.scrollHeight,
+        0
+      );
+      registerHandleResizeWithParams({
+        widgetMinHeight,
+        widgetMaxHeight,
+        // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+        widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
+      });
+    }
   }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
+    if (compressedParagraphState) {
+      textPieces = compressedParagraphState.textPieces;
+      let paragraphCountingBuffer = [];
+      lettersCount = 0;
+      let paragraphIndex = 0;
+
+      for (let i = 0; i < textPieces.length - 1; i += 1) {
+        const { startLettersCount } = textPieces[i + 1];
+
+        for (let j = paragraphIndex; j < paragraph.length; j += 1) {
+          const insertLength = paragraph[j].insert.length;
+          if (insertLength + lettersCount === startLettersCount) {
+            // решить, делать ли копию
+            paragraphCountingBuffer.push(paragraph[j]);
+            paragraphIndex = j + 1;
+            textPieces[i].paragraph = paragraphCountingBuffer;
+            paragraphCountingBuffer = [];
+            lettersCount += insertLength;
+            break; // @learn - breaks работает для while, for, switch
+            //
+          } else if (insertLength + lettersCount < startLettersCount) {
+            paragraphCountingBuffer.push(paragraph[j]);
+            lettersCount += insertLength;
+            //
+          } else if (insertLength + lettersCount > startLettersCount) {
+            // const difference = insertLength + lettersCount - startLettersCount;
+            const difference = startLettersCount - lettersCount;
+            paragraphCountingBuffer.push({
+              insert: paragraph[j].insert.slice(0, difference),
+            });
+            paragraph.splice(j + 1, 0, {
+              insert: paragraph[j].insert.slice(difference),
+            });
+            paragraph[j].insert = paragraph[j].insert.slice(0, difference);
+            paragraphIndex = j + 1;
+            textPieces[i].paragraph = paragraphCountingBuffer;
+            paragraphCountingBuffer = [];
+            // lettersCount -= insertLength;
+            lettersCount += difference;
+            break;
+            //
+          }
+        }
+      }
+      textPieces[textPieces.length - 1].paragraph =
+        paragraph.slice(paragraphIndex);
+      setCompressedTexts(textPieces);
+
+      // console.log(
+      //   'textPieces',
+      //   textPieces.reduce((sum, textPiece) => {
+      //     console.log(textPiece);
+      //     return sum + textPiece.height;
+      //   }, 0)
+      // );
+
+      setCompressedHeight(
+        textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
+        // + (textPieces.length - 1) * 11 // todo: const
+      );
+      return;
+    }
+
     // if (!wrapperRef.current) return false;
     if (!compressedTextPieces?.length) return false;
 
@@ -181,6 +263,8 @@ const Compressor = ({
         // }
       }
     }
+
+    paragraphStateSaveToLocalStorage(textPieces, turnId);
 
     let paragraphCountingBuffer = [];
     lettersCount = 0;

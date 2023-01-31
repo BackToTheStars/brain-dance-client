@@ -41,6 +41,7 @@ import {
   COMP_ACTIVE,
   ORIG_ACTIVE,
 } from '../components/widgets/paragraph/settings';
+import { paragraphStateGetFromLocalStorage } from '../components/helpers/store';
 
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
@@ -65,6 +66,7 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
           ...turn,
           x: turn.x - viewport.x,
           y: turn.y - viewport.y,
+          compressedParagraphState: paragraphStateGetFromLocalStorage(turn._id),
         })),
       },
     });
