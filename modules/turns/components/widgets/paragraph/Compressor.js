@@ -1,5 +1,9 @@
 import { widgetSpacer } from '@/config/ui';
-import { increment } from '@/modules/telemetry/utils/logger';
+import {
+  increment,
+  startLoggingTime,
+  stopLoggingTime,
+} from '@/modules/telemetry/utils/logger';
 import { changeParagraphStage } from '@/modules/turns/redux/actions';
 import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
@@ -348,10 +352,23 @@ const Compressor = ({
     if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
 
+  useEffect(() => {
+    if (stage === COMP_READY) {
+      stopLoggingTime('paragraphStageReady' + turnId);
+    } else if (stage === COMP_READY_TO_RECEIVE_PARAMS) {
+      startLoggingTime('paragraphStageReady' + turnId);
+      stopLoggingTime('paragraphStageReceivePRMS' + turnId);
+    } else if (stage === COMP_LOADING) {
+      startLoggingTime('paragraphStageReceivePRMS' + turnId);
+      stopLoggingTime('paragraphStageOther' + turnId);
+    } else {
+      startLoggingTime('paragraphStageOther' + turnId);
+    }
+  }, [stage]);
+
   const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
     console.log({ compressedTexts });
-    // if (stageIsCompReady)
     return compressedTexts.map((text, i) => {
       return (
         <TextAroundQuoteOptimized
@@ -386,7 +403,7 @@ const Compressor = ({
     //     />
     //   );
     // });
-  }, [compressedTexts, stageIsCompReady]);
+  }, [compressedTexts]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
     return <ParagraphCompressorTextWrapper arrText={paragraph} />;
