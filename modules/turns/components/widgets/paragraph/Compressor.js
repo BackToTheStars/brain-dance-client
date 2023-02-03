@@ -417,7 +417,10 @@ const Compressor = ({
           className="compressor paragraphText"
           // style={{ width: `${width}px` }}
         >
-          {stage !== COMP_READY ? paragraphCompressorTextWrapper : ''}
+          {/* {stage !== COMP_READY ? paragraphCompressorTextWrapper : ''} */}
+          {stage !== COMP_READY && !compressedParagraphState
+            ? paragraphCompressorTextWrapper
+            : ''}
         </div>
       </div>
       <div className="compressed-paragraph-widget">{textsAroundQuotes}</div>

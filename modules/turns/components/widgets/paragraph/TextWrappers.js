@@ -246,7 +246,7 @@ export const TextAroundQuoteOptimized = ({
 
   useEffect(() => {
     // @todo: check if no quotes
-    paragraphEl.current.scrollTop = scrollPosition;
+    // paragraphEl.current.scrollTop = scrollPosition;
     setTimeout(() => {
       if (!paragraphEl?.current) return;
       paragraphEl.current.scrollTop = scrollPosition;
