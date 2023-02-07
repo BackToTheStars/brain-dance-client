@@ -41,7 +41,22 @@ import {
   COMP_ACTIVE,
   ORIG_ACTIVE,
 } from '../components/widgets/paragraph/settings';
-import { paragraphStateGetFromLocalStorage } from '../components/helpers/store';
+import {
+  paragraphStateDeleteFromLocalStorage,
+  paragraphStateGetFromLocalStorage,
+} from '../components/helpers/store';
+
+export const resetCompressedParagraphState = (_id) => (dispatch) => {
+  dispatch({
+    type: types.TURNS_UPDATE_GEOMETRY,
+    payload: { compressedParagraphState: null, _id, compressedHeight: 0 },
+  });
+  // dispatch({
+  //   type: types.TURN_WAS_CHANGED,
+  //   payload: { _id },
+  // });
+  paragraphStateDeleteFromLocalStorage(_id);
+};
 
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
@@ -125,6 +140,7 @@ export const compressParagraph = () => (dispatch, getState) => {
       // height: activeTurn.compressedHeight
     })
   );
+
   dispatch(markTurnAsChanged({ _id: editTurnId }));
 };
 
@@ -151,6 +167,7 @@ export const unCompressParagraph = () => (dispatch, getState) => {
   //     paragraphIsReady: false,
   //   })
   //   );
+
   dispatch(markTurnAsChanged({ _id: editTurnId }));
 };
 
@@ -222,8 +239,11 @@ export const deleteTurn = (_id) => (dispatch, getState) => {
 
 export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   updateTurnRequest(turn._id, turn).then((data) => {
+    paragraphStateDeleteFromLocalStorage(turn._id);
     const preparedTurn = {
       ...data.item,
+      compressedHeight: 0,
+      compressedParagraphState: null,
       x: turn.x + zeroPoint.x,
       y: turn.y + zeroPoint.y,
     };

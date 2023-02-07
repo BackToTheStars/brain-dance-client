@@ -1,5 +1,5 @@
 import { isTurnInsideRenderArea } from '../components/helpers/sizeHelper';
-import turnSettings from '../settings';
+import turnSettings, { TURN_READY } from '../settings';
 import * as types from './types';
 
 const initialTurnsState = {
@@ -90,6 +90,8 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
               state.d[payload._id].paragraphStages,
               payload.paragraphStage
             ),
+            wasReady:
+              state.d[payload._id].wasReady || payload.stage === TURN_READY,
             ...payload,
             // @todo: id параграфа
           },

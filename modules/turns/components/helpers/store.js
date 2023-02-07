@@ -23,3 +23,7 @@ export const paragraphStateGetFromLocalStorage = (turnId) => {
   const res = localStorage.getItem(`compressedParagraphState_${turnId}`);
   return res ? JSON.parse(res) : null;
 };
+
+export const paragraphStateDeleteFromLocalStorage = (turnId) => {
+  localStorage.removeItem(`compressedParagraphState_${turnId}`);
+};

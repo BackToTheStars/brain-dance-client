@@ -46,6 +46,7 @@ const ParagraphOriginal = ({
     scrollPosition,
     width,
     height,
+    wasReady,
   } = turn;
 
   const stage = getParagraphStage(turn);
@@ -94,8 +95,13 @@ const ParagraphOriginal = ({
         getScrolledQuotes(quotes, paragraphEl, scrollTop)
       )
     );
-    dispatch(markTurnAsChanged({ _id: turnId }));
+
+    // dispatch(markTurnAsChanged({ _id: turnId }));
   }, [width]);
+
+  // useEffect(() => {
+
+  // }, [width, wasReady]);
 
   useEffect(() => {
     if (!quotesWithoutScroll.length) return;
@@ -107,6 +113,7 @@ const ParagraphOriginal = ({
         getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
       )
     );
+
     dispatch(markTurnAsChanged({ _id: turnId }));
   }, [height, scrollTop]); // stage, stateIsReady
   // @todo: нужно учитывать stage

@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import {
   changeTurnStage,
   markTurnAsChanged,
+  resetCompressedParagraphState,
   // setParagraphIsReady,
   updateGeometry,
 } from '../redux/actions';
@@ -378,6 +379,10 @@ const Turn = ({ id }) => {
       $(wrapper.current).resizable('destroy');
     };
   }, [widgets, turnStage]);
+
+  useEffect(() => {
+    dispatch(resetCompressedParagraphState(_id));
+  }, [width]);
 
   useEffect(() => {
     if (!wrapper.current) return;
