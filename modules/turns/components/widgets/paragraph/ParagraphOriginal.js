@@ -1,4 +1,7 @@
-import { PARAGRAPH_SCROLL_TIMEOUT_DELAY } from '@/config/ui';
+import {
+  PARAGRAPH_SCROLL_TIMEOUT_DELAY,
+  TURN_SCROLL_TIMEOUT_DELAY,
+} from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import {
@@ -29,6 +32,7 @@ import {
 // import { useTurnData } from '../contexts/TurnData';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
+const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
   setParagraphElCurrent,
@@ -106,15 +110,17 @@ const ParagraphOriginal = ({
   useEffect(() => {
     if (!quotesWithoutScroll.length) return;
     // обновляем только вертикальное расположение цитат
-    dispatch(
-      quoteCoordsUpdate(
-        turnId,
-        TYPE_QUOTE_TEXT,
-        getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
-      )
-    );
+    turnScrollQueue.add(() => {
+      dispatch(
+        quoteCoordsUpdate(
+          turnId,
+          TYPE_QUOTE_TEXT,
+          getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
+        )
+      );
 
-    dispatch(markTurnAsChanged({ _id: turnId }));
+      dispatch(markTurnAsChanged({ _id: turnId }));
+    });
   }, [height, scrollTop]); // stage, stateIsReady
   // @todo: нужно учитывать stage
 

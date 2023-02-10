@@ -120,11 +120,15 @@ export const updateGeometry = (data) => (dispatch) =>
 
 export const markTurnAsChanged =
   ({ _id }) =>
-  (dispatch) =>
-    dispatch({
+  (dispatch, getState) => {
+    const state = getState();
+    const turn = state.turns.d[_id];
+    if (turn.wasChanged) return;
+    return dispatch({
       type: types.TURN_WAS_CHANGED,
       payload: { _id },
     });
+  };
 
 export const compressParagraph = () => (dispatch, getState) => {
   const state = getState();

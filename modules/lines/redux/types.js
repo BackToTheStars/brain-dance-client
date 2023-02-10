@@ -1,7 +1,7 @@
-export const LINES_LOAD = 'lines_load';
-export const LINES_ADDED = 'lines_added';
-export const LINES_QUOTE_COORDS_UPDATE = 'lines_quote_coords_update';
-export const LINES_WITH_END_COORDS_UPDATE = 'lines_with_end_coords';
-export const LINE_DELETE = 'line_delete';
-export const LINES_DELETE = 'lines_delete';
-export const LINES_LOAD_TO_PASTE = 'lines_load_to_paste';
+export const LINES_LOAD = 'LINES_LOAD';
+export const LINES_ADDED = 'LINES_ADDED';
+export const LINES_QUOTE_COORDS_UPDATE = 'LINES_QUOTE_COORDS_UPDATE';
+export const LINES_WITH_END_COORDS_UPDATE = 'LINES_WITH_END_COORDS_UPDATE';
+export const LINE_DELETE = 'LINE_DELETE';
+export const LINES_DELETE = 'LINES_DELETE';
+export const LINES_LOAD_TO_PASTE = 'LINES_LOAD_TO_PASTE';

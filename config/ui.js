@@ -16,6 +16,7 @@ export const PARAGRAPH_SCROLL_TIMEOUT_DELAY = 500; // 40 - 25 изменений
 export const TURNS_GEOMETRY_TIMEOUT_DELAY = 40; // 25 изменений в секунду
 export const TURNS_POSITION_TIMEOUT_DELAY = 100; // 10 изменений в секунду
 export const WIDGET_PICTURE_CROP_TIMEOUT_DELAY = 500; // 2 изменения в секунду
+export const TURN_SCROLL_TIMEOUT_DELAY = 500;
 
 export const NOTIFICATION_SHOWTIME = 3000;
 export const NOTIFICATION_TRANSITION = 500;

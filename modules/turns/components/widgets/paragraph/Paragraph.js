@@ -3,6 +3,7 @@ import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { getQueue } from '../../helpers/queueHelper';
 import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';

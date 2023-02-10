@@ -6,6 +6,9 @@ import { getLineEnds, getLinesCoords } from './helpers/line';
 
 const LinesCalculator = () => {
   const lines = useSelector((store) => store.lines.lines);
+  const linesWithEndCoords = useSelector(
+    (store) => store.lines.linesWithEndCoords
+  );
   const quotesInfo = useSelector((store) => store.lines.quotesInfo);
   const turnsDictionary = useSelector((store) => store.turns.d);
   const gamePosition = useSelector((store) => store.game.position);
@@ -15,13 +18,16 @@ const LinesCalculator = () => {
 
   const pictureQuotesInfo = {};
   useEffect(() => {
-    const linesWithEndCoords = getLinesCoords(
+    const linesWithEndCoordsNew = getLinesCoords(
       lines,
       turnsToRender,
       turnsDictionary,
       quotesInfo,
       pictureQuotesInfo
     );
+
+    if (!linesWithEndCoordsNew.length && !linesWithEndCoords.length) return;
+
     dispatch(linesWithEndCoordsUpdate(linesWithEndCoords));
     // turnsDispatch({
     //   type: ACTION_RECALCULATE_LINES,
