@@ -1,6 +1,8 @@
 import { TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment } from 'react';
+import { useDispatch } from 'react-redux';
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 
 const ORANGE = '#ffd596';
 const GRAY = '#d2d3d4';
@@ -240,9 +242,12 @@ export const TextAroundQuoteOptimized = ({
   arrText,
   turnId,
   turnType,
+  deltaTop,
 }) => {
   //
   const paragraphEl = useRef(null);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // @todo: check if no quotes
@@ -271,8 +276,54 @@ export const TextAroundQuoteOptimized = ({
       // const { top, bottom } = quote.getBoundingClientRect();
       // }
       // console.log(middleLine, ' ', middleLineParagraph);
+
+      const quotesInfoPart = [];
+
+      for (let quote of quotes) {
+        const { top, left, width, height } = quote.getBoundingClientRect();
+        const quoteId = quote.getAttribute('data-id');
+        quotesInfoPart.push({
+          initialCoords: {
+            left,
+            top,
+            width,
+            height,
+          },
+          quoteId,
+          quoteKey: `${turnId}_${quoteId}`,
+          turnId,
+          text: 'some text should go here...',
+          type: 'text',
+          width,
+          height,
+          left,
+          // top: deltaTop + top,
+          top,
+          // position: 'bottom',
+        });
+      }
+      dispatch(quoteCoordsUpdate(turnId, 'text', quotesInfoPart));
+
+      //
     }, 300);
   }, []);
+
+  console.log({ arrText });
+
+  useEffect(() => {
+    // if (!quotesWithoutScroll.length) return;
+    // // обновляем только вертикальное расположение цитат
+    // turnScrollQueue.add(() => {
+    //   dispatch(
+    //     quoteCoordsUpdate(
+    //       turnId,
+    //       TYPE_QUOTE_TEXT,
+    //       getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
+    //     )
+    //   );
+    // dispatch(markTurnAsChanged({ _id: turnId }));
+    // });
+  }, [paragraphEl?.current?.scrollTop]);
 
   return (
     <div

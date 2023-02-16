@@ -8,6 +8,8 @@ export const calculateTextPiecesFromQuotes = (
   const textQuotesVerticalPositions = quotesWithCoords.map((quote) => ({
     top: quote.initialCoords.top + paragraphElCurrent.scrollTop, // - 40, // @todo: использовать положение параграфа
     height: quote.initialCoords.height,
+    left: quote.initialCoords.left,
+    width: quote.initialCoords.width,
   }));
 
   const createEmptyTextPiece = () => ({

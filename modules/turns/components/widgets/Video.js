@@ -1,3 +1,4 @@
+import { isDevMode } from '@/config/mode';
 import { widgetSpacer } from '@/config/ui';
 import { useEffect, useState, useRef } from 'react';
 import YouTube from 'react-youtube';
@@ -56,20 +57,32 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
       className="video"
       ref={videoEl}
     >
-      <YouTube
-        videoId={newVideoUrl}
-        onReady={
-          () => {}
-          // setTimeout(() => {
-          //   // @todo: убедиться, что iframe не только "готов", но и отрисован
-          //   handleResize();
-          // }, 1000)
-        }
-        opts={{
-          width: '100%',
-          height: '100%',
-        }}
-      ></YouTube>
+      {isDevMode ? (
+        <img
+          src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
+          style={{
+            display: 'block',
+            margin: '0 auto',
+            maxWidth: '100%',
+            maxHeight: '100%',
+          }}
+        />
+      ) : (
+        <YouTube
+          videoId={newVideoUrl}
+          onReady={
+            () => {}
+            // setTimeout(() => {
+            //   // @todo: убедиться, что iframe не только "готов", но и отрисован
+            //   handleResize();
+            // }, 1000)
+          }
+          opts={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      )}
     </div>
   );
 };

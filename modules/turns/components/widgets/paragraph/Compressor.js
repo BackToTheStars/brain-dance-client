@@ -369,7 +369,11 @@ const Compressor = ({
   const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
     console.log({ compressedTexts });
+
+    let deltaTop = 0;
+
     return compressedTexts.map((text, i) => {
+      deltaTop += text.height;
       return (
         <TextAroundQuoteOptimized
           key={i}
@@ -379,6 +383,7 @@ const Compressor = ({
           setTextIsReady={setTextIsReady}
           scrollPosition={text.scrollTop + text.delta}
           height={text.height}
+          deltaTop={deltaTop - text.height}
         />
       );
     });
