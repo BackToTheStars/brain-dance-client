@@ -1,4 +1,5 @@
 import { widgetSpacer } from '@/config/ui';
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import {
   increment,
   startLoggingTime,
@@ -63,6 +64,8 @@ const Compressor = ({
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
+  const [quoteCollection, setQuoteCollection] = useState([]);
+
   // console.log({
   //   turnId,
   //   width,
@@ -95,7 +98,27 @@ const Compressor = ({
 
   const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
 
+  const addToQuoteCollection = (quotesInfoPart, index) => {
+    setQuoteCollection((quoteCollection) => {
+      // callback потому что идём через useMemo, чтобы отвязаться от scope
+      const quoteCollectionCopy = [...quoteCollection];
+      quoteCollectionCopy[index] = quotesInfoPart;
+      return quoteCollectionCopy;
+    });
+  };
+
+  useEffect(() => {
+    if (!quoteCollection.length) return;
+    const count = quoteCollection.filter((q) => !!q).length;
+    if (count !== compressedTexts.length) return;
+    const quotesInfo = quoteCollection.reduce((acc, element) => {
+      return [...acc, ...element];
+    }, []);
+    dispatch(quoteCoordsUpdate(turnId, 'text', quotesInfo));
+  }, [quoteCollection]);
+
   // PARAGRAPH STAGE OF STATE MACHINE (same in ParagraphOriginal.js)
+
   useEffect(() => {
     dispatch(changeParagraphStage(turnId, COMP_LOADING));
     increment('CompressorInit');
@@ -376,6 +399,8 @@ const Compressor = ({
       deltaTop += text.height;
       return (
         <TextAroundQuoteOptimized
+          index={i}
+          addToQuoteCollection={addToQuoteCollection}
           key={i}
           arrText={text.paragraph || []}
           turnId={turnId}

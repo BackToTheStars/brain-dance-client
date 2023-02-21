@@ -8,7 +8,6 @@ const TextAroundQuote = ({
   // registerHandleResize,
   // unregisterHandleResize,
   // variableHeight,
-
   paragraph,
   scrollPosition,
   height, // через этот viewport смотрим на кусок текста

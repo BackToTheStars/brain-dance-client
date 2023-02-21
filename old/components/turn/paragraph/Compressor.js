@@ -1,4 +1,6 @@
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { Fragment, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useEffect } from 'react/cjs/react.development';
 import { useTurnContext } from '../../contexts/TurnContext';
 import { ParagraphTextWrapper } from '../ParagraphTextWrapper';
@@ -171,7 +173,6 @@ const Compressor = ({
                 // registerHandleResize,
                 // unregisterHandleResize,
                 // variableHeight,
-
                 paragraph: text.paragraph,
                 scrollPosition: text.scrollTop + text.delta,
                 // scrollPosition: text.scrollTop,

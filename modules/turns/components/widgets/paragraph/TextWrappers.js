@@ -1,6 +1,6 @@
-import { TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
+import { PARAGRAPH_TEXT_PADDING, TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
-import React, { useEffect, useRef, Fragment } from 'react';
+import React, { useEffect, useRef, Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 
@@ -243,9 +243,14 @@ export const TextAroundQuoteOptimized = ({
   turnId,
   turnType,
   deltaTop,
+  index,
+  addToQuoteCollection,
 }) => {
   //
   const paragraphEl = useRef(null);
+
+  const [scrollTop, setScrollTop] = useState(scrollPosition);
+  const [quotesInfoPart, setQuotesInfoPart] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -284,8 +289,8 @@ export const TextAroundQuoteOptimized = ({
         const quoteId = quote.getAttribute('data-id');
         quotesInfoPart.push({
           initialCoords: {
-            left,
-            top,
+            left: PARAGRAPH_TEXT_PADDING,
+            top: top + paragraphEl.current.scrollTop,
             width,
             height,
           },
@@ -296,13 +301,14 @@ export const TextAroundQuoteOptimized = ({
           type: 'text',
           width,
           height,
-          left,
+          left: PARAGRAPH_TEXT_PADDING,
           // top: deltaTop + top,
-          top,
+          top: top + paragraphEl.current.scrollTop,
           // position: 'bottom',
         });
       }
-      dispatch(quoteCoordsUpdate(turnId, 'text', quotesInfoPart));
+      setQuotesInfoPart(quotesInfoPart);
+      // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
 
       //
     }, 300);
@@ -311,19 +317,26 @@ export const TextAroundQuoteOptimized = ({
   console.log({ arrText });
 
   useEffect(() => {
-    // if (!quotesWithoutScroll.length) return;
-    // // обновляем только вертикальное расположение цитат
-    // turnScrollQueue.add(() => {
-    //   dispatch(
-    //     quoteCoordsUpdate(
-    //       turnId,
-    //       TYPE_QUOTE_TEXT,
-    //       getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
-    //     )
-    //   );
-    // dispatch(markTurnAsChanged({ _id: turnId }));
-    // });
-  }, [paragraphEl?.current?.scrollTop]);
+    if (!quotesInfoPart.length) return;
+    addToQuoteCollection(
+      quotesInfoPart.map((quoteInfo) => {
+        return { ...quoteInfo, top: quoteInfo.initialCoords.top - scrollTop };
+      }),
+      index
+    );
+  }, [scrollTop, quotesInfoPart]);
+
+  useEffect(() => {
+    if (!paragraphEl || !paragraphEl.current) return;
+    const scrollHandler = () => {
+      if (!!paragraphEl.current) {
+        setScrollTop(paragraphEl.current.scrollTop);
+      }
+    };
+    paragraphEl.current.addEventListener('scroll', scrollHandler);
+    return () =>
+      paragraphEl.current.removeEventListener('scroll', scrollHandler);
+  }, [paragraphEl]);
 
   return (
     <div
