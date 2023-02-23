@@ -393,7 +393,12 @@ const Compressor = ({
     increment('txt_compressor', { turnId, count: compressedTexts.length });
     console.log({ compressedTexts });
 
+    if (!wrapperRef?.current) return [];
+
     let deltaTop = 0;
+    const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
+
+    console.log({ widgetTop });
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;
@@ -409,6 +414,7 @@ const Compressor = ({
           scrollPosition={text.scrollTop + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
+          widgetTop={widgetTop}
         />
       );
     });
@@ -433,7 +439,7 @@ const Compressor = ({
     //     />
     //   );
     // });
-  }, [compressedTexts]);
+  }, [compressedTexts, wrapperRef, stageIsCompReady]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
     return <ParagraphCompressorTextWrapper arrText={paragraph} />;

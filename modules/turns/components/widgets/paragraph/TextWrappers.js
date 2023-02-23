@@ -243,6 +243,7 @@ export const TextAroundQuoteOptimized = ({
   turnId,
   turnType,
   deltaTop,
+  widgetTop,
   index,
   addToQuoteCollection,
 }) => {
@@ -314,13 +315,36 @@ export const TextAroundQuoteOptimized = ({
     }, 300);
   }, []);
 
-  console.log({ arrText });
-
   useEffect(() => {
     if (!quotesInfoPart.length) return;
+    const blockTop = widgetTop + deltaTop;
+    const blockBottom = widgetTop + deltaTop + height;
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
-        return { ...quoteInfo, top: quoteInfo.initialCoords.top - scrollTop };
+        const quoteTop = quoteInfo.top - scrollTop;
+        const quoteBottom = quoteInfo.top + quoteInfo.height - scrollTop;
+
+        const params = {};
+
+        if (quoteBottom < blockTop) {
+          params.height = 0;
+          params.top = blockTop + 1;
+        } else if (quoteTop < blockTop) {
+          params.top = blockTop + 1;
+          params.height = quoteBottom - blockTop;
+        } else if (quoteTop > blockBottom) {
+          params.top = blockBottom - 1;
+          params.height = 0;
+        } else if (quoteBottom > blockBottom) {
+          params.height = blockBottom - quoteTop;
+        } else {
+          params.top = quoteInfo.initialCoords.top - scrollTop;
+        }
+
+        return {
+          ...quoteInfo,
+          ...params,
+        };
       }),
       index
     );
