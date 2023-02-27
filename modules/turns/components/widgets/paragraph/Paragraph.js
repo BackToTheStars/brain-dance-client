@@ -16,7 +16,7 @@ const Paragraph = ({
   widgetId,
   // paragraphIsReady,
   // setParagraphIsReady,
-  height,
+  // height,
 }) => {
   // console.log('paragraph height');
   // console.log({ height });
@@ -67,9 +67,6 @@ const Paragraph = ({
             // } else if (!paragraphElCurrent) {
             //   return 0;
             // }
-            console.log({
-              maxHeight: paragraphElCurrent.scrollHeight + widgetSpacer + 5,
-            });
             return (
               // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
               // widgetSpacer +
@@ -116,23 +113,14 @@ const Paragraph = ({
         minHeight,
         maxHeight,
       }) => {
-        console.log('CHECK');
         // это для случая compressed
         if (compressedHeight) {
           return newHeight;
         } else {
           const resultHeight = minHeightBasic + widgetMinHeight;
           if (resultHeight >= minHeight && resultHeight <= maxHeight) {
-            console.log('returned', { resultHeight });
             return resultHeight;
           } else {
-            console.log({
-              minHeightBasic,
-              newHeight,
-              minHeight,
-              maxHeight,
-              resultHeight,
-            });
             return newHeight;
           }
         }
@@ -166,7 +154,7 @@ const Paragraph = ({
             setWrapperElCurrent,
             registerHandleResizeWithParams,
             // setParagraphIsReady,
-            height,
+            // height,
             // paragraphIsReady,
           }}
         />

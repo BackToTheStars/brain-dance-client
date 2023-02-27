@@ -3,7 +3,7 @@ import {
   compressParagraph,
   unCompressParagraph,
 } from '@/modules/turns/redux/actions';
-import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
+// import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit } from '../../../redux/actions';

@@ -6,7 +6,7 @@ import {
   stopLoggingTime,
 } from '@/modules/telemetry/utils/logger';
 import { changeParagraphStage } from '@/modules/turns/redux/actions';
-import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
+// import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
@@ -24,9 +24,6 @@ import {
   TextAroundQuote,
   TextAroundQuoteOptimized,
 } from './TextWrappers';
-// import { useTurnContext } from '../../contexts/TurnContext';
-// import { ParagraphTextWrapper } from '../ParagraphTextWrapper';
-// import TextAroundQuote from '../TextAroundQuote';
 
 const Compressor = ({
   turn,
@@ -37,7 +34,7 @@ const Compressor = ({
   setWrapperElCurrent,
   registerHandleResizeWithParams,
   // setParagraphIsReady,
-  height,
+  // height,
   // paragraphIsReady,
   // contentType,
   // backgroundColor,
@@ -66,29 +63,11 @@ const Compressor = ({
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  // console.log({
-  //   turnId,
-  //   width,
-  //   height,
-  //   originalParagraph,
-  //   y,
-  //   compressedTexts,
-  //   textsReadyCount,
-  //   compressedTextPieces,
-  // });
-
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
     ...paragraphItem,
   }));
   const wrapperRef = useRef(null); // @learn null это мы, undefined, это система
-
-  // let paragraphTop = y + 40; // @todo: верх виджета параграфа под header, picture
-  // if (wrapperRef?.current) {
-  //   const { top } = wrapperRef.current.getBoundingClientRect();
-  //   paragraphTop = top;
-  // }
-  // console.log({ paragraphTop })
 
   // @fixme: цитата делит одно слово на несколько слов
   // const words = paragraph
@@ -143,15 +122,12 @@ const Compressor = ({
         widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
       });
     } else {
-      // console.log({ wrapperRef, height, stage, turnId });
       const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-      // console.log({ quotes });
 
       const textPieces = calculateTextPiecesFromQuotes(
         quotes,
         wrapperRef?.current
       );
-      console.log({ quotes, textPieces });
 
       setCompressedTextPieces(textPieces);
 
@@ -363,10 +339,9 @@ const Compressor = ({
     if (!textsReadyCount) return;
     if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
-        dispatch(setCallsQueueIsBlocked(false));
+        // dispatch(setCallsQueueIsBlocked(false));
         // setParagraphIsReady(true);
         dispatch(changeParagraphStage(turnId, COMP_READY_TO_RECEIVE_PARAMS));
-        console.log('COMP_READY_TO_RECEIVE_PARAMS');
       }, 50);
     }
   }, [textsReadyCount, compressedTexts]);
@@ -391,14 +366,11 @@ const Compressor = ({
 
   const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
-    console.log({ compressedTexts });
 
     if (!wrapperRef?.current) return [];
 
     let deltaTop = 0;
     const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
-
-    console.log({ widgetTop });
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;

@@ -359,7 +359,7 @@ export const TextAroundQuoteOptimized = ({
     };
     paragraphEl.current.addEventListener('scroll', scrollHandler);
     return () =>
-      paragraphEl.current.removeEventListener('scroll', scrollHandler);
+      paragraphEl.current?.removeEventListener('scroll', scrollHandler);
   }, [paragraphEl]);
 
   return (

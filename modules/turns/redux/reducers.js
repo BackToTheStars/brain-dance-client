@@ -38,7 +38,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           turnsToRender.push(id);
         }
       }
-      console.log({ d, turnsToRender, payload });
       return {
         ...state,
         turns: payload.turns,
@@ -63,17 +62,17 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
         updateGeometryTime: new Date().getTime(),
       };
-    case types.TURN_PARAGRAPH_SET_IS_READY:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            paragraphIsReady: payload.value,
-          },
-        },
-      };
+    // case types.TURN_PARAGRAPH_SET_IS_READY:
+    //   return {
+    //     ...state,
+    //     d: {
+    //       ...state.d,
+    //       [payload._id]: {
+    //         ...state.d[payload._id],
+    //         paragraphIsReady: payload.value,
+    //       },
+    //     },
+    //   };
     case types.TURN_SET_STAGE:
       return {
         ...state,

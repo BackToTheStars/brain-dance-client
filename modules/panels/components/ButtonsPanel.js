@@ -15,7 +15,9 @@ import PictureQuoteActive from './buttons/picture/PictureQuoteActive';
 import PictureQuoteAdd from './buttons/picture/PictureQuoteAdd';
 
 export const Buttons = ({ buttons }) => {
-  const disabled = useSelector((state) => state.ui.callsQueueIsBlocked);
+  // const disabled = useSelector((state) => state.ui.callsQueueIsBlocked);
+  const disabled = false;
+
   const classNames = ['btn', 'btn-primary'];
   if (disabled) {
     classNames.push('disabled');

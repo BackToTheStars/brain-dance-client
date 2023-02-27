@@ -37,6 +37,6 @@ export const viewportGeometryUpdate =
     });
   };
 
-export const setCallsQueueIsBlocked = (value) => (dispatch) => {
-  dispatch({ type: types.SET_CALLS_QUEUE_IS_BLOCKED, payload: value });
-};
+// export const setCallsQueueIsBlocked = (value) => (dispatch) => {
+//   dispatch({ type: types.SET_CALLS_QUEUE_IS_BLOCKED, payload: value });
+// };

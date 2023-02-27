@@ -44,14 +44,12 @@ import Video from './widgets/Video';
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
-const getParagraphHeight = ({
+const getParagraphHeightOld = ({
   widgetId,
   widgetD,
-  height,
   compressed,
   paragraphIsReady,
   compressedHeight,
-  uncompressedHeight,
 }) => {
   const widget = widgetD[widgetId];
   if (!widget) return 0;
@@ -151,10 +149,7 @@ const Turn = ({ id }) => {
     date,
     //-- paragraph
     paragraph, // contentType, dontShowHeader
-    paragraphIsReady,
     compressed,
-    compressedHeight,
-    uncompressedHeight,
     //-- video
     videoUrl,
     //-- image
@@ -165,9 +160,9 @@ const Turn = ({ id }) => {
   const paragraphStage = getParagraphStage(turn);
   const turnStage = getTurnStage(turn);
 
-  const callsQueueIsBlockedFlag = useSelector(
-    (state) => state.ui.callsQueueIsBlocked
-  );
+  // const callsQueueIsBlockedFlag = useSelector(
+  //   (state) => state.ui.callsQueueIsBlocked
+  // );
 
   // const dispatchParagraphIsReady = (value) => {
   //   dispatch(setParagraphIsReady(_id, value));
@@ -228,16 +223,6 @@ const Turn = ({ id }) => {
       minHeightBasic,
     } = getTurnMinMaxHeight(widgets, width);
 
-    console.log({
-      minHeight,
-      maxHeight,
-      minWidth,
-      maxWidth,
-      widgetD,
-      desiredHeight,
-      minHeightBasic,
-    });
-
     let newHeight = Math.round(
       Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer // @todo: для компрессора проверить
     );
@@ -264,7 +249,7 @@ const Turn = ({ id }) => {
 
     const isLocked = // transition from compressed to uncompressed
       paragraphStage === ORIG_LOADING &&
-      turn.paragraphStages.slice(-3, -2)[0] === COMP_READY;
+      turn.paragraphStages.at(-3) === COMP_READY;
 
     if (!isLocked) {
       turnGeometryQueue.add(() => {
@@ -382,7 +367,7 @@ const Turn = ({ id }) => {
 
   useEffect(() => {
     dispatch(resetCompressedParagraphState(_id));
-  }, [width]);
+  }, [width]); // @todo: проверить, необходимо ли перенести это в Compressor
 
   useEffect(() => {
     if (!wrapper.current) return;
@@ -471,15 +456,13 @@ const Turn = ({ id }) => {
           widgetId="paragraph1"
           // paragraphIsReady={paragraphIsReady}
           // setParagraphIsReady={dispatchParagraphIsReady}
-          height={getParagraphHeight({
-            widgetId: 'paragraph1',
-            widgetD,
-            height,
-            compressed,
-            paragraphIsReady: paragraphStage === COMP_READY,
-            compressedHeight,
-            uncompressedHeight,
-          })}
+          // height={getParagraphHeight({
+          //   widgetId: 'paragraph1',
+          //   widgetD,
+          //   compressed,
+          //   paragraphIsReady: paragraphStage === COMP_READY,
+          //   compressedHeight,
+          // })}
         />
       )}
       {dontShowHeader && !!date && !!sourceUrl && (
@@ -490,74 +473,74 @@ const Turn = ({ id }) => {
     </div>
   );
 
-  return (
-    <div
-      ref={wrapper}
-      className={wrapperClasses.join(' ')}
-      style={wrapperStyles}
-    >
-      <Header
-        registerHandleResize={registerHandleResize}
-        // copyPasteActions={copyPasteActions}
-        {...{
-          header,
-          contentType,
-          backgroundColor,
-          fontColor,
-          dontShowHeader,
-          _id,
-          sourceUrl,
-          date,
-        }}
-      />
+  // return (
+  //   <div
+  //     ref={wrapper}
+  //     className={wrapperClasses.join(' ')}
+  //     style={wrapperStyles}
+  //   >
+  //     <Header
+  //       registerHandleResize={registerHandleResize}
+  //       // copyPasteActions={copyPasteActions}
+  //       {...{
+  //         header,
+  //         contentType,
+  //         backgroundColor,
+  //         fontColor,
+  //         dontShowHeader,
+  //         _id,
+  //         sourceUrl,
+  //         date,
+  //       }}
+  //     />
 
-      {/* <div className="top-spaceholder" /> */}
-      {!!videoUrl && (
-        <Video
-          videoUrl={videoUrl}
-          registerHandleResize={registerHandleResize}
-          width={width}
-        />
-      )}
-      {!!imageUrl && (
-        <Picture
-          imageUrl={imageUrl}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          widgetId="picture1"
-          widgetType="picture"
-          turnId={_id}
-          widgetSettings={widgetD['picture1']}
-          pictureOnly={pictureOnly}
-        />
-      )}
-      {doesParagraphExist && (
-        <Paragraph
-          turn={turn}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          // stateIsReady={stateIsReady}
-          widgetId="paragraph1"
-          // paragraphIsReady={paragraphIsReady}
-          // setParagraphIsReady={dispatchParagraphIsReady}
-          height={getParagraphHeight({
-            widgetId: 'paragraph1',
-            widgetD,
-            height,
-            compressed,
-            paragraphIsReady: paragraphStage === COMP_READY,
-            compressedHeight,
-            uncompressedHeight,
-          })}
-        />
-      )}
-      {dontShowHeader && !!date && !!sourceUrl && (
-        <div className="bottom-date-and-sourceurl">
-          <DateAndSourceUrl {...{ date, sourceUrl }} />
-        </div>
-      )}
-    </div>
-  );
+  //     {/* <div className="top-spaceholder" /> */}
+  //     {!!videoUrl && (
+  //       <Video
+  //         videoUrl={videoUrl}
+  //         registerHandleResize={registerHandleResize}
+  //         width={width}
+  //       />
+  //     )}
+  //     {!!imageUrl && (
+  //       <Picture
+  //         imageUrl={imageUrl}
+  //         registerHandleResize={registerHandleResize}
+  //         unregisterHandleResize={unregisterHandleResize}
+  //         widgetId="picture1"
+  //         widgetType="picture"
+  //         turnId={_id}
+  //         widgetSettings={widgetD['picture1']}
+  //         pictureOnly={pictureOnly}
+  //       />
+  //     )}
+  //     {doesParagraphExist && (
+  //       <Paragraph
+  //         turn={turn}
+  //         registerHandleResize={registerHandleResize}
+  //         unregisterHandleResize={unregisterHandleResize}
+  //         // stateIsReady={stateIsReady}
+  //         widgetId="paragraph1"
+  //         // paragraphIsReady={paragraphIsReady}
+  //         // setParagraphIsReady={dispatchParagraphIsReady}
+  //         height={getParagraphHeight({
+  //           widgetId: 'paragraph1',
+  //           widgetD,
+  //           height,
+  //           compressed,
+  //           paragraphIsReady: paragraphStage === COMP_READY,
+  //           compressedHeight,
+  //           uncompressedHeight,
+  //         })}
+  //       />
+  //     )}
+  //     {dontShowHeader && !!date && !!sourceUrl && (
+  //       <div className="bottom-date-and-sourceurl">
+  //         <DateAndSourceUrl {...{ date, sourceUrl }} />
+  //       </div>
+  //     )}
+  //   </div>
+  // );
 };
 
 export default Turn;
