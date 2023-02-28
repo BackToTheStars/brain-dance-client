@@ -2,18 +2,19 @@ import { widgetSpacer } from '@/config/ui';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
 
 const Paragraph = ({
-  turn,
+  turnId,
   registerHandleResize,
   unregisterHandleResize,
   // stateIsReady,
   widgetId,
+  widget,
   // paragraphIsReady,
   // setParagraphIsReady,
   // height,
@@ -21,11 +22,15 @@ const Paragraph = ({
   // console.log('paragraph height');
   // console.log({ height });
 
-  const { _id, compressed } = turn;
+  console.log({ widget });
 
-  const [compressedHeight, setCompressedHeight] = useState(
-    turn.compressedHeight
+  const compressed = useSelector((state) => state.turns.d[turnId].compressed);
+  const turnCompressedHeight = useSelector(
+    (state) => state.turns.d[turnId].compressedHeight
   );
+
+  const [compressedHeight, setCompressedHeight] =
+    useState(turnCompressedHeight);
 
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
   const [wrapperElCurrent, setWrapperElCurrent] = useState(null);
@@ -147,7 +152,8 @@ const Paragraph = ({
       {compressed ? (
         <Compressor
           {...{
-            turn,
+            turnId,
+            widget,
             compressedHeight,
             setCompressedHeight,
             // stateIsReady,
@@ -161,14 +167,14 @@ const Paragraph = ({
       ) : (
         <ParagraphOriginal
           {...{
-            turn,
+            turnId,
             setParagraphElCurrent,
             // stateIsReady,
             // setParagraphIsReady,
           }}
         />
       )}
-      <ParagraphQuotes turnId={_id} />
+      <ParagraphQuotes turnId={turnId} />
       <a
         className="widget-button"
         href="#"
@@ -177,7 +183,7 @@ const Paragraph = ({
           dispatch(
             setPanelMode({
               mode: MODE_WIDGET_PARAGRAPH,
-              params: { editTurnId: _id, editWidgetId: widgetId },
+              params: { editTurnId: turnId, editWidgetId: widgetId },
             })
           );
         }}

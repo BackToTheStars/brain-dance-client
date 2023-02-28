@@ -9,6 +9,7 @@ import { changeParagraphStage } from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
 import { getParagraphStage } from '../../helpers/stageHelper';
@@ -26,7 +27,8 @@ import {
 } from './TextWrappers';
 
 const Compressor = ({
-  turn,
+  turnId,
+  widget,
   // textPieces: compressedTextPieces,
   // compressedHeight,
   setCompressedHeight,
@@ -47,9 +49,9 @@ const Compressor = ({
 }) => {
   //
   // const { turn } = useTurnContext();
+  const turn = useSelector((state) => state.turns.d[turnId]);
   const dispatch = useDispatch();
   const {
-    _id: turnId,
     width,
     paragraph: originalParagraph,
     y,
@@ -62,6 +64,8 @@ const Compressor = ({
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
+
+  console.log({ compressedTexts, compressedTextPieces });
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -367,10 +371,10 @@ const Compressor = ({
   const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
 
-    if (!wrapperRef?.current) return [];
+    // if (!wrapperRef?.current) return [];
 
     let deltaTop = 0;
-    const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
+    // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;
@@ -386,7 +390,9 @@ const Compressor = ({
           scrollPosition={text.scrollTop + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
-          widgetTop={widgetTop}
+          widgetTop={widget?.minTop}
+          widgetWidth={widget?.width}
+          quotes={text.quotes}
         />
       );
     });
@@ -411,7 +417,8 @@ const Compressor = ({
     //     />
     //   );
     // });
-  }, [compressedTexts, wrapperRef, stageIsCompReady]);
+    // }, [compressedTexts, wrapperRef, stageIsCompReady]);
+  }, [compressedTexts, widget]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
     return <ParagraphCompressorTextWrapper arrText={paragraph} />;

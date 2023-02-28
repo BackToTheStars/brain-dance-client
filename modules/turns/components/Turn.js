@@ -449,11 +449,12 @@ const Turn = ({ id }) => {
       )}
       {doesParagraphExist && (
         <Paragraph
-          turn={turn}
+          turnId={_id}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
           // stateIsReady={stateIsReady}
           widgetId="paragraph1"
+          widget={widgetD['paragraph1']}
           // paragraphIsReady={paragraphIsReady}
           // setParagraphIsReady={dispatchParagraphIsReady}
           // height={getParagraphHeight({

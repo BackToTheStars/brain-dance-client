@@ -11,7 +11,7 @@ import {
 } from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import {
   getParagraphQuotesWithoutScroll,
@@ -37,9 +37,10 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 const ParagraphOriginal = ({
   setParagraphElCurrent,
   // stateIsReady,
-  turn,
+  turnId,
   // setParagraphIsReady,
 }) => {
+  const turn = useSelector((state) => state.turns.d[turnId]);
   const {
     compressed,
     paragraph,

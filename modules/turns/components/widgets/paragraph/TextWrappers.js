@@ -242,10 +242,12 @@ export const TextAroundQuoteOptimized = ({
   arrText,
   turnId,
   turnType,
-  deltaTop,
-  widgetTop,
   index,
   addToQuoteCollection,
+  deltaTop,
+  widgetTop,
+  widgetWidth,
+  quotes,
 }) => {
   //
   const paragraphEl = useRef(null);
@@ -258,61 +260,61 @@ export const TextAroundQuoteOptimized = ({
   useEffect(() => {
     // @todo: check if no quotes
     // paragraphEl.current.scrollTop = scrollPosition;
-    setTimeout(() => {
-      if (!paragraphEl?.current) return;
-      paragraphEl.current.scrollTop = scrollPosition;
-      const quotes = [
-        ...paragraphEl.current.querySelectorAll('.compressed-quote'),
-      ];
-      if (!quotes?.length) {
-        console.log('no quotes in TextAroundQuote');
-        return;
-      }
+    // setTimeout(() => {
+    // if (!paragraphEl?.current) return;
+    // paragraphEl.current.scrollTop = scrollPosition;
+    // const quotes = [
+    //   ...paragraphEl.current.querySelectorAll('.compressed-quote'),
+    // ];
+    if (!quotes?.length) {
+      console.log('no quotes in TextAroundQuote');
+      return;
+    }
 
-      const { top } = quotes[0].getBoundingClientRect();
-      const { bottom } = quotes[quotes.length - 1].getBoundingClientRect();
-      const middleLine = (top + bottom) / 2;
-      const { top: paragraphTop, bottom: paragraphBottom } =
-        paragraphEl.current.getBoundingClientRect();
-      const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
-      const fixScroll = Math.floor(middleLineParagraph - middleLine);
-      paragraphEl.current.scrollTop -= fixScroll;
-      setTextIsReady();
-      // for (let quote of quotes) {
-      // const { top, bottom } = quote.getBoundingClientRect();
-      // }
-      // console.log(middleLine, ' ', middleLineParagraph);
+    const { top } = quotes[0].top;
+    const lastQuote = quotes.at(-1);
+    const { bottom } = lastQuote.top + lastQuote.height;
+    const middleLine = (top + bottom) / 2;
+    const paragraphTop = widgetTop + deltaTop; // + turn.y?
+    const paragraphBottom = paragraphTop + height;
+    const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
+    const fixScroll = Math.floor(middleLineParagraph - middleLine);
+    paragraphEl.current.scrollTop -= fixScroll;
+    // for (let quote of quotes) {
+    // const { top, bottom } = quote.getBoundingClientRect();
+    // }
+    // console.log(middleLine, ' ', middleLineParagraph);
 
-      const quotesInfoPart = [];
+    const quotesInfoPart = [];
 
-      for (let quote of quotes) {
-        const { top, left, width, height } = quote.getBoundingClientRect();
-        const quoteId = quote.getAttribute('data-id');
-        quotesInfoPart.push({
-          initialCoords: {
-            left: PARAGRAPH_TEXT_PADDING,
-            top: top + paragraphEl.current.scrollTop,
-            width,
-            height,
-          },
-          quoteId,
-          quoteKey: `${turnId}_${quoteId}`,
-          turnId,
-          text: 'some text should go here...',
-          type: 'text',
+    for (let quote of quotes) {
+      const { top, left, width, height } = quote;
+      quotesInfoPart.push({
+        initialCoords: {
+          left: PARAGRAPH_TEXT_PADDING,
+          top: top + paragraphEl.current.scrollTop,
           width,
           height,
-          left: PARAGRAPH_TEXT_PADDING,
-          // top: deltaTop + top,
-          top: top + paragraphEl.current.scrollTop,
-          // position: 'bottom',
-        });
-      }
-      setQuotesInfoPart(quotesInfoPart);
-      // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
+        },
+        quoteId: quote.quoteId,
+        quoteKey: quote.quoteKey,
+        turnId,
+        text: quote.text,
+        type: 'text',
+        width,
+        height,
+        left: PARAGRAPH_TEXT_PADDING,
+        // top: deltaTop + top,
+        top: top + paragraphEl.current.scrollTop,
+        // position: 'bottom',
+      });
+    }
+    setQuotesInfoPart(quotesInfoPart);
+    // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
 
-      //
-    }, 300);
+    setTextIsReady();
+    //
+    // }, 300);
   }, []);
 
   useEffect(() => {

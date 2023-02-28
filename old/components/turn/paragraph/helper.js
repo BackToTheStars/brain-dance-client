@@ -10,6 +10,9 @@ export const calculateTextPiecesFromQuotes = (
     height: quote.initialCoords.height,
     left: quote.initialCoords.left,
     width: quote.initialCoords.width,
+    quoteId: quote.quoteId,
+    quoteKey: quote.quoteKey,
+    text: quote.text,
   }));
 
   const createEmptyTextPiece = () => ({
