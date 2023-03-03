@@ -1,4 +1,8 @@
-import { PARAGRAPH_TEXT_PADDING, TURN_QUOTE_BORDER_RADIUS } from '@/config/ui';
+import {
+  PARAGRAPH_TEXT_PADDING,
+  TURN_QUOTE_BORDER_RADIUS,
+  widgetSpacer,
+} from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -245,6 +249,7 @@ export const TextAroundQuoteOptimized = ({
   index,
   addToQuoteCollection,
   deltaTop,
+  deltaScrollHeightTop,
   widgetTop,
   widgetWidth,
   quotes,
@@ -252,17 +257,26 @@ export const TextAroundQuoteOptimized = ({
   //
   const paragraphEl = useRef(null);
 
-  const [scrollTop, setScrollTop] = useState(scrollPosition);
+  const [scrollTop, setScrollTop] = useState(0);
   const [quotesInfoPart, setQuotesInfoPart] = useState([]);
 
-  const dispatch = useDispatch();
+  console.log({
+    deltaTop,
+    widgetTop,
+    widgetWidth,
+    quotes,
+    scrollTop,
+    quotesInfoPart,
+  });
+
+  // const dispatch = useDispatch();
 
   useEffect(() => {
     // @todo: check if no quotes
     // paragraphEl.current.scrollTop = scrollPosition;
     // setTimeout(() => {
-    // if (!paragraphEl?.current) return;
-    // paragraphEl.current.scrollTop = scrollPosition;
+    if (!paragraphEl?.current) return;
+    paragraphEl.current.scrollTop = scrollPosition;
     // const quotes = [
     //   ...paragraphEl.current.querySelectorAll('.compressed-quote'),
     // ];
@@ -271,15 +285,26 @@ export const TextAroundQuoteOptimized = ({
       return;
     }
 
-    const { top } = quotes[0].top;
+    const top = quotes[0].top;
     const lastQuote = quotes.at(-1);
-    const { bottom } = lastQuote.top + lastQuote.height;
+    const bottom = lastQuote.top + lastQuote.height;
     const middleLine = (top + bottom) / 2;
     const paragraphTop = widgetTop + deltaTop; // + turn.y?
     const paragraphBottom = paragraphTop + height;
     const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
     const fixScroll = Math.floor(middleLineParagraph - middleLine);
-    paragraphEl.current.scrollTop -= fixScroll;
+    console.log({
+      paragraphTop,
+      paragraphBottom,
+      top,
+      bottom,
+    });
+    console.log({
+      scrollTop: paragraphEl.current.scrollTop,
+      fixScroll,
+      scrollPosition,
+    });
+    // paragraphEl.current.scrollTop -= fixScroll;
     // for (let quote of quotes) {
     // const { top, bottom } = quote.getBoundingClientRect();
     // }
@@ -291,8 +316,8 @@ export const TextAroundQuoteOptimized = ({
       const { top, left, width, height } = quote;
       quotesInfoPart.push({
         initialCoords: {
-          left: PARAGRAPH_TEXT_PADDING,
-          top: top + paragraphEl.current.scrollTop,
+          left: left, // + PARAGRAPH_TEXT_PADDING,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, // + paragraphEl.current.scrollTop,
           width,
           height,
         },
@@ -303,24 +328,33 @@ export const TextAroundQuoteOptimized = ({
         type: 'text',
         width,
         height,
-        left: PARAGRAPH_TEXT_PADDING,
+        left: left, // + PARAGRAPH_TEXT_PADDING,
         // top: deltaTop + top,
-        top: top + paragraphEl.current.scrollTop,
+        top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, // + paragraphEl.current.scrollTop,
         // position: 'bottom',
       });
     }
+    // console.log({
+    //   top,
+    //   widgetTop,
+    //   deltaTop,
+    //   deltaScrollHeightTop,
+    //   widgetSpacer,
+    // });
+
     setQuotesInfoPart(quotesInfoPart);
     // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
 
     setTextIsReady();
+    // setScrollTop(scrollPosition);
     //
     // }, 300);
-  }, []);
+  }, [paragraphEl]);
 
   useEffect(() => {
     if (!quotesInfoPart.length) return;
-    const blockTop = widgetTop + deltaTop;
-    const blockBottom = widgetTop + deltaTop + height;
+    const blockTop = widgetTop + deltaTop + widgetSpacer;
+    const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
         const quoteTop = quoteInfo.top - scrollTop;

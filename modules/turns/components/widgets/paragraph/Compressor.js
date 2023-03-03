@@ -65,7 +65,7 @@ const Compressor = ({
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  console.log({ compressedTexts, compressedTextPieces });
+  // console.log({ compressedTexts, compressedTextPieces });
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -371,13 +371,15 @@ const Compressor = ({
   const textsAroundQuotes = useMemo(() => {
     increment('txt_compressor', { turnId, count: compressedTexts.length });
 
-    // if (!wrapperRef?.current) return [];
+    if (!widget) return [];
 
     let deltaTop = 0;
+    let deltaScrollHeightTop = 0;
     // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;
+      deltaScrollHeightTop += text.scrollHeight;
       return (
         <TextAroundQuoteOptimized
           index={i}
@@ -387,10 +389,11 @@ const Compressor = ({
           turnId={turnId}
           turnType={contentType}
           setTextIsReady={setTextIsReady}
-          scrollPosition={text.scrollTop + text.delta}
+          scrollPosition={text.scrollTop} // + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
-          widgetTop={widget?.minTop}
+          deltaScrollHeightTop={deltaScrollHeightTop - text.scrollHeight}
+          widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
           widgetWidth={widget?.width}
           quotes={text.quotes}
         />

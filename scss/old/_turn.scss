@@ -25,7 +25,7 @@ $black-color: rgb(0, 0, 0);
 .wrapperParagraphText {
   padding: 0 $turn-scrollbar-margin 0 0;
   display: block;
-  overflow-y: scroll;
+  overflow-y: hidden; //scroll;
   background: $turn-main-color;
   margin: 0;
   border-top-left-radius: $turn-upper-corners-radius;
