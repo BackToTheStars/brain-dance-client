@@ -249,6 +249,7 @@ export const TextAroundQuoteOptimized = ({
   index,
   addToQuoteCollection,
   deltaTop,
+  delta,
   deltaScrollHeightTop,
   widgetTop,
   widgetWidth,
@@ -317,7 +318,13 @@ export const TextAroundQuoteOptimized = ({
       quotesInfoPart.push({
         initialCoords: {
           left: left, // + PARAGRAPH_TEXT_PADDING,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, // + paragraphEl.current.scrollTop,
+          top:
+            top +
+            widgetTop +
+            deltaTop -
+            deltaScrollHeightTop +
+            widgetSpacer +
+            delta, // + paragraphEl.current.scrollTop,
           width,
           height,
         },
@@ -330,7 +337,13 @@ export const TextAroundQuoteOptimized = ({
         height,
         left: left, // + PARAGRAPH_TEXT_PADDING,
         // top: deltaTop + top,
-        top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, // + paragraphEl.current.scrollTop,
+        top:
+          top +
+          widgetTop +
+          deltaTop -
+          deltaScrollHeightTop +
+          widgetSpacer +
+          delta, // + paragraphEl.current.scrollTop,
         // position: 'bottom',
       });
     }
@@ -357,7 +370,7 @@ export const TextAroundQuoteOptimized = ({
     const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
-        const quoteTop = quoteInfo.top - scrollTop;
+        const quoteTop = quoteInfo.initialCoords.top - scrollTop;
         const quoteBottom = quoteInfo.top + quoteInfo.height - scrollTop;
 
         const params = {};
@@ -372,9 +385,10 @@ export const TextAroundQuoteOptimized = ({
           params.top = blockBottom - 1;
           params.height = 0;
         } else if (quoteBottom > blockBottom) {
+          params.top = quoteTop;
           params.height = blockBottom - quoteTop;
         } else {
-          params.top = quoteInfo.initialCoords.top - scrollTop;
+          params.top = quoteTop;
         }
 
         return {

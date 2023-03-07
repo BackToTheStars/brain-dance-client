@@ -96,7 +96,6 @@ export const calculateTextPiecesFromQuotes = (
     textPiece.viewportTop = top - freeSpaceRequired;
     textPiece.scrollTop = textPiece.viewportTop - textPiece.top;
   }
-
   return textPieces;
 };
 

@@ -255,6 +255,7 @@ const Compressor = ({
           if (textPieces[textPieceIndex + 1].top < maxHeightPlusTop) {
             textPieceIndex += 1;
             textPieces[textPieceIndex].startLettersCount = lettersCount;
+            console.log({ span });
             textPieces[textPieceIndex].delta =
               maxHeightPlusTop - textPieces[textPieceIndex].top;
           }
@@ -392,6 +393,7 @@ const Compressor = ({
           scrollPosition={text.scrollTop} // + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
+          delta={text.delta}
           deltaScrollHeightTop={deltaScrollHeightTop - text.scrollHeight}
           widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
           widgetWidth={widget?.width}
