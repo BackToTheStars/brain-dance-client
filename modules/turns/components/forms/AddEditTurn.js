@@ -272,6 +272,14 @@ const AddEditTurnPopup = () => {
 
   return (
     <>
+      <button
+        onClick={() => {
+          debugger;
+          console.log(quillConstants.quill.editor.getText());
+        }}
+      >
+        get text
+      </button>
       <div
         className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
