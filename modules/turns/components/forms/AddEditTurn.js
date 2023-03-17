@@ -16,6 +16,7 @@ import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Switch } from 'antd';
 import moment from 'moment';
+import { cleanText } from '../helpers/textHelper';
 
 const {
   settings,
@@ -272,14 +273,6 @@ const AddEditTurnPopup = () => {
 
   return (
     <>
-      <button
-        onClick={() => {
-          debugger;
-          console.log(quillConstants.quill.editor.getText());
-        }}
-      >
-        get text
-      </button>
       <div
         className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
@@ -420,6 +413,21 @@ const AddEditTurnPopup = () => {
             >
               Cancel
             </button>
+
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                const cleanedText = cleanText(
+                  quillConstants.quill.editor.getText(0, Infinity)
+                );
+                quillConstants.quill.setText(cleanedText);
+                console.log({ cleanedText });
+                console.log(quillConstants.quill.editor);
+              }}
+            >
+              Format
+            </button>
+
             <div className="flex-1" />
             <button
               className="btn btn-primary"

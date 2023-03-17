@@ -1,8 +1,10 @@
 import Quill from 'quill';
 const colorModule = Quill.import('attributors/class/color');
+const Delta = Quill.import('delta');
 // @todo: refactoring
 
 Quill.register(colorModule, true);
+Quill.register(Delta, true);
 
 const getQuill = (containerSelector, toolbarSelector) => {
   const quill = new Quill(containerSelector, {
@@ -20,6 +22,11 @@ const getQuill = (containerSelector, toolbarSelector) => {
     },
     placeholder: 'Compose an epic...',
     theme: 'snow',
+  });
+
+  quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+    const ops = delta.ops.map((op) => ({ insert: op.insert }));
+    return new Delta(ops);
   });
 
   const getQuillTextArr = () => {

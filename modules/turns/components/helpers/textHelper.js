@@ -1,14 +1,6 @@
-const path = require('path');
-const fs = require('fs');
-
-const filePath = path.join(__dirname, './text.txt');
-
-const text = fs.readFileSync(filePath, 'utf8');
-// ([a-zA-Z0-9()]{1,}){1,}\.(ru|com|net|org|eu)
-
 const MARKER = '~^@~';
 
-const format = (text) => {
+export const cleanText = (text) => {
   const text1 = text
     .replaceAll(/(\n|\r\n)\s/gm, MARKER)
     .replaceAll(/(\n|\r\n)/gm, ' ')
@@ -27,5 +19,3 @@ const format = (text) => {
 
   return text1;
 };
-
-console.log(format(text));
