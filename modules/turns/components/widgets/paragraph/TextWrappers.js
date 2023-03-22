@@ -97,6 +97,56 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
     ? !!textItem.attributes.background
     : false;
 
+  // console.log(newInserts);
+
+  const links = isItQuote
+    ? newInserts
+    : newInserts.map((element) => {
+        if (typeof element !== 'string') return element;
+        const iterator = element.matchAll(
+          /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/gm,
+          '<a href="$&" target="_blank">$&</a>'
+        );
+        const matches = [];
+        for (const item of iterator) {
+          matches.push(item);
+        }
+        if (matches.length === 0) return element;
+        console.log({ element, matches });
+        const items = [];
+        let startPosition = 0;
+        for (const match of matches) {
+          if (match.index > startPosition)
+            items.push({
+              value: element.slice(startPosition, match.index),
+              type: 'text',
+            });
+          const value =
+            match[0].at(-1) === '.' ? match[0].slice(0, -1) : match[0];
+          items.push({ value, type: 'link' });
+          startPosition = match.index + value.length;
+        }
+        if (startPosition < element.length) {
+          items.push({ value: element.slice(startPosition), type: 'text' });
+        }
+        // console.log(items);
+        // [{
+        //   value: 'Я пишу про ',
+        //   type: 'text',
+        // }, {
+        //   value: 'https://google.com',
+        //   type: 'link',
+        // }]
+        return items.map((item) => {
+          if (item.type === 'text') return item.value;
+          return (
+            <a href={item.value} target="_blank">
+              {item.value}
+            </a>
+          );
+        });
+      });
+
   return (
     <span
       style={textItem.attributes}
@@ -104,7 +154,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
       className={isItQuote && compressed ? 'compressed-quote' : ''}
       // ref={spanFragment}
     >
-      {newInserts}
+      {links}
     </span>
   );
 };
