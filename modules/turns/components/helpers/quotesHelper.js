@@ -80,7 +80,7 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
     const initialCoords = {
       left,
-      top: top + paragraphEl.current.scrollTop,
+      top: top, // + paragraphEl.current.scrollTop,
       width,
       height,
     };

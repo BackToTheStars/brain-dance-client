@@ -127,6 +127,7 @@ const Compressor = ({
       });
     } else {
       const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+      console.log({ quotes });
 
       const textPieces = calculateTextPiecesFromQuotes(
         quotes,
@@ -377,10 +378,12 @@ const Compressor = ({
     let deltaTop = 0;
     let deltaScrollHeightTop = 0;
     // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
+    let newDeltaScrollHightTop = 0;
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;
       deltaScrollHeightTop += text.scrollHeight;
+      // newDeltaScrollHightTop = text.height - text.scrollHeight
       return (
         <TextAroundQuoteOptimized
           index={i}
@@ -395,9 +398,11 @@ const Compressor = ({
           deltaTop={deltaTop - text.height}
           delta={text.delta}
           deltaScrollHeightTop={deltaScrollHeightTop - text.scrollHeight}
+          scrollHeight={text.scrollHeight}
           widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
           widgetWidth={widget?.width}
           quotes={text.quotes}
+          // newDeltaScrollHightTop={newDeltaScrollHightTop}
         />
       );
     });

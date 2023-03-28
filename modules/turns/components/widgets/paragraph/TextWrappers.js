@@ -4,9 +4,10 @@ import {
   widgetSpacer,
 } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
-import React, { useEffect, useRef, Fragment, useState } from 'react';
+import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { createTextAroundQuotesObject } from '../../helpers/paragraph/TextAroundQuotesClass';
 
 const ORANGE = '#ffd596';
 const GRAY = '#d2d3d4';
@@ -304,21 +305,30 @@ export const TextAroundQuoteOptimized = ({
   widgetTop,
   widgetWidth,
   quotes,
+  scrollHeight,
 }) => {
   //
   const paragraphEl = useRef(null);
 
   const [scrollTop, setScrollTop] = useState(0);
   const [quotesInfoPart, setQuotesInfoPart] = useState([]);
+  const textAroundQuoteObj = useMemo(() => {
+    return createTextAroundQuotesObject({
+      turnId,
+      index,
+      originalQuotes: quotes,
+    });
+  }, []);
 
-  console.log({
-    deltaTop,
-    widgetTop,
-    widgetWidth,
-    quotes,
-    scrollTop,
-    quotesInfoPart,
-  });
+  // console.log({
+  //   deltaTop,
+  //   widgetTop,
+  //   widgetWidth,
+  //   quotes,
+  //   scrollTop,
+  //   quotesInfoPart,
+  // });
+  console.log({ quotes, height, scrollHeight });
 
   // const dispatch = useDispatch();
 
