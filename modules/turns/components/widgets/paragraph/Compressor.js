@@ -65,7 +65,7 @@ const Compressor = ({
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  // console.log({ compressedTexts, compressedTextPieces });
+  console.log({ compressedTexts, compressedTextPieces });
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -127,13 +127,13 @@ const Compressor = ({
       });
     } else {
       const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-      console.log({ quotes });
+      // console.log({ quotes });
 
       const textPieces = calculateTextPiecesFromQuotes(
         quotes,
         wrapperRef?.current
       );
-
+      console.log({ textPieces });
       setCompressedTextPieces(textPieces);
 
       const widgetMinHeight = textPieces.reduce(
@@ -379,6 +379,8 @@ const Compressor = ({
     let deltaScrollHeightTop = 0;
     // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
     let newDeltaScrollHightTop = 0;
+
+    console.log({ compressedTexts });
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;

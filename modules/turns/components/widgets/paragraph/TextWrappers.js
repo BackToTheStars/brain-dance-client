@@ -317,6 +317,12 @@ export const TextAroundQuoteOptimized = ({
       turnId,
       index,
       originalQuotes: quotes,
+      widgetCoords: {
+        left: 0,
+        top: widgetTop,
+      },
+      originalMiniParagraphTop: deltaScrollHeightTop,
+      realMiniParagraphTop: deltaTop,
     });
   }, []);
 
