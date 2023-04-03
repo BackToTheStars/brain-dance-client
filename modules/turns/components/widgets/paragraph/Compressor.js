@@ -133,7 +133,7 @@ const Compressor = ({
         quotes,
         wrapperRef?.current
       );
-      console.log({ textPieces });
+      // console.log({ textPieces });
       setCompressedTextPieces(textPieces);
 
       const widgetMinHeight = textPieces.reduce(
