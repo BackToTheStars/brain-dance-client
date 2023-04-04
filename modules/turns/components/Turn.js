@@ -40,6 +40,7 @@ import {
 } from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
+import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -181,6 +182,13 @@ const Turn = ({ id }) => {
 
   if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {
     wrapperStyles.backgroundColor = backgroundColor;
+  }
+
+  const { isDeveloperModeActive, setDevItem } = useDevPanel();
+
+  if (isDeveloperModeActive) {
+    setDevItem('turn', _id, { x, y, w: width, h: height }, 'window', '0');
+    // setDevItem = (itemType, id, params, parentType, parentId) => {
   }
 
   const registerHandleResize = useCallback(

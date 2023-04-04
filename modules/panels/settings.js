@@ -39,6 +39,8 @@ export const PANEL_NOTIFICATIONS = 'panel_notifications';
 export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
 export const PANEL_TURNS_PASTE = 'panel_turns_paste';
+export const PANEL_DEVELOPER_MODE = 'panel_developer_mode';
+
 
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
@@ -145,6 +147,15 @@ export const panels = [
     type: PANEL_TURNS_PASTE,
     position: POSITION_BOTTOM_CENTER,
     component: PasteTurnPanel,
+    isDisplayed: false,
+    id: (id += 1),
+    width: () => `50vw`,
+  },
+  
+  {
+    type: PANEL_DEVELOPER_MODE,
+    position: POSITION_BOTTOM_CENTER,
+    component: () => { return null },
     isDisplayed: false,
     id: (id += 1),
     width: () => `50vw`,
