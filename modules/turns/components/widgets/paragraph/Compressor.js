@@ -25,10 +25,12 @@ import {
   TextAroundQuote,
   TextAroundQuoteOptimized,
 } from './TextWrappers';
+import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 
 const Compressor = ({
   turnId,
   widget,
+  widgetId,
   // textPieces: compressedTextPieces,
   // compressedHeight,
   setCompressedHeight,
@@ -65,7 +67,7 @@ const Compressor = ({
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  console.log({ compressedTexts, compressedTextPieces });
+  console.log({ widget });
 
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
@@ -89,6 +91,26 @@ const Compressor = ({
       return quoteCollectionCopy;
     });
   };
+
+  const classNameId = `turn_${turnId}_compressor_${widgetId}`;
+
+  const { isDeveloperModeActive, setDevItem } = useDevPanel();
+
+  if (isDeveloperModeActive) {
+    setDevItem(
+      'compressor',
+      classNameId,
+      {
+        x: 0,
+        y: widget.minTop,
+        w: widget.width,
+        h: widget.minHeight,
+        selector: `.${classNameId}`,
+      },
+      'turn',
+      turnId
+    );
+  }
 
   useEffect(() => {
     if (!quoteCollection.length) return;
@@ -450,7 +472,9 @@ const Compressor = ({
             : ''}
         </div>
       </div>
-      <div className="compressed-paragraph-widget">{textsAroundQuotes}</div>
+      <div className={`compressed-paragraph-widget ${classNameId}`}>
+        {textsAroundQuotes}
+      </div>
     </div>
   );
 };

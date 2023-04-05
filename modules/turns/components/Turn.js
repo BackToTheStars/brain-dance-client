@@ -184,10 +184,18 @@ const Turn = ({ id }) => {
     wrapperStyles.backgroundColor = backgroundColor;
   }
 
+  const classNameId = `turn_${_id}`;
+
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
 
   if (isDeveloperModeActive) {
-    setDevItem('turn', _id, { x, y, w: width, h: height }, 'window', '0');
+    setDevItem(
+      'turn',
+      _id,
+      { x, y, w: width, h: height, selector: `.${classNameId}` },
+      'window',
+      '0'
+    );
     // setDevItem = (itemType, id, params, parentType, parentId) => {
   }
 
@@ -408,7 +416,12 @@ const Turn = ({ id }) => {
 
   // console.log({ widgets });
 
-  const wrapperClasses = [contentType, 'react-turn-new', 'noselect'];
+  const wrapperClasses = [
+    contentType,
+    'react-turn-new',
+    'noselect',
+    classNameId,
+  ];
 
   if (dontShowHeader) {
     wrapperClasses.push('dont-show-header');

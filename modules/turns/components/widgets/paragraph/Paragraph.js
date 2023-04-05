@@ -154,6 +154,7 @@ const Paragraph = ({
           {...{
             turnId,
             widget,
+            widgetId,
             compressedHeight,
             setCompressedHeight,
             // stateIsReady,

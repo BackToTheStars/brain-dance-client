@@ -6,16 +6,45 @@ const items = {
 };
 
 class DevItem {
-  constructor(id, { x, y, w, h, itemType }, { parentType, parentId }) {
+  constructor(
+    id,
+    { x, y, w, h, itemType, selector },
+    { parentType, parentId }
+  ) {
     this.parentId = parentId;
     this.parentType = parentType;
+    this.selector = selector;
+    this.selfInfo = { x, y, w, h };
   }
 
   getParent() {
     return getDevItem(this.parentType, this.parentId);
   }
+
+  showTelemetry() {
+    if (!this.selector) {
+      console.log('No selector given');
+
+      return;
+    }
+    const domElement = document.querySelector(this.selector);
+    let { x, y, width: w, height: h } = domElement.getBoundingClientRect();
+    x = Math.round(x);
+    y = Math.round(y);
+    w = Math.round(w);
+    h = Math.round(h);
+
+    console.log({
+      viewportInfo: { x, y, w, h },
+      selfInfo: this.selfInfo,
+      domElement,
+    });
+  }
 }
 
+/**
+ * @param itemType тип элемента
+ */
 const setDevItem = (itemType, id, params, parentType, parentId) => {
   if (!items[itemType]) {
     items[itemType] = {};
