@@ -13,8 +13,14 @@ class DevItem {
   ) {
     this.parentId = parentId;
     this.parentType = parentType;
+    this.itemType = itemType;
     this.selector = selector;
-    this.selfInfo = { x, y, w, h };
+    this.selfInfo = {
+      x: Math.round(x),
+      y: Math.round(y),
+      w: Math.round(w),
+      h: Math.round(h),
+    };
   }
 
   getParent() {
@@ -34,8 +40,17 @@ class DevItem {
     w = Math.round(w);
     h = Math.round(h);
 
+    let currentNode = this;
+    let addedTop = 0;
+
+    while (currentNode.itemType !== 'window') {
+      addedTop = addedTop + currentNode.selfInfo.y;
+      currentNode = currentNode.getParent();
+    }
+
     console.log({
       viewportInfo: { x, y, w, h },
+      addedTop,
       selfInfo: this.selfInfo,
       domElement,
     });
@@ -45,7 +60,7 @@ class DevItem {
 /**
  * @param itemType тип элемента
  */
-const setDevItem = (itemType, id, params, parentType, parentId) => {
+const setDevItem = ({ itemType, id, params, parentType, parentId }) => {
   if (!items[itemType]) {
     items[itemType] = {};
   }
@@ -56,7 +71,13 @@ const setDevItem = (itemType, id, params, parentType, parentId) => {
   );
 };
 
-setDevItem('window', '0', { x: 0, y: 0, w: 0, h: 0 }, 'window', '0');
+setDevItem({
+  itemType: 'window',
+  id: '0',
+  params: { x: 0, y: 0, w: 0, h: 0 },
+  parentType: 'window',
+  parentId: '0',
+});
 
 const getDevItems = () => {
   return items;

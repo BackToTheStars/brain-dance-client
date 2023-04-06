@@ -1,4 +1,4 @@
-import { widgetSpacer } from '@/config/ui';
+import { PARAGRAPH_TEXT_PADDING, widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import {
   increment,
@@ -97,19 +97,19 @@ const Compressor = ({
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
 
   if (isDeveloperModeActive) {
-    setDevItem(
-      'compressor',
-      classNameId,
-      {
+    setDevItem({
+      itemType: 'compressor',
+      id: classNameId,
+      params: {
         x: 0,
-        y: widget.minTop,
+        y: widget.minTop + widgetSpacer,
         w: widget.width,
         h: widget.minHeight,
         selector: `.${classNameId}`,
       },
-      'turn',
-      turnId
-    );
+      parentType: 'turn',
+      parentId: turnId,
+    });
   }
 
   useEffect(() => {
@@ -426,6 +426,7 @@ const Compressor = ({
           widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
           widgetWidth={widget?.width}
           quotes={text.quotes}
+          parentClassNameId={classNameId}
           // newDeltaScrollHightTop={newDeltaScrollHightTop}
         />
       );

@@ -189,13 +189,13 @@ const Turn = ({ id }) => {
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
 
   if (isDeveloperModeActive) {
-    setDevItem(
-      'turn',
-      _id,
-      { x, y, w: width, h: height, selector: `.${classNameId}` },
-      'window',
-      '0'
-    );
+    setDevItem({
+      itemType: 'turn',
+      id: _id,
+      params: { x, y, w: width, h: height, selector: `.${classNameId}` },
+      parentType: 'window',
+      parentId: '0',
+    });
     // setDevItem = (itemType, id, params, parentType, parentId) => {
   }
 

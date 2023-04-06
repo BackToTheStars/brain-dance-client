@@ -35,7 +35,7 @@ $turn-header-link-color-hover: #add8e6;
 $turn-header-date-color: #c3c2c2;
 
 $turn-scrollbar-color: #183968;
-$turn-scrollbar-margin: 8px;
+$turn-scrollbar-margin: 8px; // такая же переменная дублируется в config/ui.js
 
 $turn-edit-icon-color: #16272c;
 $turn-delete-icon-color: #d72929;

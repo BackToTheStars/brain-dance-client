@@ -1,6 +1,7 @@
 import {
   PARAGRAPH_TEXT_PADDING,
   TURN_QUOTE_BORDER_RADIUS,
+  TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
 } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
@@ -8,6 +9,7 @@ import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { createTextAroundQuotesObject } from '../../helpers/paragraph/TextAroundQuotesClass';
+import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 
 const ORANGE = '#ffd596';
 const GRAY = '#d2d3d4';
@@ -306,6 +308,7 @@ export const TextAroundQuoteOptimized = ({
   widgetWidth,
   quotes,
   scrollHeight,
+  parentClassNameId,
 }) => {
   //
   const paragraphEl = useRef(null);
@@ -337,6 +340,25 @@ export const TextAroundQuoteOptimized = ({
   console.log({ quotes, height, scrollHeight });
 
   // const dispatch = useDispatch();
+  const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
+
+  const { isDeveloperModeActive, setDevItem } = useDevPanel();
+
+  if (isDeveloperModeActive) {
+    setDevItem({
+      itemType: 'textaroundquotes',
+      id: classNameId,
+      params: {
+        x: 0,
+        y: deltaTop,
+        w: widgetWidth - TURN_SCROLLBAR_MARGIN,
+        h: height,
+        selector: `.${classNameId}`,
+      },
+      parentType: 'compressor',
+      parentId: parentClassNameId,
+    });
+  }
 
   useEffect(() => {
     // @todo: check if no quotes
@@ -480,7 +502,7 @@ export const TextAroundQuoteOptimized = ({
 
   return (
     <div
-      className="paragraphText"
+      className={`paragraphText ${classNameId}`}
       ref={paragraphEl}
       style={{ height: `${height}px` }}
     >
