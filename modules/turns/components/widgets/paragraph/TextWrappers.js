@@ -456,6 +456,26 @@ export const TextAroundQuoteOptimized = ({
     if (!quotesInfoPart.length) return;
     const blockTop = widgetTop + deltaTop + widgetSpacer;
     const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
+
+    if (isDeveloperModeActive) {
+      const quote = quotesInfoPart[0];
+      const top = quotes[0].top - deltaScrollHeightTop - scrollTop;
+      // quote.top - текущее значение от верха turn
+      setDevItem({
+        itemType: 'quoteincompressedpart',
+        id: `q_${quote.quoteKey}`,
+        params: {
+          x: quote.left,
+          y: top,
+          w: quote.width,
+          h: quote.height,
+          selector: `.q_${quote.quoteKey}`,
+        },
+        parentType: 'textaroundquotes',
+        parentId: classNameId, // id сжатого мини-параграфа, text around quote
+      });
+    }
+
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
         const quoteTop = quoteInfo.initialCoords.top - scrollTop;

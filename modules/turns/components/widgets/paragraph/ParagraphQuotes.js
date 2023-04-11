@@ -42,7 +42,7 @@ const ParagraphQuotes = ({ turnId }) => {
 
         return (
           <div
-            className="quote-rectangle"
+            className={`q_${quote.quoteKey} quote-rectangle`}
             key={quote.quoteKey}
             style={{
               ...quote,
