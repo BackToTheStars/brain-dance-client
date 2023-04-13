@@ -275,7 +275,8 @@ const Compressor = ({
       if (height + top > maxHeightPlusTop) {
         maxHeightPlusTop = height + top;
         if (textPieceIndex < textPieces.length - 1) {
-          if (textPieces[textPieceIndex + 1].top < maxHeightPlusTop) {
+          if (textPieces[textPieceIndex + 1].top <= maxHeightPlusTop) {
+            textPieces[textPieceIndex + 1].top = maxHeightPlusTop - height;
             textPieceIndex += 1;
             textPieces[textPieceIndex].startLettersCount = lettersCount;
             console.log({ span });
@@ -341,6 +342,20 @@ const Compressor = ({
     }
     textPieces[textPieces.length - 1].paragraph =
       paragraph.slice(paragraphIndex);
+
+    // scrollHeight fixes
+    const compressedScrollHeight = textPieces.reduce(
+      (sum, textPiece) => sum + textPiece.scrollHeight,
+      0
+    );
+    let acc = 0;
+    for (let i = 1; i < textPieces.length; i += 1) {
+      textPieces[i - 1].scrollHeight = textPieces[i].top - acc;
+      acc += textPieces[i - 1].scrollHeight;
+    }
+    textPieces[textPieces.length - 1].scrollHeight =
+      compressedScrollHeight - acc;
+
     setCompressedTexts(textPieces);
 
     // console.log(

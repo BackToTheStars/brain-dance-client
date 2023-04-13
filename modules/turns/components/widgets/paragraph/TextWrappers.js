@@ -374,25 +374,25 @@ export const TextAroundQuoteOptimized = ({
       return;
     }
 
-    const top = quotes[0].top;
-    const lastQuote = quotes.at(-1);
-    const bottom = lastQuote.top + lastQuote.height;
-    const middleLine = (top + bottom) / 2;
-    const paragraphTop = widgetTop + deltaTop; // + turn.y?
-    const paragraphBottom = paragraphTop + height;
-    const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
-    const fixScroll = Math.floor(middleLineParagraph - middleLine);
-    console.log({
-      paragraphTop,
-      paragraphBottom,
-      top,
-      bottom,
-    });
-    console.log({
-      scrollTop: paragraphEl.current.scrollTop,
-      fixScroll,
-      scrollPosition,
-    });
+    // const top = quotes[0].top;
+    // const lastQuote = quotes.at(-1);
+    // const bottom = lastQuote.top + lastQuote.height;
+    // const middleLine = (top + bottom) / 2;
+    // const paragraphTop = widgetTop + deltaTop; // + turn.y?
+    // const paragraphBottom = paragraphTop + height;
+    // const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
+    // const fixScroll = Math.floor(middleLineParagraph - middleLine);
+    // console.log({
+    //   paragraphTop,
+    //   paragraphBottom,
+    //   top,
+    //   bottom,
+    // });
+    // console.log({
+    //   scrollTop: paragraphEl.current.scrollTop,
+    //   fixScroll,
+    //   scrollPosition,
+    // });
     // paragraphEl.current.scrollTop -= fixScroll;
     // for (let quote of quotes) {
     // const { top, bottom } = quote.getBoundingClientRect();
@@ -406,13 +406,7 @@ export const TextAroundQuoteOptimized = ({
       quotesInfoPart.push({
         initialCoords: {
           left: left, // + PARAGRAPH_TEXT_PADDING,
-          top:
-            top +
-            widgetTop +
-            deltaTop -
-            deltaScrollHeightTop +
-            widgetSpacer +
-            delta, // + paragraphEl.current.scrollTop,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer,
           width,
           height,
         },
@@ -424,15 +418,7 @@ export const TextAroundQuoteOptimized = ({
         width,
         height,
         left: left, // + PARAGRAPH_TEXT_PADDING,
-        // top: deltaTop + top,
-        top:
-          top +
-          widgetTop +
-          deltaTop -
-          deltaScrollHeightTop +
-          widgetSpacer +
-          delta, // + paragraphEl.current.scrollTop,
-        // position: 'bottom',
+        top: top,
       });
     }
     // console.log({
@@ -479,7 +465,10 @@ export const TextAroundQuoteOptimized = ({
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
         const quoteTop = quoteInfo.initialCoords.top - scrollTop;
-        const quoteBottom = quoteInfo.top + quoteInfo.height - scrollTop;
+        const quoteBottom =
+          quoteInfo.initialCoords.top +
+          quoteInfo.initialCoords.height -
+          scrollTop;
 
         const params = {};
 
