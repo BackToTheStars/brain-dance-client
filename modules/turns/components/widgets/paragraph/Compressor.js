@@ -356,6 +356,18 @@ const Compressor = ({
     textPieces[textPieces.length - 1].scrollHeight =
       compressedScrollHeight - acc;
 
+    // scrollTop fixes - когда цитата не по центру
+    for (const textPiece of textPieces) {
+      const centerLine =
+        (textPiece.quotes[0].top +
+          textPiece.quotes.at(-1).top +
+          textPiece.quotes.at(-1).height) /
+          2 -
+        textPiece.top;
+      textPiece.scrollTop = centerLine - textPiece.height / 2;
+      // textPiece.scrollTop = (textPiece.scrollHeight - textPiece.height) / 2;
+    }
+
     setCompressedTexts(textPieces);
 
     // console.log(
