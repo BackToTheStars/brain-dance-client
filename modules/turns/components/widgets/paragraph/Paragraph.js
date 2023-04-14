@@ -12,18 +12,9 @@ const Paragraph = ({
   turnId,
   registerHandleResize,
   unregisterHandleResize,
-  // stateIsReady,
   widgetId,
   widget,
-  // paragraphIsReady,
-  // setParagraphIsReady,
-  // height,
 }) => {
-  // console.log('paragraph height');
-  // console.log({ height });
-
-  console.log({ widget });
-
   const compressed = useSelector((state) => state.turns.d[turnId].compressed);
   const turnCompressedHeight = useSelector(
     (state) => state.turns.d[turnId].compressedHeight
@@ -38,13 +29,6 @@ const Paragraph = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // console.log({
-    //   wrapperElCurrent,
-    //   paragraphElCurrent,
-    //   compressedHeight,
-    //   compressed,
-    // });
-
     if (!compressed) {
       if (paragraphElCurrent) {
         registerHandleResize({
@@ -72,12 +56,7 @@ const Paragraph = ({
             // } else if (!paragraphElCurrent) {
             //   return 0;
             // }
-            return (
-              // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
-              // widgetSpacer +
-              // 5
-              paragraphElCurrent.scrollHeight + widgetSpacer + 5
-            );
+            return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
           },
         });
         return () => unregisterHandleResize({ id: 'paragraph' }); // return будет вызван только в момент unmount
@@ -157,12 +136,8 @@ const Paragraph = ({
             widgetId,
             compressedHeight,
             setCompressedHeight,
-            // stateIsReady,
             setWrapperElCurrent,
             registerHandleResizeWithParams,
-            // setParagraphIsReady,
-            // height,
-            // paragraphIsReady,
           }}
         />
       ) : (
@@ -170,8 +145,6 @@ const Paragraph = ({
           {...{
             turnId,
             setParagraphElCurrent,
-            // stateIsReady,
-            // setParagraphIsReady,
           }}
         />
       )}
