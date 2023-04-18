@@ -1,4 +1,6 @@
 import {
+  GRID_CELL_X,
+  GRID_CELL_Y,
   TURNS_GEOMETRY_TIMEOUT_DELAY,
   TURNS_POSITION_TIMEOUT_DELAY,
   widgetSpacer,
@@ -329,6 +331,7 @@ const Turn = ({ id }) => {
   // DRAGGABLE
   useEffect(() => {
     $(wrapper.current).draggable({
+      grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
         $('#gameBox')
           .addClass('remove-line-transition')
@@ -361,6 +364,7 @@ const Turn = ({ id }) => {
     if (paragraphStage === COMP_READY) return;
 
     $(wrapper.current).resizable({
+      grid: [GRID_CELL_X, GRID_CELL_Y],
       resize: (event, ui) => {
         const widgetsCount =
           1 + // header

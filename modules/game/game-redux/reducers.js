@@ -15,8 +15,8 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
         ...state,
         game: payload,
         position: {
-          left: payload.viewportPointX,
-          top: payload.viewportPointY,
+          left: payload.x,
+          top: payload.y,
         },
       };
     case types.GAME_FIELD_MOVE:

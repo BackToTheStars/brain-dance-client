@@ -18,24 +18,33 @@ import {
   getTurnsFromBuffer,
 } from '@/modules/turns/components/helpers/dataCopier';
 import { resetAndExit } from '@/modules/panels/redux/actions';
+import { PANEL_SNAP_TO_GRID } from '@/modules/panels/settings';
+import { GRID_CELL_X } from '@/config/ui';
 
-export const loadFullGame = (hash) => (dispatch) => {
+export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
   getGameRequest(hash).then((data) => {
+    const state = getState();
+    const isSnapToGrid = state.panels.d[PANEL_SNAP_TO_GRID].isDisplayed;
+    const viewport = isSnapToGrid
+      ? {
+          x: Math.round(data.item.viewportPointX / GRID_CELL_X) * GRID_CELL_X,
+          y: Math.round(data.item.viewportPointY / GRID_CELL_X) * GRID_CELL_X,
+        }
+      : {
+          x: data.item.viewportPointX,
+          y: data.item.viewportPointY,
+        };
+
     dispatch({
       type: types.LOAD_GAME,
-      payload: data.item,
+      payload: { ...data.item, ...viewport },
     });
 
     dispatch({
       type: linesTypes.LINES_LOAD,
       payload: data.item.lines,
     });
-
-    const viewport = {
-      x: data.item.viewportPointX,
-      y: data.item.viewportPointY,
-    };
 
     dispatch(loadTurns(hash, viewport));
 

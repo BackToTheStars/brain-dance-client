@@ -1,4 +1,4 @@
-import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
+import { GRID_CELL_X, TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
   loadTurnsAndLinesToPaste,
@@ -73,6 +73,7 @@ const Game = ({ hash }) => {
     if (!gameBox.current) return;
 
     $(gameBox.current).draggable({
+      // grid: [GRID_CELL_X, GRID_CELL_X],
       stop: (event, ui) => {
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(

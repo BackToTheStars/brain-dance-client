@@ -32,6 +32,7 @@ import {
   MODE_GAME,
   PANEL_ADD_EDIT_TURN,
   PANEL_BUTTONS,
+  PANEL_SNAP_TO_GRID,
   PANEL_TURNS_PASTE,
 } from '@/modules/panels/settings';
 
@@ -45,6 +46,7 @@ import {
   paragraphStateDeleteFromLocalStorage,
   paragraphStateGetFromLocalStorage,
 } from '../components/helpers/store';
+import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 
 export const resetCompressedParagraphState = (_id) => (dispatch) => {
   dispatch({
@@ -61,6 +63,8 @@ export const resetCompressedParagraphState = (_id) => (dispatch) => {
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
     const state = getState();
+    const isSnapToGrid = state.panels.d[PANEL_SNAP_TO_GRID].isDisplayed;
+
     const quotesD = {};
     for (let turn of data.items) {
       if (!turn.quotes) continue;
@@ -79,8 +83,8 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
         },
         turns: data.items.map((turn) => ({
           ...turn,
-          x: turn.x - viewport.x,
-          y: turn.y - viewport.y,
+          x: Math.round((turn.x - viewport.x) / GRID_CELL_X) * GRID_CELL_X,
+          y: Math.round((turn.y - viewport.y) / GRID_CELL_X) * GRID_CELL_X,
           compressedParagraphState: paragraphStateGetFromLocalStorage(turn._id),
         })),
       },
