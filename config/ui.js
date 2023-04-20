@@ -27,5 +27,5 @@ export const TURN_ICON_WIDTH = 14;
 export const TURN_ICON_HEIGHT = 16;
 export const TURN_QUOTE_BORDER_RADIUS = '5px';
 
-export const GRID_CELL_X = 12;
+export const GRID_CELL_X = 24;
 export const GRID_CELL_Y = 1;

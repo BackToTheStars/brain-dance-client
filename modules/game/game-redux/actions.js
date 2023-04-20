@@ -1,35 +1,33 @@
 import {
   getGameRequest,
-  getTurnsRequest,
   saveGamePositionRequest,
 } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
-import {
-  updateCoordinates,
-  updateCoordinatesRequest,
-} from '@/modules/turns/requests';
+import { updateCoordinatesRequest } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { loadTurns, moveField } from '@/modules/turns/redux/actions';
 import {
   getLinesNotExpired,
-  getTimestampsNotExpired,
   getTurnsFromBuffer,
 } from '@/modules/turns/components/helpers/dataCopier';
 import { resetAndExit } from '@/modules/panels/redux/actions';
-import { PANEL_SNAP_TO_GRID } from '@/modules/panels/settings';
 import { GRID_CELL_X } from '@/config/ui';
+import {
+  isSnapToGridSelector,
+  snapRound,
+} from '@/modules/turns/components/helpers/grid';
 
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
   getGameRequest(hash).then((data) => {
     const state = getState();
-    const isSnapToGrid = state.panels.d[PANEL_SNAP_TO_GRID].isDisplayed;
+    const isSnapToGrid = isSnapToGridSelector(state);
     const viewport = isSnapToGrid
       ? {
-          x: Math.round(data.item.viewportPointX / GRID_CELL_X) * GRID_CELL_X,
-          y: Math.round(data.item.viewportPointY / GRID_CELL_X) * GRID_CELL_X,
+          x: snapRound(data.item.viewportPointX, GRID_CELL_X),
+          y: snapRound(data.item.viewportPointY, GRID_CELL_X),
         }
       : {
           x: data.item.viewportPointX,

@@ -23,21 +23,10 @@ import {
 } from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
-import {
-  setPanelMode,
-  toggleMinimizePanel,
-  togglePanel,
-} from '@/modules/panels/redux/actions';
-import {
-  MODE_GAME,
-  PANEL_ADD_EDIT_TURN,
-  PANEL_BUTTONS,
-  PANEL_SNAP_TO_GRID,
-  PANEL_TURNS_PASTE,
-} from '@/modules/panels/settings';
+import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
+import { MODE_GAME, PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 
 import { STATIC_API_URL } from '@/config/server';
-import { panelReducer } from '@/modules/panels/redux/reducers';
 import {
   COMP_ACTIVE,
   ORIG_ACTIVE,
@@ -47,6 +36,7 @@ import {
   paragraphStateGetFromLocalStorage,
 } from '../components/helpers/store';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
+import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
 
 export const resetCompressedParagraphState = (_id) => (dispatch) => {
   dispatch({
@@ -63,7 +53,7 @@ export const resetCompressedParagraphState = (_id) => (dispatch) => {
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
     const state = getState();
-    const isSnapToGrid = state.panels.d[PANEL_SNAP_TO_GRID].isDisplayed;
+    const isSnapToGrid = isSnapToGridSelector(state);
 
     const quotesD = {};
     for (let turn of data.items) {
@@ -83,8 +73,8 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
         },
         turns: data.items.map((turn) => ({
           ...turn,
-          x: Math.round((turn.x - viewport.x) / GRID_CELL_X) * GRID_CELL_X,
-          y: Math.round((turn.y - viewport.y) / GRID_CELL_X) * GRID_CELL_X,
+          x: snapRound(turn.x - viewport.x, GRID_CELL_X),
+          y: snapRound(turn.y - viewport.y, GRID_CELL_X),
           compressedParagraphState: paragraphStateGetFromLocalStorage(turn._id),
         })),
       },
@@ -199,6 +189,13 @@ export const moveField = (data) => (dispatch, getState) => {
   // }
 
   const state = getState();
+  const isSnapToGrid = isSnapToGridSelector(state);
+  const gameFieldMoveVector = isSnapToGrid
+    ? {
+        left: snapRound(data.left, GRID_CELL_X),
+        top: snapRound(data.top, GRID_CELL_X),
+      }
+    : data;
   const viewport = {
     // x: state.game.position.left,
     // y: state.game.position.top,
@@ -209,11 +206,11 @@ export const moveField = (data) => (dispatch, getState) => {
   };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
-    payload: data,
+    payload: gameFieldMoveVector,
   });
   dispatch({
     type: types.TURNS_FIELD_WAS_MOVED,
-    payload: { ...data, viewport },
+    payload: { ...gameFieldMoveVector, viewport },
   });
 };
 

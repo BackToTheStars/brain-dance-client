@@ -43,6 +43,7 @@ import {
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
 import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
+import { isSnapToGridSelector, snapRound } from './helpers/grid';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -127,7 +128,8 @@ const getParagraphHeightOld = ({
 };
 
 const Turn = ({ id }) => {
-  const turn = useSelector((store) => store.turns.d[id]);
+  const turn = useSelector((state) => state.turns.d[id]);
+  const isSnapToGrid = useSelector(isSnapToGridSelector);
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
@@ -372,10 +374,15 @@ const Turn = ({ id }) => {
           !!videoUrl + // Video
           doesParagraphExist; // Paragraph
         if (widgetsCount === widgets.length) {
-          recalculateSize(
-            Math.round(ui.size.width),
-            Math.round(ui.size.height)
-          );
+          isSnapToGrid
+            ? recalculateSize(
+                snapRound(ui.size.width, GRID_CELL_X),
+                snapRound(ui.size.height, GRID_CELL_Y)
+              )
+            : recalculateSize(
+                Math.round(ui.size.width),
+                Math.round(ui.size.height)
+              );
           dispatch(markTurnAsChanged({ _id }));
         }
       },
