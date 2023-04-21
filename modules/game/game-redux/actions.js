@@ -13,7 +13,7 @@ import {
   getTurnsFromBuffer,
 } from '@/modules/turns/components/helpers/dataCopier';
 import { resetAndExit } from '@/modules/panels/redux/actions';
-import { GRID_CELL_X } from '@/config/ui';
+import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import {
   isSnapToGridSelector,
   snapRound,
@@ -62,44 +62,78 @@ export const loadFullGame = (hash) => (dispatch, getState) => {
   });
 };
 
-export const saveField = (d, zeroPoint, gamePosition) => (dispatch) => {
-  //
-  const changedTurns = Object.values(d)
-    .filter((turn) => turn.wasChanged === true)
+export const saveField =
+  (d, zeroPoint, gamePosition) => (dispatch, getState) => {
+    //
+    const state = getState();
+    const isSnapToGrid = isSnapToGridSelector(state);
 
-    .map((turn) => {
-      const {
-        _id,
-        x,
-        y,
-        height,
-        compressed,
-        compressedHeight,
-        uncompressedHeight,
-        width,
-        scrollPosition,
-      } = turn;
-      return {
-        _id,
-        x: x + gamePosition.left,
-        y: y + gamePosition.top,
-        height,
-        compressed,
-        compressedHeight,
-        uncompressedHeight,
-        width,
-        scrollPosition,
-      };
-    }); // ход был изменён, сохранить только его
+    const changedTurns = Object.values(d)
+      .filter((turn) => {
+        if (turn.wasChanged) return true;
+        if (isSnapToGrid) {
+          if (turn.x % GRID_CELL_X !== 0 || turn.y % GRID_CELL_X !== 0)
+            return true;
+          if (turn.width % GRID_CELL_X !== 0 || turn.height % GRID_CELL_Y !== 0)
+            return true;
+        }
+        return false;
+      })
+      .map((turn) => {
+        const {
+          _id,
+          x,
+          y,
+          height,
+          compressed,
+          compressedHeight,
+          uncompressedHeight,
+          width,
+          scrollPosition,
+        } = turn;
+        const coords = {
+          x: x + gamePosition.left,
+          y: y + gamePosition.top,
+          height,
+          width,
+        };
+        if (isSnapToGrid) {
+          coords.x = snapRound(coords.x, GRID_CELL_X);
+          coords.y = snapRound(coords.y, GRID_CELL_X);
+          coords.width = snapRound(coords.width, GRID_CELL_X);
+          coords.height = snapRound(coords.height, GRID_CELL_Y);
+        }
+        return {
+          _id,
+          ...coords,
+          compressed,
+          compressedHeight,
+          uncompressedHeight,
+          scrollPosition,
+        };
+      }); // ход был изменён, сохранить только его
 
-  updateCoordinatesRequest(changedTurns).then((data) => {
-    dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
-    dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
-    dispatch(resetAndExit());
-  });
+    updateCoordinatesRequest(changedTurns).then((data) => {
+      // for (const turn of data.items) {
+      for (const turn of changedTurns) {
+        dispatch({
+          type: turnsTypes.TURNS_UPDATE_GEOMETRY,
+          payload: {
+            ...turn,
+            x: turn.x - state.game.position.left,
+            y: turn.y - state.game.position.top,
+          },
+        });
+      }
+      dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
+      dispatch(
+        addNotification({ title: 'Info:', text: 'Field has been saved' })
+      );
+      dispatch(resetAndExit());
+    });
 
-  saveGamePositionRequest(gamePosition);
-};
+    saveGamePositionRequest(gamePosition);
+  };
 
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {
   dispatch({
