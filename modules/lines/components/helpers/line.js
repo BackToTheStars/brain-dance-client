@@ -35,8 +35,8 @@ export const getLinesCoords = (
   lines,
   turnsToRender,
   turnsDictionary,
-  quotesInfo,
-  pictureQuotesInfo
+  quotesInfo
+  // pictureQuotesInfo
 ) => {
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, targetTurnId}
@@ -78,23 +78,19 @@ export const getLinesCoords = (
           (quote) => quote.quoteId == line.sourceMarker
         );
       }
-      if (!sourceQuoteCoords && pictureQuotesInfo[line.sourceTurnId]) {
-        sourceQuoteCoords = pictureQuotesInfo[line.sourceTurnId].find(
-          (quote) => quote.quoteId == line.sourceMarker
-        );
-      }
+      // if (!sourceQuoteCoords && pictureQuotesInfo[line.sourceTurnId]) {
+      //   sourceQuoteCoords = pictureQuotesInfo[line.sourceTurnId].find(
+      //     (quote) => quote.quoteId == line.sourceMarker
+      //   );
+      // }
 
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
         sourceCoords = {
-          left:
-            turnsDictionary[line.sourceTurnId].x +
-            sourceQuoteCoords.left +
-            TURN_BORDER_THICKNESS,
-          top:
-            turnsDictionary[line.sourceTurnId].y +
-            sourceQuoteCoords.top +
-            TURN_BORDER_THICKNESS,
+          left: turnsDictionary[line.sourceTurnId].x + sourceQuoteCoords.left,
+          // - TURN_BORDER_THICKNESS,
+          top: turnsDictionary[line.sourceTurnId].y + sourceQuoteCoords.top,
+          // + TURN_BORDER_THICKNESS,
           width: sourceQuoteCoords.width,
           height: sourceQuoteCoords.height,
         };
@@ -108,24 +104,26 @@ export const getLinesCoords = (
         );
       }
 
-      if (!targetQuoteCoords && pictureQuotesInfo[line.targetTurnId]) {
-        targetQuoteCoords = pictureQuotesInfo[line.targetTurnId].find(
-          (quote) => quote.quoteId == line.targetMarker
-        );
-      }
+      // if (!targetQuoteCoords && pictureQuotesInfo[line.targetTurnId]) {
+      //   targetQuoteCoords = pictureQuotesInfo[line.targetTurnId].find(
+      //     (quote) => quote.quoteId == line.targetMarker
+      //   );
+      // }
       if (targetQuoteCoords) {
         targetCoords = {
-          left:
-            turnsDictionary[line.targetTurnId].x +
-            targetQuoteCoords.left +
-            TURN_BORDER_THICKNESS,
-          top:
-            turnsDictionary[line.targetTurnId].y +
-            targetQuoteCoords.top +
-            TURN_BORDER_THICKNESS,
+          left: turnsDictionary[line.targetTurnId].x + targetQuoteCoords.left,
+          // + TURN_BORDER_THICKNESS,
+          top: turnsDictionary[line.targetTurnId].y + targetQuoteCoords.top,
+          // + TURN_BORDER_THICKNESS,
           width: targetQuoteCoords.width,
           height: targetQuoteCoords.height,
         };
+        console.log({
+          id: 'log4',
+          left: targetCoords.left,
+          lineX: turnsDictionary[line.targetTurnId].x,
+          quoteLeft: targetQuoteCoords.left,
+        });
       }
     }
 

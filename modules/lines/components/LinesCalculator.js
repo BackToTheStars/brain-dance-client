@@ -16,14 +16,14 @@ const LinesCalculator = () => {
 
   const turnsToRender = Object.keys(turnsDictionary);
 
-  const pictureQuotesInfo = {};
+  // const pictureQuotesInfo = {};
   useEffect(() => {
     const linesWithEndCoordsNew = getLinesCoords(
       lines,
       turnsToRender,
       turnsDictionary,
-      quotesInfo,
-      pictureQuotesInfo
+      quotesInfo
+      // pictureQuotesInfo
     );
 
     // if (!linesWithEndCoordsNew.length && !linesWithEndCoords.length) return;
@@ -37,7 +37,7 @@ const LinesCalculator = () => {
     //   type: ACTION_UPDATE_LINE_ENDS,
     //   payload: getLineEnds(linesWithEndCoords),
     // });
-  }, [lines, turnsToRender, quotesInfo, pictureQuotesInfo, gamePosition]);
+  }, [lines, turnsToRender, quotesInfo, gamePosition]);
   return '';
 };
 

@@ -263,6 +263,7 @@ const Turn = ({ id }) => {
     // }
 
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
+    console.log({ width, minWidth, maxWidth, newWidth });
 
     // if (paragraphStage !== ORIG_LOADING) {
     //  && paragraphStage !== COMP_LOADING) {
@@ -306,6 +307,8 @@ const Turn = ({ id }) => {
         maxTop,
         width: newWidth,
       };
+
+      console.log({ newWidgetD });
 
       minTop = minTop + widgetD[widgetId].minHeight;
       maxTop = maxTop + widgetD[widgetId].maxHeight;
@@ -440,6 +443,7 @@ const Turn = ({ id }) => {
   if (pictureOnly) {
     wrapperClasses.push('picture-only');
   }
+  console.log({ id: 'log3', widgetD });
   return (
     <div
       ref={wrapper}

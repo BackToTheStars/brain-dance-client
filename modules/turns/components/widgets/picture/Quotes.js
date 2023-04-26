@@ -45,7 +45,8 @@ const PictureQuotes = ({
     let height = widgetSettings.minHeight;
 
     if (!pictureOnly) {
-      width = widgetSettings.width - 2 * widgetSpacer; // - TURN_BORDER_THICKNESS;
+      width =
+        widgetSettings.width - 2 * widgetSpacer - 2 * TURN_BORDER_THICKNESS; // log3 поправили
       height = widgetSettings.minHeight - widgetSpacer; // - TURN_BORDER_THICKNESS;
     }
 
@@ -54,6 +55,17 @@ const PictureQuotes = ({
         turnId,
         TYPE_QUOTE_PICTURE,
         quotes.map((quote) => {
+          console.log({
+            left:
+              Math.round((width * quote.x) / 100) +
+              (pictureOnly ? 0 : widgetSpacer) +
+              2,
+            MathRound: Math.round((width * quote.x) / 100),
+            quoteX: quote.x,
+            width,
+            widgetSpacer,
+          });
+
           return {
             type: TYPE_QUOTE_PICTURE,
             initialCoords: {},

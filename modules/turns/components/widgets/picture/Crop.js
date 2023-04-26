@@ -29,7 +29,19 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   useEffect(() => {
     cropQueue.add(() => {
       dispatch(
-        changeWidgetParams({ widgetKey, params: { crop, activeQuoteId } })
+        changeWidgetParams({
+          widgetKey,
+          params: {
+            crop: {
+              ...crop,
+              width: Math.round(crop.width * 100) / 100,
+              height: Math.round(crop.height * 100) / 100,
+              x: Math.round(crop.x * 100) / 100,
+              y: Math.round(crop.y * 100) / 100,
+            },
+            activeQuoteId,
+          },
+        })
       );
     });
   }, [crop]);
