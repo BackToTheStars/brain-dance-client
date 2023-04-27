@@ -136,7 +136,7 @@ export const getScrolledQuotes = (
       top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
       position = 'bottom';
     } else {
-      top = top + topGap - scrollPosition - outlineWidth;
+      top = top + topGap - scrollPosition - outlineWidth; // положение красной рамки вокруг цитат по вертикали
     }
     return {
       ...quote,
