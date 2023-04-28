@@ -87,10 +87,14 @@ export const getLinesCoords = (
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
         sourceCoords = {
-          left: turnsDictionary[line.sourceTurnId].x + sourceQuoteCoords.left,
-          // - TURN_BORDER_THICKNESS,
-          top: turnsDictionary[line.sourceTurnId].y + sourceQuoteCoords.top,
-          // + TURN_BORDER_THICKNESS,
+          left:
+            turnsDictionary[line.sourceTurnId].x +
+            sourceQuoteCoords.left +
+            (sourceQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
+          top:
+            turnsDictionary[line.sourceTurnId].y +
+            sourceQuoteCoords.top +
+            (sourceQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           width: sourceQuoteCoords.width,
           height: sourceQuoteCoords.height,
         };
@@ -111,10 +115,14 @@ export const getLinesCoords = (
       // }
       if (targetQuoteCoords) {
         targetCoords = {
-          left: turnsDictionary[line.targetTurnId].x + targetQuoteCoords.left,
-          // + TURN_BORDER_THICKNESS,
-          top: turnsDictionary[line.targetTurnId].y + targetQuoteCoords.top,
-          // + TURN_BORDER_THICKNESS,
+          left:
+            turnsDictionary[line.targetTurnId].x +
+            targetQuoteCoords.left +
+            (targetQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
+          top:
+            turnsDictionary[line.targetTurnId].y +
+            targetQuoteCoords.top +
+            (targetQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           width: targetQuoteCoords.width,
           height: targetQuoteCoords.height,
         };

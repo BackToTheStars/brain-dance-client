@@ -103,11 +103,20 @@ const Line = ({
   };
   const targetCoords = {
     ...prevTargetCoords,
+    left: prevTargetCoords.left,
+    top: prevTargetCoords.top,
     right: prevTargetCoords.left + prevTargetCoords.width,
     bottom: prevTargetCoords.top + prevTargetCoords.height,
     centerX: Math.floor(prevTargetCoords.left + prevTargetCoords.width / 2),
     centerY: Math.floor(prevTargetCoords.top + prevTargetCoords.height / 2),
   };
+  console.log({
+    id: 'quo3',
+    sourceCoords,
+    targetCoords,
+    prevTargetCoords,
+    prevSourceCoords,
+  });
 
   const [sourceSide, targetSide, curveType] = getFromToQuoteSettingsX(
     sourceCoords,

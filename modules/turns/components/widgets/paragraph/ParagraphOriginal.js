@@ -92,6 +92,7 @@ const ParagraphOriginal = ({
   useEffect(() => {
     // полностью пересчитываем расположение цитат
     const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
+    console.log({ id: 'quo1', quotes, scrollTop });
     setQuotesWithoutScroll(quotes);
     dispatch(
       quoteCoordsUpdate(

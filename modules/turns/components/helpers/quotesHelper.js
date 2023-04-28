@@ -117,6 +117,7 @@ export const getScrolledQuotes = (
     let position = 'default';
     const outlineWidth = TURN_BORDER_THICKNESS; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
+    console.log({ id: 'quo2', topGap, passedScrollPosition });
 
     if (top + outlineWidth < scrollPosition) {
       // height / 2
@@ -136,8 +137,9 @@ export const getScrolledQuotes = (
       top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
       position = 'bottom';
     } else {
-      top = top + topGap - scrollPosition - outlineWidth; // положение красной рамки вокруг цитат по вертикали
+      top = top + topGap - scrollPosition - outlineWidth; // положение красной рамки вокруг цитаты по вертикали
     }
+
     return {
       ...quote,
       type: TYPE_QUOTE_TEXT,
