@@ -67,8 +67,6 @@ const Compressor = ({
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  console.log({ widget });
-
   //
   const paragraph = originalParagraph.map((paragraphItem) => ({
     ...paragraphItem,
@@ -279,7 +277,7 @@ const Compressor = ({
             textPieces[textPieceIndex + 1].top = maxHeightPlusTop - height;
             textPieceIndex += 1;
             textPieces[textPieceIndex].startLettersCount = lettersCount;
-            console.log({ span });
+
             textPieces[textPieceIndex].delta =
               maxHeightPlusTop - textPieces[textPieceIndex].top;
           }
@@ -428,8 +426,6 @@ const Compressor = ({
     let deltaScrollHeightTop = 0;
     // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
     let newDeltaScrollHightTop = 0;
-
-    console.log({ compressedTexts });
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;

@@ -107,7 +107,13 @@ const Picture = ({
   }, [imageLoaded]);
 
   return (
-    <div className={`picture-content ${isActive ? 'active' : ''}`}>
+    <div
+      className={`picture-content ${isActive ? 'active' : ''}`}
+      style={{
+        minHeight: `${widgetSettings?.minHeight}px`,
+        maxHeight: `${widgetSettings?.maxHeight}px`,
+      }}
+    >
       <div
         style={{ width: '100%', height: '100%', position: 'relative' }}
         ref={imgWrapperEl}

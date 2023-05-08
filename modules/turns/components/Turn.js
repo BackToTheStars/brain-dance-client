@@ -165,6 +165,8 @@ const Turn = ({ id }) => {
   const paragraphStage = getParagraphStage(turn);
   const turnStage = getTurnStage(turn);
 
+  console.log({ id: 'log1', _id, paragraphStage, turnStage });
+
   // const callsQueueIsBlockedFlag = useSelector(
   //   (state) => state.ui.callsQueueIsBlocked
   // );
@@ -191,6 +193,13 @@ const Turn = ({ id }) => {
   const classNameId = `turn_${_id}`;
 
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
+
+  const widgetsCount =
+    1 + // header
+    !!imageUrl + // Picture
+    !!videoUrl + // Video
+    doesParagraphExist; // Paragraph
+  const notRegisteredWidgetsCount = widgetsCount - widgets.length;
 
   if (isDeveloperModeActive) {
     setDevItem({
@@ -263,7 +272,6 @@ const Turn = ({ id }) => {
     // }
 
     const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
-    console.log({ width, minWidth, maxWidth, newWidth });
 
     // if (paragraphStage !== ORIG_LOADING) {
     //  && paragraphStage !== COMP_LOADING) {
@@ -307,8 +315,6 @@ const Turn = ({ id }) => {
         maxTop,
         width: newWidth,
       };
-
-      console.log({ newWidgetD });
 
       minTop = minTop + widgetD[widgetId].minHeight;
       maxTop = maxTop + widgetD[widgetId].maxHeight;
@@ -371,12 +377,7 @@ const Turn = ({ id }) => {
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],
       resize: (event, ui) => {
-        const widgetsCount =
-          1 + // header
-          !!imageUrl + // Picture
-          !!videoUrl + // Video
-          doesParagraphExist; // Paragraph
-        if (widgetsCount === widgets.length) {
+        if (notRegisteredWidgetsCount === 0) {
           isSnapToGrid
             ? recalculateSize(
                 snapRound(ui.size.width, GRID_CELL_X),
@@ -408,13 +409,8 @@ const Turn = ({ id }) => {
 
   useEffect(() => {
     // if (callsQueueIsBlockedFlag) return;
-    const widgetsCount =
-      1 + // header
-      !!imageUrl + // Picture
-      !!videoUrl + // Video
-      doesParagraphExist; // Paragraph
 
-    if (widgetsCount === widgets.length) {
+    if (notRegisteredWidgetsCount === 0) {
       recalculateSize(Math.round(width), Math.round(height));
       // setStateIsReady(true);
       dispatch(changeTurnStage(_id, TURN_LOADING_FIXED));
@@ -443,7 +439,7 @@ const Turn = ({ id }) => {
   if (pictureOnly) {
     wrapperClasses.push('picture-only');
   }
-  console.log({ id: 'log3', widgetD });
+
   return (
     <div
       ref={wrapper}
@@ -491,6 +487,7 @@ const Turn = ({ id }) => {
           // stateIsReady={stateIsReady}
           widgetId="paragraph1"
           widget={widgetD['paragraph1']}
+          notRegisteredWidgetsCount={notRegisteredWidgetsCount}
           // paragraphIsReady={paragraphIsReady}
           // setParagraphIsReady={dispatchParagraphIsReady}
           // height={getParagraphHeight({

@@ -55,10 +55,10 @@ const getFromToQuoteSettingsX = (source, target) => {
 const findXY = (coords, side) => {
   // const SIDE_TOP = 'top';
   const settings = {
-    [SIDE_TOP]: [coords.centerX, coords.top],
-    [SIDE_BOTTOM]: [coords.centerX, coords.bottom],
-    [SIDE_LEFT]: [coords.left, coords.centerY],
-    [SIDE_RIGHT]: [coords.right, coords.centerY],
+    [SIDE_TOP]: [coords.centerX, coords.top - 1],
+    [SIDE_BOTTOM]: [coords.centerX, coords.bottom + 1],
+    [SIDE_LEFT]: [coords.left - 1, coords.centerY],
+    [SIDE_RIGHT]: [coords.right + 1, coords.centerY],
   };
   return settings[side];
 };
@@ -110,13 +110,6 @@ const Line = ({
     centerX: Math.floor(prevTargetCoords.left + prevTargetCoords.width / 2),
     centerY: Math.floor(prevTargetCoords.top + prevTargetCoords.height / 2),
   };
-  console.log({
-    id: 'quo3',
-    sourceCoords,
-    targetCoords,
-    prevTargetCoords,
-    prevSourceCoords,
-  });
 
   const [sourceSide, targetSide, curveType] = getFromToQuoteSettingsX(
     sourceCoords,

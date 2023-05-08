@@ -38,6 +38,7 @@ const ParagraphOriginal = ({
   setParagraphElCurrent,
   // stateIsReady,
   turnId,
+  notRegisteredWidgetsCount,
   // setParagraphIsReady,
 }) => {
   const turn = useSelector((state) => state.turns.d[turnId]);
@@ -92,7 +93,6 @@ const ParagraphOriginal = ({
   useEffect(() => {
     // полностью пересчитываем расположение цитат
     const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
-    console.log({ id: 'quo1', quotes, scrollTop });
     setQuotesWithoutScroll(quotes);
     dispatch(
       quoteCoordsUpdate(
@@ -132,13 +132,14 @@ const ParagraphOriginal = ({
 
   useEffect(() => {
     paragraphEl.current.scrollTop = scrollPosition;
+    if (!!notRegisteredWidgetsCount) return;
     // @todo: дождаться сигналы завершения от всех внутренних компонентов
     // проверить что очередь заблокирована
     setTimeout(() => {
       // dispatch(setCallsQueueIsBlocked(false));
       dispatch(changeParagraphStage(turnId, ORIG_READY_TO_RECEIVE_PARAMS));
     }, 300);
-  }, []);
+  }, [notRegisteredWidgetsCount]);
 
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
@@ -201,4 +202,6 @@ const ParagraphOriginal = ({
   );
 };
 
-export default React.memo(ParagraphOriginal);
+// export default React.memo(ParagraphOriginal);
+
+export default ParagraphOriginal;

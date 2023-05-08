@@ -62,11 +62,6 @@ export const calculateTextPiecesFromQuotes = (
       textPiece.height = freeSpaceRequired + quote.height;
       textPiece.scrollHeight = quote.top + quote.height - textPiece.top;
 
-      console.log({
-        textPiece,
-        middle,
-        quote,
-      });
       // textPiece.height += quote.height;
     } else {
       // если нет отсечки, и мы до сих пор накапливаем цитаты, то

@@ -126,12 +126,6 @@ export const getLinesCoords = (
           width: targetQuoteCoords.width,
           height: targetQuoteCoords.height,
         };
-        console.log({
-          id: 'log4',
-          left: targetCoords.left,
-          lineX: turnsDictionary[line.targetTurnId].x,
-          quoteLeft: targetQuoteCoords.left,
-        });
       }
     }
 

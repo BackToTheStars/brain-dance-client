@@ -14,6 +14,7 @@ const Paragraph = ({
   unregisterHandleResize,
   widgetId,
   widget,
+  notRegisteredWidgetsCount,
 }) => {
   const compressed = useSelector((state) => state.turns.d[turnId].compressed);
   const turnCompressedHeight = useSelector(
@@ -145,6 +146,7 @@ const Paragraph = ({
           {...{
             turnId,
             setParagraphElCurrent,
+            notRegisteredWidgetsCount,
           }}
         />
       )}

@@ -71,10 +71,10 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
   for (let quoteEl of quoteEls) {
     const rect = quoteEl.getBoundingClientRect();
-    let left = rect.left - paragraphRect.left;
-    let top = rect.top - paragraphRect.top;
-    let width = rect.width;
-    let height = rect.height;
+    let left = Math.round(rect.left - paragraphRect.left); // КРАСНАЯ РАМКА
+    let top = Math.round((rect.top - paragraphRect.top) * 100) / 100;
+    let width = Math.round(rect.width);
+    let height = Math.round(rect.height * 100) / 100;
 
     const quoteId = quoteEl.getAttribute('data-id') || new Date().getTime();
 
@@ -117,7 +117,6 @@ export const getScrolledQuotes = (
     let position = 'default';
     const outlineWidth = TURN_BORDER_THICKNESS; // ещё в Turn.js строчка 466
     let scrollPosition = passedScrollPosition || 0;
-    console.log({ id: 'quo2', topGap, passedScrollPosition });
 
     if (top + outlineWidth < scrollPosition) {
       // height / 2

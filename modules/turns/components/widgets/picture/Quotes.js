@@ -55,17 +55,6 @@ const PictureQuotes = ({
         turnId,
         TYPE_QUOTE_PICTURE,
         quotes.map((quote) => {
-          console.log({
-            left:
-              Math.round((width * quote.x) / 100) +
-              (pictureOnly ? 0 : widgetSpacer) +
-              2,
-            MathRound: Math.round((width * quote.x) / 100),
-            quoteX: quote.x,
-            width,
-            widgetSpacer,
-          });
-
           return {
             type: TYPE_QUOTE_PICTURE,
             initialCoords: {},

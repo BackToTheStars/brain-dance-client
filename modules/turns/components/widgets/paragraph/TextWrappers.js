@@ -1,5 +1,6 @@
 import {
   PARAGRAPH_TEXT_PADDING,
+  TURN_BORDER_THICKNESS,
   TURN_QUOTE_BORDER_RADIUS,
   TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
@@ -42,14 +43,15 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
   return arrText.map((textItem) => {
     if (!textItem?.attributes?.background) return textItem;
     // console.log(textItem?.attributes?.background);
+    const rectColor =
+      colors[textItem.attributes.background] || textItem.attributes.background;
     return {
       ...textItem,
       attributes: {
         ...textItem.attributes,
-        background:
-          colors[textItem.attributes.background] ||
-          textItem.attributes.background,
+        background: rectColor,
         borderRadius: TURN_QUOTE_BORDER_RADIUS,
+        outline: `solid 2px ${rectColor}`,
       },
     };
   });
@@ -115,7 +117,6 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
           matches.push(item);
         }
         if (matches.length === 0) return element;
-        console.log({ element, matches });
         const items = [];
         let startPosition = 0;
         for (const match of matches) {
@@ -233,6 +234,7 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
   );
 };
 
+/** @deprecated */
 export const TextAroundQuote = ({
   // contentType,
   // backgroundColor,
@@ -337,7 +339,6 @@ export const TextAroundQuoteOptimized = ({
   //   scrollTop,
   //   quotesInfoPart,
   // });
-  console.log({ quotes, height, scrollHeight });
 
   // const dispatch = useDispatch();
   const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
@@ -406,7 +407,8 @@ export const TextAroundQuoteOptimized = ({
       quotesInfoPart.push({
         initialCoords: {
           left: left, // + PARAGRAPH_TEXT_PADDING,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, //-
+          //TURN_BORDER_THICKNESS,
           width,
           height,
         },
@@ -421,13 +423,6 @@ export const TextAroundQuoteOptimized = ({
         top: top,
       });
     }
-    // console.log({
-    //   top,
-    //   widgetTop,
-    //   deltaTop,
-    //   deltaScrollHeightTop,
-    //   widgetSpacer,
-    // });
 
     setQuotesInfoPart(quotesInfoPart);
     // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
