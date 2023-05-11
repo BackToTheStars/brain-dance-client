@@ -5,13 +5,14 @@ import { linesWithEndCoordsUpdate } from '../redux/actions';
 import { getLineEnds, getLinesCoords } from './helpers/line';
 
 const LinesCalculator = () => {
-  const lines = useSelector((store) => store.lines.lines);
+  const lines = useSelector((state) => state.lines.lines);
   // const linesWithEndCoords = useSelector(
-  //   (store) => store.lines.linesWithEndCoords
+  //   (state) => state.lines.linesWithEndCoords
   // );
-  const quotesInfo = useSelector((store) => store.lines.quotesInfo);
-  const turnsDictionary = useSelector((store) => store.turns.d);
-  const gamePosition = useSelector((store) => store.game.position);
+  const quotesInfo = useSelector((state) => state.lines.quotesInfo);
+  const turnsDictionary = useSelector((state) => state.turns.d);
+  const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.ui.viewport);
   const dispatch = useDispatch();
 
   const turnsToRender = Object.keys(turnsDictionary);
@@ -37,7 +38,7 @@ const LinesCalculator = () => {
     //   type: ACTION_UPDATE_LINE_ENDS,
     //   payload: getLineEnds(linesWithEndCoords),
     // });
-  }, [lines, turnsToRender, quotesInfo, gamePosition]);
+  }, [lines, turnsToRender, quotesInfo, gamePosition, viewport]);
   return '';
 };
 

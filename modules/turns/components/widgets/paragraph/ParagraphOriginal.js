@@ -123,7 +123,7 @@ const ParagraphOriginal = ({
 
       dispatch(markTurnAsChanged({ _id: turnId }));
     });
-  }, [height, scrollTop]); // stage, stateIsReady
+  }, [height, scrollTop, wasReady]); // stage, stateIsReady
   // @todo: нужно учитывать stage
 
   useEffect(() => {

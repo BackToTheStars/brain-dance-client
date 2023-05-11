@@ -1,6 +1,7 @@
 import { increment } from '@/modules/telemetry/utils/logger';
 import { createLinesRequest, deleteLinesRequest } from '../requests';
 import * as types from './types';
+import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 
 export const quoteCoordsUpdate =
   (turnId, type, quotesWithCoords) => (dispatch) => {
@@ -25,6 +26,7 @@ export const lineDelete = (id) => (dispatch) => {
       type: types.LINE_DELETE,
       payload: { id },
     });
+    dispatch(setActiveQuoteKey(null));
   });
 };
 

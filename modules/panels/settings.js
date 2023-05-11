@@ -28,6 +28,7 @@ export const POSITION_BOTTOM_LEFT = 'position_bottom_left';
 export const POSITION_BOTTOM_CENTER = 'position_bottom_center';
 export const POSITION_NOTIFICATIONS = 'position_notifications';
 export const POSITION_FLEXIBLE = 'position_flexible';
+export const POSITION_INVISIBLE = 'POSITION_INVISIBLE';
 
 export const PANEL_CLASSES = 'panel_classes';
 export const PANEL_SETTINGS = 'panel_settings';
@@ -165,11 +166,11 @@ export const panels = [
 
   {
     type: PANEL_SNAP_TO_GRID,
-    position: POSITION_BOTTOM_CENTER,
+    position: POSITION_INVISIBLE,
     component: () => {
       return null;
     },
-    isDisplayed: true,
+    isDisplayed: true, // пока решили оставить так, потом переключить на isSwitchOn или подобное
     id: (id += 1),
     width: () => `50vw`,
   },

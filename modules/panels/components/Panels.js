@@ -20,8 +20,12 @@ const Panels = () => {
   return (
     <>
       {panels
-        .filter((panel) => panel.isDisplayed)
+        .filter((panel) => {
+          // console.log({ id: 'panel', panel, isDisplayed: panel.isDisplayed });
+          return panel.isDisplayed;
+        })
         .map((panel) => {
+          console.log({ id: 'panel', panel, isDisplayed: panel.isDisplayed });
           const Wrapper = UIPanel;
           if (panel.position === POSITION_POPUP) {
             Wrapper = PanelPopup;

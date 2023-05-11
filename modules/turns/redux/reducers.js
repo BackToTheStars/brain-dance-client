@@ -90,7 +90,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
               payload.paragraphStage
             ),
             wasReady:
-              state.d[payload._id].wasReady || payload.stage === TURN_READY,
+              state.d[payload._id].wasReady || payload.turnStage === TURN_READY,
             ...payload,
             // @todo: id параграфа
           },
