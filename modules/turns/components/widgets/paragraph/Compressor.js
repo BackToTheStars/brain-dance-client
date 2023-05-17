@@ -1,4 +1,10 @@
-import { PARAGRAPH_TEXT_PADDING, widgetSpacer } from '@/config/ui';
+// @fixme: цитата делит одно слово на несколько слов
+// const words = paragraph
+//   .map((textItem) => textItem.insert)
+//   .join(' ')
+//   .split(' '); // слили всё в один большой текст и разделили по словам
+
+import { widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import {
   increment,
@@ -8,7 +14,7 @@ import {
 import { changeParagraphStage } from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
-import { Fragment, useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
@@ -21,8 +27,6 @@ import {
 } from './settings';
 import {
   ParagraphCompressorTextWrapper,
-  ParagraphOriginalTexts,
-  TextAroundQuote,
   TextAroundQuoteOptimized,
 } from './TextWrappers';
 import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
@@ -31,53 +35,28 @@ const Compressor = ({
   turnId,
   widget,
   widgetId,
-  // textPieces: compressedTextPieces,
-  // compressedHeight,
   setCompressedHeight,
-  // stateIsReady,
   setWrapperElCurrent,
   registerHandleResizeWithParams,
-  // setParagraphIsReady,
-  // height,
-  // paragraphIsReady,
-  // contentType,
-  // backgroundColor,
-  // fontColor,
-  // registerHandleResize,
-  // unregisterHandleResize,
-  // variableHeight,
-  // paragraphElCurrent,
-  // setParagraphElCurrent,
 }) => {
-  //
-  // const { turn } = useTurnContext();
   const turn = useSelector((state) => state.turns.d[turnId]);
   const dispatch = useDispatch();
   const {
     width,
     paragraph: originalParagraph,
-    y,
     contentType,
     compressedParagraphState,
   } = turn;
   const stage = getParagraphStage(turn);
-  const stageIsCompReady = stage === COMP_READY;
   const [compressedTexts, setCompressedTexts] = useState([]);
   const [textsReadyCount, setTextsReadyCount] = useState(0);
   const [compressedTextPieces, setCompressedTextPieces] = useState([]);
   const [quoteCollection, setQuoteCollection] = useState([]);
 
-  //
   const paragraph = originalParagraph.map((paragraphItem) => ({
     ...paragraphItem,
   }));
   const wrapperRef = useRef(null); // @learn null это мы, undefined, это система
-
-  // @fixme: цитата делит одно слово на несколько слов
-  // const words = paragraph
-  //   .map((textItem) => textItem.insert)
-  //   .join(' ')
-  //   .split(' '); // слили всё в один большой текст и разделили по словам
 
   const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
 
@@ -130,115 +109,48 @@ const Compressor = ({
   useEffect(() => {
     if (!wrapperRef.current) return false;
     if (stage !== COMP_LOADING) return false;
-    if (compressedParagraphState) {
-      const widgetMinHeight = compressedParagraphState.textPieces.reduce(
-        (acc, textPiece) => acc + textPiece.height,
-        0
-      );
-      const widgetMaxHeight = compressedParagraphState.textPieces.reduce(
-        (acc, textPiece) => acc + textPiece.scrollHeight,
-        0
-      );
+    if (!!compressedParagraphState) {
+      const { height, textPieces: textPiecesFromDB } = compressedParagraphState;
+      setCompressedTextPieces(textPiecesFromDB);
       registerHandleResizeWithParams({
-        widgetMinHeight,
-        widgetMaxHeight,
-        // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+        widgetMinHeight: height,
+        widgetMaxHeight: height,
         widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
       });
-    } else {
-      const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-      // console.log({ quotes });
-
-      const textPieces = calculateTextPiecesFromQuotes(
-        quotes,
-        wrapperRef?.current
-      );
-      // console.log({ textPieces });
-      setCompressedTextPieces(textPieces);
-
-      const widgetMinHeight = textPieces.reduce(
-        (acc, textPiece) => acc + textPiece.height,
-        0
-      );
-      const widgetMaxHeight = textPieces.reduce(
-        (acc, textPiece) => acc + textPiece.scrollHeight,
-        0
-      );
-      registerHandleResizeWithParams({
-        widgetMinHeight,
-        widgetMaxHeight,
-        // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
-        widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
-      });
-    }
-  }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
-
-  useEffect(() => {
-    if (compressedParagraphState) {
-      textPieces = compressedParagraphState.textPieces;
-      let paragraphCountingBuffer = [];
-      lettersCount = 0;
-      let paragraphIndex = 0;
-
-      for (let i = 0; i < textPieces.length - 1; i += 1) {
-        const { startLettersCount } = textPieces[i + 1];
-
-        for (let j = paragraphIndex; j < paragraph.length; j += 1) {
-          const insertLength = paragraph[j].insert.length;
-          if (insertLength + lettersCount === startLettersCount) {
-            // решить, делать ли копию
-            paragraphCountingBuffer.push(paragraph[j]);
-            paragraphIndex = j + 1;
-            textPieces[i].paragraph = paragraphCountingBuffer;
-            paragraphCountingBuffer = [];
-            lettersCount += insertLength;
-            break; // @learn - breaks работает для while, for, switch
-            //
-          } else if (insertLength + lettersCount < startLettersCount) {
-            paragraphCountingBuffer.push(paragraph[j]);
-            lettersCount += insertLength;
-            //
-          } else if (insertLength + lettersCount > startLettersCount) {
-            // const difference = insertLength + lettersCount - startLettersCount;
-            const difference = startLettersCount - lettersCount;
-            paragraphCountingBuffer.push({
-              insert: paragraph[j].insert.slice(0, difference),
-            });
-            paragraph.splice(j + 1, 0, {
-              insert: paragraph[j].insert.slice(difference),
-            });
-            paragraph[j].insert = paragraph[j].insert.slice(0, difference);
-            paragraphIndex = j + 1;
-            textPieces[i].paragraph = paragraphCountingBuffer;
-            paragraphCountingBuffer = [];
-            // lettersCount -= insertLength;
-            lettersCount += difference;
-            break;
-            //
-          }
-        }
-      }
-      textPieces[textPieces.length - 1].paragraph =
-        paragraph.slice(paragraphIndex);
-      setCompressedTexts(textPieces);
-
-      // console.log(
-      //   'textPieces',
-      //   textPieces.reduce((sum, textPiece) => {
-      //     console.log(textPiece);
-      //     return sum + textPiece.height;
-      //   }, 0)
-      // );
-
-      setCompressedHeight(
-        textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
-        // + (textPieces.length - 1) * 11 // todo: const
-      );
+      setCompressedTexts(textPiecesFromDB);
+      setCompressedHeight(height);
       return;
     }
 
-    // if (!wrapperRef.current) return false;
+    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+    const textPieces = calculateTextPiecesFromQuotes(
+      quotes,
+      wrapperRef?.current
+    );
+    setCompressedTextPieces(textPieces);
+
+    const widgetMinHeight = textPieces.reduce(
+      (acc, textPiece) => acc + textPiece.height,
+      0
+    );
+    const widgetMaxHeight = textPieces.reduce(
+      (acc, textPiece) => acc + textPiece.scrollHeight,
+      0
+    );
+    registerHandleResizeWithParams({
+      widgetMinHeight,
+      widgetMaxHeight,
+      // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
+      widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
+    });
+  }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
+
+  useEffect(() => {
     if (!compressedTextPieces?.length) return false;
+    if (!!compressedParagraphState) {
+      const { width: widthFromDB } = compressedParagraphState;
+      if (width === widthFromDB) return;
+    }
 
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
@@ -293,8 +205,6 @@ const Compressor = ({
         // }
       }
     }
-
-    paragraphStateSaveToLocalStorage(textPieces, turnId);
 
     let paragraphCountingBuffer = [];
     lettersCount = 0;
@@ -366,20 +276,23 @@ const Compressor = ({
       // textPiece.scrollTop = (textPiece.scrollHeight - textPiece.height) / 2;
     }
 
+    const height = textPieces.reduce(
+      // высота виджета параграфа в сжатом состоянии
+      (sum, textPiece) => sum + textPiece.height,
+      0
+    );
+
+    console.log({ id: 'log7', textPieces, turnId });
+    paragraphStateSaveToLocalStorage({
+      textPieces,
+      turnId,
+      height,
+      width,
+      updatedAt: Date.now(),
+    });
     setCompressedTexts(textPieces);
 
-    // console.log(
-    //   'textPieces',
-    //   textPieces.reduce((sum, textPiece) => {
-    //     console.log(textPiece);
-    //     return sum + textPiece.height;
-    //   }, 0)
-    // );
-
-    setCompressedHeight(
-      textPieces.reduce((sum, textPiece) => sum + textPiece.height, 0)
-      // + (textPieces.length - 1) * 11 // todo: const
-    );
+    setCompressedHeight(height);
     // setTimeout(() => {
     //   if (!!compressedHeight) setCompressedHeight(null);
     // }, 300);
@@ -430,7 +343,7 @@ const Compressor = ({
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;
       deltaScrollHeightTop += text.scrollHeight;
-      // newDeltaScrollHightTop = text.height - text.scrollHeight
+
       return (
         <TextAroundQuoteOptimized
           index={i}
@@ -443,39 +356,14 @@ const Compressor = ({
           scrollPosition={text.scrollTop} // + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
-          delta={text.delta}
           deltaScrollHeightTop={deltaScrollHeightTop - text.scrollHeight}
-          scrollHeight={text.scrollHeight}
           widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
           widgetWidth={widget?.width}
           quotes={text.quotes}
           parentClassNameId={classNameId}
-          // newDeltaScrollHightTop={newDeltaScrollHightTop}
         />
       );
     });
-    // return compressedTexts.map((text, i) => {
-    //   return (
-    //     <TextAroundQuote
-    //       key={i}
-    //       {...{
-    //         // contentType,
-    //         // backgroundColor,
-    //         // fontColor,
-    //         // registerHandleResize,
-    //         // unregisterHandleResize,
-    //         // variableHeight,
-    //         setTextIsReady,
-    //         paragraph: text.paragraph,
-    //         scrollPosition: text.scrollTop + text.delta,
-    //         // scrollPosition: text.scrollTop,
-    //         height: text.height, // через этот viewport смотрим на кусок текста
-    //         // height: text.scrollHeight,
-    //       }}
-    //     />
-    //   );
-    // });
-    // }, [compressedTexts, wrapperRef, stageIsCompReady]);
   }, [compressedTexts, widget]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
@@ -485,15 +373,10 @@ const Compressor = ({
   return (
     <div className="wrapperParagraphText">
       <div style={{ position: 'relative' }}>
-        <div
-          ref={wrapperRef}
-          className="compressor paragraphText"
-          // style={{ width: `${width}px` }}
-        >
-          {/* {stage !== COMP_READY ? paragraphCompressorTextWrapper : ''} */}
-          {stage !== COMP_READY && !compressedParagraphState
-            ? paragraphCompressorTextWrapper
-            : ''}
+        <div ref={wrapperRef} className="compressor paragraphText">
+          {stage !== COMP_READY &&
+            !compressedParagraphState &&
+            paragraphCompressorTextWrapper}
         </div>
       </div>
       <div className={`compressed-paragraph-widget ${classNameId}`}>

@@ -165,8 +165,6 @@ const Turn = ({ id }) => {
   const paragraphStage = getParagraphStage(turn);
   const turnStage = getTurnStage(turn);
 
-  console.log({ id: 'log1', _id, paragraphStage, turnStage });
-
   // const callsQueueIsBlockedFlag = useSelector(
   //   (state) => state.ui.callsQueueIsBlocked
   // );

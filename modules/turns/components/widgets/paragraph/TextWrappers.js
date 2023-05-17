@@ -1,15 +1,10 @@
 import {
-  PARAGRAPH_TEXT_PADDING,
-  TURN_BORDER_THICKNESS,
   TURN_QUOTE_BORDER_RADIUS,
   TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
 } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
-import { createTextAroundQuotesObject } from '../../helpers/paragraph/TextAroundQuotesClass';
 import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 
 const ORANGE = '#ffd596';
@@ -106,7 +101,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
 
   const links = isItQuote
     ? newInserts
-    : newInserts.map((element) => {
+    : newInserts.map((element, index) => {
         if (typeof element !== 'string') return element;
         const iterator = element.matchAll(
           /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/gm,
@@ -141,10 +136,10 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
         //   value: 'https://google.com',
         //   type: 'link',
         // }]
-        return items.map((item) => {
+        return items.map((item, index2) => {
           if (item.type === 'text') return item.value;
           return (
-            <a href={item.value} target="_blank">
+            <a key={`${index}_${index2}`} href={item.value} target="_blank">
               {item.value}
             </a>
           );
@@ -304,12 +299,10 @@ export const TextAroundQuoteOptimized = ({
   index,
   addToQuoteCollection,
   deltaTop,
-  delta,
   deltaScrollHeightTop,
   widgetTop,
   widgetWidth,
   quotes,
-  scrollHeight,
   parentClassNameId,
 }) => {
   //
@@ -317,30 +310,7 @@ export const TextAroundQuoteOptimized = ({
 
   const [scrollTop, setScrollTop] = useState(0);
   const [quotesInfoPart, setQuotesInfoPart] = useState([]);
-  const textAroundQuoteObj = useMemo(() => {
-    return createTextAroundQuotesObject({
-      turnId,
-      index,
-      originalQuotes: quotes,
-      widgetCoords: {
-        left: 0,
-        top: widgetTop,
-      },
-      originalMiniParagraphTop: deltaScrollHeightTop,
-      realMiniParagraphTop: deltaTop,
-    });
-  }, []);
 
-  // console.log({
-  //   deltaTop,
-  //   widgetTop,
-  //   widgetWidth,
-  //   quotes,
-  //   scrollTop,
-  //   quotesInfoPart,
-  // });
-
-  // const dispatch = useDispatch();
   const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
 
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
@@ -363,42 +333,12 @@ export const TextAroundQuoteOptimized = ({
 
   useEffect(() => {
     // @todo: check if no quotes
-    // paragraphEl.current.scrollTop = scrollPosition;
-    // setTimeout(() => {
     if (!paragraphEl?.current) return;
     paragraphEl.current.scrollTop = scrollPosition;
-    // const quotes = [
-    //   ...paragraphEl.current.querySelectorAll('.compressed-quote'),
-    // ];
     if (!quotes?.length) {
       console.log('no quotes in TextAroundQuote');
       return;
     }
-
-    // const top = quotes[0].top;
-    // const lastQuote = quotes.at(-1);
-    // const bottom = lastQuote.top + lastQuote.height;
-    // const middleLine = (top + bottom) / 2;
-    // const paragraphTop = widgetTop + deltaTop; // + turn.y?
-    // const paragraphBottom = paragraphTop + height;
-    // const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
-    // const fixScroll = Math.floor(middleLineParagraph - middleLine);
-    // console.log({
-    //   paragraphTop,
-    //   paragraphBottom,
-    //   top,
-    //   bottom,
-    // });
-    // console.log({
-    //   scrollTop: paragraphEl.current.scrollTop,
-    //   fixScroll,
-    //   scrollPosition,
-    // });
-    // paragraphEl.current.scrollTop -= fixScroll;
-    // for (let quote of quotes) {
-    // const { top, bottom } = quote.getBoundingClientRect();
-    // }
-    // console.log(middleLine, ' ', middleLineParagraph);
 
     const quotesInfoPart = [];
 
@@ -406,9 +346,8 @@ export const TextAroundQuoteOptimized = ({
       const { top, left, width, height } = quote;
       quotesInfoPart.push({
         initialCoords: {
-          left: left, // + PARAGRAPH_TEXT_PADDING,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer, //-
-          //TURN_BORDER_THICKNESS,
+          left: left,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer,
           width,
           height,
         },
@@ -419,18 +358,13 @@ export const TextAroundQuoteOptimized = ({
         type: 'text',
         width,
         height,
-        left: left, // + PARAGRAPH_TEXT_PADDING,
+        left: left,
         top: top,
       });
     }
 
     setQuotesInfoPart(quotesInfoPart);
-    // dispatch(quoteCoordsUpdate(turnId,'text', quotesInfoPart));
-
     setTextIsReady();
-    // setScrollTop(scrollPosition);
-    //
-    // }, 300);
   }, [paragraphEl]);
 
   useEffect(() => {

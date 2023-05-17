@@ -12,10 +12,16 @@ export const getWidgetDataFromState = (state) => {
   return { turn, editWidgetId, editWidgetParams, zeroPoint };
 };
 
-export const paragraphStateSaveToLocalStorage = (textPieces, turnId) => {
+export const paragraphStateSaveToLocalStorage = ({
+  textPieces,
+  turnId,
+  height,
+  width,
+  updatedAt,
+}) => {
   localStorage.setItem(
     `compressedParagraphState_${turnId}`,
-    JSON.stringify({ time: Date.now(), textPieces })
+    JSON.stringify({ time: updatedAt, turnId, width, height, textPieces })
   );
 };
 

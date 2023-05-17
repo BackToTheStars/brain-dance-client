@@ -71,12 +71,23 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
           width: state.ui.viewport.width,
           height: state.ui.viewport.height,
         },
-        turns: data.items.map((turn) => ({
-          ...turn,
-          x: snapRound(turn.x - viewport.x, GRID_CELL_X),
-          y: snapRound(turn.y - viewport.y, GRID_CELL_X),
-          compressedParagraphState: paragraphStateGetFromLocalStorage(turn._id),
-        })),
+        turns: data.items.map((turn) => {
+          const compressedParagraphStateOld = paragraphStateGetFromLocalStorage(
+            turn._id
+          );
+          const compressedParagraphState =
+            compressedParagraphStateOld?.width === turn.width &&
+            compressedParagraphStateOld?.updatedAt >=
+              new Date(turn.updatedAt).getTime()
+              ? compressedParagraphStateOld
+              : null;
+          return {
+            ...turn,
+            x: snapRound(turn.x - viewport.x, GRID_CELL_X),
+            y: snapRound(turn.y - viewport.y, GRID_CELL_X),
+            compressedParagraphState,
+          };
+        }),
       },
     });
     dispatch({
