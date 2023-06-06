@@ -209,7 +209,7 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
             return (
               <Fragment key={'item' + index}>
                 {words.map((word, index2) => {
-                  increment('WordMap');
+                  // increment('WordMap');
                   return (
                     <span key={`item-${index}-${index2}`}>
                       {word}

@@ -77,7 +77,7 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
           );
           const compressedParagraphState =
             compressedParagraphStateOld?.width === turn.width &&
-            compressedParagraphStateOld?.updatedAt >=
+            compressedParagraphStateOld?.time >=
               new Date(turn.updatedAt).getTime()
               ? compressedParagraphStateOld
               : null;

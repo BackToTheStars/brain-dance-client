@@ -395,10 +395,6 @@ const Turn = ({ id }) => {
   }, [widgets, turnStage]);
 
   useEffect(() => {
-    dispatch(resetCompressedParagraphState(_id));
-  }, [width]); // @todo: проверить, необходимо ли перенести это в Compressor
-
-  useEffect(() => {
     if (!wrapper.current) return;
     if (paragraphStage === COMP_READY) {
       $(wrapper.current).resizable({ disabled: true });

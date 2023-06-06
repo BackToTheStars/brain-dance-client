@@ -11,7 +11,10 @@ import {
   startLoggingTime,
   stopLoggingTime,
 } from '@/modules/telemetry/utils/logger';
-import { changeParagraphStage } from '@/modules/turns/redux/actions';
+import {
+  changeParagraphStage,
+  resetCompressedParagraphState,
+} from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
 import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
 import { useRef, useState, useEffect, useMemo } from 'react';
@@ -39,6 +42,7 @@ const Compressor = ({
   setWrapperElCurrent,
   registerHandleResizeWithParams,
 }) => {
+  increment('Render');
   const turn = useSelector((state) => state.turns.d[turnId]);
   const dispatch = useDispatch();
   const {
@@ -90,6 +94,7 @@ const Compressor = ({
   }
 
   useEffect(() => {
+    increment('useEffect 1');
     if (!quoteCollection.length) return;
     const count = quoteCollection.filter((q) => !!q).length;
     if (count !== compressedTexts.length) return;
@@ -102,6 +107,7 @@ const Compressor = ({
   // PARAGRAPH STAGE OF STATE MACHINE (same in ParagraphOriginal.js)
 
   useEffect(() => {
+    increment('useEffect 2');
     dispatch(changeParagraphStage(turnId, COMP_LOADING));
     increment('CompressorInit');
   }, []);
@@ -110,6 +116,7 @@ const Compressor = ({
     if (!wrapperRef.current) return false;
     if (stage !== COMP_LOADING) return false;
     if (!!compressedParagraphState) {
+      increment('useEffect 3 1');
       const { height, textPieces: textPiecesFromDB } = compressedParagraphState;
       setCompressedTextPieces(textPiecesFromDB);
       registerHandleResizeWithParams({
@@ -121,7 +128,7 @@ const Compressor = ({
       setCompressedHeight(height);
       return;
     }
-
+    increment('useEffect 3 2');
     const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
     const textPieces = calculateTextPiecesFromQuotes(
       quotes,
@@ -146,11 +153,22 @@ const Compressor = ({
   }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
-    if (!compressedTextPieces?.length) return false;
     if (!!compressedParagraphState) {
       const { width: widthFromDB } = compressedParagraphState;
       if (width === widthFromDB) return;
     }
+    dispatch(resetCompressedParagraphState(turnId));
+  }, [width]);
+
+  console.log({ turnId, compressedParagraphState });
+  useEffect(() => {
+    if (!compressedTextPieces?.length) return false;
+    if (!!compressedParagraphState) {
+      increment('useEffect 4 1');
+      const { width: widthFromDB } = compressedParagraphState;
+      if (width === widthFromDB) return;
+    }
+    increment('useEffect 4 2');
 
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
@@ -299,6 +317,7 @@ const Compressor = ({
   }, [width, compressedTextPieces]); // , wrapperRef
 
   useEffect(() => {
+    increment('useEffect 5');
     // console.log(
     //   `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
     // );
@@ -313,10 +332,12 @@ const Compressor = ({
   }, [textsReadyCount, compressedTexts]);
 
   useEffect(() => {
+    increment('useEffect 6');
     if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
 
   useEffect(() => {
+    increment('useEffect 7');
     if (stage === COMP_READY) {
       stopLoggingTime('paragraphStageReady' + turnId);
     } else if (stage === COMP_READY_TO_RECEIVE_PARAMS) {
@@ -331,7 +352,7 @@ const Compressor = ({
   }, [stage]);
 
   const textsAroundQuotes = useMemo(() => {
-    increment('txt_compressor', { turnId, count: compressedTexts.length });
+    increment('useMemo 1');
 
     if (!widget) return [];
 
@@ -367,6 +388,7 @@ const Compressor = ({
   }, [compressedTexts, widget]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
+    increment('useMemo 2');
     return <ParagraphCompressorTextWrapper arrText={paragraph} />;
   }, []);
 
