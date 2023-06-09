@@ -72,6 +72,8 @@ const Game = ({ hash }) => {
   useEffect(() => {
     if (!gameBox.current) return;
 
+    if (typeof $ === 'undefined') return;
+
     $(gameBox.current).draggable({
       // grid: [GRID_CELL_X, GRID_CELL_X],
       stop: (event, ui) => {

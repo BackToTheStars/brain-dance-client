@@ -48,8 +48,8 @@ const LastTurns = () => {
                 <iframe
                   className="card-img-top d-none d-sm-block"
                   src={turn.videoUrl.replace('watch?v=', 'embed/')}
-                  frameborder="1"
-                  allowfullscreen
+                  frameBorder="1"
+                  allowFullScreen
                 ></iframe>
               )}
 
@@ -58,8 +58,9 @@ const LastTurns = () => {
                 <div className="card-game-buttons">
                   <Link
                     href={'game?hash=' + lastTurnsGamesDictionary[turn._id]}
+                    className="btn btn-success me-2 mb-2"
                   >
-                    <a className="btn btn-success me-2 mb-2">Open</a>
+                    Open
                   </Link>
                 </div>
               </div>

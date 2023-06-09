@@ -1,3 +1,4 @@
+'use  client'
 import { useMemo } from 'react'
 import { createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
@@ -7,10 +8,13 @@ import reducers from './reducers.js'
 let store
 
 function initStore(initialState) {
+  const composeEnhancers = composeWithDevTools({
+    maxAge: 500
+  });
   return createStore(
     reducers,
     initialState,
-    composeWithDevTools(applyMiddleware(thunkMiddleware))
+    composeEnhancers(applyMiddleware(thunkMiddleware))
   )
 }
 
@@ -37,6 +41,7 @@ export const initializeStore = (preloadedState) => {
 }
 
 export function useStore(initialState) {
-  const store = useMemo(() => initializeStore(initialState), [initialState])
+  // const store = useMemo(() => initializeStore(initialState), [initialState])
+  const store = initializeStore()
   return store
 }

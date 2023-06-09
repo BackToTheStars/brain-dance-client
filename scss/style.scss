@@ -1,6 +1,10 @@
-@import './old/variables';
+// @import './old/variables';
+@import './variables';
 @import 'mixins';
-@import '../node_modules/bootstrap/scss/bootstrap';
+
+@import "../desk-scss/bootstrap-mini.scss";
+// @import '../node_modules/bootstrap/scss/bootstrap';
+
 @import 'overrides';
 
 @import 'common';

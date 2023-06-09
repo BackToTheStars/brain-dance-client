@@ -5,7 +5,6 @@ import {
   getClassesRequest,
   updateClassRequest,
 } from '../requests';
-import { ACTION_CLASS_ADD } from 'old/components/contexts/ClassContext';
 
 export const loadClasses = () => {
   return (dispatch) => {

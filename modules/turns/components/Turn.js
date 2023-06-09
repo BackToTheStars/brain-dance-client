@@ -290,11 +290,13 @@ const Turn = ({ id }) => {
         );
       });
 
-      if (newHeight !== height || newWidth !== width) {
-        $(wrapper.current).css({
-          height: `${newHeight}px`,
-          width: `${newWidth}px`,
-        });
+      if (typeof $ !== 'undefined') {
+        if (newHeight !== height || newWidth !== width) {
+          $(wrapper.current).css({
+            height: `${newHeight}px`,
+            width: `${newWidth}px`,
+          });
+        }
       }
     }
 
@@ -339,6 +341,7 @@ const Turn = ({ id }) => {
 
   // DRAGGABLE
   useEffect(() => {
+    if (typeof $ === 'undefined') return;
     $(wrapper.current).draggable({
       grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
@@ -371,6 +374,7 @@ const Turn = ({ id }) => {
   // RESIZABLE
   useEffect(() => {
     if (paragraphStage === COMP_READY) return;
+    if (typeof $ === 'undefined') return;
 
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],
@@ -400,6 +404,7 @@ const Turn = ({ id }) => {
 
   useEffect(() => {
     if (!wrapper.current) return;
+    if (typeof $ === 'undefined') return;
     if (paragraphStage === COMP_READY) {
       $(wrapper.current).resizable({ disabled: true });
     } // @todo: else if previous paragraphStage === COMP_READY then enable

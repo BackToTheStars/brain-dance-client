@@ -6,6 +6,8 @@ export const utils = {
 
 export const registerMoveScene = (dispatch, gameBoxEl) => {
   utils.moveScene = (left, top, animationTime = 0) => {
+    if (typeof $ === 'undefined') return;
+    
     $(gameBoxEl).addClass('remove-line-transition');
     $(gameBoxEl).animate(
       {

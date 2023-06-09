@@ -13,7 +13,8 @@ import {
 } from '@/modules/telemetry/utils/logger';
 import { changeParagraphStage } from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
-import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
+// import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
+const calculateTextPiecesFromQuotes = () => {}
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -107,8 +108,8 @@ const Compressor = ({
   }, []);
 
   useEffect(() => {
-    if (!wrapperRef.current) return false;
-    if (stage !== COMP_LOADING) return false;
+    if (!wrapperRef.current) return;
+    if (stage !== COMP_LOADING) return;
     if (!!compressedParagraphState) {
       const { height, textPieces: textPiecesFromDB } = compressedParagraphState;
       setCompressedTextPieces(textPiecesFromDB);
@@ -126,7 +127,7 @@ const Compressor = ({
     const textPieces = calculateTextPiecesFromQuotes(
       quotes,
       wrapperRef?.current
-    );
+    ) || [];
     setCompressedTextPieces(textPieces);
 
     const widgetMinHeight = textPieces.reduce(
@@ -146,7 +147,7 @@ const Compressor = ({
   }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
-    if (!compressedTextPieces?.length) return false;
+    if (!compressedTextPieces?.length) return;
     if (!!compressedParagraphState) {
       const { width: widthFromDB } = compressedParagraphState;
       if (width === widthFromDB) return;

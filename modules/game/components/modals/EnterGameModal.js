@@ -1,6 +1,6 @@
 import { enterGameRequest } from '@/modules/admin/requests';
 import Modal from '@/modules/ui/components/Modal';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 
 const EnterGameModal = ({ close, onCreate }) => {

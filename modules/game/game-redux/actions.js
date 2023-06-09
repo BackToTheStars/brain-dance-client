@@ -156,6 +156,8 @@ export const centerViewportAtPosition =
     const left = position.left - x + Math.floor(viewport.width / 2);
     const top = position.top - y + Math.floor(viewport.height / 2);
 
+    if (typeof $ === 'undefined') return;
+
     const gameBoxEl = $('#gameBox');
 
     gameBoxEl.addClass('remove-line-transition');

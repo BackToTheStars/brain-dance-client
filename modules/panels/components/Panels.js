@@ -24,7 +24,7 @@ const Panels = () => {
           return panel.isDisplayed;
         })
         .map((panel) => {
-          const Wrapper = UIPanel;
+          let Wrapper = UIPanel;
           if (panel.position === POSITION_POPUP) {
             Wrapper = PanelPopup;
           }

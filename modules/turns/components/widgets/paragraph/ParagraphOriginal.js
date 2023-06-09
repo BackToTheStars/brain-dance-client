@@ -45,7 +45,7 @@ const ParagraphOriginal = ({
   const {
     compressed,
     paragraph,
-    _id: turnId,
+    // _id: turnId,
     backgroundColor,
     fontColor,
     contentType,

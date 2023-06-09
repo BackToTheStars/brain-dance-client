@@ -1,7 +1,7 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { saveField } from '@/modules/game/game-redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from 'react-redux';
 import { setPanelMode, togglePanel } from '../../redux/actions';
 import {

@@ -15,7 +15,6 @@ import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Fragment } from 'react/cjs/react.development';
 import { togglePanel } from '../redux/actions';
 import { PANEL_INFO } from '../settings';
 import EditGameForm from './info/EditGameForm';
