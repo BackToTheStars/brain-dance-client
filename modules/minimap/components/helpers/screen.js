@@ -1,13 +1,18 @@
 export const getScreenRect = (turnObjects) => {
-  let left = turnObjects[0]?.x || 0,
-    right = turnObjects[0]?.x + turnObjects[0]?.width || 0,
-    top = turnObjects[0]?.y || 0,
-    bottom = turnObjects[0]?.y + turnObjects[0]?.height || 0,
+  let left = turnObjects[0]?.position.x || 0,
+    right = turnObjects[0]?.position.x + turnObjects[0]?.size.width || 0,
+    top = turnObjects[0]?.position.y || 0,
+    bottom = turnObjects[0]?.position.y + turnObjects[0]?.size.height || 0,
     zeroX = 0,
     zeroY = 0;
   const turns = [];
   for (let turnObject of turnObjects) {
-    const { x, y, height, width, _id, contentType } = turnObject; // собирает все ходы с экрана
+    const {
+      position: { x, y },
+      size: { height, width },
+      _id,
+      contentType,
+    } = turnObject; // собирает все ходы с экрана
     turns.push({ x, y, height, width, _id });
     if (contentType === 'zero-point') {
       zeroX = x;

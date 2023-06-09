@@ -139,6 +139,8 @@ const Turn = ({ id }) => {
 
   const {
     //-- geometry
+    size,
+    position,
     _id,
     x,
     y,
@@ -162,8 +164,8 @@ const Turn = ({ id }) => {
     pictureOnly,
   } = turn;
 
-  const paragraphStage = getParagraphStage(turn);
-  const turnStage = getTurnStage(turn);
+  const paragraphStage = ''; //getParagraphStage(turn);
+  const turnStage = ''; //getTurnStage(turn);
 
   // const callsQueueIsBlockedFlag = useSelector(
   //   (state) => state.ui.callsQueueIsBlocked
@@ -175,13 +177,13 @@ const Turn = ({ id }) => {
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
 
-  const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
+  const doesParagraphExist = false; // !pictureOnly && checkIfParagraphExists(paragraph);
 
   const wrapperStyles = {
-    left: `${x}px`,
-    top: `${y}px`,
-    width: `${width}px`,
-    height: `${height}px`,
+    left: `${position.x}px`,
+    top: `${position.y}px`,
+    width: `${size.width}px`,
+    height: `${size.height}px`,
   };
 
   if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {

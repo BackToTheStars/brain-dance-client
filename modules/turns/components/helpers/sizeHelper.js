@@ -1,4 +1,5 @@
 import { widgetSpacer } from '@/config/ui';
+import { TurnHelper } from '../../redux/helpers';
 
 export const areRectanglesIntersect = (rect1, rect2) => {
   return (
@@ -10,7 +11,7 @@ export const areRectanglesIntersect = (rect1, rect2) => {
 };
 
 export const isTurnInsideRenderArea = (turn, viewport) => {
-  return areRectanglesIntersect(turn, {
+  return areRectanglesIntersect(TurnHelper.toOldFields(turn), {
     x: viewport.x - viewport.width,
     width: 3 * viewport.width,
     y: viewport.y - viewport.height,

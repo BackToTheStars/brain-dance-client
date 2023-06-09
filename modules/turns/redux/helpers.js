@@ -7,7 +7,7 @@ export class TurnHelper {
       date: turn.date,
       gameId: turn.gameId,
       originalId: turn.originalId,
-  
+
       colors: {
         background: turn.backgroundColor,
         font: turn.fontColor,
@@ -22,7 +22,7 @@ export class TurnHelper {
       },
 
       quotes: turn.quotes,
-  
+
       widgetsCount: 0,
       widgets: {
         header: {
@@ -52,6 +52,15 @@ export class TurnHelper {
           uncompressedHeight: turn.uncompressedHeight, // ?
         },
       },
-    }
+    };
+  }
+
+  static toOldFields(turn) {
+    return {
+      x: turn.position.x,
+      y: turn.position.y,
+      width: turn.size.width,
+      height: turn.size.height,
+    };
   }
 }

@@ -37,6 +37,7 @@ import {
 } from '../components/helpers/store';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
+import { TurnHelper } from './helpers';
 
 export const resetCompressedParagraphState = (_id) => (dispatch) => {
   dispatch({
@@ -81,12 +82,12 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
               new Date(turn.updatedAt).getTime()
               ? compressedParagraphStateOld
               : null;
-          return {
+          return TurnHelper.toNewFields({
             ...turn,
             x: snapRound(turn.x - viewport.x, GRID_CELL_X),
             y: snapRound(turn.y - viewport.y, GRID_CELL_X),
             compressedParagraphState,
-          };
+          });
         }),
       },
     });

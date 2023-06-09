@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getScreenRect } from './helpers/screen';
 import Line from './line/Line';
 import MinimapButtons from './MinimapButtons';
+import { TurnHelper } from '@/modules/turns/redux/helpers';
 // import {
 // useTurnsCollectionContext,
 // ACTION_FIELD_WAS_MOVED,
@@ -110,20 +111,23 @@ const Minimap = ({ settings }) => {
       ...turn,
       // для получения координаты шага на карте достаточно
       // сместить его координаты на координаты viewport
-      x: turn.x - left + freeSpaceLeftRight - zeroX,
-      y: turn.y - top + freeSpaceTopBottom - zeroY,
+      x: turn.position.x - left + freeSpaceLeftRight - zeroX,
+      y: turn.position.y - top + freeSpaceTopBottom - zeroY,
     }))
     .map((turn) => {
-      const isTurnInsideViewport = areRectanglesIntersect(turn, {
-        // x: viewport.x,
-        // width: viewport.width,
-        // y: viewport.y,
-        // height: viewport.height,
-        x: viewport.x - viewport.width,
-        width: 3 * viewport.width,
-        y: viewport.y - viewport.height,
-        height: 3 * viewport.height,
-      });
+      const isTurnInsideViewport = areRectanglesIntersect(
+        TurnHelper.toOldFields(turn),
+        {
+          // x: viewport.x,
+          // width: viewport.width,
+          // y: viewport.y,
+          // height: viewport.height,
+          x: viewport.x - viewport.width,
+          width: 3 * viewport.width,
+          y: viewport.y - viewport.height,
+          height: 3 * viewport.height,
+        }
+      );
       return {
         ...turn,
         isTurnInsideViewport,
@@ -397,13 +401,13 @@ const SVGMiniMap = ({
             return (
               <rect
                 key={turn._id}
-                x={turn.x}
-                y={turn.y}
-                width={turn.width}
+                x={turn.position.x}
+                y={turn.position.y}
+                width={turn.size.width}
+                height={turn.size.height}
                 rx={turnRadiusFactored}
                 fill={fill}
                 // fill="gray"
-                height={turn.height}
               />
             );
           })}
@@ -447,13 +451,13 @@ const SVGMiniMap = ({
             return (
               <rect
                 key={`viewport_${turn._id}`}
-                x={turn.x}
-                y={turn.y}
-                width={turn.width}
+                x={turn.position.x}
+                y={turn.position.y}
+                width={turn.size.width}
+                height={turn.size.height}
                 rx={turnRadiusFactored}
                 // fill={fill}
                 fill="#489BC1"
-                height={turn.height}
                 clipPath="url(#viewPort)"
               />
             );
