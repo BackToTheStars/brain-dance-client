@@ -136,14 +136,20 @@ export const saveField =
   };
 
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {
-  dispatch({
-    type: turnsTypes.TURNS_LOAD_TO_PASTE,
-    payload: { turnsToPaste: getTurnsFromBuffer() },
-  });
-  dispatch({
-    type: linesTypes.LINES_LOAD_TO_PASTE,
-    payload: { linesToPaste: getLinesNotExpired() },
-  });
+  const turnsToPaste = getTurnsFromBuffer();
+  if (turnsToPaste.length) {
+    dispatch({
+      type: turnsTypes.TURNS_LOAD_TO_PASTE,
+      payload: { turnsToPaste },
+    });
+  }
+  const linesToPaste = getLinesNotExpired();
+  if (Object.keys(linesToPaste).length) {
+    dispatch({
+      type: linesTypes.LINES_LOAD_TO_PASTE,
+      payload: { linesToPaste },
+    });
+  }
 };
 
 export const centerViewportAtPosition =

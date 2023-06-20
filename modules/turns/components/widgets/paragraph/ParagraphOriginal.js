@@ -41,21 +41,33 @@ const ParagraphOriginal = ({
   notRegisteredWidgetsCount,
   // setParagraphIsReady,
 }) => {
-  const turn = useSelector((state) => state.turns.d[turnId]);
-  const {
-    compressed,
-    paragraph,
-    // _id: turnId,
-    backgroundColor,
-    fontColor,
-    contentType,
-    scrollPosition,
-    width,
-    height,
-    wasReady,
-  } = turn;
+  const widget = useSelector((state) => state.turns.d[turnId].widgets.paragraph);
+  const showCompressed =  useSelector((state) => state.turns.d[turnId].widgets.compressed.show);
+  const colors = useSelector((state) => state.turns.d[turnId].colors);
+  const contentType = useSelector((state) => state.turns.d[turnId].contentType);
+  const size = useSelector((state) => state.turns.d[turnId].size);
+  // const {
+  //   // compressed,
+  //   // paragraph,
+  //   // _id: turnId,
+  //   // backgroundColor,
+  //   // fontColor,
+  //   // contentType,
+  //   // scrollPosition,
+  //   // width,
+  //   // height,
+  //   // wasReady,
+  // } = turn;
+  const {width, height} = size;
+  const wasReady = true; // @todo убрать
 
-  const stage = getParagraphStage(turn);
+  const paragraph = widget.inserts;
+  const scrollPosition = widget.scrollPosition;
+  const backgroundColor = colors.background;
+  const fontColor = colors.font;
+
+
+  // const stage = getParagraphStage(turn);
 
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
@@ -69,7 +81,7 @@ const ParagraphOriginal = ({
     style.backgroundColor = backgroundColor;
     style.color = fontColor || 'black';
   }
-  if (compressed) {
+  if (showCompressed) {
     style.visibility = 'hidden';
     style.position = 'absolute';
   }

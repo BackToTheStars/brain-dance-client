@@ -41,8 +41,8 @@ const getQuill = (containerSelector, toolbarSelector) => {
   };
 };
 
-const checkIfParagraphExists = (paragraph) => {
-  return !!paragraph
+const checkIfParagraphExists = (inserts) => {
+  return !!inserts
     .map((item) => item.insert)
     .join('')
     .trim(); // @todo: remove after quill fix

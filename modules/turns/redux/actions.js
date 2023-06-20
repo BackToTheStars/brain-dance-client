@@ -39,15 +39,15 @@ import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
 
-export const resetCompressedParagraphState = (_id) => (dispatch) => {
-  dispatch({
-    type: types.TURNS_UPDATE_GEOMETRY,
-    payload: { compressedParagraphState: null, _id, compressedHeight: 0 },
-  });
-  // dispatch({
-  //   type: types.TURN_WAS_CHANGED,
-  //   payload: { _id },
-  // });
+export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
+  const state = getState();
+  const prevTurn = state.turns.d[_id]
+  if (prevTurn.compressedParagraphState || prevTurn.compressedHeight) {
+    dispatch({
+      type: types.TURNS_UPDATE_GEOMETRY,
+      payload: { compressedParagraphState: null, _id, compressedHeight: 0 },
+    });
+  }
   paragraphStateDeleteFromLocalStorage(_id);
 };
 
@@ -67,10 +67,14 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
       type: types.LOAD_TURNS,
       payload: {
         viewport: {
-          x: 0,
-          y: 0,
-          width: state.ui.viewport.width,
-          height: state.ui.viewport.height,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          size: {
+            width: state.ui.viewport.width,
+            height: state.ui.viewport.height,
+          },
         },
         turns: data.items.map((turn) => {
           const compressedParagraphStateOld = paragraphStateGetFromLocalStorage(
@@ -209,12 +213,14 @@ export const moveField = (data) => (dispatch, getState) => {
       }
     : data;
   const viewport = {
-    // x: state.game.position.left,
-    // y: state.game.position.top,
-    x: 0,
-    y: 0,
-    width: state.ui.viewport.width,
-    height: state.ui.viewport.height,
+    position: {
+      x: 0,
+      y: 0,
+    },
+    size: {
+      width: state.ui.viewport.width,
+      height: state.ui.viewport.height,
+    }
   };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
@@ -455,8 +461,11 @@ export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
   }
 };
 
-export const resetTurnNextPastePosition = () => (dispatch) => {
-  dispatch({ type: types.TURN_NEXT_PASTE_POSITION, payload: null });
+export const resetTurnNextPastePosition = () => (dispatch, getState) => {
+  const state = getState();
+  if (state.turns.pasteNextTurnPosition) {
+    dispatch({ type: types.TURN_NEXT_PASTE_POSITION, payload: null });
+  }
 };
 
 export const uploadImage = (image) => () => {

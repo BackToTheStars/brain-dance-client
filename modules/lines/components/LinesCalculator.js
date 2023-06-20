@@ -1,18 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { linesWithEndCoordsUpdate } from '../redux/actions';
 import { getLineEnds, getLinesCoords } from './helpers/line';
 
+const getSerializedTurnsGeometry = (d) => {
+  return JSON.stringify(
+    Object.keys(d).map(({ size, position }) => ({ size, position }))
+  );
+};
+
 const LinesCalculator = () => {
   const lines = useSelector((state) => state.lines.lines);
-  // const linesWithEndCoords = useSelector(
-  //   (state) => state.lines.linesWithEndCoords
-  // );
   const quotesInfo = useSelector((state) => state.lines.quotesInfo);
   const turnsDictionary = useSelector((state) => state.turns.d);
-  const gamePosition = useSelector((state) => state.game.position);
-  const viewport = useSelector((state) => state.ui.viewport);
+  const [serializedTurnsGeometry, setSerializedTurnsGeometry] = useState(
+    getSerializedTurnsGeometry(turnsDictionary)
+  );
   const dispatch = useDispatch();
 
   const turnsToRender = Object.keys(turnsDictionary);
@@ -27,18 +31,14 @@ const LinesCalculator = () => {
       // pictureQuotesInfo
     );
 
-    // if (!linesWithEndCoordsNew.length && !linesWithEndCoords.length) return;
-
-    dispatch(linesWithEndCoordsUpdate(linesWithEndCoordsNew));
-    // turnsDispatch({
-    //   type: ACTION_RECALCULATE_LINES,
-    //   payload: linesWithEndCoords,
-    // });
-    // turnsDispatch({
-    //   type: ACTION_UPDATE_LINE_ENDS,
-    //   payload: getLineEnds(linesWithEndCoords),
-    // });
-  }, [lines, turnsToRender, quotesInfo, gamePosition, viewport]);
+    if (turnsToRender.length !== 0) {
+      dispatch(linesWithEndCoordsUpdate(linesWithEndCoordsNew));
+    }
+  }, [lines, quotesInfo, serializedTurnsGeometry]);
+  
+  useEffect(() => {
+    setSerializedTurnsGeometry(getSerializedTurnsGeometry(turnsDictionary))
+  }, [turnsDictionary])
   return '';
 };
 

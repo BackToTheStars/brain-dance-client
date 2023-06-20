@@ -1,5 +1,8 @@
 export const DEFAULT_GAME_IMG = '/img/game_screenshot.png';
 
+// количество вьюпортов для предзагрузки шагов по горизонтали и вертикали
+export const PRELOAD_VIEWPORTS_COUNT = 3;
+
 export const TURN_BORDER_THICKNESS = 2; // такая же переменная дублируется в variables.scss
 
 export const panelSpacer = 10;

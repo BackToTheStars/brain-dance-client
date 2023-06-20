@@ -1,21 +1,26 @@
-import { widgetSpacer } from '@/config/ui';
-import { TurnHelper } from '../../redux/helpers';
+import { PRELOAD_VIEWPORTS_COUNT } from '@/config/ui';
 
 export const areRectanglesIntersect = (rect1, rect2) => {
+  const { position: position1, size: size1 } = rect1;
+  const { position: position2, size: size2 } = rect2;
   return (
-    rect1.x + rect1.width >= rect2.x &&
-    rect1.x <= rect2.x + rect2.width &&
-    rect1.y + rect1.height >= rect2.y &&
-    rect1.y <= rect2.y + rect2.height
+    position1.x + size1.width >= position2.x &&
+    position1.x <= position2.x + size2.width &&
+    position1.y + size1.height >= position2.y &&
+    position1.y <= position2.y + size2.height
   );
 };
 
 export const isTurnInsideRenderArea = (turn, viewport) => {
-  return areRectanglesIntersect(TurnHelper.toOldFields(turn), {
-    x: viewport.x - viewport.width,
-    width: 3 * viewport.width,
-    y: viewport.y - viewport.height,
-    height: 3 * viewport.height,
+  return areRectanglesIntersect(turn, {
+    position: {
+      x: viewport.position.x - viewport.size.width,
+      y: viewport.position.y - viewport.size.height,
+    },
+    size: {
+      width: PRELOAD_VIEWPORTS_COUNT * viewport.size.width,
+      height: PRELOAD_VIEWPORTS_COUNT * viewport.size.height,
+    },
   });
 };
 

@@ -5,7 +5,7 @@ const initialLinesState = {
   linesWithEndCoords: [],
   quotesInfo: {},
   error: null,
-  linesToPaste: [],
+  linesToPaste: {},
 };
 
 export const linesReducer = (state = initialLinesState, { type, payload }) => {

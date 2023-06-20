@@ -8,7 +8,6 @@ const initialTurnsState = {
   d: {},
   error: null,
   zeroPointId: null,
-  updateGeometryTime: 0,
   turnsToPaste: [],
   pasteNextTurnPosition: null,
 };
@@ -22,11 +21,6 @@ export const getStageHistory = (currentStages, newStage) => {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
-    case types.TURNS_UPDATE_GEOMETRY_TIME:
-      return {
-        ...state,
-        updateGeometryTime: new Date().getTime(),
-      };
     case types.LOAD_TURNS: {
       const d = payload.turns.reduce((a, turn) => {
         a[turn._id] = turn;
@@ -45,7 +39,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           (turn) => turn.contentType === turnSettings.TEMPLATE_ZERO_POINT
         )._id,
         d,
-        updateGeometryTime: new Date().getTime(),
         turnsToRender,
       };
     }
@@ -60,7 +53,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
             // wasChanged: true,
           },
         },
-        updateGeometryTime: new Date().getTime(),
       };
     // case types.TURN_PARAGRAPH_SET_IS_READY:
     //   return {
@@ -142,15 +134,16 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       for (let id in state.d) {
         newState.d[id] = {
           ...newState.d[id],
-          x: newState.d[id].x - left,
-          y: newState.d[id].y - top,
+          position: {
+            x: newState.d[id].position.x - left,
+            y: newState.d[id].position.y - top,
+          },
         };
         if (isTurnInsideRenderArea(newState.d[id], viewport)) {
           turnsToRender.push(id);
         }
       }
       newState.turnsToRender = turnsToRender;
-      newState.updateGeometryTime = new Date().getTime();
       return newState;
     }
 
@@ -173,7 +166,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...state.d,
           [payload._id]: payload,
         },
-        updateGeometryTime: new Date().getTime(),
         turnsToRender: [...state.turnsToRender, payload._id],
       };
     }
@@ -200,7 +192,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         turnsToRender: state.turnsToRender.filter(
           (turnId) => turnId !== payload
         ),
-        // updateGeometryTime: new Date().getTime(),
       };
     }
 

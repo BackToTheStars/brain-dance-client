@@ -16,10 +16,12 @@ const Paragraph = ({
   widget,
   notRegisteredWidgetsCount,
 }) => {
-  const compressed = useSelector((state) => state.turns.d[turnId].compressed);
-  const turnCompressedHeight = useSelector(
-    (state) => state.turns.d[turnId].compressedHeight
-  );
+  const compressedWidget = useSelector((state) => state.turns.d[turnId].widgets.compressed);
+  // const turnCompressedHeight = useSelector(
+  //   (state) => state.turns.d[turnId].compressed.compressedHeight
+  // );
+  const compressed = compressedWidget.show;
+  const turnCompressedHeight = compressedWidget.height;
 
   const [compressedHeight, setCompressedHeight] =
     useState(turnCompressedHeight);

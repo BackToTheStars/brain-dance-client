@@ -3,7 +3,7 @@ export class TurnHelper {
     return {
       _id: turn._id,
       contentType: turn.contentType, // turn.pictureOnly
-
+      pictureOnly: false, // @todo: remove
       date: turn.date,
       gameId: turn.gameId,
       originalId: turn.originalId,

@@ -155,7 +155,12 @@ const Turn = ({ id }) => {
     sourceUrl,
     date,
     //-- paragraph
-    paragraph, // contentType, dontShowHeader
+    widgets: {
+      paragraph: {
+        inserts: paragraph,
+      }
+    },
+    // paragraph, // contentType, dontShowHeader
     compressed,
     //-- video
     videoUrl,
@@ -164,8 +169,8 @@ const Turn = ({ id }) => {
     pictureOnly,
   } = turn;
 
-  const paragraphStage = ''; //getParagraphStage(turn);
-  const turnStage = ''; //getTurnStage(turn);
+  const paragraphStage = getParagraphStage(turn);
+  const turnStage = getTurnStage(turn);
 
   // const callsQueueIsBlockedFlag = useSelector(
   //   (state) => state.ui.callsQueueIsBlocked
@@ -176,8 +181,8 @@ const Turn = ({ id }) => {
   // };
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
-
-  const doesParagraphExist = false; // !pictureOnly && checkIfParagraphExists(paragraph);
+  
+  const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
 
   const wrapperStyles = {
     left: `${position.x}px`,

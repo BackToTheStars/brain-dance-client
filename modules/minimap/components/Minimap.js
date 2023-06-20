@@ -1,64 +1,45 @@
-// import { useUiContext } from '../contexts/UI_Context';
-import { panelSpacer } from '@/config/ui';
 import { utils } from '@/modules/game/components/helpers/game';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import { PANEL_CHANGE_GEOMETRY } from '@/modules/panels/redux/types';
 import { PANEL_MINIMAP } from '@/modules/panels/settings';
-import { moveField } from '@/modules/turns/redux/actions';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getScreenRect } from './helpers/screen';
 import Line from './line/Line';
 import MinimapButtons from './MinimapButtons';
-import { TurnHelper } from '@/modules/turns/redux/helpers';
-// import {
-// useTurnsCollectionContext,
-// ACTION_FIELD_WAS_MOVED,
-// } from '../contexts/TurnsCollectionContext';
+import { isTurnInsideRenderArea } from '@/modules/turns/components/helpers/sizeHelper';
 
 const Minimap = ({ settings }) => {
-  //
   const dispatch = useDispatch();
 
   const minimapSizePercents =
     useSelector((state) => state.panels.d[PANEL_MINIMAP].size) || 100;
 
   const { isMinimized } = settings;
+  const gamePosition = useSelector(s => s.game.position);
+  const uiViewport = useSelector(s => s.ui.viewport);
+  const gameInfo = useSelector(s => ({
+    vx: s.game.game.viewportPointX,
+    vy: s.game.game.viewportPointY,
+    x: s.game.game.x,
+    y: s.game.game.y,
+  }))
 
   const maxMinimapSizeWidthPlusHeight = Math.round(
     (500 * minimapSizePercents) / 100
   );
 
-  const [gameBoxEl, setGameBoxEl] = useState(null);
   const turnsDictionary = useSelector((state) => state.turns.d);
   const turns = Object.values(turnsDictionary);
 
   const position = useSelector((state) => state.game.position);
-  const updateGeometryTime = useSelector(
-    (state) => state.turns.updateGeometryTime
-  );
-  // useSelector((state) => state.turns.updateGeometryTime);
 
-  // const isMinimized = useSelector(
-  //   (state) => state.panels.d[PANEL_MINIMAP].isMinimized
-  // );
   const setMinimapSizePercents = (size) => {
     dispatch({
       type: PANEL_CHANGE_GEOMETRY,
       payload: { geometryData: { size }, type: PANEL_MINIMAP },
     });
   };
-
-  useEffect(() => {
-    setGameBoxEl(document.querySelector('#gameBox'));
-  }, []);
-
-  const minimapState = {};
-
-  // const { minimapState, minimapDispatch } = useUiContext();
-  // const { dispatch: turnsDispatch, lines: uiLines } =
-  //   useTurnsCollectionContext();
-  // const [lines, setLines] = useState([]);
 
   const lines = [];
   const uiLines = [];
@@ -70,23 +51,15 @@ const Minimap = ({ settings }) => {
     bottom,
     zeroX,
     zeroY,
-    // turns = [],
   } = getScreenRect(turns);
   const isHidden = false; // @todo: remove
 
-  const minimapPnlRef = useRef(null);
   const widthPx = Math.round(right - left) || 600; // ширина всего поля
   const heightPx = Math.round(bottom - top) || 400; // высота всего поля
 
   const minimapWidth = isMinimized
     ? 38
     : (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
-
-  // console.log({
-  //   maxMinimapSizeWidthPlusHeight,
-  //   widthPx,
-  //   heightPx,
-  // });
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200;
@@ -100,10 +73,14 @@ const Minimap = ({ settings }) => {
 
   const viewport = {
     // смещение viewport - это координата левого верхнего шага
-    x: -left + freeSpaceLeftRight - zeroX,
-    y: -top + freeSpaceTopBottom - zeroY,
-    width: viewportWidth,
-    height: viewportHeight,
+    position: {
+      x: -left + freeSpaceLeftRight - zeroX,
+      y: -top + freeSpaceTopBottom - zeroY,
+    },
+    size: {
+      width: viewportWidth,
+      height: viewportHeight,
+    }
   };
 
   const preparedTurns = turns
@@ -111,22 +88,15 @@ const Minimap = ({ settings }) => {
       ...turn,
       // для получения координаты шага на карте достаточно
       // сместить его координаты на координаты viewport
-      x: turn.position.x - left + freeSpaceLeftRight - zeroX,
-      y: turn.position.y - top + freeSpaceTopBottom - zeroY,
+      position: {
+        x: turn.position.x - left + freeSpaceLeftRight - zeroX,
+        y: turn.position.y - top + freeSpaceTopBottom - zeroY,
+      }
     }))
     .map((turn) => {
-      const isTurnInsideViewport = areRectanglesIntersect(
-        TurnHelper.toOldFields(turn),
-        {
-          // x: viewport.x,
-          // width: viewport.width,
-          // y: viewport.y,
-          // height: viewport.height,
-          x: viewport.x - viewport.width,
-          width: 3 * viewport.width,
-          y: viewport.y - viewport.height,
-          height: 3 * viewport.height,
-        }
+      const isTurnInsideViewport = isTurnInsideRenderArea(
+        turn,
+        viewport
       );
       return {
         ...turn,
@@ -150,33 +120,11 @@ const Minimap = ({ settings }) => {
       //   const gf = window[Symbol.for('MyGame')].gameField;
 
       const left =
-        viewport.x - targetXMap + Math.floor(viewport.width / 2) + zeroX;
+        viewport.position.x - targetXMap + Math.floor(viewport.size.width / 2) + zeroX;
       const top =
-        viewport.y - targetYMap + Math.floor(viewport.height / 2) + zeroY;
+        viewport.position.y - targetYMap + Math.floor(viewport.size.height / 2) + zeroY;
 
       utils.moveScene(left, -top, 0);
-
-      // $(gameBoxEl).addClass('remove-line-transition');
-      // $(gameBoxEl).animate(
-      //   {
-      //     left: `${left}px`,
-      //     top: `${top}px`,
-      //   },
-      //   300,
-      //   () => {
-      //     dispatch(
-      //       moveField({
-      //         left: -left,
-      //         top: -top,
-      //       })
-      //     );
-      //     $(gameBoxEl).css('left', 0);
-      //     $(gameBoxEl).css('top', 0);
-      //     setTimeout(() => {
-      //       $(gameBoxEl).removeClass('remove-line-transition');
-      //     }, 100);
-      //   }
-      // );
     },
     turns: preparedTurns.filter((turn) => turn.contentType !== 'zero-point'),
     zeroPoint: preparedTurns.find((turn) => turn.contentType === 'zero-point'),
@@ -187,69 +135,11 @@ const Minimap = ({ settings }) => {
     .map((turn) => turn._id); // отфильтровали какие ходы рендерить на экране
 
   useEffect(() => {
-    if (!turns.length) return;
-    // @todo: оптимизировать ?
-    // minimapDispatch({ type: 'TURNS_TO_RENDER', payload: turnsToRender });
-  }, [turns]); // массив с id тех ходов, которые нужно render
-
-  useEffect(() => {
     if (!value.minimapWidth) return;
+    if (!turnsToRender.length) return;
     dispatch(changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth }));
   }, [value.minimapWidth]);
 
-  // useEffect(() => {
-  //   if (!value.minimapWidth) return;
-  //   if (!isMinimized) {
-  //     console.log('Width whatever');
-  //     dispatch(
-  //       changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth })
-  //     );
-  //   } else {
-  //     console.log('Width 38');
-  //     dispatch(changePanelGeometry(PANEL_MINIMAP, { width: 38 }));
-  //   }
-  //   console.log({ isMinimized, value });
-  // }, [isMinimized]);
-
-  useEffect(() => {
-    if (!minimapPnlRef.current) return;
-    // setTimeout(() => {
-    const { left, top, width, height } =
-      minimapPnlRef.current.getBoundingClientRect();
-    if (isHidden) {
-      // minimapDispatch({
-      //   type: 'MINIMAP_SIZE_UPDATED',
-      //   payload: {
-      //     left,
-      //     top: window.innerHeight + 0.2 * height,
-      //     width,
-      //     height,
-      //   },
-      // });
-    } else {
-      // minimapDispatch({
-      //   type: 'MINIMAP_SIZE_UPDATED',
-      //   payload: {
-      //     left,
-      //     top: window.innerHeight - height - panelSpacer,
-      //     width,
-      //     height,
-      //   },
-      // });
-    }
-    // }, 250);
-  }, [isHidden, left, right, top, bottom]); // подумать ещё, при изменениях самой миникарты, ширины и проч.
-
-  // if (!lines.length || !value.turns.length) {
-  //   return 'Loading...';
-  // }
-
-  // useEffect(() => {
-  //   console.log({
-  //     lines,
-  //     valueTurns: value.turns,
-  //   });
-  // }, [lines, value.turns]);
   useEffect(() => {
     if (turns.length && uiLines.length) {
       setLines(uiLines);
@@ -258,11 +148,9 @@ const Minimap = ({ settings }) => {
 
   value.lines = getLinesByTurns(value.turns, lines);
   value.isMinimized = isMinimized;
-  const style = { transform: `translateY(${isHidden ? '120%' : '0%'})` }; // контролируем стиль из компонента
 
   return (
     <>
-      {/* {!isMinimized && <SVGMiniMap {...value} />} */}
       <SVGMiniMap {...value} turnsToRender={turnsToRender} />
       <MinimapButtons
         {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
@@ -307,15 +195,6 @@ const getLinesByTurns = (turns, lines) => {
   return resLines;
 };
 
-const areRectanglesIntersect = (rect1, rect2) => {
-  return (
-    rect1.x + rect1.width >= rect2.x &&
-    rect1.x <= rect2.x + rect2.width &&
-    rect1.y + rect1.height >= rect2.y &&
-    rect1.y <= rect2.y + rect2.height
-  );
-};
-
 const SVGMiniMap = ({
   position,
   minimapWidth,
@@ -354,6 +233,7 @@ const SVGMiniMap = ({
     : Math.round((minimapWidth * height) / width);
 
   useEffect(() => {
+    if (!turns.length) return;
     dispatch(
       changePanelGeometry(PANEL_MINIMAP, { calculatedHeight: minimapHeight })
     );
@@ -430,10 +310,10 @@ const SVGMiniMap = ({
           // ry={60}
           stroke="#FFFFFF"
           strokeWidth={Math.round(k * viewportRectangleThickness)}
-          x={viewport.x - viewportLineWidthCorrection}
-          y={viewport.y - viewportLineWidthCorrection}
-          width={viewport.width + 2 * viewportLineWidthCorrection}
-          height={viewport.height + 2 * viewportLineWidthCorrection}
+          x={viewport.position.x - viewportLineWidthCorrection}
+          y={viewport.position.y - viewportLineWidthCorrection}
+          width={viewport.size.width + 2 * viewportLineWidthCorrection}
+          height={viewport.size.height + 2 * viewportLineWidthCorrection}
           // fill="rgba(0, 247, 255, 0.5)"
           fill="transparent"
         />
@@ -472,10 +352,10 @@ const SVGMiniMap = ({
         <defs>
           <clipPath id="viewPort">
             <rect
-              x={viewport.x}
-              y={viewport.y}
-              width={viewport.width}
-              height={viewport.height}
+              x={viewport.position.x}
+              y={viewport.position.y}
+              width={viewport.size.width}
+              height={viewport.size.height}
             />
           </clipPath>
         </defs>

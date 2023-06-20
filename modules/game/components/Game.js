@@ -59,7 +59,7 @@ const Game = ({ hash }) => {
     });
     update();
     dispatch(loadTurnsAndLinesToPaste());
-    dispatch(resetAndExit());
+    // dispatch(resetAndExit());
   }, []);
 
   useEffect(() => {
