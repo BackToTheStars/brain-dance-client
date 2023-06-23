@@ -3,36 +3,36 @@ import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
 import ButtonsMenu from './header/ButtonsMenu';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
+import { useSelector } from 'react-redux';
 //const HEADER_HEIGHT = 105;
 
-const Header = ({
-  registerHandleResize,
-  _id,
-  header,
-  contentType,
-  backgroundColor,
-  fontColor,
-  dontShowHeader,
-  sourceUrl,
-  date,
-}) => {
+const Header = ({ widgetId, registerHandleResize, _id }) => {
+  const contentType = useSelector((state) => state.turns.d[_id].contentType);
+  const { url, date } = useSelector((state) => state.turns.d[_id].dWidgets.s_1);
+  const { text, show } = useSelector(
+    (state) => state.turns.d[_id].dWidgets[widgetId]
+  );
+  const { font, background } = useSelector(
+    (state) => state.turns.d[_id].colors
+  );
+
   const headerEl = useRef(null);
 
-  const headerHeight = !!sourceUrl || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
+  const headerHeight = !!url || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
 
   const style = useMemo(() => {
     let style = {
       height: `${headerHeight}px`,
     };
-    if (contentType === 'comment' && !dontShowHeader) {
+    if (contentType === 'comment' && show) {
       style = {
         ...style,
-        backgroundColor: getCommentHeaderColor(backgroundColor),
-        color: fontColor || 'black',
+        backgroundColor: getCommentHeaderColor(background),
+        color: font || 'black',
       };
     }
     return style;
-  }, [dontShowHeader, backgroundColor, fontColor, contentType]);
+  }, [show, background, font, contentType]);
 
   useEffect(() => {
     registerHandleResize({
@@ -40,17 +40,17 @@ const Header = ({
       id: 'header1',
       minWidthCallback: () => 300,
       minHeightCallback: () => {
-        return dontShowHeader ? 0 : headerHeight;
+        return !show ? 0 : headerHeight;
       },
-      maxHeightCallback: () => (dontShowHeader ? 0 : headerHeight),
+      maxHeightCallback: () => (!show ? 0 : headerHeight),
     });
-  }, [dontShowHeader]);
+  }, [show]);
 
   return (
     <>
       <div className="headerText" ref={headerEl} style={style}>
-        <div className="headerTextTitle">{header}</div>
-        {!!(date || sourceUrl) && <DateAndSourceUrl {...{ date, sourceUrl }} />}
+        <div className="headerTextTitle">{text}</div>
+        {!!(date || url) && <DateAndSourceUrl {...{ date, url }} />}
       </div>
       <ButtonsMenu {...{ _id }} />
     </>

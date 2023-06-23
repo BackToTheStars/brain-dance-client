@@ -1,31 +1,36 @@
 import { isDevMode } from '@/config/mode';
 import { widgetSpacer } from '@/config/ui';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import YouTube from 'react-youtube';
 import { youtubeFormatter } from '../helpers/youtubeFormatter';
+import { useSelector } from 'react-redux';
 
 let timeoutId;
-const Video = ({ videoUrl, registerHandleResize, width }) => {
+const Video = ({ registerHandleResize, turnId }) => {
   const videoEl = useRef(null);
-  let newVideoUrl = '';
-  const [newWidth, setNewWidth] = useState(width);
+  // const [newWidth, setNewWidth] = useState(width);
+  const width = useSelector((state) => state.turns.d[turnId].size.width);
+  const videoUrl = useSelector(
+    (state) => state.turns.d[turnId].widgets.video.url
+  );
+  const newVideoUrl = useMemo(() => {
+    if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+      // @todo videoFormatter()
+      return youtubeFormatter(videoUrl);
+    } else {
+      console.log(`Unknown video source: "${videoUrl}"`);
+    }
+  }, [videoUrl]);
 
   // console.log({ width });
-  useEffect(() => {
-    // clearTimeout(timeoutId);
-    // timeoutId = setTimeout(() => {
-    if (width !== newWidth) {
-      setNewWidth(width);
-    }
-    // }, 100);
-  }, [width]);
-
-  if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-    // @todo videoFormatter()
-    newVideoUrl = youtubeFormatter(videoUrl);
-  } else {
-    console.log(`Unknown video source: "${videoUrl}"`);
-  }
+  // useEffect(() => {
+  //   // clearTimeout(timeoutId);
+  //   // timeoutId = setTimeout(() => {
+  //   if (width !== newWidth) {
+  //     setNewWidth(width);
+  //   }
+  //   // }, 100);
+  // }, [width]);
 
   useEffect(() => {
     registerHandleResize({
@@ -50,9 +55,10 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
   return (
     <div
       style={{
-        width: newWidth,
-        height:
-          Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer,
+        width: `${width}px`,
+        height: `${
+          Math.floor((9 * (width - 2 * widgetSpacer)) / 16) + widgetSpacer
+        }px`,
       }}
       className="video"
       ref={videoEl}

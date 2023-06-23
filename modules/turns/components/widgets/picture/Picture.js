@@ -10,16 +10,20 @@ import PictureCrop from './Crop';
 import PictureQuotes from './Quotes';
 
 const Picture = ({
-  imageUrl,
   registerHandleResize,
   unregisterHandleResize,
-  widgetId,
-  widgetType,
   turnId,
   widgetSettings,
-  pictureOnly,
+
+  // imageUrl,
+  pictureOnly, // отдельный тип
+  widgetId,
+  widgetType,
 }) => {
   //
+  const imageUrl = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId].url
+  );
   const widgetSpacer = pictureOnly ? 0 : widgetSpacerOriginal;
 
   const imgEl = useRef(null);
@@ -36,6 +40,7 @@ const Picture = ({
   const editWidgetParams = useSelector(
     (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`]
   );
+
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {

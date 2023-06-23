@@ -31,6 +31,11 @@ const FIELD_PICTURE_ONLY = 'pictureOnly';
 export const WIDGET_PICTURE = 'picture';
 export const WIDGET_PARAGRAPH = 'paragraph';
 
+export const WIDGET_HEADER = 'header';
+export const WIDGET_VIDEO = 'video';
+export const WIDGET_SOURCE = 'source';
+export const WIDGET_COMPRESSED = 'compressed';
+
 // по умолчанию виджет текста присутствует
 const settings = {
   // [TEMPLATE_PICTURE_ONLY]: {

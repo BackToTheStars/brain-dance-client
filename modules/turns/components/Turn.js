@@ -144,30 +144,28 @@ const Turn = ({ id }) => {
     _id,
     x,
     y,
-    width,
-    height,
+    size: { width, height },
     //-- header
-    header,
     contentType,
     backgroundColor,
-    fontColor,
-    dontShowHeader: dontShowHeaderOriginal,
-    sourceUrl,
-    date,
+    // dontShowHeader: dontShowHeaderOriginal,
     //-- paragraph
-    widgets: {
-      paragraph: {
-        inserts: paragraph,
-      }
+    dWidgets: {
+      p_1: { inserts: paragraph },
+      i_1: { url: imageUrl },
+      v_1: { url: videoUrl },
+      h_1: { show: headerShow },
+      s_1: { url: sourceUrl, date },
     },
     // paragraph, // contentType, dontShowHeader
     compressed,
-    //-- video
-    videoUrl,
     //-- image
-    imageUrl,
     pictureOnly,
   } = turn;
+
+  // console.log(turn.dWidgets.p_1.inserts, paragraph);
+
+  const dontShowHeaderOriginal = !headerShow;
 
   const paragraphStage = getParagraphStage(turn);
   const turnStage = getTurnStage(turn);
@@ -181,7 +179,7 @@ const Turn = ({ id }) => {
   // };
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
-  
+
   const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
 
   const wrapperStyles = {
@@ -276,7 +274,7 @@ const Turn = ({ id }) => {
     //   newHeight = desiredHeight;
     // }
 
-    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
+    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;;
 
     // if (paragraphStage !== ORIG_LOADING) {
     //  && paragraphStage !== COMP_LOADING) {
@@ -290,8 +288,10 @@ const Turn = ({ id }) => {
         dispatch(
           updateGeometry({
             _id,
-            width: newWidth,
-            height: newHeight,
+            size: {
+              width: newWidth,
+              height: newHeight,
+            },
             [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
           })
         );
@@ -308,7 +308,7 @@ const Turn = ({ id }) => {
     }
 
     const newWidgetD = {};
-    const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1'];
+    const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1']; // позже перенести
 
     let minTop = 0;
     let maxTop = 0;
@@ -361,8 +361,9 @@ const Turn = ({ id }) => {
           dispatch(
             updateGeometry({
               _id,
-              x: ui.position.left, // x - left - ui.position.left,
-              y: ui.position.top, // y - top - ui.position.top,
+              position: { x: ui.position.left, y: ui.position.top },
+              // x: ui.position.left, // x - left - ui.position.left,
+              // y: ui.position.top, // y - top - ui.position.top,
             })
           );
         });
@@ -457,32 +458,25 @@ const Turn = ({ id }) => {
       style={wrapperStyles}
     >
       <Header
+        widgetId={'h_1'}
         registerHandleResize={registerHandleResize}
-        // copyPasteActions={copyPasteActions}
-        {...{
-          header,
-          contentType,
-          backgroundColor,
-          fontColor,
-          dontShowHeader,
-          _id,
-          sourceUrl,
-          date,
-        }}
+        _id={_id}
       />
       {!!videoUrl && (
         <Video
-          videoUrl={videoUrl}
+          // videoUrl={videoUrl}
+          widgetId={'v_1'}
           registerHandleResize={registerHandleResize}
-          width={width}
+          turnId={_id}
+          // width={width}
         />
       )}
       {!!imageUrl && (
         <Picture
-          imageUrl={imageUrl}
+          // imageUrl={imageUrl}
+          widgetId={'i_1'}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
-          widgetId="picture1"
           widgetType="picture"
           turnId={_id}
           widgetSettings={widgetD['picture1']}
@@ -492,10 +486,10 @@ const Turn = ({ id }) => {
       {doesParagraphExist && (
         <Paragraph
           turnId={_id}
+          widgetId={'p_1'}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
           // stateIsReady={stateIsReady}
-          widgetId="paragraph1"
           widget={widgetD['paragraph1']}
           notRegisteredWidgetsCount={notRegisteredWidgetsCount}
           // paragraphIsReady={paragraphIsReady}
@@ -511,80 +505,11 @@ const Turn = ({ id }) => {
       )}
       {dontShowHeader && !!date && !!sourceUrl && (
         <div className="bottom-date-and-sourceurl">
-          <DateAndSourceUrl {...{ date, sourceUrl }} />
+          <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />
         </div>
       )}
     </div>
   );
-
-  // return (
-  //   <div
-  //     ref={wrapper}
-  //     className={wrapperClasses.join(' ')}
-  //     style={wrapperStyles}
-  //   >
-  //     <Header
-  //       registerHandleResize={registerHandleResize}
-  //       // copyPasteActions={copyPasteActions}
-  //       {...{
-  //         header,
-  //         contentType,
-  //         backgroundColor,
-  //         fontColor,
-  //         dontShowHeader,
-  //         _id,
-  //         sourceUrl,
-  //         date,
-  //       }}
-  //     />
-
-  //     {/* <div className="top-spaceholder" /> */}
-  //     {!!videoUrl && (
-  //       <Video
-  //         videoUrl={videoUrl}
-  //         registerHandleResize={registerHandleResize}
-  //         width={width}
-  //       />
-  //     )}
-  //     {!!imageUrl && (
-  //       <Picture
-  //         imageUrl={imageUrl}
-  //         registerHandleResize={registerHandleResize}
-  //         unregisterHandleResize={unregisterHandleResize}
-  //         widgetId="picture1"
-  //         widgetType="picture"
-  //         turnId={_id}
-  //         widgetSettings={widgetD['picture1']}
-  //         pictureOnly={pictureOnly}
-  //       />
-  //     )}
-  //     {doesParagraphExist && (
-  //       <Paragraph
-  //         turn={turn}
-  //         registerHandleResize={registerHandleResize}
-  //         unregisterHandleResize={unregisterHandleResize}
-  //         // stateIsReady={stateIsReady}
-  //         widgetId="paragraph1"
-  //         // paragraphIsReady={paragraphIsReady}
-  //         // setParagraphIsReady={dispatchParagraphIsReady}
-  //         height={getParagraphHeight({
-  //           widgetId: 'paragraph1',
-  //           widgetD,
-  //           height,
-  //           compressed,
-  //           paragraphIsReady: paragraphStage === COMP_READY,
-  //           compressedHeight,
-  //           uncompressedHeight,
-  //         })}
-  //       />
-  //     )}
-  //     {dontShowHeader && !!date && !!sourceUrl && (
-  //       <div className="bottom-date-and-sourceurl">
-  //         <DateAndSourceUrl {...{ date, sourceUrl }} />
-  //       </div>
-  //     )}
-  //   </div>
-  // );
 };
 
 export default Turn;

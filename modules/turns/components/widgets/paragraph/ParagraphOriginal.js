@@ -36,36 +36,27 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
   setParagraphElCurrent,
-  // stateIsReady,
   turnId,
+  widgetId,
   notRegisteredWidgetsCount,
-  // setParagraphIsReady,
 }) => {
-  const widget = useSelector((state) => state.turns.d[turnId].widgets.paragraph);
-  const showCompressed =  useSelector((state) => state.turns.d[turnId].widgets.compressed.show);
+  const widget = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId]
+  );
+  const showCompressed = useSelector(
+    (state) => state.turns.d[turnId].dWidgets.c_1.show
+  );
   const colors = useSelector((state) => state.turns.d[turnId].colors);
   const contentType = useSelector((state) => state.turns.d[turnId].contentType);
   const size = useSelector((state) => state.turns.d[turnId].size);
-  // const {
-  //   // compressed,
-  //   // paragraph,
-  //   // _id: turnId,
-  //   // backgroundColor,
-  //   // fontColor,
-  //   // contentType,
-  //   // scrollPosition,
-  //   // width,
-  //   // height,
-  //   // wasReady,
-  // } = turn;
-  const {width, height} = size;
+
+  const { width, height } = size;
   const wasReady = true; // @todo убрать
 
   const paragraph = widget.inserts;
   const scrollPosition = widget.scrollPosition;
   const backgroundColor = colors.background;
   const fontColor = colors.font;
-
 
   // const stage = getParagraphStage(turn);
 

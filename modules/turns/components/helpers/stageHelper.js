@@ -13,7 +13,10 @@ export const getTurnStage = (turn) => {
 
 export const getParagraphStage = (turn) => {
   if (!!turn.paragraphStage) return turn.paragraphStage;
-  if (!!turn.pictureOnly || !checkIfParagraphExists(turn.widgets.paragraph.inserts)) {
+  if (
+    !!turn.pictureOnly ||
+    !checkIfParagraphExists(turn.dWidgets.p_1.inserts)
+  ) {
     return NOT_EXISTS;
   }
   if (turn.compressed) return COMP_ACTIVE;
