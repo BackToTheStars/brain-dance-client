@@ -96,10 +96,25 @@ export class TurnHelper {
 
   static toOldFields(turn) {
     return {
+      _id: turn._id,
+      contentType: turn.contentType, // turn.pictureOnly
+      gameId: turn.gameId,
+      originalId: turn.originalId,
       x: turn.position.x,
       y: turn.position.y,
       width: turn.size.width,
       height: turn.size.height,
+      dontShowHeader: !turn.dWidgets.h_1.show,
+      header: turn.dWidgets.h_1.text,
+      imageUrl: turn.dWidgets.i_1.url,
+      videoUrl: turn.dWidgets.v_1.url,
+      sourceUrl: turn.dWidgets.s_1.url,
+      date: turn.dWidgets.s_1.date,
+      paragraph: turn.dWidgets.p_1.inserts,
+      scrollPosition: turn.dWidgets.p_1.scrollPosition,
+      compressed: turn.dWidgets.c_1.show,
+      compressedHeight: turn.dWidgets.c_1.compressedHeight,
+      uncompressedHeight: turn.dWidgets.c_1.uncompressedHeight,
     };
   }
 }

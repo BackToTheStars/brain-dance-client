@@ -1,4 +1,4 @@
-import { Button, Dropdown, Menu, Space } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import React from 'react';
 
@@ -9,28 +9,48 @@ const DropdownTemplate = ({
   setError,
   setActiveTemplate,
 }) => {
-  const menu = (
-    <Menu
-      onClick={({ key }) => {
-        setActiveTemplate(templatesToShow[key]);
-        setError(null);
-      }}
-      items={templatesToShow.map((el, i) => {
-        const templateSettings = settings[el];
-        return {
-          key: i,
-          label: (
-            <a href="#" style={{ paddingLeft: '10px' }}>
-              {templateSettings.label}
-            </a>
-          ),
-        };
-      })}
-    />
-  );
+  // const menu = (
+  //   <Menu
+  //     onClick={({ key }) => {
+  //       setActiveTemplate(templatesToShow[key]);
+  //       setError(null);
+  //     }}
+  // items={templatesToShow.map((el, i) => {
+  //   const templateSettings = settings[el];
+  //   return {
+  //     key: i,
+  //     label: (
+  //       <a href="#" style={{ paddingLeft: '10px' }}>
+  //         {templateSettings.label}
+  //       </a>
+  //     ),
+  //   };
+  // })}
+  //   />
+  // );
+
+  const items = templatesToShow.map((el, i) => {
+    const templateSettings = settings[el];
+    return {
+      key: i,
+      label: (
+        <a
+          href="#"
+          style={{ paddingLeft: '10px' }}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTemplate(templatesToShow[i]);
+            setError(null);
+          }}
+        >
+          {templateSettings.label}
+        </a>
+      ),
+    };
+  });
 
   return (
-    <Dropdown overlay={menu} placement="bottomLeft">
+    <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
       <Button
         className="w-100"
         style={{

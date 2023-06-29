@@ -6,19 +6,19 @@ import { youtubeFormatter } from '../helpers/youtubeFormatter';
 import { useSelector } from 'react-redux';
 
 let timeoutId;
-const Video = ({ registerHandleResize, turnId }) => {
+const Video = ({ registerHandleResize, turnId, widgetId }) => {
   const videoEl = useRef(null);
   // const [newWidth, setNewWidth] = useState(width);
   const width = useSelector((state) => state.turns.d[turnId].size.width);
   const videoUrl = useSelector(
-    (state) => state.turns.d[turnId].widgets.video.url
+    (state) => state.turns.d[turnId].dWidgets[widgetId].url
   );
   const newVideoUrl = useMemo(() => {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
       // @todo videoFormatter()
       return youtubeFormatter(videoUrl);
     } else {
-      console.log(`Unknown video source: "${videoUrl}"`);
+      console.log(`Unknown video source: "${videoUrl}_${turnId}"`);
     }
   }, [videoUrl]);
 

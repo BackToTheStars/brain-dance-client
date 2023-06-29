@@ -41,7 +41,7 @@ import { TurnHelper } from './helpers';
 
 export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
   const state = getState();
-  const prevTurn = state.turns.d[_id]
+  const prevTurn = state.turns.d[_id];
   if (prevTurn.compressedParagraphState || prevTurn.compressedHeight) {
     dispatch({
       type: types.TURNS_UPDATE_GEOMETRY,
@@ -100,15 +100,15 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
       payload: quotesD,
     });
 
-    const viewportNew = {
-      // временный только для первой загрузки
-      // x: state.game.position.left,
-      x: -viewport.x,
-      // y: state.game.position.top,
-      y: -viewport.y,
-      width: state.ui.viewport.width,
-      height: state.ui.viewport.height,
-    };
+    // const viewportNew = {
+    //   // временный только для первой загрузки
+    //   // x: state.game.position.left,
+    //   x: -viewport.x,
+    //   // y: state.game.position.top,
+    //   y: -viewport.y,
+    //   width: state.ui.viewport.width,
+    //   height: state.ui.viewport.height,
+    // };
     // dispatch({
     //   type: types.TURNS_FIELD_WAS_MOVED,
     //   payload: { left: 0, top: 0, viewport: viewportNew },
@@ -220,7 +220,7 @@ export const moveField = (data) => (dispatch, getState) => {
     size: {
       width: state.ui.viewport.width,
       height: state.ui.viewport.height,
-    }
+    },
   };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
@@ -236,14 +236,14 @@ export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   createTurnRequest(turn).then((data) => {
     const preparedTurn = {
       ...data.item,
-      x: turn.x + zeroPoint.x,
-      y: turn.y + zeroPoint.y,
+      x: turn.x + zeroPoint.position.x,
+      y: turn.y + zeroPoint.position.y,
     };
     dispatch({
       type: types.TURN_CREATE,
-      payload: preparedTurn,
+      payload: TurnHelper.toNewFields(preparedTurn),
     });
-    callbacks?.success(data.item);
+    callbacks?.success(TurnHelper.toNewFields(data.item));
   });
 };
 
@@ -267,12 +267,12 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
       ...data.item,
       compressedHeight: 0,
       compressedParagraphState: null,
-      x: turn.x + zeroPoint.x,
-      y: turn.y + zeroPoint.y,
+      x: turn.position.x + zeroPoint.position.x,
+      y: turn.position.y + zeroPoint.position.y,
     };
     dispatch({
       type: types.TURN_RESAVE,
-      payload: preparedTurn,
+      payload: TurnHelper.toNewFields(preparedTurn),
     });
     dispatch({
       type: quotesTypes.QUOTES_UPDATE_DICTIONARY,
@@ -356,13 +356,15 @@ export const insertTurnFromBuffer =
     const position = state.game.position;
     const viewport = state.ui.viewport;
     if (!!pasteNextTurnPosition) {
-      copiedTurn.x = pasteNextTurnPosition.x;
-      copiedTurn.y = pasteNextTurnPosition.y;
+      copiedTurn.position.x = pasteNextTurnPosition.position.x;
+      copiedTurn.position.y = pasteNextTurnPosition.position.y;
     } else {
-      copiedTurn.x =
-        position.left + Math.floor((viewport.width - copiedTurn.width) / 2);
-      copiedTurn.y =
-        position.top + Math.floor((viewport.height - copiedTurn.height) / 2);
+      copiedTurn.position.x =
+        position.left +
+        Math.floor((viewport.size.width - copiedTurn.size.width) / 2);
+      copiedTurn.position.y =
+        position.top +
+        Math.floor((viewport.size.height - copiedTurn.size.height) / 2);
     }
 
     if (!copiedTurn) {
@@ -386,14 +388,14 @@ export const insertTurnFromBuffer =
           dispatch({
             type: types.TURN_NEXT_PASTE_POSITION,
             payload: {
-              x: copiedTurn.x + copiedTurn.width + 40, // вставляет Paste Turn с промежутком от предыдущей вставки
-              y: copiedTurn.y,
+              x: copiedTurn.position.x + copiedTurn.size.width + 40, // вставляет Paste Turn с промежутком от предыдущей вставки
+              y: copiedTurn.position.y,
             },
           });
           dispatch(
             centerViewportAtPosition({
-              x: copiedTurn.x + Math.floor(copiedTurn.width / 2),
-              y: copiedTurn.y + Math.floor(copiedTurn.height / 2),
+              x: copiedTurn.position.x + Math.floor(copiedTurn.size.width / 2),
+              y: copiedTurn.position.y + Math.floor(copiedTurn.size.height / 2),
             })
           );
           const turnId = copiedTurn.originalId;

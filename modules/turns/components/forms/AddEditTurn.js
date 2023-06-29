@@ -1,5 +1,5 @@
 import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import turnSettings from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Switch } from 'antd';
 import moment from 'moment';
 import { cleanText } from '../helpers/textHelper';
+import { TurnHelper } from '../../redux/helpers';
 
 const {
   settings,
@@ -41,7 +42,8 @@ const getDate = (mixedDate) => {
 const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
   const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const turnToEdit = useSelector((state) => state.turns.d[editTurnId]);
+  const turn = useSelector((state) => state.turns.d[editTurnId]);
+  const turnToEdit = useMemo(() => TurnHelper.toOldFields(turn), [turn]);
   const zeroPointId = useSelector((state) => state.turns.zeroPointId);
   const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
 
@@ -87,9 +89,7 @@ const AddEditTurnPopup = () => {
       setForm(newForm);
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
-        // quill.setContents(turnToEdit.paragraph);
         quill.setContents(turnToEdit.paragraph);
-        // console.log(' quill.getLine(0).value()', quill.getLine(0).value());
         setTimeout(() => {
           const paragraphQuotes = turnToEdit.quotes
             ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
@@ -396,7 +396,6 @@ const AddEditTurnPopup = () => {
             </span>
           </div>
           <div id="editor-container-new" />
-          {/* class="h-85"> */}
         </div>
         <div className="panel-cell">
           <div className="panel-flex panel-buttons">

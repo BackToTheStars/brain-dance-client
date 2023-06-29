@@ -52,8 +52,15 @@ const ButtonsMenu = ({ _id }) => {
 
     dispatch(
       centerViewportAtPosition({
-        x: turn.x - zeroPoint.x + Math.floor(turn.width / 2) + 450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
-        y: turn.y - zeroPoint.y + Math.floor(turn.height / 2),
+        x:
+          turn.position.x -
+          zeroPoint.position.x +
+          Math.floor(turn.size.width / 2) +
+          450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
+        y:
+          turn.position.y -
+          zeroPoint.position.y +
+          Math.floor(turn.size.height / 2),
       })
     );
   };

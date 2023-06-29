@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import dynamic from 'next/dynamic';
 
 import { panelSpacer } from '@/config/ui';
@@ -92,7 +92,7 @@ export const panels = [
     component: AddEditTurnPopup,
     isDisplayed: false,
     id: (id += 1),
-    width: () => '900px',
+    width: () => '1000px',
   },
   {
     type: PANEL_BUTTONS,

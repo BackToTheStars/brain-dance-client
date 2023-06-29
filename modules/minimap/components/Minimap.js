@@ -16,14 +16,14 @@ const Minimap = ({ settings }) => {
     useSelector((state) => state.panels.d[PANEL_MINIMAP].size) || 100;
 
   const { isMinimized } = settings;
-  const gamePosition = useSelector(s => s.game.position);
-  const uiViewport = useSelector(s => s.ui.viewport);
-  const gameInfo = useSelector(s => ({
-    vx: s.game.game.viewportPointX,
-    vy: s.game.game.viewportPointY,
-    x: s.game.game.x,
-    y: s.game.game.y,
-  }))
+  // const gamePosition = useSelector(s => s.game.position);
+  // const uiViewport = useSelector(s => s.ui.viewport);
+  // const gameInfo = useSelector(s => ({
+  //   vx: s.game.game.viewportPointX,
+  //   vy: s.game.game.viewportPointY,
+  //   x: s.game.game.x,
+  //   y: s.game.game.y,
+  // }))
 
   const maxMinimapSizeWidthPlusHeight = Math.round(
     (500 * minimapSizePercents) / 100
@@ -44,14 +44,7 @@ const Minimap = ({ settings }) => {
   const lines = [];
   const uiLines = [];
 
-  const {
-    left,
-    right,
-    top,
-    bottom,
-    zeroX,
-    zeroY,
-  } = getScreenRect(turns);
+  const { left, right, top, bottom, zeroX, zeroY } = getScreenRect(turns);
   const isHidden = false; // @todo: remove
 
   const widthPx = Math.round(right - left) || 600; // ширина всего поля
@@ -80,7 +73,7 @@ const Minimap = ({ settings }) => {
     size: {
       width: viewportWidth,
       height: viewportHeight,
-    }
+    },
   };
 
   const preparedTurns = turns
@@ -91,13 +84,10 @@ const Minimap = ({ settings }) => {
       position: {
         x: turn.position.x - left + freeSpaceLeftRight - zeroX,
         y: turn.position.y - top + freeSpaceTopBottom - zeroY,
-      }
+      },
     }))
     .map((turn) => {
-      const isTurnInsideViewport = isTurnInsideRenderArea(
-        turn,
-        viewport
-      );
+      const isTurnInsideViewport = isTurnInsideRenderArea(turn, viewport);
       return {
         ...turn,
         isTurnInsideViewport,
@@ -120,9 +110,15 @@ const Minimap = ({ settings }) => {
       //   const gf = window[Symbol.for('MyGame')].gameField;
 
       const left =
-        viewport.position.x - targetXMap + Math.floor(viewport.size.width / 2) + zeroX;
+        viewport.position.x -
+        targetXMap +
+        Math.floor(viewport.size.width / 2) +
+        zeroX;
       const top =
-        viewport.position.y - targetYMap + Math.floor(viewport.size.height / 2) + zeroY;
+        viewport.position.y -
+        targetYMap +
+        Math.floor(viewport.size.height / 2) +
+        zeroY;
 
       utils.moveScene(left, -top, 0);
     },
@@ -165,8 +161,8 @@ const getLinesByTurns = (turns, lines) => {
   const turnCentersDictionary = {};
   for (let turn of turns) {
     turnCentersDictionary[turn._id] = {
-      x: Math.floor(turn.x + turn.width / 2),
-      y: Math.floor(turn.y + turn.height / 2),
+      x: Math.floor(turn.position.x + turn.size.width / 2),
+      y: Math.floor(turn.position.y + turn.size.height / 2),
     };
   }
 
@@ -186,10 +182,10 @@ const getLinesByTurns = (turns, lines) => {
 
     resLines.push({
       id: line._id,
-      x1: turnCentersDictionary[line.sourceTurnId].x,
-      y1: turnCentersDictionary[line.sourceTurnId].y,
-      x2: turnCentersDictionary[line.targetTurnId].x,
-      y2: turnCentersDictionary[line.targetTurnId].y,
+      x1: turnCentersDictionary[line.sourceTurnId].position.x,
+      y1: turnCentersDictionary[line.sourceTurnId].position.y,
+      x2: turnCentersDictionary[line.targetTurnId].position.x,
+      y2: turnCentersDictionary[line.targetTurnId].position.y,
     });
   }
   return resLines;

@@ -13,3 +13,8 @@
 @import '../modules/turns/scss/style.scss';
 @import './old/styles';
 @import './refactoring';
+
+/** временные стили */
+.ql-color-picker svg {
+  width: 16px;
+}
