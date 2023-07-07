@@ -2,6 +2,8 @@
 
 import { Input, Switch } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
+import CarouselTemplate from './components/templates/Carousel';
+import PictureOnlyTemplate from './components/templates/PictureOnly';
 
 export const TURN_INIT = 'TURN_INIT';
 export const TURN_LOADING = 'TURN_LOADING';
@@ -17,6 +19,7 @@ const TEMPLATE_PDF = 'pdf';
 const TEMPLATE_AUDIO = 'audio';
 const TEMPLATE_CAROUSEL = 'carousel';
 const TEMPLATE_NEWS = 'news';
+const TEMPLATE_PICTURE_ONLY = 'picture-only';
 
 const FIELD_HEADER = 'header';
 const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
@@ -38,12 +41,21 @@ export const WIDGET_COMPRESSED = 'compressed';
 
 // по умолчанию виджет текста присутствует
 const settings = {
-  // [TEMPLATE_PICTURE_ONLY]: {
-  //   availableFields: [FIELD_PICTURE],
-  //   disabledFields: [FIELD_TEXT],
-  //   value: 'picture-only',
-  //   label: 'Picture',
-  // },
+  [TEMPLATE_CAROUSEL]: {
+    // это именно тип хода, а не виджета
+    component: CarouselTemplate,
+    value: TEMPLATE_CAROUSEL,
+    label: 'Carousel',
+    availableWidgets: [WIDGET_PICTURE, WIDGET_VIDEO],
+    optionalWidgets: [WIDGET_HEADER, WIDGET_SOURCE],
+  },
+  [TEMPLATE_PICTURE_ONLY]: {
+    component: PictureOnlyTemplate,
+    value: TEMPLATE_PICTURE_ONLY,
+    label: 'Picture only',
+    availableWidgets: [WIDGET_PICTURE],
+    optionalWidgets: [],
+  },
   [TEMPLATE_PICTURE]: {
     availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
     value: 'picture',
@@ -64,7 +76,13 @@ const settings = {
   },
 };
 
-const templatesToShow = [TEMPLATE_PICTURE, TEMPLATE_VIDEO, TEMPLATE_COMMENT];
+const templatesToShow = [
+  TEMPLATE_PICTURE,
+  TEMPLATE_VIDEO,
+  TEMPLATE_COMMENT,
+  TEMPLATE_CAROUSEL,
+  TEMPLATE_PICTURE_ONLY,
+];
 
 const fieldSettings = {
   [FIELD_HEADER]: {

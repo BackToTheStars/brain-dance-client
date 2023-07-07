@@ -18,7 +18,12 @@ export class TurnHelper {
         },
       ],
       [WIDGET_PICTURE]: [
-        { id: 'i_1', show: !!turn.imageUrl, url: turn.imageUrl },
+        {
+          id: 'i_1',
+          show: !!turn.imageUrl,
+          url: turn.imageUrl,
+          quotes: turn.quotes.filter((quote) => quote.type === 'picture'),
+        },
       ],
       [WIDGET_VIDEO]: [
         { id: 'v_1', show: !!turn.videoUrl, url: turn.videoUrl },
@@ -26,9 +31,7 @@ export class TurnHelper {
       [WIDGET_SOURCE]: [
         {
           id: 's_1',
-          date: turn.date,
-          show: !!turn.sourceUrl,
-          url: turn.sourceUrl,
+          show: (!!turn.sourceUrl || !!turn.date) && turn.dontShowHeader,
         },
       ],
       [WIDGET_PARAGRAPH]: [
@@ -37,6 +40,7 @@ export class TurnHelper {
           show: !!turn.paragraph && turn.paragraph.length && !turn.compressed,
           inserts: turn.paragraph,
           scrollPosition: turn.scrollPosition,
+          quotes: turn.quotes.filter((quote) => quote.type === 'text'),
         },
       ],
       [WIDGET_COMPRESSED]: [
@@ -62,9 +66,16 @@ export class TurnHelper {
     for (const type in widgets) {
       for (const widget of widgets[type]) {
         // сейчас там только нулевой элемент
-        dWidgets[widget.id] = widget;
+        dWidgets[widget.id] = { ...widget, type };
       }
     }
+
+    const widgetToShow = Object.values(dWidgets)
+      .filter((widget) => widget.show)
+      .map((widget) => ({
+        type: widget.type,
+        id: widget.id,
+      }));
 
     return {
       _id: turn._id,
@@ -72,6 +83,8 @@ export class TurnHelper {
       pictureOnly: false, // @todo: remove
       gameId: turn.gameId,
       originalId: turn.originalId,
+      date: turn.date,
+      sourceUrl: turn.sourceUrl,
 
       colors: {
         background: turn.backgroundColor,
@@ -88,15 +101,18 @@ export class TurnHelper {
 
       quotes: turn.quotes,
       widgetsCount: 0,
-      // displayedWidgets: ['header1', 'video1', 'picture1', 'paragraph1'],
       widgets,
       dWidgets,
+      widgetToShow,
     };
   }
 
   static toOldFields(turn) {
     return {
       _id: turn._id,
+      backgroundColor: turn.colors.background,
+      fontColor: turn.colors.font,
+      quotes: [...turn.dWidgets.p_1.quotes, ...turn.dWidgets.i_1.quotes],
       contentType: turn.contentType, // turn.pictureOnly
       gameId: turn.gameId,
       originalId: turn.originalId,
@@ -108,8 +124,8 @@ export class TurnHelper {
       header: turn.dWidgets.h_1.text,
       imageUrl: turn.dWidgets.i_1.url,
       videoUrl: turn.dWidgets.v_1.url,
-      sourceUrl: turn.dWidgets.s_1.url,
-      date: turn.dWidgets.s_1.date,
+      sourceUrl: turn.sourceUrl,
+      date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       scrollPosition: turn.dWidgets.p_1.scrollPosition,
       compressed: turn.dWidgets.c_1.show,

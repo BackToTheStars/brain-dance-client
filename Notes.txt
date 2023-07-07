@@ -43,3 +43,27 @@ console.log(2, Math.floor(new Date().getTime()) % 10000); // маркер #2 т�
 
 
 
+      {fieldsToShow
+            .filter((field) => {
+              if (
+                !fieldSettings[field].special &&
+                !fieldSettings[field].separate
+              ) {
+                return true;
+              }
+              return availableFields.includes(field);
+            })
+            .map((field) => {
+              return (
+                <FormInput
+                  changeHandler={(value) => formChangeHandler(field, value)}
+                  label={fieldSettings[field].label}
+                  prefixClass={fieldSettings[field].prefixClass}
+                  inputType={fieldSettings[field].inputType}
+                  key={field}
+                  value={form[field] || ''}
+                  widgetSettings={fieldSettings[field].widgetSettings}
+                  form={form}
+                />
+              );
+            })}

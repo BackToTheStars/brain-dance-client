@@ -18,6 +18,7 @@ import {
   isSnapToGridSelector,
   snapRound,
 } from '@/modules/turns/components/helpers/grid';
+import { TurnHelper } from '@/modules/turns/redux/helpers';
 
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
@@ -72,9 +73,15 @@ export const saveField =
       .filter((turn) => {
         if (turn.wasChanged) return true;
         if (isSnapToGrid) {
-          if (turn.x % GRID_CELL_X !== 0 || turn.y % GRID_CELL_X !== 0)
+          if (
+            turn.position.x % GRID_CELL_X !== 0 ||
+            turn.position.y % GRID_CELL_X !== 0
+          )
             return true;
-          if (turn.width % GRID_CELL_X !== 0 || turn.height % GRID_CELL_Y !== 0)
+          if (
+            turn.size.width % GRID_CELL_X !== 0 ||
+            turn.size.height % GRID_CELL_Y !== 0
+          )
             return true;
         }
         return false;
@@ -90,7 +97,7 @@ export const saveField =
           uncompressedHeight,
           width,
           scrollPosition,
-        } = turn;
+        } = TurnHelper.toOldFields(turn);
         const coords = {
           x: x + gamePosition.left,
           y: y + gamePosition.top,
@@ -116,13 +123,15 @@ export const saveField =
     updateCoordinatesRequest(changedTurns).then((data) => {
       // for (const turn of data.items) {
       for (const turn of changedTurns) {
+        // @todo: оптимизировать
         dispatch({
           type: turnsTypes.TURNS_UPDATE_GEOMETRY,
-          payload: {
+          payload: TurnHelper.toNewFields({
+            ...TurnHelper.toOldFields(d[turn._id]),
             ...turn,
             x: turn.x - state.game.position.left,
             y: turn.y - state.game.position.top,
-          },
+          }),
         });
       }
       dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
