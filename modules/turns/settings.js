@@ -38,6 +38,13 @@ export const WIDGET_HEADER = 'header';
 export const WIDGET_VIDEO = 'video';
 export const WIDGET_SOURCE = 'source';
 export const WIDGET_COMPRESSED = 'compressed';
+export const widgetSettings = {
+  [WIDGET_HEADER]: { label: 'Header' },
+  [WIDGET_PICTURE]: { label: 'Picture' },
+  [WIDGET_PARAGRAPH]: { label: 'Paragraph' },
+  [WIDGET_VIDEO]: { label: 'Video' },
+  [WIDGET_SOURCE]: { label: 'Source' },
+};
 
 // по умолчанию виджет текста присутствует
 const settings = {

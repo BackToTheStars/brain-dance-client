@@ -57,7 +57,8 @@ const PasteTurnPanel = () => {
       </thead>
       <tbody>
         {turnsToPaste.map((turn, index) => {
-          const { header, timeStamp, paragraph } = turn;
+          const { header, timeStamp, dWidgets } = turn;
+          const paragraph = dWidgets.p_1.inserts;
           return (
             <tr key={index}>
               <td>

@@ -4,6 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import HeaderEditForm from '../widgets/header/EditForm';
 import { Button, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import {
+  WIDGET_HEADER,
+  WIDGET_PARAGRAPH,
+  WIDGET_PICTURE,
+  WIDGET_SOURCE,
+  WIDGET_VIDEO,
+  widgetSettings,
+} from '../../settings';
+import { useState } from 'react';
 
 const Buttons = () => {
   const dispatch = useDispatch();
@@ -24,7 +33,50 @@ const Buttons = () => {
 };
 
 const CreateTurnForm = () => {
-  return 'CreateTurnForm';
+  const [widgetToAdd, setWidgetToAdd] = useState(WIDGET_HEADER);
+
+  const items = [
+    WIDGET_HEADER,
+    WIDGET_PICTURE,
+    WIDGET_PARAGRAPH,
+    WIDGET_VIDEO,
+    WIDGET_SOURCE,
+  ].map((item) => ({
+    key: item,
+    label: (
+      <a
+        href="#"
+        style={{ paddingLeft: '10px' }}
+        onClick={(e) => {
+          e.preventDefault();
+          setWidgetToAdd(item);
+        }}
+      >
+        {widgetSettings[item].label}
+      </a>
+    ),
+  }));
+  return (
+    <>
+      <div className="panel-flex mb-2">
+        <div className="col-sm-2">
+          <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
+            <Button
+              className="w-100"
+              style={{
+                color: 'rgb(255, 255, 255)',
+                backgroundColor: '#1b4d76',
+                borderColor: '#667480',
+                opacity: 0.65,
+              }}
+            >
+              {widgetSettings[widgetToAdd].label}
+            </Button>
+          </Dropdown>
+        </div>
+      </div>
+    </>
+  );
 };
 
 const UpdateTurnForm = () => {
@@ -52,7 +104,7 @@ const UpdateTurnForm = () => {
             </Button>
           </Dropdown>
         </div>
-        
+
         {/* [header, picture, video, source?, paragraph + compressed] */}
         <hr />
         <HeaderEditForm turnId={editTurnId} widgetId="h_1" />
