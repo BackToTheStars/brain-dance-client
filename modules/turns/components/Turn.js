@@ -161,6 +161,8 @@ const Turn = ({ id }) => {
     compressed,
     //-- image
     pictureOnly,
+    // states
+    wasChanged,
   } = turn;
 
   // console.log(turn.dWidgets.p_1.inserts, paragraph);
@@ -449,6 +451,10 @@ const Turn = ({ id }) => {
   }
   if (pictureOnly) {
     wrapperClasses.push('picture-only');
+  }
+
+  if (wasChanged) {
+    wrapperClasses.push('was-changed');
   }
 
   return (

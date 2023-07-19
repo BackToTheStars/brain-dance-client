@@ -54,6 +54,25 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           },
         },
       };
+    case types.TURN_UPDATE_WIDGET: {
+      const { turnId, widgetId, widget } = payload;
+      const prevTurn = state.d[turnId]
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [turnId]: {
+            ...prevTurn,
+            dWidgets: {
+              ...prevTurn.dWidgets,
+              [widgetId]: widget,
+            },
+            // wasChanged: true,
+          },
+        },
+      };
+    }
+      
     // case types.TURN_PARAGRAPH_SET_IS_READY:
     //   return {
     //     ...state,

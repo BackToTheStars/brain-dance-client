@@ -30,6 +30,9 @@
   border-bottom-left-radius: $turn-upper-corners-radius;
   border-bottom-right-radius: $turn-upper-corners-radius;
   border: $turn-border-thickness solid $turn-border-color;
+  &.was-changed {
+    border: $turn-border-thickness solid $turn-changed-border-color;
+  }
   padding-bottom: $turn-widget-bottom-spacer;
   .ui-icon {
     visibility: hidden;

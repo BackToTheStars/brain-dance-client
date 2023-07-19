@@ -128,6 +128,14 @@ export const updateGeometry = (data) => (dispatch) =>
     payload: data,
   });
 
+export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
+  dispatch({
+    type: types.TURN_UPDATE_WIDGET,
+    payload: { turnId, widgetId, widget },
+  });
+  dispatch(markTurnAsChanged({ _id: turnId }))
+}
+
 export const markTurnAsChanged =
   ({ _id }) =>
   (dispatch, getState) => {
