@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Input, Switch } from 'antd';
 import { updateWidget } from '@/modules/turns/redux/actions';
+import { WIDGET_HEADER, widgetSettings } from '@/modules/turns/settings';
 
-const HeaderEditForm = ({ turnId, widgetId }) => {
+export const HeaderEditForm = ({ turnId, widgetId }) => {
   const dispatch = useDispatch();
   const widget = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId]
@@ -29,7 +30,7 @@ const HeaderEditForm = ({ turnId, widgetId }) => {
           defaultChecked={widget.show}
           checked={widget.show}
           onChange={(checked) => {
-            updateField('show', checked)
+            updateField('show', checked);
           }}
         />
       </div>
@@ -37,4 +38,34 @@ const HeaderEditForm = ({ turnId, widgetId }) => {
   );
 };
 
-export default HeaderEditForm
+export const HeaderAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
+  const settings = widgetSettings[WIDGET_HEADER];
+
+  const updateField = (field, value) => {
+    updateWidgetBlock({
+      ...widget,
+      [field]: value,
+    });
+  };
+
+  return (
+    <div className="panel-flex">
+      <div className="col-sm-9">
+        <Input
+          placeholder="Header:"
+          value={widget.text}
+          onChange={(e) => updateField('text', e.target.value)}
+        />
+      </div>
+      <div className="col-sm-3">
+        <Switch
+          defaultChecked={widget.show}
+          checked={widget.show}
+          onChange={(checked) => {
+            updateField('show', checked);
+          }}
+        />
+      </div>
+    </div>
+  );
+};

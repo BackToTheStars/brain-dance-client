@@ -4,6 +4,9 @@ import { Input, Switch } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
 import CarouselTemplate from './components/templates/Carousel';
 import PictureOnlyTemplate from './components/templates/PictureOnly';
+import { HeaderAddForm } from './components/widgets/header/EditForm';
+import PictureAddForm from './components/widgets/picture/EditForm';
+import { SourceAddForm } from './components/widgets/source/EditForm';
 
 export const TURN_INIT = 'TURN_INIT';
 export const TURN_LOADING = 'TURN_LOADING';
@@ -39,11 +42,38 @@ export const WIDGET_VIDEO = 'video';
 export const WIDGET_SOURCE = 'source';
 export const WIDGET_COMPRESSED = 'compressed';
 export const widgetSettings = {
-  [WIDGET_HEADER]: { label: 'Header' },
-  [WIDGET_PICTURE]: { label: 'Picture' },
-  [WIDGET_PARAGRAPH]: { label: 'Paragraph' },
-  [WIDGET_VIDEO]: { label: 'Video' },
-  [WIDGET_SOURCE]: { label: 'Source' },
+  [WIDGET_HEADER]: {
+    label: 'Header',
+    prefix: 'h',
+    componentToAdd: HeaderAddForm,
+    defaultParams: { show: true, text: '' },
+  },
+  [WIDGET_PICTURE]: {
+    label: 'Picture',
+    prefix: 'i',
+    componentToAdd: PictureAddForm,
+    subWidgets: [
+      {
+        field: 'sources',
+        label: 'Sources',
+        component: SourceAddForm,
+        defaultData: { url: '', date: null },
+      },
+      {
+        field: 'headers',
+        label: 'Headers',
+        component: HeaderAddForm,
+        defaultData: { show: false, text: '' },
+      },
+    ],
+  },
+  [WIDGET_PARAGRAPH]: { label: 'Paragraph', prefix: 'p' },
+  [WIDGET_VIDEO]: { label: 'Video', prefix: 'v' },
+  [WIDGET_SOURCE]: {
+    label: 'Source',
+    prefix: 's',
+    componentToAdd: SourceAddForm,
+  },
 };
 
 // по умолчанию виджет текста присутствует
