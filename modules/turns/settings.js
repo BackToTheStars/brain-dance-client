@@ -59,12 +59,12 @@ export const widgetSettings = {
         component: SourceAddForm,
         defaultData: { url: '', date: null },
       },
-      {
-        field: 'headers',
-        label: 'Headers',
-        component: HeaderAddForm,
-        defaultData: { show: false, text: '' },
-      },
+      // {
+      //   field: 'headers',
+      //   label: 'Headers',
+      //   component: HeaderAddForm,
+      //   defaultData: { show: false, text: '' },
+      // },
     ],
   },
   [WIDGET_PARAGRAPH]: { label: 'Paragraph', prefix: 'p' },

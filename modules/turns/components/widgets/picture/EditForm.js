@@ -5,6 +5,7 @@ import { WIDGET_PICTURE, widgetSettings } from '@/modules/turns/settings';
 // import { SourceAddForm } from '../source/EditForm';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { s } from '@/config/request';
+import SubWidgetBlocks from '../../forms/SubWidgetBlocks';
 
 const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
   const field = 'url';
@@ -16,23 +17,6 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
       ...widget,
       [field]: value,
     });
-  };
-
-  const getSubWidgetActions = (field, defaultData) => {
-    return {
-      remove: (index) => {
-        const dataCopy = [...widget[field]];
-        updateField(field, [
-          ...dataCopy.slice(0, index),
-          ...dataCopy.slice(index + 1),
-        ]);
-      },
-      addBelow: () => {
-        const data = widget[field] || [];
-        data.push(defaultData);
-        updateField(field, data);
-      },
-    };
   };
 
   // const sourceActions = {
@@ -83,7 +67,7 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
         }}
         form={widget}
       />
-      {subWidgets.map((s, i) => {
+      {/* {subWidgets.map((s, i) => {
         s.actions = getSubWidgetActions(s.field, s.defaultData);
         return (
           <div key={i}>
@@ -118,7 +102,13 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
             </Button>
           </div>
         );
-      })}
+      })} */}
+
+      <SubWidgetBlocks
+        settings={settings}
+        widget={widget}
+        updateField={updateField}
+      />
     </div>
   );
 };
