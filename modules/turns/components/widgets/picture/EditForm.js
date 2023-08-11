@@ -68,7 +68,7 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
         form={widget}
       />
       {/* {subWidgets.map((s, i) => {
-        s.actions = getSubWidgetActions(s.field, s.defaultData);
+        s.actions = getSubWidgetActions(s.field, s.defaultParams);
         return (
           <div key={i}>
             <h4>{s.label}</h4>

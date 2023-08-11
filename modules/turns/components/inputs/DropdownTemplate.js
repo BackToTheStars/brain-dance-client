@@ -6,7 +6,7 @@ const DropdownTemplate = ({
   templatesToShow,
   settings,
   activeTemplate,
-  setError,
+  setError = () => {},
   setActiveTemplate,
 }) => {
   // const menu = (

@@ -7,6 +7,8 @@ import PictureOnlyTemplate from './components/templates/PictureOnly';
 import { HeaderAddForm } from './components/widgets/header/EditForm';
 import PictureAddForm from './components/widgets/picture/EditForm';
 import { SourceAddForm } from './components/widgets/source/EditForm';
+import { VideoAddForm } from './components/widgets/video/EditForm';
+import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 
 export const TURN_INIT = 'TURN_INIT';
 export const TURN_LOADING = 'TURN_LOADING';
@@ -47,28 +49,66 @@ export const widgetSettings = {
     prefix: 'h',
     componentToAdd: HeaderAddForm,
     defaultParams: { show: true, text: '' },
+    validation: (widgetFields) => {
+      const { text, show } = widgetFields;
+      if (!show) return [true];
+      if (!text) {
+        return [false, 'text required'];
+      }
+      return [true];
+    },
   },
   [WIDGET_PICTURE]: {
     label: 'Picture',
     prefix: 'i',
     componentToAdd: PictureAddForm,
+    defaultParams: { url: '', show: true },
+    validation: (widgetFields) => {
+      const { url, show } = widgetFields;
+      if (!show) return [true];
+      if (!url) {
+        return [false, 'no picture added'];
+      }
+      return [true];
+    },
     subWidgets: [
       {
         field: 'sources',
         label: 'Sources',
         component: SourceAddForm,
-        defaultData: { url: '', date: null },
+        defaultParams: { url: '', date: null, show: true },
       },
+
       // {
       //   field: 'headers',
       //   label: 'Headers',
       //   component: HeaderAddForm,
-      //   defaultData: { show: false, text: '' },
+      //   defaultParams: { show: false, text: '' },
       // },
     ],
   },
-  [WIDGET_PARAGRAPH]: { label: 'Paragraph', prefix: 'p' },
-  [WIDGET_VIDEO]: { label: 'Video', prefix: 'v' },
+  [WIDGET_PARAGRAPH]: {
+    label: 'Paragraph',
+    prefix: 'p',
+    componentToAdd: ParagraphAddForm,
+    defaultParams: { inserts: [{ insert: '' }], show: true },
+  },
+  [WIDGET_VIDEO]: {
+    label: 'Video',
+    prefix: 'v',
+    componentToAdd: VideoAddForm,
+    defaultParams: { provider: 'youtube', url: '' },
+    validation: (widgetFields) => {
+      const { url, provider, show } = widgetFields;
+      if (!show) return [true];
+      if (provider === 'youtube') {
+        if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+          return [true];
+        } else return [false, 'provider is not youtube'];
+      }
+      return [false, 'provider unknown'];
+    },
+  },
   [WIDGET_SOURCE]: {
     label: 'Source',
     prefix: 's',
@@ -78,20 +118,52 @@ export const widgetSettings = {
 
 // по умолчанию виджет текста присутствует
 const settings = {
+  [TEMPLATE_MIXED]: {
+    // это именно тип хода, а не виджета
+    component: () => {}, // MixedTemplate,
+    value: TEMPLATE_MIXED,
+    label: 'Mixed',
+    availableWidgets: {},
+    optionalWidgets: [],
+    description:
+      'Экспериментальный шаблон, содержит любые виджеты в любых количествах',
+  },
+
   [TEMPLATE_CAROUSEL]: {
     // это именно тип хода, а не виджета
     component: CarouselTemplate,
     value: TEMPLATE_CAROUSEL,
     label: 'Carousel',
-    availableWidgets: [WIDGET_PICTURE, WIDGET_VIDEO],
+    // availableWidgets: [WIDGET_PICTURE, WIDGET_VIDEO],
     optionalWidgets: [WIDGET_HEADER, WIDGET_SOURCE],
+    availableWidgets: {
+      [WIDGET_HEADER]: { max: 2, min: 1 },
+      [WIDGET_SOURCE]: { max: 1 },
+      [WIDGET_PICTURE]: { max: 15 },
+      [WIDGET_VIDEO]: { max: 3 },
+    },
+    description:
+      'Ход, в котором есть карусели, одна или несколько, и каждая содержит фото или видео',
+    validation: (widgetBlocks) => {
+      // const count = widgetBlocks.filter((widgetBlock) => [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type)).length
+      // @learn reduce & accumulator
+      const count = widgetBlocks.reduce(
+        (acc, widgetBlock) =>
+          [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type),
+        0
+      );
+      if (count < 2) return [false, 'need more media for carousel'];
+      return [true];
+    },
   },
   [TEMPLATE_PICTURE_ONLY]: {
     component: PictureOnlyTemplate,
     value: TEMPLATE_PICTURE_ONLY,
     label: 'Picture only',
-    availableWidgets: [WIDGET_PICTURE],
+    availableWidgets: { [WIDGET_PICTURE]: { max: 1, min: 1 } },
+    // availableWidgets: [WIDGET_PICTURE],
     optionalWidgets: [],
+    description: 'Только картинка, без ничего',
   },
   [TEMPLATE_PICTURE]: {
     availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
@@ -114,6 +186,7 @@ const settings = {
 };
 
 const templatesToShow = [
+  TEMPLATE_MIXED,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
   TEMPLATE_COMMENT,

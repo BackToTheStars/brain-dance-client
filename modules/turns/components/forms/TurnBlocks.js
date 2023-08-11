@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { HeaderEditForm } from '../widgets/header/EditForm';
 import { Button, Dropdown } from 'antd';
 import { CheckOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
-import {
+import turnSettings, {
   WIDGET_HEADER,
   WIDGET_PARAGRAPH,
   WIDGET_PICTURE,
@@ -14,6 +14,9 @@ import {
 } from '../../settings';
 import React, { useState } from 'react';
 import { WidgetBlockComponent } from './turnBlocks/WidgetBlock';
+import DropdownTemplate from '../inputs/DropdownTemplate';
+
+const { templatesToShow, settings } = turnSettings;
 
 // Кнопки для всей формы
 const Buttons = () => {
@@ -34,12 +37,42 @@ const Buttons = () => {
   );
 };
 
+const validateAvailableWidgets = (widgetBlocks, availableWidgets) => {
+  const widgetsCount = {};
+  for (const widgetBlock of widgetBlocks) {
+    if (!widgetsCount[widgetBlock.type]) {
+      widgetsCount[widgetBlock.type] = 0;
+    }
+    widgetsCount[widgetBlock.type] += 1;
+  }
+  for (const widgetName in widgetsCount) {
+    if (availableWidgets[widgetName].max < widgetsCount[widgetName]) {
+      return [
+        false,
+        `max amount of ${widgetName} is ${availableWidgets[widgetName].max}`,
+      ];
+    }
+  }
+  for (const widgetName in availableWidgets) {
+    if (!availableWidgets[widgetName].min) continue;
+    if (availableWidgets[widgetName].min > (widgetsCount[widgetName] || 0)) {
+      return [
+        false,
+        `min amount of ${widgetName} is ${availableWidgets[widgetName].min}`,
+      ];
+    }
+  }
+  return [true];
+};
+
 // Форма создания хода
 const CreateTurnForm = () => {
   const [widgetToAdd, setWidgetToAdd] = useState(WIDGET_HEADER);
   const [widgetBlocks, setWidgetBlocks] = useState([]);
   const [dWidgetIds, setDWidgetIds] = useState({});
   const [addWidgetBlockPos, setAddWidgetBlockPos] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [activeTemplate, setActiveTemplate] = useState(templatesToShow[0]);
 
   const items = [
     WIDGET_HEADER,
@@ -62,6 +95,56 @@ const CreateTurnForm = () => {
       </a>
     ),
   }));
+
+  const onSaveTurn = (e) => {
+    e.preventDefault();
+    const errors = {};
+    for (const widgetBlock of widgetBlocks) {
+      const validation = widgetSettings[widgetBlock.type].validation;
+      if (!!validation) {
+        const [success, message] = validation(widgetBlock);
+        if (!success) {
+          errors[widgetBlock.id] = message;
+        }
+      }
+    }
+    console.log({ errors, widgetBlocks });
+
+    if (Object.values(errors).length !== 0) {
+      setErrors(errors);
+      return;
+    }
+    // @todo: проверка шаблона по их правилам валидации, напр. есть ли картинка
+
+    // доступные виджеты, мин и макс количество
+    const templateSettings = settings[activeTemplate];
+    if (!!Object.values(templateSettings.availableWidgets || {}).length) {
+      const [success, message] = validateAvailableWidgets(
+        widgetBlocks.filter((w) => w.show),
+        templateSettings.availableWidgets
+      );
+      if (!success) {
+        errors.extra = message;
+        setErrors(errors);
+        return;
+      }
+    }
+
+    if (templateSettings.validation) {
+      const [success, message] = templateSettings.validation(
+        widgetBlocks.filter((w) => w.show)
+      );
+      if (!success) {
+        errors.extra = message;
+        setErrors(errors);
+        return;
+      }
+    }
+    // обязательные виджеты
+    // порядок виджетов
+    setErrors({});
+    // saveTurn()
+  };
 
   const addWidgetBlock = (position) => {
     // @todo: изменить подсчёт при редактировании хода
@@ -153,6 +236,28 @@ const CreateTurnForm = () => {
 
   return (
     <>
+      <div className="d-flex">
+        <div className="col-sm-3">
+          <DropdownTemplate
+            {...{
+              templatesToShow,
+              settings,
+              activeTemplate: activeTemplate,
+              setActiveTemplate: setActiveTemplate,
+            }}
+          />
+        </div>
+        <div className="col-sm-9">
+          <p style={{ fontSize: '16px' }} className="ps-2">
+            {settings[activeTemplate].description}
+          </p>
+          {!!errors.extra && (
+            <p style={{ fontSize: '16px' }} className="text-danger ps-2">
+              {errors.extra}
+            </p>
+          )}
+        </div>
+      </div>
       {widgetBlocks.map((widgetBlock, index) => {
         if (index === addWidgetBlockPos) {
           return (
@@ -164,20 +269,30 @@ const CreateTurnForm = () => {
                 actions={actions}
               />
               <AddWidgetComponent position={index + 1} />
+              {!!errors[widgetBlock.id] && (
+                <div className="text-red-400">{errors[widgetBlock.id]}</div>
+              )}
             </React.Fragment>
           );
         }
         return (
-          <WidgetBlockComponent
-            key={widgetBlock.id}
-            widgetBlock={widgetBlock}
-            index={index}
-            updateWidgetBlock={updateWidgetBlock}
-            actions={actions}
-          />
+          <React.Fragment key={widgetBlock.id}>
+            <WidgetBlockComponent
+              widgetBlock={widgetBlock}
+              index={index}
+              updateWidgetBlock={updateWidgetBlock}
+              actions={actions}
+            />
+            {!!errors[widgetBlock.id] && (
+              <div className="text-red-400">{errors[widgetBlock.id]}</div>
+            )}
+          </React.Fragment>
         );
       })}
       {!widgetBlocks.length && <AddWidgetComponent position={0} />}
+      <button className="btn btn-primary" onClick={(e) => onSaveTurn(e)}>
+        Save
+      </button>
       <pre>{JSON.stringify(widgetBlocks, null, 2)}</pre>
     </>
   );

@@ -3,7 +3,7 @@ import { Button } from 'antd';
 
 const SubWidgetBlocks = ({ settings, widget, updateField }) => {
   const { subWidgets } = settings;
-  const getSubWidgetActions = (field, defaultData) => {
+  const getSubWidgetActions = (field, defaultParams) => {
     return {
       remove: (index) => {
         const dataCopy = [...widget[field]];
@@ -14,7 +14,7 @@ const SubWidgetBlocks = ({ settings, widget, updateField }) => {
       },
       addBelow: () => {
         const data = widget[field] || [];
-        data.push(defaultData);
+        data.push(defaultParams);
         updateField(field, data);
       },
     };
@@ -22,7 +22,7 @@ const SubWidgetBlocks = ({ settings, widget, updateField }) => {
   return (
     <>
       {subWidgets.map((s, i) => {
-        s.actions = getSubWidgetActions(s.field, s.defaultData);
+        s.actions = getSubWidgetActions(s.field, s.defaultParams);
         return (
           <div key={i}>
             <h4>{s.label}</h4>
