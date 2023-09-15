@@ -13,10 +13,10 @@ const Picture = ({
   registerHandleResize,
   unregisterHandleResize,
   turnId,
-  widgetSettings,
+  widgetSettings = {},
 
   // imageUrl,
-  pictureOnly, // отдельный тип
+  pictureOnly = false, // отдельный тип
   widgetId,
   widgetType,
 }) => {

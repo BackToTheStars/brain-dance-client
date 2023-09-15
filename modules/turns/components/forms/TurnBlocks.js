@@ -2,7 +2,7 @@ import { togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { useDispatch, useSelector } from 'react-redux';
 import { HeaderEditForm } from '../widgets/header/EditForm';
-import { Button, Dropdown } from 'antd';
+import { Button, Carousel, Dropdown } from 'antd';
 import { CheckOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
 import turnSettings, {
   WIDGET_HEADER,
@@ -15,6 +15,10 @@ import turnSettings, {
 import React, { useState } from 'react';
 import { WidgetBlockComponent } from './turnBlocks/WidgetBlock';
 import DropdownTemplate from '../inputs/DropdownTemplate';
+import Picture from '../widgets/picture/Picture';
+import Video from '../widgets/Video';
+import Paragraph from 'antd/es/skeleton/Paragraph';
+import { TURN_SIZE_HEIGHT, TURN_SIZE_WIDTH } from '@/config/turn';
 
 const { templatesToShow, settings } = turnSettings;
 
@@ -73,6 +77,31 @@ const CreateTurnForm = () => {
   const [addWidgetBlockPos, setAddWidgetBlockPos] = useState(null);
   const [errors, setErrors] = useState({});
   const [activeTemplate, setActiveTemplate] = useState(templatesToShow[0]);
+  const templateSettings = settings[activeTemplate];
+
+  const zeroPoint = useSelector(
+    (state) => state.turns.d[state.turns.zeroPointId]
+  );
+
+  const commonFields = {
+    colors: {
+      background: null,
+      font: null,
+    },
+    position: {
+      // @todo: get vieport size from redux
+      x:
+        -zeroPoint.position.x +
+        Math.round(window.innerWidth / 2 - TURN_SIZE_WIDTH / 2),
+      y:
+        -zeroPoint.position.y +
+        Math.round(window.innerHeight / 2 - TURN_SIZE_HEIGHT / 2),
+    },
+    size: {
+      width: TURN_SIZE_WIDTH,
+      height: TURN_SIZE_HEIGHT,
+    },
+  };
 
   const items = [
     WIDGET_HEADER,
@@ -108,16 +137,13 @@ const CreateTurnForm = () => {
         }
       }
     }
-    console.log({ errors, widgetBlocks });
 
     if (Object.values(errors).length !== 0) {
       setErrors(errors);
       return;
     }
-    // @todo: проверка шаблона по их правилам валидации, напр. есть ли картинка
-
     // доступные виджеты, мин и макс количество
-    const templateSettings = settings[activeTemplate];
+
     if (!!Object.values(templateSettings.availableWidgets || {}).length) {
       const [success, message] = validateAvailableWidgets(
         widgetBlocks.filter((w) => w.show),
@@ -130,6 +156,7 @@ const CreateTurnForm = () => {
       }
     }
 
+    // проверка шаблона по их правилам валидации, напр. есть ли картинка
     if (templateSettings.validation) {
       const [success, message] = templateSettings.validation(
         widgetBlocks.filter((w) => w.show)
@@ -140,10 +167,33 @@ const CreateTurnForm = () => {
         return;
       }
     }
-    // обязательные виджеты
-    // порядок виджетов
+
     setErrors({});
+
+    const data = {
+      ...commonFields,
+      widgets: widgetBlocks,
+      contentType: activeTemplate,
+      gameId: '',
+      quotes: [],
+      widgetShownIds: widgetBlocks.map((i) => i.id),
+    };
+
+    console.log({ data });
+
     // saveTurn()
+  };
+
+  const onRearrange = () => {
+    setWidgetBlocks(
+      [...widgetBlocks].sort((a, b) => {
+        const pos1 = templateSettings.widgetOrder.indexOf(a.type);
+        const pos2 = templateSettings.widgetOrder.indexOf(b.type);
+        if (pos1 > pos2) return 1;
+        if (pos1 < pos2) return -1;
+        if (pos1 === pos2) return 0;
+      })
+    );
   };
 
   const addWidgetBlock = (position) => {
@@ -258,6 +308,7 @@ const CreateTurnForm = () => {
           )}
         </div>
       </div>
+      {/* <div className="d-flex">{commonFields}</div> */}
       {widgetBlocks.map((widgetBlock, index) => {
         if (index === addWidgetBlockPos) {
           return (
@@ -293,6 +344,11 @@ const CreateTurnForm = () => {
       <button className="btn btn-primary" onClick={(e) => onSaveTurn(e)}>
         Save
       </button>
+      {!!templateSettings?.widgetOrder?.length && (
+        <button className="btn btn-primary" onClick={(e) => onRearrange(e)}>
+          Rearrange
+        </button>
+      )}
       <pre>{JSON.stringify(widgetBlocks, null, 2)}</pre>
     </>
   );

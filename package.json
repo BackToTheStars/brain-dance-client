@@ -29,6 +29,7 @@
     "react-image-crop": "^10.1.2",
     "react-redux": "^8.0.5",
     "react-youtube": "^10.1.0",
+    "reactflow": "^11.8.3",
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.2",

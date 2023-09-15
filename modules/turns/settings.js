@@ -57,6 +57,14 @@ export const widgetSettings = {
       }
       return [true];
     },
+    subWidgets: [
+      {
+        field: 'sources',
+        label: 'Sources',
+        component: SourceAddForm,
+        defaultParams: { url: '', date: null, show: true },
+      },
+    ],
   },
   [WIDGET_PICTURE]: {
     label: 'Picture',
@@ -92,6 +100,14 @@ export const widgetSettings = {
     prefix: 'p',
     componentToAdd: ParagraphAddForm,
     defaultParams: { inserts: [{ insert: '' }], show: true },
+    validation: (widgetFields) => {
+      const { inserts } = widgetFields;
+      if (inserts.length > 1) return [true];
+      if (inserts.length === 0 || inserts[0].insert.trim() === '') {
+        return [false, 'text area is empty'];
+      }
+      return [true];
+    },
   },
   [WIDGET_VIDEO]: {
     label: 'Video',
@@ -166,22 +182,48 @@ const settings = {
     description: 'Только картинка, без ничего',
   },
   [TEMPLATE_PICTURE]: {
-    availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
     value: 'picture',
     label: 'Text / picture',
+    availableWidgets: {
+      [WIDGET_HEADER]: { max: 1, min: 1 },
+      [WIDGET_SOURCE]: { max: 1, min: 0 },
+      [WIDGET_PICTURE]: { max: 1, min: 0 },
+      [WIDGET_PARAGRAPH]: { max: 1, min: 0 },
+    },
+    widgetOrder: [
+      WIDGET_HEADER,
+      WIDGET_PICTURE,
+      WIDGET_PARAGRAPH,
+      WIDGET_SOURCE,
+    ],
+    validation: (widgetBlocks) => {
+      // const count = widgetBlocks.filter((widgetBlock) => [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type)).length
+      // @learn reduce & accumulator
+      const count = widgetBlocks.reduce(
+        (acc, widgetBlock) =>
+          [WIDGET_PICTURE, WIDGET_PARAGRAPH].includes(widgetBlock.type),
+        0
+      );
+      if (count < 1) return [false, 'need either picture or paragraph'];
+      return [true];
+    },
+    //
     requiredFields: [],
+    availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
   },
   [TEMPLATE_VIDEO]: {
-    availableFields: [FIELD_VIDEO],
     value: 'video',
     label: 'Text / video',
+
     requiredFields: [FIELD_VIDEO],
+    availableFields: [FIELD_VIDEO],
   },
   [TEMPLATE_COMMENT]: {
-    availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
     value: 'comment',
     label: 'Comment',
     requiredParagraph: true,
+
+    availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
   },
 };
 

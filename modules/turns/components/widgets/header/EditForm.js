@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Input, Switch } from 'antd';
 import { updateWidget } from '@/modules/turns/redux/actions';
 import { WIDGET_HEADER, widgetSettings } from '@/modules/turns/settings';
+import SubWidgetBlocks from '../../forms/SubWidgetBlocks';
 
 export const HeaderEditForm = ({ turnId, widgetId }) => {
   const dispatch = useDispatch();
@@ -49,23 +50,30 @@ export const HeaderAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
   };
 
   return (
-    <div className="panel-flex">
-      <div className="col-sm-9">
-        <Input
-          placeholder="Header:"
-          value={widget.text}
-          onChange={(e) => updateField('text', e.target.value)}
-        />
+    <div className="panel-flex" style={{ flexDirection: 'column' }}>
+      <div className="d-flex">
+        <div className="col-sm-9">
+          <Input
+            placeholder="Header:"
+            value={widget.text}
+            onChange={(e) => updateField('text', e.target.value)}
+          />
+        </div>
+        <div className="col-sm-3">
+          <Switch
+            defaultChecked={widget.show}
+            checked={widget.show}
+            onChange={(checked) => {
+              updateField('show', checked);
+            }}
+          />
+        </div>
       </div>
-      <div className="col-sm-3">
-        <Switch
-          defaultChecked={widget.show}
-          checked={widget.show}
-          onChange={(checked) => {
-            updateField('show', checked);
-          }}
-        />
-      </div>
+      <SubWidgetBlocks
+        settings={settings}
+        widget={widget}
+        updateField={updateField}
+      />
     </div>
   );
 };

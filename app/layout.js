@@ -13,6 +13,7 @@ export default function RootLayout({ children }) {
         <script src="/js/jquery.js"></script>
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
         <script src="/quill/quill.min.js"></script>
+        <link rel="stylesheet" href="/quill/quill.snow.css" />
       </head>
       <Provider store={store}>
         <body>{children}</body>
