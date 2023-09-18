@@ -21,6 +21,9 @@ const GamesPage = () => {
         (game) => game.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
       )
     : games;
+
+  const updateTurns = (gameId) => {};
+
   const columns = [
     {
       title: 'Public',
@@ -40,6 +43,11 @@ const GamesPage = () => {
       width: 100,
     },
     {
+      title: 'New Turns',
+      dataIndex: 'newTurnsCount',
+      width: 150,
+    },
+    {
       title: 'Roles',
       dataIndex: 'codes',
       // render: renderPre('codes'),
@@ -49,7 +57,12 @@ const GamesPage = () => {
             {codes.map((c) => {
               const { viewportPointX, viewportPointY, _id, role, hash } = c;
               return (
-                <Button key={hash} type="link" href={`/code?hash=${hash}&nickname=User`} target="_blank">
+                <Button
+                  key={hash}
+                  type="link"
+                  href={`/code?hash=${hash}&nickname=User`}
+                  target="_blank"
+                >
                   <span>
                     <b>{ROLES[role].name}</b> x:{viewportPointX} y:
                     {viewportPointY}
@@ -77,11 +90,26 @@ const GamesPage = () => {
     {
       title: 'Hash New',
       dataIndex: 'hash',
-      // width: 100,
+      width: 150,
       render: (hash) => {
         return (
           <Button type="link" href={`/game-new?hash=${hash}`} target="_blank">
             {hash}
+          </Button>
+        );
+      },
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'actions',
+      render: (_, item) => {
+        return (
+          <Button
+            onClick={() => {
+              updateTurns(item._id);
+            }}
+          >
+            Update game turns
           </Button>
         );
       },
