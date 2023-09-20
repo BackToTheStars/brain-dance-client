@@ -1,7 +1,7 @@
 'use client';
 
 import 'jquery-ui/themes/base/all.css';
-import '../scss/style.scss';
+import '@/theme/scss/index.scss';
 import { Provider } from 'react-redux';
 import { useStore } from '../redux/store';
 
