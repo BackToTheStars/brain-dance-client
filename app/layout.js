@@ -2,6 +2,7 @@
 
 import 'jquery-ui/themes/base/all.css';
 import '@/theme/scss/index.scss';
+import '../themes/lobby/index.scss';
 import { Provider } from 'react-redux';
 import { useStore } from '../redux/store';
 
@@ -12,7 +13,7 @@ export default function RootLayout({ children }) {
       <head>
         <script src="/js/jquery.js"></script>
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
-        <script src="/quill/quill.min.js"></script>
+        {/* <script src="/quill/quill.min.js"></script> */}
         <link rel="stylesheet" href="/quill/quill.snow.css" />
       </head>
       <Provider store={store}>

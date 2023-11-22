@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply dark:bg-dark-light bg-light;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply dark:bg-[#0f0f0f] bg-gray-300;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+body {
+  @apply dark:bg-dark text-main-text;
+}
+
+@layer components {
+  .header-height {
+    height: 60px;
+  }
+
+  .path-color {
+    path {
+      @apply fill-white;
+    }
+  }
+}
