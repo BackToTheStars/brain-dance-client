@@ -5,36 +5,36 @@ const CreateGame = () => {
     <form className="w-full h-full bg-black py-6 flex flex-col">
       <div className="flex gap-6">
         <div className="flex items-center gap-x-1">
-          <div class="bg-white dark:bg-gray-100 rounded-full w-4 h-4 flex flex-shrink-0 justify-center items-center relative">
+          <div className="bg-white dark:bg-gray-100 rounded-full w-4 h-4 flex flex-shrink-0 justify-center items-center relative">
             <input
               id="label1"
               type="radio"
               name="radio"
-              class="checkbox appearance-none focus:opacity-100 focus:ring-2 focus:ring-offset-2 focus:ring-main focus:outline-none border rounded-full border-gray-400 absolute cursor-pointer w-full h-full checked:border-none "
-              checked
+              className="checkbox appearance-none focus:opacity-100 focus:ring-2 focus:ring-offset-2 focus:ring-main focus:outline-none border rounded-full border-gray-400 absolute cursor-pointer w-full h-full checked:border-none "
+              defaultChecked
             />
-            <div class="check-icon hidden border-4 border-main rounded-full w-full h-full z-1"></div>
+            <div className="check-icon hidden border-4 border-main rounded-full w-full h-full z-1"></div>
           </div>
           <label
             htmlFor="label1"
-            class="ml-2 text-xl leading-4 font-normal text-white dark:text-gray-100"
+            className="ml-2 text-xl leading-4 font-normal text-white dark:text-gray-100"
           >
             Публичная игра
           </label>
         </div>
         <div className="flex items-center gap-x-1">
-          <div class="bg-white dark:bg-gray-100 rounded-full w-4 h-4 flex flex-shrink-0 justify-center items-center relative">
+          <div className="bg-white dark:bg-gray-100 rounded-full w-4 h-4 flex flex-shrink-0 justify-center items-center relative">
             <input
               id="label2"
               type="radio"
               name="radio"
-              class="checkbox appearance-none focus:opacity-100 focus:ring-2 focus:ring-offset-2 focus:ring-main focus:outline-none border rounded-full border-gray-400 absolute cursor-pointer w-full h-full checked:border-none"
+              className="checkbox appearance-none focus:opacity-100 focus:ring-2 focus:ring-offset-2 focus:ring-main focus:outline-none border rounded-full border-gray-400 absolute cursor-pointer w-full h-full checked:border-none"
             />
-            <div class="check-icon hidden border-4 border-main rounded-full w-full h-full z-1"></div>
+            <div className="check-icon hidden border-4 border-main rounded-full w-full h-full z-1"></div>
           </div>
           <label
             htmlFor="label2"
-            class="ml-2 text-xl leading-4 font-normal text-white dark:text-gray-100"
+            className="ml-2 text-xl leading-4 font-normal text-white dark:text-gray-100"
           >
             Приватная игра
           </label>

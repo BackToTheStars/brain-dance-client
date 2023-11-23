@@ -49,7 +49,7 @@ const MainDashboard = () => {
   );
 };
 
-const IndexPage = () => {
+const IndexPageOld = () => {
   return (
     <AdminProvider>
       <MainDashboard />
@@ -57,5 +57,9 @@ const IndexPage = () => {
     </AdminProvider>
   );
 };
+
+const IndexPage = () => {
+  return "Index Page";
+}
 
 export default IndexPage;
