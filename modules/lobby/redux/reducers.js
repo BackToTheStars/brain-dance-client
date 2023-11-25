@@ -1,5 +1,6 @@
 import * as types from './types';
 const initialState = {
+  modal: { open: false, type: null, params: {} },
   modals: {
     createGame: false,
     enterGame: false,
@@ -72,6 +73,12 @@ const initialState = {
 
 export const lobbyReducer = (state = initialState, { type, payload }) => {
   switch (type) {
+    case types.LOBBY_MODAL_SET: {
+      return {
+        ...state,
+        modal: payload,
+      };
+    }
     case types.LOBBY_TURNS_LOAD: {
       return {
         ...state,
