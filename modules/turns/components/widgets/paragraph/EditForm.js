@@ -1,4 +1,4 @@
-import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
+// import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
 import { Input, Switch } from 'antd';
 import { WIDGET_PARAGRAPH, widgetSettings } from '@/modules/turns/settings';
 import { useEffect, useState } from 'react';
@@ -20,13 +20,15 @@ export const ParagraphAddForm = ({
   };
 
   useEffect(() => {
-    const quillConstants = getQuill(`#${containerId}`, `#${toolbarId}`);
-    const { quill, getQuillTextArr } = quillConstants;
-    setQuillConstants(quillConstants);
+    // @todo: fix quill
+    return null;
+    // const quillConstants = getQuill(`#${containerId}`, `#${toolbarId}`);
+    // const { quill, getQuillTextArr } = quillConstants;
+    // setQuillConstants(quillConstants);
 
-    quill.on('text-change', function () {
-      updateField('inserts', getQuillTextArr());
-    });
+    // quill.on('text-change', function () {
+    //   updateField('inserts', getQuillTextArr());
+    // });
   }, []);
 
   return (
