@@ -6,13 +6,41 @@ import {
   TextLeftIcon,
   TextRightIcon,
 } from '../iconsComponents/SvgIcons.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeTextSettings } from '../../redux/actions';
 
 const SettingsRightContent = () => {
+  const dispatch = useDispatch();
+  const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
+  const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
+  const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
+  const incLineCount = () =>
+    lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
+  const decLineCount = () =>
+    lineCount > 5 && dispatch(changeTextSettings('lineCount', lineCount - 1));
+
+  const incFontSize = () =>
+    fontSize < 30 && dispatch(changeTextSettings('fontSize', fontSize + 1));
+  const decFontSize = () =>
+    fontSize > 10 && dispatch(changeTextSettings('fontSize', fontSize - 1));
+
+  const incLineSpacing = () =>
+    lineSpacing < 3 &&
+    dispatch(
+      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 + 1) / 10)
+    );
+  const decLineSpacing = () =>
+    lineSpacing > 0.5 &&
+    dispatch(
+      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 - 1) / 10)
+    );
+
   const [openList, setOpenList] = useState(false);
   const btnStyle =
-    'w-[40px] h-[40px] border border-main rounded-btn-border leading-[1] flex items-center justify-center';
+    'w-[40px] h-[40px] border border-main rounded-btn-border leading-[1] flex items-center justify-center select-none';
 
-  const toggleList = () => {
+  const toggleList = (e) => {
+    e.preventDefault();
     setOpenList((prev) => !prev);
   };
 
@@ -35,25 +63,39 @@ const SettingsRightContent = () => {
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
             <div>Количество строк</div>
             <div className="flex gap-x-3 items-center">
-              <div className={`${btnStyle}`}>-</div>
-              <div className="w-[36px] h-full text-center">15</div>
-              <div className={`${btnStyle}`}>+</div>
+              <div className={`${btnStyle}`} onClick={decLineCount}>
+                -
+              </div>
+              <div className="w-[36px] h-full text-center">{lineCount}</div>
+              <div className={`${btnStyle}`} onClick={incLineCount}>
+                +
+              </div>
             </div>
           </div>
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
             <div>Размер шрифта</div>
             <div className="flex gap-x-3 items-center">
-              <div className={`${btnStyle}`}>A-</div>
-              <div className="w-[36px] h-full text-center">20</div>
-              <div className={`${btnStyle}`}>A+</div>
+              <div className={`${btnStyle}`} onClick={decFontSize}>
+                A-
+              </div>
+              <div className="w-[36px] h-full text-center">{fontSize}</div>
+              <div className={`${btnStyle}`} onClick={incFontSize}>
+                A+
+              </div>
             </div>
           </div>
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
             <div>Междустрочный интервал</div>
             <div className="flex gap-x-3 items-center">
-              <div className={`${btnStyle}`}>+</div>
-              <div className="w-[36px] h-full text-center">90%</div>
-              <div className={`${btnStyle}`}>-</div>
+              <div className={`${btnStyle}`} onClick={decLineSpacing}>
+                -
+              </div>
+              <div className="w-[36px] h-full text-center">
+                {Math.round(lineSpacing * 100)}%
+              </div>
+              <div className={`${btnStyle}`} onClick={incLineSpacing}>
+                +
+              </div>
             </div>
           </div>
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">

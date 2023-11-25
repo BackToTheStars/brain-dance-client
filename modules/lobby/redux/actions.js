@@ -2,6 +2,13 @@ import { loadTurnsByGameRequest, loadTurnsChronoRequest } from './requests';
 import * as types from './types';
 // import { loadTurnsRequest } from './requests';
 
+export const changeTextSettings = (field, value) => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_TEXT_SETTINGS_SET,
+    payload: { field, value },
+  });
+};
+
 export const openModal = (type, params) => (dispatch) => {
   dispatch({
     type: types.LOBBY_MODAL_SET,

@@ -1,6 +1,11 @@
 import * as types from './types';
 const initialState = {
   modal: { open: false, type: null, params: {} },
+  textSettings: {
+    lineCount: 10,
+    fontSize: 16,
+    lineSpacing: 1.5,
+  },
   modals: {
     createGame: false,
     enterGame: false,
@@ -73,6 +78,15 @@ const initialState = {
 
 export const lobbyReducer = (state = initialState, { type, payload }) => {
   switch (type) {
+    case types.LOBBY_TEXT_SETTINGS_SET: {
+      return {
+        ...state,
+        textSettings: {
+          ...state.textSettings,
+          [payload.field]: payload.value,
+        },
+      };
+    }
     case types.LOBBY_MODAL_SET: {
       return {
         ...state,
