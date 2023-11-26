@@ -1,4 +1,4 @@
-import { loadTurnsByGameRequest, loadTurnsChronoRequest } from './requests';
+import { loadGamesRequest, loadTurnsByGameRequest, loadTurnsChronoRequest } from './requests';
 import * as types from './types';
 // import { loadTurnsRequest } from './requests';
 
@@ -23,6 +23,14 @@ export const closeModal = () => (dispatch) => {
   });
 };
 
+export const loadGames = () => (dispatch) => {
+  return loadGamesRequest().then((data) => {
+    dispatch({
+      type: types.LOBBY_GAMES_LOAD,
+      payload: data.items,
+    });
+  });
+};
 export const loadTurns = () => (dispatch, getState) => {
   const mode = getState().lobby.mode;
   const loadTurnsRequest =

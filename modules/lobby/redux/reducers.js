@@ -1,5 +1,6 @@
 import * as types from './types';
 const initialState = {
+  games: [],
   modal: { open: false, type: null, params: {} },
   textSettings: {
     lineCount: 10,
@@ -91,6 +92,12 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         modal: payload,
+      };
+    }
+    case types.LOBBY_GAMES_LOAD: {
+      return {
+        ...state,
+        games: payload,
       };
     }
     case types.LOBBY_TURNS_LOAD: {
