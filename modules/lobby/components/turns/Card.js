@@ -1,6 +1,7 @@
 import { ArrowRightOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 const getVideoImg = (url) => {
   if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -12,6 +13,9 @@ const getVideoImg = (url) => {
 };
 
 const TurnCard = ({ turn }) => {
+  const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
+  const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
+  const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
   const { header, imageUrl, videoUrl, paragraph, date, contentType } = turn;
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
@@ -29,25 +33,16 @@ const TurnCard = ({ turn }) => {
     };
   };
 
-  const [maxHeight, setMaxHeight] = useState(500);
   const minHeight = 150;
 
-  const headerFontSize = 20;
-  const headerLineSpacing = 1.4;
-  const stepSize = 4;
-
-  const defaultMaxHeight = 1600;
-  const line = 20;
-  const lineSpacing = 1.4;
-  const fontSize = 16;
-
-  useEffect(() => {
-    setMaxHeight((prev) =>
-      prev >= defaultMaxHeight
-        ? defaultMaxHeight
-        : lineSpacing * fontSize * line + 16
-    );
-  }, []);
+  const maxHeight = useMemo(() => {
+    const maxHeightLimit = 1600;
+    const newHeight = lineSpacing * fontSize * lineCount + 16;
+    if (newHeight > maxHeightLimit) {
+      return maxHeightLimit;
+    }
+    return newHeight;
+  }, [lineCount, fontSize, lineSpacing]);
 
   return (
     <>

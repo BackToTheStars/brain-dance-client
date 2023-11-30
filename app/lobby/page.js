@@ -1,15 +1,13 @@
 'use client';
 import GridLayout from '@/modules/lobby/components/layouts/GridLayout';
-// import CreateGame from '@/modules/lobby/components/modals/CreateGame';
-// import Modal from '@/modules/lobby/components/widgets/Modal';
+import { loadSettings } from '@/modules/settings/redux/actions';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function Home() {
-  return (
-    <div>
-      <GridLayout />
-      {/* <Modal title={'Создать игру'} isOpen={false}>
-        <CreateGame />
-      </Modal> */}
-    </div>
-  )
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(loadSettings());
+  }, []);
+  return <GridLayout />;
 }

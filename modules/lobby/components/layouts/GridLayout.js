@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from './Header';
 import LeftContent from './LeftContent';
 import RightContent from './RightContent';
@@ -7,16 +7,26 @@ import { VerticalSplit } from '../ui/VerticalSplit';
 import Sidebar from '../sidebars/Sidebar';
 import SidebarGames from '../sidebars/SidebarGames';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleSidebar } from '../../redux/actions';
+import { loadGames, toggleSidebar } from '../../redux/actions';
 
 const GridLayout = () => {
+  const settingsGame = useSelector((s) => s.settings.games);
   const [mobileSwitcherWidth, setMobileSwitcherWidth] = useState(false);
   const [activeGame, setActiveGame] = useState({});
-  const { games } = useSelector((state) => state.lobby.section.leftContent);
+  const originalGames = useSelector((s) => s.lobby.games);
   const [resize, setResize] = useState('');
   const [size, setSize] = useState(false);
   const sidebarOpen = useSelector((state) => state.lobby.sidebar);
   const dispatch = useDispatch();
+  const games = useMemo(() => {
+    return originalGames.map((g) => ({
+      title: g.name,
+      turns: g.turnsCount,
+      status: g.public ? 'public' : 'private',
+      link: '#',
+      image: g.image || '/img/game_screenshot.png',
+    }));
+  }, [originalGames]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -33,6 +43,10 @@ const GridLayout = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    dispatch(loadGames());
+  }, [settingsGame]);
 
   return (
     <main className="main">

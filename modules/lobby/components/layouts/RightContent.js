@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Button from '@/modules/lobby/components/ui/Button';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,18 +44,6 @@ const RightContent = () => {
   const numCols = useMemo(() => {
     return Math.min(variantGrid.length, desiredNumCols);
   }, [desiredNumCols, variantGrid]);
-
-  const images = useMemo(() => {
-    const arrImg = new Array(numCols).fill(null).map(() => []);
-    const imgCount = 18;
-    const delta = Math.floor(imgCount / numCols);
-    for (let i = 0; i < delta; i += 1) {
-      for (let j = 0; j < numCols; j += 1) {
-        arrImg[j].push(i * numCols + j + 1);
-      }
-    }
-    return arrImg;
-  }, [numCols]);
 
   const turnGroups = useMemo(() => {
     const arrTurns = new Array(numCols).fill(null).map(() => []);
@@ -145,7 +132,8 @@ const RightContent = () => {
           <Button
             title={<GridIcon />}
             className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               setDisplayVariantGridList((prev) => !prev);
             }}
           />
