@@ -58,8 +58,6 @@ const TurnCard = ({ turn }) => {
                 className="text-lg"
                 style={{
                   ...limitLine(2),
-                  fontSize: `${headerFontSize}px`,
-                  lineHeight: headerLineSpacing,
                 }}
               >
                 {header}
