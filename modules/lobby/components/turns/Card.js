@@ -1,3 +1,4 @@
+import { ArrowRightOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -16,11 +17,28 @@ const TurnCard = ({ turn }) => {
   const videoImg = getVideoImg(videoUrl || '');
   const newDate = new Date(date);
 
+  const limitLine = (line) => {
+    return {
+      WebkitLineClamp: `${line}`,
+      WebkitBoxOrient: 'vertical',
+      display: 'inline-block',
+      display: '-webkit-box',
+      maxHeight: 'auto',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    };
+  };
+
   const [maxHeight, setMaxHeight] = useState(500);
+  const minHeight = 150;
+
+  const headerFontSize = 20;
+  const headerLineSpacing = 1.4;
+  const stepSize = 4;
 
   const defaultMaxHeight = 1600;
   const line = 20;
-  const lineSpacing = 2.5;
+  const lineSpacing = 1.4;
   const fontSize = 16;
 
   useEffect(() => {
@@ -34,13 +52,21 @@ const TurnCard = ({ turn }) => {
   return (
     <>
       <div
-        className={`relative w-full group/item overflow-y-auto overflow-x-hidden rounded`}
-        style={{ maxHeight: `${maxHeight}px` }}
+        className={`relative w-full group/item overflow-hidden rounded bg-dark-light`}
+        style={{ maxHeight: `${maxHeight}px`, minHeight: `${minHeight}px` }}
       >
         {contentType !== 'comment' && (
-          <div className="p-4 bg-main-dark">
+          <div className="px-4 py-1 bg-main-dark">
             {!!header && (
-              <Link href={'#'} className="text-lg">
+              <Link
+                href={'#'}
+                className="text-lg"
+                style={{
+                  ...limitLine(2),
+                  fontSize: `${headerFontSize}px`,
+                  lineHeight: headerLineSpacing,
+                }}
+              >
                 {header}
               </Link>
             )}
@@ -68,20 +94,6 @@ const TurnCard = ({ turn }) => {
           )}
 
           {/* ДОП КНОПКИ появляются сверху при ховере (Если не нужны можно удалить) */}
-          <div className="absolute z-[1] top-3 right-0 translate-x-full flex gap-3 group-hover/item:translate-x-[-12px] transition-all">
-            <Link
-              href={'#'}
-              className="w-[30px] h-[30px] flex items-center justify-center rounded-btn-border border-2 border-main bg-dark-light bg-opacity-90 rotate-180 group-hover/item:rotate-0 transition-all"
-            >
-              ℹ
-            </Link>
-            <Link
-              href={'#'}
-              className="w-[30px] h-[30px] flex items-center justify-center rounded-btn-border border-2 border-main bg-dark-light bg-opacity-90 rotate-180 group-hover/item:rotate-0 transition-all"
-            >
-              ✩
-            </Link>
-          </div>
 
           <div
             className="absolute left-0 top-0 w-full transition-all duration-500 h-full opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible"
@@ -89,7 +101,10 @@ const TurnCard = ({ turn }) => {
           ></div>
 
           {/* НАЗВАНИЕ ИГРЫ ИНФА И КНОПКА ПРИ ХОВЕРЕ */}
-          <div className="absolute bottom-0 translate-y-[100%] group-hover/item:translate-y-[0] left-0 px-3 py-3 bg-main-dark bg-opacity-90 rounded-b w-full text-white transition-all">
+          <div
+            className="absolute bottom-0 translate-y-[100%] group-hover/item:translate-y-[0] left-0 px-3 py-3 bg-main-dark bg-opacity-90 rounded-b w-full text-white transition-all"
+            style={{ maxHeight: `calc(100% - 45px)` }}
+          >
             {!!header && (
               <h4 className="pe-[70px] mb-1">
                 <Link href={'#'} className="font-bold text-lg">
@@ -101,24 +116,21 @@ const TurnCard = ({ turn }) => {
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam,
               asperiores!
             </p>
+
             {/* КНОПКА (ПЕРЕХОД В САМУ ИГРУ)  */}
-            <div className="absolute bottom-[-50px] border-2 border-main right-3 w-[50px] h-[50px] rounded bg-dark-light bg-opacity-90 group-hover/item:bottom-[calc(100%-25px)] transition-all delay-75">
+
+            <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border bg-dark-light border border-main">
               <Link
                 href={'#'}
-                className="h-full w-full flex items-center justify-center"
+                className="h-[16px] flex items-center justify-center pe-3 border-r border-main"
               >
-                <svg
-                  width="25"
-                  height="25"
-                  viewBox="0 0 57 42"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M32.1383 33.0754L32.1375 42L57 21L32.1375 -3.04042e-06L32.1375 8.92463L-1.9801e-06 8.93225L-9.24771e-07 33.0754L32.1383 33.0754Z"
-                    className="fill-main"
-                  />
-                </svg>
+                <InfoCircleOutlined />
+              </Link>
+              <Link
+                href={'#'}
+                className="h-[16px] flex items-center justify-center ps-3"
+              >
+                <ArrowRightOutlined />
               </Link>
             </div>
           </div>

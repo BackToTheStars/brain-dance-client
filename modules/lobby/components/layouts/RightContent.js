@@ -29,7 +29,7 @@ const factor = (index) => {
 
 const RightContent = () => {
   const dispatch = useDispatch();
-  const mode = useSelector((state)=> state.lobby.mode)
+  const mode = useSelector((state) => state.lobby.mode);
   const turnsGridRef = useRef();
   const turns = useSelector((s) => s.lobby.turns);
   // @todo: get default width by props
@@ -119,9 +119,9 @@ const RightContent = () => {
             }}
             title={
               <img
-              src="/icons/calendar-icon.svg"
-              className={'sm:w-[30px] w-[25px]'}
-              alt="icon"
+                src="/icons/calendar-icon.svg"
+                className={'sm:w-[30px] w-[25px]'}
+                alt="icon"
               />
             }
             className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
@@ -133,9 +133,9 @@ const RightContent = () => {
             }}
             title={
               <img
-              src="/icons/step-icon.svg"
-              className={'sm:w-[30px] w-[25px]'}
-              alt="icon"
+                src="/icons/step-icon.svg"
+                className={'sm:w-[30px] w-[25px]'}
+                alt="icon"
               />
             }
             className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}

@@ -3,7 +3,7 @@ import Header from './Header';
 import LeftContent from './LeftContent';
 import RightContent from './RightContent';
 import Button from '../ui/Button';
-import VerticalSplit from '../ui/VerticalSplit';
+import { VerticalSplit } from '../ui/VerticalSplit';
 import Sidebar from '../sidebars/Sidebar';
 import SidebarGames from '../sidebars/SidebarGames';
 import { useDispatch, useSelector } from 'react-redux';
@@ -69,11 +69,14 @@ const GridLayout = () => {
               </div>
               <VerticalSplit resize={setResize} />
             </div>
-            <div className="w-full h-full xl:relative absolute left-0 top-0 -z-10 rounded overflow-hidden">
+            <div
+              className="w-full h-full xl:relative absolute left-0 top-0 -z-10 rounded overflow-hidden"
+              id="right-content"
+            >
               <RightContent />
               <Sidebar
                 left={true}
-                maxWidth={400}
+                maxWidth={50}
                 contentPos={'start'}
                 isOpen={sidebarOpen.sidebarGame}
               >

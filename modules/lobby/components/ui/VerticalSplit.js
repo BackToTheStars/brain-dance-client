@@ -1,18 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
-const VerticalSplit = ({ resize }) => {
+export const VerticalSplit = ({ resize, minW, maxW, element }) => {
   const resizeBtn = useRef(null);
   const [resizeWindow, setResizeWindow] = useState(0);
 
-  const minWidth = 30;
-  const maxWidth = 51;
+  const minWidth = minW || 30;
+  const maxWidth = maxW || 51;
 
-  useEffect(() => {
-    if (!resizeBtn.current || !window || !document) return;
-    setResizeWindow(window.innerWidth);
-
+  const getResize = (positionMouse) => {
     const listenerMouseMove = (e) => {
-      const percent = (e.clientX / resizeWindow) * 100;
+      const percent = (e[positionMouse] / resizeWindow) * 100;
       if (percent < minWidth || percent > maxWidth) return;
       resize(percent);
     };
@@ -26,6 +23,24 @@ const VerticalSplit = ({ resize }) => {
     };
 
     document.addEventListener('mouseup', mouseUp);
+  };
+
+  useEffect(() => {
+    if (
+      !resizeBtn.current ||
+      window === 'undefined' ||
+      document === 'undefined'
+    )
+      return;
+
+    if (element) {
+      const el = document.querySelector(element);
+      setResizeWindow(el.clientWidth);
+      getResize('offsetX');
+    } else {
+      setResizeWindow(window.innerWidth);
+      getResize('clientX');
+    }
   }, [resizeBtn.current]);
 
   return (
@@ -42,5 +57,3 @@ const VerticalSplit = ({ resize }) => {
     </div>
   );
 };
-
-export default VerticalSplit;
