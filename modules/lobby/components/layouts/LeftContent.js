@@ -1,9 +1,10 @@
 import Search from '@/modules/lobby/components/ui/Search';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleSidebar } from '../../redux/actions';
+import { openSliderModal, toggleSidebar } from '../../redux/actions';
+import { SLIDER_MODAL_GAME } from '@/config/lobby/modal';
 
-const LeftContent = ({ games, activeGame }) => {
+const LeftContent = ({ games }) => {
   const dispatch = useDispatch();
 
   return (
@@ -45,8 +46,11 @@ const LeftContent = ({ games, activeGame }) => {
                 <div
                   className="flex-[0_1_100%] sm:text-xl text-[15px] dark:text-white text-dark-light cursor-pointer game-item"
                   onClick={() => {
-                    dispatch(toggleSidebar('sidebarGame'));
-                    activeGame(el);
+                    dispatch(
+                      openSliderModal(SLIDER_MODAL_GAME, {
+                        title: el.title,
+                      })
+                    );
                   }}
                 >
                   {el.title}

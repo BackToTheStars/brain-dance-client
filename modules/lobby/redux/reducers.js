@@ -1,80 +1,21 @@
+import { FONT_INTER } from '@/config/lobby/fonts';
 import * as types from './types';
+
 const initialState = {
   games: [],
   modal: { open: false, type: null, params: {} },
+  sliderModal: { open: false, type: null, params: {} },
   textSettings: {
     lineCount: 10,
     fontSize: 16,
     lineSpacing: 1.5,
-  },
-  modals: {
-    createGame: false,
-    enterGame: false,
+    alignment: 'left',
+    activeFontFamily: FONT_INTER,
   },
   sidebar: {},
   turns: [],
   theme: '',
   mode: 'byGame',
-  section: {
-    leftContent: {
-      games: [
-        {
-          title: 'Караоке',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Открыт',
-          turns: '5',
-          image: './resources/games/1-min.jpg',
-        },
-        {
-          title: 'Русский Космизм',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Открыт',
-          turns: '12',
-          image: './resources/games/2-min.jpg',
-        },
-        {
-          title: 'Философия создания этой игры',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Открыт',
-          turns: '2',
-          image: './resources/games/3-min.jpg',
-        },
-        {
-          title: 'Еще игра',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Закрыт',
-          turns: '7',
-          image: './resources/games/4-min.jpg',
-        },
-        {
-          title: 'Караоке',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Открыт',
-          turns: '46',
-          image: './resources/games/5-min.jpg',
-        },
-        {
-          title: 'Русский Космизм',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus ullam nisi doloribus libero autem voluptatibus dolorem reprehenderit.',
-          link: '#',
-          status: 'Открыт',
-          turns: '104',
-          image: './resources/games/6-min.jpg',
-        },
-      ],
-    },
-  },
 };
 
 export const lobbyReducer = (state = initialState, { type, payload }) => {
@@ -92,6 +33,12 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         modal: payload,
+      };
+    }
+    case types.LOBBY_SLIDER_MODAL_SET: {
+      return {
+        ...state,
+        sliderModal: payload,
       };
     }
     case types.LOBBY_GAMES_LOAD: {
@@ -116,7 +63,7 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mode: payload,
-      }
+      };
     }
   }
   return state;

@@ -8,6 +8,10 @@ module.exports = {
     './modules/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontFamily: {
+      main: 'var(--main-font)',
+      additional: 'var(--additional-font)',
+    },
     extend: {
       colors: {
         main: '#829af7',

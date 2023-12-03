@@ -1,4 +1,5 @@
 import { CloseCircleOutlined } from '@ant-design/icons';
+import { useRef } from 'react';
 
 const Modal = ({ title, children, isOpen = false, onCancel }) => {
   return (
@@ -6,6 +7,7 @@ const Modal = ({ title, children, isOpen = false, onCancel }) => {
       className={`bg-dark bg-opacity-70 fixed left-0 top-0 w-screen h-screen flex items-center justify-center z-[100] ${
         isOpen ? 'visible opacity-100' : 'invisible opacity-0'
       }`}
+      onClick={(e) => e.currentTarget === e.target && onCancel()}
     >
       <div className="max-w-xl w-full h-[450px] flex flex-col border border-white bg-dark rounded overflow-hidden">
         <div className="flex justify-between py-6 px-6">

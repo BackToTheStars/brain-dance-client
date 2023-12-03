@@ -1,4 +1,8 @@
-import { loadGamesRequest, loadTurnsByGameRequest, loadTurnsChronoRequest } from './requests';
+import {
+  loadGamesRequest,
+  loadTurnsByGameRequest,
+  loadTurnsChronoRequest,
+} from './requests';
 import * as types from './types';
 // import { loadTurnsRequest } from './requests';
 
@@ -19,6 +23,20 @@ export const openModal = (type, params) => (dispatch) => {
 export const closeModal = () => (dispatch) => {
   dispatch({
     type: types.LOBBY_MODAL_SET,
+    payload: { open: false, type: null, params: {} },
+  });
+};
+
+export const openSliderModal = (type, params) => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_SLIDER_MODAL_SET,
+    payload: { open: true, type, params },
+  });
+};
+
+export const closeSliderModal = () => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_SLIDER_MODAL_SET,
     payload: { open: false, type: null, params: {} },
   });
 };

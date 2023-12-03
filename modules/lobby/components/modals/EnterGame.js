@@ -26,7 +26,7 @@ const TextInput = ({ label, value, onChange }) => {
   );
 };
 
-const EnterGame = () => {
+const EnterGame = ({ params }) => {
   const dispatch = useDispatch();
   const [values, setValues] = useState({ code: '', nickname: '' });
   const [error, setError] = useState('');

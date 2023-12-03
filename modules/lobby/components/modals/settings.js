@@ -1,6 +1,13 @@
-import { MODAL_CREATE_GAME, MODAL_ENTER_GAME } from '@/config/lobby/modal';
+import {
+  MODAL_CREATE_GAME,
+  MODAL_DONATE,
+  MODAL_ENTER_GAME,
+  SLIDER_MODAL_GAME,
+} from '@/config/lobby/modal';
 import CreateGame from './CreateGame';
 import EnterGame from './EnterGame';
+import DonateModal from './DonateModal';
+import GameModal from './GameModal';
 
 export const settings = {
   [MODAL_CREATE_GAME]: {
@@ -10,5 +17,13 @@ export const settings = {
   [MODAL_ENTER_GAME]: {
     title: 'Войти в игру',
     component: EnterGame,
+  },
+  [MODAL_DONATE]: {
+    title: 'Пожертвовать развитию проекта',
+    component: DonateModal,
+  },
+  [SLIDER_MODAL_GAME]: {
+    title: '',
+    component: GameModal,
   },
 };

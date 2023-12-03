@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Button from './Button';
 import {
   SettingIcon,
@@ -8,12 +8,18 @@ import {
 } from '../iconsComponents/SvgIcons.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeTextSettings } from '../../redux/actions';
+import { fontSettings } from '@/config/lobby/fonts';
 
 const SettingsRightContent = () => {
   const dispatch = useDispatch();
   const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
   const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
+  const activeFontFamily = useSelector(
+    (s) => s.lobby.textSettings.activeFontFamily
+  );
+  const fontFamily = fontSettings[activeFontFamily];
+
   const incLineCount = () =>
     lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
   const decLineCount = () =>
@@ -34,6 +40,22 @@ const SettingsRightContent = () => {
     dispatch(
       changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 - 1) / 10)
     );
+
+  const setAlignment = (type) => {
+    dispatch(changeTextSettings('alignment', type));
+  };
+
+  const fontFamilyOptions = useMemo(() => {
+    return Object.keys(fontSettings).map((field) => ({
+      ...fontSettings[field],
+      active: field === activeFontFamily,
+      key: field,
+    }));
+  }, [activeFontFamily]);
+
+  const setActiveFontFamily = (fontFamily) => {
+    dispatch(changeTextSettings('activeFontFamily', fontFamily));
+  };
 
   const [openList, setOpenList] = useState(false);
   const btnStyle =
@@ -101,15 +123,42 @@ const SettingsRightContent = () => {
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
             <div>Выравнивание текста</div>
             <div className="flex gap-x-[10px] items-center">
-              <div className={`${btnStyle}`}>
+              <div
+                className={`${btnStyle}`}
+                onClick={() => setAlignment('left')}
+              >
                 <TextLeftIcon />
               </div>
-              <div className={`${btnStyle}`}>
+              <div
+                className={`${btnStyle}`}
+                onClick={() => setAlignment('center')}
+              >
                 <TextCenterIcon />
               </div>
-              <div className={`${btnStyle}`}>
+              <div
+                className={`${btnStyle}`}
+                onClick={() => setAlignment('right')}
+              >
                 <TextRightIcon />
               </div>
+            </div>
+          </div>
+          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
+            <div>Шрифт</div>
+            <div className="flex gap-x-3 items-center">
+              <ul>
+                {fontFamilyOptions.map((el) => {
+                  return (
+                    <li
+                      className={`${el.active ? 'text-main' : ''}`}
+                      key={el.label}
+                      onClick={() => setActiveFontFamily(el.key)}
+                    >
+                      {el.label}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
           <Button title={'Сохранить'} className={'w-full py-3 mt-4'} />

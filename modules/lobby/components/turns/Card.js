@@ -1,3 +1,4 @@
+import { fontSettings } from '@/config/lobby/fonts';
 import { ArrowRightOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -16,10 +17,16 @@ const TurnCard = ({ turn }) => {
   const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
   const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
+  const alignment = useSelector((s) => s.lobby.textSettings.alignment);
   const { header, imageUrl, videoUrl, paragraph, date, contentType } = turn;
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
   const newDate = new Date(date);
+  const activeFontFamily = useSelector(
+    (s) => s.lobby.textSettings.activeFontFamily
+  );
+  const fontFamily = fontSettings[activeFontFamily];
+  console.log(fontFamily.className);
 
   const limitLine = (line) => {
     return {
@@ -51,7 +58,7 @@ const TurnCard = ({ turn }) => {
         style={{ maxHeight: `${maxHeight}px`, minHeight: `${minHeight}px` }}
       >
         {contentType !== 'comment' && (
-          <div className="px-4 py-1 bg-main-dark">
+          <div className={`px-4 py-1 bg-main-dark ${fontFamily.className}`}>
             {!!header && (
               <Link
                 href={'#'}
@@ -80,9 +87,14 @@ const TurnCard = ({ turn }) => {
               style={{
                 fontSize: `${fontSize}px`,
                 lineHeight: `${lineSpacing}`,
+                textAlign: alignment,
               }}
             >
-              <p className="dark:text-white text-dark">{text}</p>
+              <p
+                className={`dark:text-white text-dark ${fontFamily.className}`}
+              >
+                {text}
+              </p>
             </div>
           )}
 
@@ -105,7 +117,10 @@ const TurnCard = ({ turn }) => {
                 </Link>
               </h4>
             )}
-            <p className="mb-0 text-sm">
+            <p
+              className={`mb-0 text-sm ${fontFamily.className}`}
+              style={{ textAlign: alignment }}
+            >
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam,
               asperiores!
             </p>

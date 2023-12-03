@@ -8,6 +8,7 @@ import Sidebar from '../sidebars/Sidebar';
 import SidebarGames from '../sidebars/SidebarGames';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadGames, toggleSidebar } from '../../redux/actions';
+import CommonSliderModal from '../modals/CommonSliderModal';
 
 const GridLayout = () => {
   const settingsGame = useSelector((s) => s.settings.games);
@@ -79,7 +80,7 @@ const GridLayout = () => {
                     : 'translate-x-[0%]'
                 } transition-all overflow-hidden h-full`}
               >
-                <LeftContent games={games} activeGame={setActiveGame} />
+                <LeftContent games={games} />
               </div>
               <VerticalSplit resize={setResize} />
             </div>
@@ -88,14 +89,7 @@ const GridLayout = () => {
               id="right-content"
             >
               <RightContent />
-              <Sidebar
-                left={true}
-                maxWidth={50}
-                contentPos={'start'}
-                isOpen={sidebarOpen.sidebarGame}
-              >
-                <SidebarGames game={activeGame} />
-              </Sidebar>
+              <CommonSliderModal />
             </div>
           </div>
           <div className="absolute z-10 sm:right-[-38px] right-0 sm:bottom-0 sm:top-auto top-[-13px] sm:h-[calc(100%-32px)] sm:w-auto w-full xl:hidden block">
