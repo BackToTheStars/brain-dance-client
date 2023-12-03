@@ -58,7 +58,10 @@ const TurnCard = ({ turn }) => {
         style={{ maxHeight: `${maxHeight}px`, minHeight: `${minHeight}px` }}
       >
         {contentType !== 'comment' && (
-          <div className={`px-4 py-1 bg-main-dark ${fontFamily.className}`}>
+          <div
+            className={`px-4 py-1 bg-main-dark`}
+            style={{ fontFamily: `var(--${fontFamily.className})` }}
+          >
             {!!header && (
               <Link
                 href={'#'}
@@ -92,6 +95,7 @@ const TurnCard = ({ turn }) => {
             >
               <p
                 className={`dark:text-white text-dark ${fontFamily.className}`}
+                style={{ fontFamily: `var(--${fontFamily.className})` }}
               >
                 {text}
               </p>
