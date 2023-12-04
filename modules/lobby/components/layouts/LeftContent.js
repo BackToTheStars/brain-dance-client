@@ -9,16 +9,16 @@ const LeftContent = ({ games }) => {
 
   return (
     <div className={`rounded h-full flex flex-col dark:bg-dark bg-white`}>
-      <div className="mb-3 pt-[7px]">
+      {/* <div className="mb-3 pt-[7px]">
         <Search />
-      </div>
+      </div> */}
       <div className="dark:bg-dark-light bg-light flex-[0_1_100%] rounded overflow-y-auto sm:px-8 sm:pb-8 p-3">
         <div className="w-full flex sm:gap-6 gap-3 sm:pb-4 pb-3 sm:pt-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0 dark:bg-dark-light bg-light">
           <div className="flex-[0_0_30px] flex sm:justify-center dark:text-white text-dark-light sm:text-xl text-base font-bold">
             №
           </div>
           <div className="flex-[0_1_100%] dark:text-white text-dark-light sm:text-xl text-sm font-bold">
-            Описание игры
+            <Search showLabel={false} clsInput={'sm:py-1 sm:px-2'} placeholder="Название" />
           </div>
           <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold">
             Ходы

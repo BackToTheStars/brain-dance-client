@@ -51,10 +51,12 @@ const GridLayout = () => {
 
   return (
     <main className="main">
-      <div className="sm:p-section-padding p-3 w-screen h-screen relative">
+      {/* sm:p-section-padding */}
+      <div className="p-4 w-screen h-screen relative">
         <Header />
         <div
-          className={`mt-6 pt-6 sm:border-t-2 dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 sm:h-[calc(100vh-60px-130px)] h-[calc(100vh-44px-48px)] relative`}
+          // sm:h-[calc(100vh-60px-130px)]
+          className={`mt-6 pt-6 sm:border-t-2 dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 sm:h-[calc(100vh-60px-60px)] h-[calc(100vh-44px-48px)] relative`}
         >
           <div className="flex gap-x-9 h-full relative z-[1] overflow-hidden">
             <div

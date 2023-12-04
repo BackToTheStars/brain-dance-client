@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Button from './Button';
-import { useDispatch } from 'react-redux';
-import { switchTheme } from '../../redux/actions';
+// import { useDispatch } from 'react-redux';
+// import { switchTheme } from '../../redux/actions';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState(false);
@@ -28,11 +28,12 @@ export const useTheme = () => {
   }, []);
 
   return {
+    theme,
     toggleTheme,
   };
 };
 
-const SwitchTheme = () => {
+export const SwitchTheme = () => {
   const { toggleTheme } = useTheme();
   return (
     <Button
@@ -44,7 +45,20 @@ const SwitchTheme = () => {
   );
 };
 
-export default SwitchTheme;
+export const ThemeSwitcher = () => {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <Button
+      link={'#'}
+      title={theme ? 'dark' : 'light' }
+      onClick={(e) => {
+        e.preventDefault();
+        toggleTheme();
+      }}
+      className={`lg:px-3 sm:w-auto dark:text-white text-dark-light text-opacity-80`}
+    />
+  );
+};
 
 // export const useTheme = () => {
 //   const dispatch = useDispatch();

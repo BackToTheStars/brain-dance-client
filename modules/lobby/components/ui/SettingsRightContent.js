@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { changeTextSettings } from '../../redux/actions';
 import { fontSettings } from '@/config/lobby/fonts';
+import { ThemeSwitcher } from './SwitchTheme';
 
 const SettingsRightContent = () => {
   const dispatch = useDispatch();
@@ -81,7 +82,10 @@ const SettingsRightContent = () => {
         }`}
       >
         <form>
-          <div className="text-lg font-semibold mb-5">Текст</div>
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-lg font-semibold">Текст</div>
+            <ThemeSwitcher />
+          </div>
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
             <div>Количество строк</div>
             <div className="flex gap-x-3 items-center">

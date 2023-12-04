@@ -26,6 +26,110 @@ const factor = (index) => {
   return elements;
 };
 
+export const ContentToolbar = () => {
+  const dispatch = useDispatch();
+  const [gridWidth, setGridWidth] = useState(DEFAULT_GRID_WIDTH);
+
+  const [displayVariantGridList, setDisplayVariantGridList] = useState(false);
+  const [desiredNumCols, setDesiredNumCols] = useState(DEFAULT_COLS);
+
+  const variantGrid = useMemo(() => {
+    return new Array(Math.floor(gridWidth / MIN_TURN_WIDTH)).fill(0);
+  }, [gridWidth]);
+
+  const numCols = useMemo(() => {
+    return Math.min(variantGrid.length, desiredNumCols);
+  }, [desiredNumCols, variantGrid]);
+
+  useEffect(() => {
+    if (!document && !window) return;
+
+    const clickToDocument = (e) => {
+      if (
+        e.target.tagName === 'IMG' ||
+        e.target.tagName === 'A' ||
+        e.target.tagName === 'LI' ||
+        e.target.tagName === 'SPAN'
+      )
+        return;
+      setDisplayVariantGridList(false);
+    };
+
+    if (displayVariantGridList) {
+      document.addEventListener('click', clickToDocument);
+    } else {
+      document.removeEventListener('click', clickToDocument);
+    }
+  }, [displayVariantGridList]);
+
+  return (
+    <div className={`flex justify-between items-center gap-x-4 w-full`}>
+      <div className={'flex items-center mb-3 pt-[7px] gap-x-3'}>
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            dispatch(switchMode('byGame'));
+          }}
+          title={
+            <img
+              src="/icons/calendar-icon.svg"
+              className={'sm:w-[30px] w-[25px]'}
+              alt="icon"
+            />
+          }
+          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+        />
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            dispatch(switchMode('chrono'));
+          }}
+          title={
+            <img
+              src="/icons/step-icon.svg"
+              className={'sm:w-[30px] w-[25px]'}
+              alt="icon"
+            />
+          }
+          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+        />
+      </div>
+      <div className={'relative md:block hidden ms-auto'}>
+        <Button
+          title={<GridIcon />}
+          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+          onClick={(e) => {
+            e.preventDefault();
+            setDisplayVariantGridList((prev) => !prev);
+          }}
+        />
+        <ul
+          className={`${
+            displayVariantGridList ? 'visible' : 'hidden'
+          } rounded-btn-border dark:bg-dark-light bg-light border border-main absolute flex flex-col gap-y-2 gap-x-4 right-[calc(100%+12px)] top-0 z-[1]`}
+        >
+          {variantGrid.map((el, index) => {
+            return (
+              <li
+                className={`flex items-center px-3 py-2 rounded-btn-border justify-center gap-x-3 cursor-pointer ${
+                  numCols === index + 1 ? 'bg-main' : ''
+                }`}
+                onClick={() => setDesiredNumCols(index + 1)}
+                key={index}
+              >
+                {factor(index)}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div>
+        <SettingsRightContent />
+      </div>
+    </div>
+  );
+};
+
 const RightContent = () => {
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.lobby.mode);
@@ -80,87 +184,12 @@ const RightContent = () => {
   }, [displayVariantGridList]);
 
   useEffect(() => {
-    if (!turnsGridRef.current) return;
-    const outputsize = () => {
-      setGridWidth(turnsGridRef.current.offsetWidth);
-    };
-    outputsize();
-    const resizeObserver = new ResizeObserver(outputsize);
-    resizeObserver.observe(turnsGridRef.current);
-    return () =>
-      turnsGridRef.current && resizeObserver?.unobserve(turnsGridRef.current);
-  }, [turnsGridRef]);
-
-  useEffect(() => {
     dispatch(loadTurns());
   }, [mode]);
 
   return (
     <div className={'flex flex-col h-full'} ref={turnsGridRef}>
-      <div className={`flex justify-between items-center gap-x-4`}>
-        <div className={'flex items-center mb-3 pt-[7px] gap-x-3'}>
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              dispatch(switchMode('byGame'));
-            }}
-            title={
-              <img
-                src="/icons/calendar-icon.svg"
-                className={'sm:w-[30px] w-[25px]'}
-                alt="icon"
-              />
-            }
-            className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
-          />
-          <Button
-            onClick={(e) => {
-              e.preventDefault();
-              dispatch(switchMode('chrono'));
-            }}
-            title={
-              <img
-                src="/icons/step-icon.svg"
-                className={'sm:w-[30px] w-[25px]'}
-                alt="icon"
-              />
-            }
-            className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
-          />
-        </div>
-        <div className={'relative md:block hidden ms-auto'}>
-          <Button
-            title={<GridIcon />}
-            className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
-            onClick={(e) => {
-              e.preventDefault();
-              setDisplayVariantGridList((prev) => !prev);
-            }}
-          />
-          <ul
-            className={`${
-              displayVariantGridList ? 'visible' : 'hidden'
-            } rounded-btn-border dark:bg-dark-light bg-light border border-main absolute flex flex-col gap-y-2 gap-x-4 right-[calc(100%+12px)] top-0 z-[1]`}
-          >
-            {variantGrid.map((el, index) => {
-              return (
-                <li
-                  className={`flex items-center px-3 py-2 rounded-btn-border justify-center gap-x-3 cursor-pointer ${
-                    numCols === index + 1 ? 'bg-main' : ''
-                  }`}
-                  onClick={() => setDesiredNumCols(index + 1)}
-                  key={index}
-                >
-                  {factor(index)}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <div>
-          <SettingsRightContent />
-        </div>
-      </div>
+      {/* <ContentToolbar /> */}
       <div
         className={`flex flex-wrap gap-x-6 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}
       >

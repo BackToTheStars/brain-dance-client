@@ -19,7 +19,7 @@ export const settings = {
     component: EnterGame,
   },
   [MODAL_DONATE]: {
-    title: 'Пожертвовать развитию проекта',
+    title: 'Вклад в развитие проекта',
     component: DonateModal,
   },
   [SLIDER_MODAL_GAME]: {
