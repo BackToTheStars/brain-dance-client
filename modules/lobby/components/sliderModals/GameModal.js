@@ -1,13 +1,18 @@
 import Button from '../ui/Button';
 import Search from '../ui/Search';
+import { VerticalSplit } from '../ui/VerticalSplit';
 
 const GameModal = ({ params }) => {
-  const { title, image, status, turns, description } = params;
+  const { title, image, status, turns, description, width } = params;
   return (
-    <div className="flex flex-col h-full dark:bg-dark-light bg-light rounded p-4">
+    <div
+      className="flex flex-col h-full dark:bg-dark-light bg-light rounded p-4 relative"
+      style={{ width }}
+    >
+      <VerticalSplit minW={50} maxW={100} element="#main-sidebar" />
       <div className="flex items-center gap-x-4">
         <div className="w-[50px] h-[50px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
-          {status === 'Открыт' ? (
+          {status === 'public' ? (
             <img
               src="/icons/open.png"
               className="w-[25px] h-[25px] object-contain"

@@ -6,12 +6,15 @@ const initialState = {
   modal: { open: false, type: null, params: {} },
   sliderModal: { open: false, type: null, params: {} },
   textSettings: {
+    limitLineHeader: 2,
     lineCount: 10,
     fontSize: 16,
     lineSpacing: 1.5,
+    padding: 12,
     alignment: 'left',
     activeFontFamily: FONT_INTER,
   },
+  dictionaryGame: {},
   sidebar: {},
   turns: [],
   theme: '',
@@ -63,6 +66,12 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mode: payload,
+      };
+    }
+    case types.LOBBY_CREATE_DICTIONARY_GAMES: {
+      return {
+        ...state,
+        dictionaryGame: payload,
       };
     }
   }

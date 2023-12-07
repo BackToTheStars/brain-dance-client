@@ -7,7 +7,7 @@ import {
 import CreateGame from './CreateGame';
 import EnterGame from './EnterGame';
 import DonateModal from './DonateModal';
-import GameModal from './GameModal';
+import GameModal from '../sliderModals/GameModal';
 
 export const settings = {
   [MODAL_CREATE_GAME]: {
@@ -21,9 +21,5 @@ export const settings = {
   [MODAL_DONATE]: {
     title: 'Вклад в развитие проекта',
     component: DonateModal,
-  },
-  [SLIDER_MODAL_GAME]: {
-    title: '',
-    component: GameModal,
   },
 };

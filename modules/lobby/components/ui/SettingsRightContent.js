@@ -16,10 +16,13 @@ const SettingsRightContent = () => {
   const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
   const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
+  const cardPadding = useSelector((s) => s.lobby.textSettings.padding);
   const activeFontFamily = useSelector(
     (s) => s.lobby.textSettings.activeFontFamily
   );
-  const fontFamily = fontSettings[activeFontFamily];
+  const limitLineHeader = useSelector(
+    (s) => s.lobby.textSettings.limitLineHeader
+  );
 
   const incLineCount = () =>
     lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
@@ -31,16 +34,35 @@ const SettingsRightContent = () => {
   const decFontSize = () =>
     fontSize > 10 && dispatch(changeTextSettings('fontSize', fontSize - 1));
 
+  const incCardPadding = () => {
+    cardPadding < 24 &&
+      dispatch(changeTextSettings('padding', cardPadding + 1));
+  };
+
+  const decCardPadding = () => {
+    cardPadding > 10 &&
+      dispatch(changeTextSettings('padding', cardPadding - 1));
+  };
+
   const incLineSpacing = () =>
     lineSpacing < 3 &&
     dispatch(
       changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 + 1) / 10)
     );
+
   const decLineSpacing = () =>
     lineSpacing > 0.5 &&
     dispatch(
       changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 - 1) / 10)
     );
+
+  const incLimitLineHeader = () =>
+    limitLineHeader < 5 &&
+    dispatch(changeTextSettings('limitLineHeader', limitLineHeader + 1));
+
+  const decLimitLineHeader = () =>
+    limitLineHeader > 1 &&
+    dispatch(changeTextSettings('limitLineHeader', limitLineHeader - 1));
 
   const setAlignment = (type) => {
     dispatch(changeTextSettings('alignment', type));
@@ -83,11 +105,37 @@ const SettingsRightContent = () => {
       >
         <form>
           <div className="flex justify-between items-center mb-3">
-            <div className="text-lg font-semibold">Текст</div>
+            <div className="text-lg font-semibold">Настройки</div>
             <ThemeSwitcher />
           </div>
           <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Количество строк</div>
+            <div>Отступы</div>
+            <div className="flex gap-x-3 items-center">
+              <div className={`${btnStyle}`} onClick={decCardPadding}>
+                -
+              </div>
+              <div className="w-[36px] h-full text-center">{cardPadding}</div>
+              <div className={`${btnStyle}`} onClick={incCardPadding}>
+                +
+              </div>
+            </div>
+          </div>
+          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
+            <div>Кол-во строк оглавления</div>
+            <div className="flex gap-x-3 items-center">
+              <div className={`${btnStyle}`} onClick={decLimitLineHeader}>
+                -
+              </div>
+              <div className="w-[36px] h-full text-center">
+                {limitLineHeader}
+              </div>
+              <div className={`${btnStyle}`} onClick={incLimitLineHeader}>
+                +
+              </div>
+            </div>
+          </div>
+          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
+            <div>Кол-во строк</div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decLineCount}>
                 -
@@ -135,7 +183,7 @@ const SettingsRightContent = () => {
               </div>
               <div
                 className={`${btnStyle}`}
-                onClick={() => setAlignment('center')}
+                onClick={() => setAlignment('justify')}
               >
                 <TextCenterIcon />
               </div>

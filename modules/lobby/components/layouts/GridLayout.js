@@ -4,20 +4,16 @@ import LeftContent from './LeftContent';
 import RightContent from './RightContent';
 import Button from '../ui/Button';
 import { VerticalSplit } from '../ui/VerticalSplit';
-import Sidebar from '../sidebars/Sidebar';
-import SidebarGames from '../sidebars/SidebarGames';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadGames, toggleSidebar } from '../../redux/actions';
-import CommonSliderModal from '../modals/CommonSliderModal';
+import { loadGames } from '../../redux/actions';
+import CommonSliderModal from '../sliderModals/CommonSliderModal';
 
 const GridLayout = () => {
   const settingsGame = useSelector((s) => s.settings.games);
   const [mobileSwitcherWidth, setMobileSwitcherWidth] = useState(false);
-  const [activeGame, setActiveGame] = useState({});
   const originalGames = useSelector((s) => s.lobby.games);
   const [resize, setResize] = useState('');
   const [size, setSize] = useState(false);
-  const sidebarOpen = useSelector((state) => state.lobby.sidebar);
   const dispatch = useDispatch();
   const games = useMemo(() => {
     return originalGames.map((g) => ({
@@ -26,6 +22,7 @@ const GridLayout = () => {
       status: g.public ? 'public' : 'private',
       link: '#',
       image: g.image || '/img/game_screenshot.png',
+      id: g._id,
     }));
   }, [originalGames]);
 

@@ -1,11 +1,11 @@
 import Search from '@/modules/lobby/components/ui/Search';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { openSliderModal, toggleSidebar } from '../../redux/actions';
-import { SLIDER_MODAL_GAME } from '@/config/lobby/modal';
+import { useDispatch } from 'react-redux';
+import { openSliderModal } from '../../redux/actions';
+import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
 
 const LeftContent = ({ games }) => {
   const dispatch = useDispatch();
+  console.log(games);
 
   return (
     <div className={`rounded h-full flex flex-col dark:bg-dark bg-white`}>
@@ -18,7 +18,11 @@ const LeftContent = ({ games }) => {
             №
           </div>
           <div className="flex-[0_1_100%] dark:text-white text-dark-light sm:text-xl text-sm font-bold">
-            <Search showLabel={false} clsInput={'sm:py-1 sm:px-2'} placeholder="Название" />
+            <Search
+              showLabel={false}
+              clsInput={'sm:py-1 sm:px-2'}
+              placeholder="Название"
+            />
           </div>
           <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold">
             Ходы
@@ -30,6 +34,8 @@ const LeftContent = ({ games }) => {
 
         <div className="flex flex-col select-none">
           {games.map((el, index) => {
+            const { title, image, status, turns, description } = el;
+            const params = { title, image, status, turns, description };
             return (
               <div
                 className="w-full flex items-center sm:gap-6 gap-3 pb-[12px] pt-[12px] border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10"
@@ -48,7 +54,8 @@ const LeftContent = ({ games }) => {
                   onClick={() => {
                     dispatch(
                       openSliderModal(SLIDER_MODAL_GAME, {
-                        title: el.title,
+                        ...params,
+                        width: '50%',
                       })
                     );
                   }}
