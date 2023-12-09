@@ -3,6 +3,7 @@ import * as types from './types';
 
 const initialState = {
   games: [],
+  dGames: {},
   modal: { open: false, type: null, params: {} },
   sliderModal: { open: false, type: null, params: {} },
   textSettings: {
@@ -14,7 +15,6 @@ const initialState = {
     alignment: 'left',
     activeFontFamily: FONT_INTER,
   },
-  dictionaryGame: {},
   sidebar: {},
   turns: [],
   theme: '',
@@ -47,7 +47,8 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
     case types.LOBBY_GAMES_LOAD: {
       return {
         ...state,
-        games: payload,
+        games: payload.items,
+        dGames: payload.d,
       };
     }
     case types.LOBBY_TURNS_LOAD: {
@@ -66,12 +67,6 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         mode: payload,
-      };
-    }
-    case types.LOBBY_CREATE_DICTIONARY_GAMES: {
-      return {
-        ...state,
-        dictionaryGame: payload,
       };
     }
   }

@@ -43,16 +43,15 @@ export const closeSliderModal = () => (dispatch) => {
 
 export const loadGames = () => (dispatch) => {
   return loadGamesRequest().then((data) => {
-    //  const dictionaryGames = data.items
-    //    .map((el) => ({ [el._id]: el }))
-    //    .reduce((acc, obj) => {
-    //      const key = Object.keys(obj)[0];
-    //      acc[key] = obj[key];
-    //      return acc;
-    //    }, {});
+    const dictionaryGames = data.items.reduce((acc, obj) => {
+      return {
+        ...acc,
+        [obj._id]: obj,
+      };
+    }, {});
     dispatch({
       type: types.LOBBY_GAMES_LOAD,
-      payload: data.items,
+      payload: { items: data.items, d: dictionaryGames },
     });
   });
 };
@@ -65,13 +64,6 @@ export const loadTurns = () => (dispatch, getState) => {
       type: types.LOBBY_TURNS_LOAD,
       payload: data.items,
     });
-  });
-};
-
-export const createDictionaryGame = (dictionary) => (dispatch) => {
-  dispatch({
-    type: types.LOBBY_CREATE_DICTIONARY_GAMES,
-    payload: dictionary,
   });
 };
 
