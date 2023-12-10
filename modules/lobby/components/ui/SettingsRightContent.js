@@ -213,7 +213,7 @@ const SettingsRightContent = () => {
               </ul>
             </div>
           </div>
-          <Button title={'Сохранить'} className={'w-full py-3 mt-4'} />
+          {/* <Button title={'Сохранить'} className={'w-full py-3 mt-4'} /> */}
         </form>
       </div>
     </div>

@@ -3,12 +3,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Button from '@/modules/lobby/components/ui/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import TurnCard from '../turns/Card';
-import { loadTurns, switchMode } from '../../redux/actions';
+import { changeLayoutSettings, loadTurns, switchMode } from '../../redux/actions';
 import SettingsRightContent from '../ui/SettingsRightContent';
 import { GridIcon } from '../iconsComponents/SvgIcons';
 
 const DEFAULT_GRID_WIDTH = 1200;
-const DEFAULT_COLS = 2;
 const MIN_TURN_WIDTH = 200;
 
 const factor = (index) => {
@@ -31,7 +30,7 @@ export const ContentToolbar = () => {
   const [gridWidth, setGridWidth] = useState(DEFAULT_GRID_WIDTH);
 
   const [displayVariantGridList, setDisplayVariantGridList] = useState(false);
-  const [desiredNumCols, setDesiredNumCols] = useState(DEFAULT_COLS);
+  const desiredNumCols = useSelector(s => s.lobby.layoutSettings.desiredNumCols)
 
   const variantGrid = useMemo(() => {
     return new Array(Math.floor(gridWidth / MIN_TURN_WIDTH)).fill(0);
@@ -41,30 +40,10 @@ export const ContentToolbar = () => {
     return Math.min(variantGrid.length, desiredNumCols);
   }, [desiredNumCols, variantGrid]);
 
-  useEffect(() => {
-    if (!document && !window) return;
-
-    const clickToDocument = (e) => {
-      if (
-        e.target.tagName === 'IMG' ||
-        e.target.tagName === 'A' ||
-        e.target.tagName === 'LI' ||
-        e.target.tagName === 'SPAN'
-      )
-        return;
-      setDisplayVariantGridList(false);
-    };
-
-    if (displayVariantGridList) {
-      document.addEventListener('click', clickToDocument);
-    } else {
-      document.removeEventListener('click', clickToDocument);
-    }
-  }, [displayVariantGridList]);
-
   return (
     <div className={`flex justify-between items-center gap-x-4 w-full`}>
       <div className={'flex items-center mb-3 pt-[7px] gap-x-3'}>
+        <SettingsRightContent />
         <Button
           onClick={(e) => {
             e.preventDefault();
@@ -106,7 +85,7 @@ export const ContentToolbar = () => {
         <ul
           className={`${
             displayVariantGridList ? 'visible' : 'hidden'
-          } rounded-btn-border dark:bg-dark-light bg-light border border-main absolute flex flex-col gap-y-2 gap-x-4 right-[calc(100%+12px)] top-0 z-[1]`}
+          } rounded-btn-border dark:bg-dark-light bg-light border border-main absolute flex flex-col gap-y-2 gap-x-4 right-[calc(100%+12px)] top-0 z-[2]`}
         >
           {variantGrid.map((el, index) => {
             return (
@@ -114,7 +93,7 @@ export const ContentToolbar = () => {
                 className={`flex items-center px-3 py-2 rounded-btn-border justify-center gap-x-3 cursor-pointer ${
                   numCols === index + 1 ? 'bg-main' : ''
                 }`}
-                onClick={() => setDesiredNumCols(index + 1)}
+                onClick={() => dispatch(changeLayoutSettings('desiredNumCols', index + 1))}
                 key={index}
               >
                 {factor(index)}
@@ -122,9 +101,6 @@ export const ContentToolbar = () => {
             );
           })}
         </ul>
-      </div>
-      <div>
-        <SettingsRightContent />
       </div>
     </div>
   );
@@ -147,8 +123,7 @@ const RightContent = () => {
       return acc;
     }, {});
 
-  const [displayVariantGridList, setDisplayVariantGridList] = useState(false);
-  const [desiredNumCols, setDesiredNumCols] = useState(DEFAULT_COLS);
+  const desiredNumCols = useSelector(s => s.lobby.layoutSettings.desiredNumCols)
 
   const variantGrid = useMemo(() => {
     return new Array(Math.floor(gridWidth / MIN_TURN_WIDTH)).fill(0);
@@ -172,33 +147,11 @@ const RightContent = () => {
   const widthCol = 100 / numCols;
 
   useEffect(() => {
-    if (!document && !window) return;
-
-    const clickToDocument = (e) => {
-      if (
-        e.target.tagName === 'IMG' ||
-        e.target.tagName === 'A' ||
-        e.target.tagName === 'LI' ||
-        e.target.tagName === 'SPAN'
-      )
-        return;
-      setDisplayVariantGridList(false);
-    };
-
-    if (displayVariantGridList) {
-      document.addEventListener('click', clickToDocument);
-    } else {
-      document.removeEventListener('click', clickToDocument);
-    }
-  }, [displayVariantGridList]);
-
-  useEffect(() => {
     dispatch(loadTurns());
   }, [mode]);
 
   return (
     <div className={'flex flex-col h-full'} ref={turnsGridRef}>
-      {/* <ContentToolbar /> */}
       <div
         className={`flex flex-wrap gap-x-6 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}
       >
@@ -224,70 +177,3 @@ const RightContent = () => {
   );
 };
 export default RightContent;
-
-{
-  /* <div className='absolute bottom-[-60px] border-2 border-main right-3 w-[60px] h-[60px] rounded bg-dark-light bg-opacity-90 group-hover/item:bottom-[60px] transition-all'>
-                                <Link
-                                    href={'#'}
-                                    className='h-full w-full flex items-center justify-center'
-                                >
-                                    <svg
-                                        width='30'
-                                        height='30'
-                                        viewBox='0 0 57 42'
-                                        fill='none'
-                                        xmlns='http://www.w3.org/2000/svg'
-                                    >
-                                        <path
-                                            d='M32.1383 33.0754L32.1375 42L57 21L32.1375 -3.04042e-06L32.1375 8.92463L-1.9801e-06 8.93225L-9.24771e-07 33.0754L32.1383 33.0754Z'
-                                            className='fill-main'
-                                        />
-                                    </svg>
-                                </Link>
-                            </div> */
-}
-
-// <div
-//     className={`grid 2xl:grid-cols-${numCols} transition-all xl:grid-cols-2 md:grid-cols-3 gap-x-6 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}>
-//     <div className='flex flex-col gap-y-6'>
-//         {images1.map(num => {
-//             return (
-//                 <div className={`relative w-full h-auto group/item`} key={num}>
-//                     <img
-//                         src={`/resources/games/${num}-min.jpg`}
-//                         alt='#'
-//                         className={`w-full h-auto rounded`}
-//                     />
-//                     <div
-//                         className='absolute bottom-0 left-0 px-3 py-6 text-center text-xl backdrop-blur-md rounded-b font-bold w-full mix-blend-difference text-white'>
-//                         <Link href={'#'}>Игра номер 1</Link>
-//                     </div>
-//                 </div>
-//             )
-//         })}
-//     </div>
-//     <div className='flex flex-col gap-y-6'>
-//         {images2.map(num => {
-//             return (
-//                 <img
-//                     key={num}
-//                     src={`/resources/games/${num}-min.jpg`}
-//                     className='w-full h-auto rounded'
-//                     alt='#'
-//                 />
-//             )
-//         })}
-//     </div>
-//     <div className='flex flex-col gap-y-6'>
-//         {images3.map(num => {
-//             return (
-//                 <img
-//                     key={num}
-//                     src={`/resources/games/${num}-min.jpg`}
-//                     className='w-full h-auto rounded'
-//                     alt='#'
-//                 />
-//             )
-//         })}
-//     </div>
-// </div>

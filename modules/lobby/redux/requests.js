@@ -8,13 +8,15 @@ export const loadTurnsRequest = () => {
 };
 
 export const loadTurnsByGameRequest = () => {
-  return fetch(`${LOBBY_API_URL}/lobby/turns?mode=byGame&gameLimit=25&turnLimit=3`).then(
+  const codeStr = getCodesString();
+  return fetch(`${LOBBY_API_URL}/lobby/turns?mode=byGame&gameLimit=25&turnLimit=3&codes=${codeStr}`).then(
     (res) => res.json()
   );
 };
 
 export const loadTurnsChronoRequest = () => {
-  return fetch(`${LOBBY_API_URL}/lobby/turns?mode=chrono`).then(
+  const codeStr = getCodesString();
+  return fetch(`${LOBBY_API_URL}/lobby/turns?mode=chrono&codes=${codeStr}`).then(
     (res) => res.json()
   );
 };
