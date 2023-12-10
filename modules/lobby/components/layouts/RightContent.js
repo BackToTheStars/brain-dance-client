@@ -109,20 +109,10 @@ export const ContentToolbar = () => {
 const RightContent = () => {
   const dispatch = useDispatch();
   const mode = useSelector((state) => state.lobby.mode);
-  const originalGames = useSelector((s) => s.lobby.games);
   const turnsGridRef = useRef();
   const turns = useSelector((s) => s.lobby.turns);
   // @todo: get default width by props
   const [gridWidth, setGridWidth] = useState(DEFAULT_GRID_WIDTH);
-
-  const dictionaryGames = originalGames
-    .map((el) => ({ [el._id]: el }))
-    .reduce((acc, obj) => {
-      const key = Object.keys(obj)[0];
-      acc[key] = obj[key];
-      return acc;
-    }, {});
-
   const desiredNumCols = useSelector(s => s.lobby.layoutSettings.desiredNumCols)
 
   const variantGrid = useMemo(() => {
@@ -165,7 +155,7 @@ const RightContent = () => {
               {innerTurns.map((turn) => {
                 return (
                   <div key={turn._id}>
-                    <TurnCard turn={turn} dictionaryGames={dictionaryGames} />
+                    <TurnCard turn={turn} />
                   </div>
                 );
               })}

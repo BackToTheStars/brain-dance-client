@@ -15,9 +15,11 @@ const getVideoImg = (url) => {
   }
 };
 
-const TurnCard = ({ turn, dictionaryGames }) => {
+const TurnCard = ({ turn }) => {
   const dispatch = useDispatch();
   const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
+  const dictionaryGames = useSelector((s) => s.lobby.dGames);
+  const gamesTitle = dictionaryGames[turn.gameId]?.name;
   const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
   const alignment = useSelector((s) => s.lobby.textSettings.alignment);
@@ -33,7 +35,6 @@ const TurnCard = ({ turn, dictionaryGames }) => {
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
   const newDate = new Date(date);
-  const gamesTitle = dictionaryGames[turn.gameId]?.name;
 
   const limitLine = () => {
     return {
