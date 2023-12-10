@@ -16,6 +16,10 @@ const initialState = {
     theme: 'light',
     activeFontFamily: FONT_INTER,
   },
+  layoutSettings: {
+    desiredNumCols: 2,
+  },
+  dictionaryGame: {},
   sidebar: {},
   turns: [],
   theme: '',
@@ -29,6 +33,15 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
         ...state,
         textSettings: {
           ...state.textSettings,
+          [payload.field]: payload.value,
+        },
+      };
+    }
+    case types.LOBBY_LAYOUT_SETTINGS_SET: {
+      return {
+        ...state,
+        layoutSettings: {
+          ...state.layoutSettings,
           [payload.field]: payload.value,
         },
       };

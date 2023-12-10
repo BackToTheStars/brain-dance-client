@@ -13,6 +13,13 @@ export const changeTextSettings = (field, value) => (dispatch) => {
   });
 };
 
+export const changeLayoutSettings = (field, value) => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_LAYOUT_SETTINGS_SET,
+    payload: { field, value },
+  });
+};
+
 export const openModal = (type, params) => (dispatch) => {
   dispatch({
     type: types.LOBBY_MODAL_SET,

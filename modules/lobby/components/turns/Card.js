@@ -133,7 +133,7 @@ const TurnCard = ({ turn }) => {
             {!!gamesTitle ? (
               <h4 className="pe-[70px] mb-1">
                 <Link href={'#'} className="font-bold text-lg">
-                  Игра: {gamesTitle}
+                  {gamesTitle}
                 </Link>
               </h4>
             ) : (
