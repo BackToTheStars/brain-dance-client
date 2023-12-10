@@ -93,9 +93,9 @@ const SettingsRightContent = () => {
   return (
     <div className="relative">
       <Button
-        title={<SettingOutlined />}
+        title={<SettingOutlined className="text-[18px]" />}
         className={
-          'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2 text-2xl'
+          'sm:h-[30px] sm:w-[36px] w-[36px] h-[30px] lg:px-4 px-2 text-2xl'
         }
         onClick={toggleList}
       />

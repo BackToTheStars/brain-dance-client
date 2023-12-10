@@ -20,7 +20,7 @@ const LeftContent = ({ games }) => {
           <div className="flex-[0_1_100%] dark:text-white text-dark-light sm:text-xl text-sm font-bold">
             <Search
               showLabel={false}
-              clsInput={'sm:py-1 sm:px-2'}
+              clsInput={'sm:py-0 sm:px-2 text-[14px]'}
               placeholder="Название"
             />
           </div>

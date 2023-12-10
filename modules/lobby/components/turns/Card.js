@@ -84,11 +84,6 @@ const TurnCard = ({ turn }) => {
                 {header}
               </Link>
             )}
-            {!!date && (
-              <div>
-                <time>{newDate.toLocaleDateString()}</time>
-              </div>
-            )}
           </div>
         )}
         <div
@@ -120,7 +115,11 @@ const TurnCard = ({ turn }) => {
 
           <div
             className="absolute left-0 top-0 w-full transition-all duration-500 h-full opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible"
-            style={{ backdropFilter: 'blur(1px)', filter: `grayscale(1)` }}
+            style={{
+              background: 'rgba(0,0,0, .3)',
+              filter: `grayscale(1)`,
+              backdropFilter: 'blur(0px)',
+            }}
           ></div>
 
           {/* НАЗВАНИЕ ИГРЫ ИНФА И КНОПКА ПРИ ХОВЕРЕ */}
@@ -160,7 +159,7 @@ const TurnCard = ({ turn }) => {
                       imageUrl,
                       videoUrl,
                       paragraph,
-                      date,
+                      // date,
                       contentType,
                       width: '50%',
                     })

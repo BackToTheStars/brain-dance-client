@@ -69,30 +69,30 @@ export const ContentToolbar = () => {
 
   return (
     <div className={`flex justify-between items-center gap-x-4 w-full`}>
-      <div className={'flex items-center mb-3 pt-[7px] gap-x-3'}>
+      <div className={'flex items-center gap-x-3'}>
         <Button
           onClick={(e) => {
             e.preventDefault();
             dispatch(switchMode('byGame'));
           }}
-          title={<CalendarOutlined className="text-[24px]" />}
-          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+          title={<CalendarOutlined className="text-[16px]" />}
+          className={'sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'}
         />
         <Button
           onClick={(e) => {
             e.preventDefault();
             dispatch(switchMode('chrono'));
           }}
-          title={<BranchesOutlined className="text-[24px]" />}
-          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+          title={<BranchesOutlined className="text-[16px]" />}
+          className={'sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'}
         />
       </div>
       <div className={'relative md:block hidden ms-auto'}>
         <Button
           title={
-            <AppstoreOutlined className="text-[24px] pointer-events-none" />
+            <AppstoreOutlined className="text-[16px] pointer-events-none" />
           }
-          className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
+          className={'sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'}
           onClick={(e) => {
             e.preventDefault();
             setDisplayVariantGridList((prev) => !prev);
@@ -212,7 +212,7 @@ const RightContent = () => {
 export default RightContent;
 
 {
-  /* <div className='absolute bottom-[-60px] border-2 border-main right-3 w-[60px] h-[60px] rounded bg-dark-light bg-opacity-90 group-hover/item:bottom-[60px] transition-all'>
+  /* <div className='absolute bottom-[-30px] border-2 border-main right-3 w-[30px] h-[30px] rounded bg-dark-light bg-opacity-90 group-hover/item:bottom-[30px] transition-all'>
                                 <Link
                                     href={'#'}
                                     className='h-full w-full flex items-center justify-center'

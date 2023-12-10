@@ -13,17 +13,17 @@ import { ContentToolbar } from './RightContent';
 const Header = () => {
   const dispatch = useDispatch();
   return (
-    <header className="sm:h-[60px]">
-      <div className="flex sm:gap-6 gap-4 sm:flex-nowrap flex-wrap">
+    <header className="sm:h-[50px]">
+      <div className="flex sm:gap-6 gap-4 sm:flex-nowrap flex-wrap h-full items-center">
         <div className="sm:order-2 order-1 flex sm:gap-x-6 gap-x-4 sm:flex-[0_0_100%] sm:w-auto w-full">
-          <div className="flex flex-1 sm:gap-x-6 gap-x-4">
+          <div className="flex flex-1 items-center sm:gap-x-6 gap-x-4">
             <Button
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(openModal(MODAL_ENTER_GAME));
               }}
               title={'Войти в игру'}
-              className={'sm:flex-[0_0_auto] sm:h-[60px] sm:w-auto w-full'}
+              className={'sm:flex-[0_0_auto] h-[32px] pb-3 sm:w-auto w-full'}
             />
             <Button
               onClick={(e) => {
@@ -31,7 +31,7 @@ const Header = () => {
                 dispatch(openModal(MODAL_CREATE_GAME));
               }}
               title={'Создать игру'}
-              className={'sm:flex-[0_0_auto] sm:h-[60px] sm:w-auto w-full'}
+              className={'sm:flex-[0_0_auto] h-[32px] pb-3 sm:w-auto w-full'}
             />
           </div>
           {/* @todo: remove pl */}
@@ -39,13 +39,13 @@ const Header = () => {
             <ContentToolbar />
             <Button
               link={'#'}
-              title={<DollarOutlined className="text-[24px]" />}
+              title={<DollarOutlined className="text-[18px]" />}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(openModal(MODAL_DONATE));
               }}
               className={
-                'sm:flex-[0_0_60px] sm:h-[60px] py-2 lg:px-3 px-3 sm:w-auto w-full dark:text-white text-dark-light text-opacity-80 inline-block'
+                'sm:flex-[0_0_36px] sm:h-[30px] py-2 lg:px-0 px-0 sm:w-auto w-full dark:text-white text-dark-light text-opacity-80 inline-block'
               }
             />
           </div>

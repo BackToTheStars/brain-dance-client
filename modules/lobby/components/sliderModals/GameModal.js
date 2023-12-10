@@ -12,11 +12,11 @@ const GameModal = ({ params }) => {
     >
       <VerticalSplit minW={50} maxW={100} element="#main-sidebar" />
       <div className="flex items-center gap-x-4">
-        <div className="w-[50px] h-[50px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
+        <div className="w-[30px] h-[30px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
           {status === 'public' ? (
-            <LockOutlined className="text-[24px] dark:text-light text-dark" />
+            <LockOutlined className="text-[18px] dark:text-light text-dark" />
           ) : (
-            <UnlockOutlined className="text-[24px] dark:text-light text-dark" />
+            <UnlockOutlined className="text-[18px] dark:text-light text-dark" />
           )}
         </div>
         <div className="text-xl font-semibold w-full pe-10 leading-[1.2] dark:text-white text-dark">
@@ -49,7 +49,11 @@ const GameModal = ({ params }) => {
         </div>
       </div>
       <div className="mt-5">
-        <Search clsInput={'sm:py-3'} clsLabel={'dark:bg-dark-light'} />
+        <Search
+          clsInput={'sm:py-[3px] sm:pb-[5px] text-[14px]'}
+          showLabel={false}
+          clsLabel={'dark:bg-dark-light'}
+        />
       </div>
       <div className="mt-6">{!!description && description}</div>
       <div className="mt-auto">

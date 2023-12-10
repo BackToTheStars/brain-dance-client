@@ -41,6 +41,14 @@ export const closeSliderModal = () => (dispatch) => {
   });
 };
 
+export const switchTheme = () => (dispatch, getState) => {
+  const theme = getState().lobby.textSettings.theme;
+  dispatch({
+    type: types.LOBBY_THEME,
+    payload: theme === 'light' ? 'dark' : 'light',
+  });
+};
+
 export const loadGames = () => (dispatch) => {
   return loadGamesRequest().then((data) => {
     const dictionaryGames = data.items.reduce((acc, obj) => {

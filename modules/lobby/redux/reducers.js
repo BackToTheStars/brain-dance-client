@@ -13,6 +13,7 @@ const initialState = {
     lineSpacing: 1.5,
     padding: 12,
     alignment: 'left',
+    theme: 'light',
     activeFontFamily: FONT_INTER,
   },
   sidebar: {},
@@ -61,6 +62,12 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         sidebar: payload,
+      };
+    }
+    case types.LOBBY_THEME: {
+      return {
+        ...state,
+        textSettings: { ...state.textSettings, theme: payload },
       };
     }
     case types.LOBBY_MODE_SET: {

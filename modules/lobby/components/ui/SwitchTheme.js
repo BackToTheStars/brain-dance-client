@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react';
 import Button from './Button';
 // import { useDispatch } from 'react-redux';
 // import { switchTheme } from '../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { switchTheme } from '../../redux/actions';
 
 export const useTheme = () => {
-  const [theme, setTheme] = useState(false);
+  const theme = useSelector((s) => s.lobby.textSettings.theme);
+  const dispatch = useDispatch();
   const [html, setHtml] = useState(null);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => !prevTheme);
-
-    localStorage.setItem('theme', theme ? 'light' : 'dark');
+    dispatch(switchTheme());
+    localStorage.setItem('theme', theme);
     if (html) {
-      html.classList.remove(theme ? 'dark' : 'light');
+      html.classList.remove(theme);
       html.classList.add(localStorage.getItem('theme'));
     }
   };
@@ -21,9 +23,9 @@ export const useTheme = () => {
     if (!document) return;
     const html = document.querySelector('html');
     html.classList.add(
-      localStorage.getItem('theme') ? localStorage.getItem('theme') : 'dark'
+      localStorage.getItem('theme') ? localStorage.getItem('theme') : theme
     );
-    setTheme(localStorage.getItem('theme') === 'dark');
+
     setHtml(html);
   }, []);
 
@@ -50,7 +52,7 @@ export const ThemeSwitcher = () => {
   return (
     <Button
       link={'#'}
-      title={theme ? 'dark' : 'light' }
+      title={theme ? 'dark' : 'light'}
       onClick={(e) => {
         e.preventDefault();
         toggleTheme();
