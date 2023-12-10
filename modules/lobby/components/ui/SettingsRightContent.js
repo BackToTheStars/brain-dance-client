@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Button from './Button';
 import {
   SettingIcon,
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { changeTextSettings } from '../../redux/actions';
 import { fontSettings } from '@/config/lobby/fonts';
 import { ThemeSwitcher } from './SwitchTheme';
+import { SettingOutlined } from '@ant-design/icons';
 
 const SettingsRightContent = () => {
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ const SettingsRightContent = () => {
 
   const [openList, setOpenList] = useState(false);
   const btnStyle =
-    'w-[40px] h-[40px] border border-main rounded-btn-border leading-[1] flex items-center justify-center select-none';
+    'w-[40px] h-[40px] border border-main rounded-btn-border leading-[1] flex items-center justify-center select-none dark:text-white text-dark';
 
   const toggleList = (e) => {
     e.preventDefault();
@@ -92,41 +93,47 @@ const SettingsRightContent = () => {
   return (
     <div className="relative">
       <Button
-        title={<SettingIcon />}
+        title={<SettingOutlined />}
         className={
           'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2 text-2xl'
         }
         onClick={toggleList}
       />
       <div
-        className={`absolute top-0 right-[calc(100%+10px)] rounded-btn-border border-2 border-main z-10 w-[380px] p-4 bg-dark-light ${
+        className={`absolute top-0 right-[calc(100%+10px)] rounded-btn-border border-2 border-main z-10 w-[380px] p-4 dark:bg-dark-light bg-light ${
           openList ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
         <form>
           <div className="flex justify-between items-center mb-3">
-            <div className="text-lg font-semibold">Настройки</div>
+            <div className="text-lg font-semibold dark:text-white text-dark">
+              Настройки
+            </div>
             <ThemeSwitcher />
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Отступы</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">Отступы</div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decCardPadding}>
                 -
               </div>
-              <div className="w-[36px] h-full text-center">{cardPadding}</div>
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
+                {cardPadding}
+              </div>
               <div className={`${btnStyle}`} onClick={incCardPadding}>
                 +
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Кол-во строк оглавления</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">
+              Кол-во строк оглавления
+            </div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decLimitLineHeader}>
                 -
               </div>
-              <div className="w-[36px] h-full text-center">
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
                 {limitLineHeader}
               </div>
               <div className={`${btnStyle}`} onClick={incLimitLineHeader}>
@@ -134,37 +141,43 @@ const SettingsRightContent = () => {
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Кол-во строк</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">Кол-во строк</div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decLineCount}>
                 -
               </div>
-              <div className="w-[36px] h-full text-center">{lineCount}</div>
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
+                {lineCount}
+              </div>
               <div className={`${btnStyle}`} onClick={incLineCount}>
                 +
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Размер шрифта</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">Размер шрифта</div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decFontSize}>
                 A-
               </div>
-              <div className="w-[36px] h-full text-center">{fontSize}</div>
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
+                {fontSize}
+              </div>
               <div className={`${btnStyle}`} onClick={incFontSize}>
                 A+
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Междустрочный интервал</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">
+              Междустрочный интервал
+            </div>
             <div className="flex gap-x-3 items-center">
               <div className={`${btnStyle}`} onClick={decLineSpacing}>
                 -
               </div>
-              <div className="w-[36px] h-full text-center">
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
                 {Math.round(lineSpacing * 100)}%
               </div>
               <div className={`${btnStyle}`} onClick={incLineSpacing}>
@@ -172,8 +185,8 @@ const SettingsRightContent = () => {
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Выравнивание текста</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">Выравнивание текста</div>
             <div className="flex gap-x-[10px] items-center">
               <div
                 className={`${btnStyle}`}
@@ -195,14 +208,16 @@ const SettingsRightContent = () => {
               </div>
             </div>
           </div>
-          <div className="cursor-pointer py-3 border-y border-white border-opacity-10 flex justify-between items-center">
-            <div>Шрифт</div>
+          <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+            <div className="dark:text-white text-dark">Шрифт</div>
             <div className="flex gap-x-3 items-center">
               <ul>
                 {fontFamilyOptions.map((el) => {
                   return (
                     <li
-                      className={`${el.active ? 'text-main' : ''}`}
+                      className={`dark:text-white text-dark ${
+                        el.active ? 'dark:text-main text-main' : ''
+                      }`}
                       key={el.label}
                       onClick={() => setActiveFontFamily(el.key)}
                     >
@@ -213,7 +228,6 @@ const SettingsRightContent = () => {
               </ul>
             </div>
           </div>
-          <Button title={'Сохранить'} className={'w-full py-3 mt-4'} />
         </form>
       </div>
     </div>

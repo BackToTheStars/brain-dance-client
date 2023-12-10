@@ -4,12 +4,12 @@ import { useRef } from 'react';
 const Modal = ({ title, children, isOpen = false, onCancel }) => {
   return (
     <div
-      className={`bg-dark bg-opacity-70 fixed left-0 top-0 w-screen h-screen flex items-center justify-center z-[100] ${
+      className={`dark:bg-dark  dark:bg-opacity-70 bg-white bg-opacity-70 fixed left-0 top-0 w-screen h-screen flex items-center justify-center z-[100] ${
         isOpen ? 'visible opacity-100' : 'invisible opacity-0'
       }`}
       onClick={(e) => e.currentTarget === e.target && onCancel()}
     >
-      <div className="max-w-xl w-full h-[450px] flex flex-col border border-white bg-dark rounded overflow-hidden">
+      <div className="max-w-xl w-full h-[450px] flex flex-col border dark:border-white border-main dark:bg-dark-light bg-main-dark rounded overflow-hidden">
         <div className="flex justify-between py-6 px-6">
           <h4 className="text-white text-2xl">{title}</h4>
           <CloseCircleOutlined
@@ -20,7 +20,7 @@ const Modal = ({ title, children, isOpen = false, onCancel }) => {
             }}
           />
         </div>
-        <div className="h-full bg-black p-6">{children}</div>
+        <div className="h-full dark:bg-black bg-light p-6">{children}</div>
       </div>
     </div>
   );

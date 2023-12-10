@@ -26,7 +26,10 @@ const TurnModal = ({ params }) => {
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
   return (
-    <div style={{ width }} className="bg-dark-light h-full flex flex-col">
+    <div
+      style={{ width }}
+      className="dark:bg-dark-light bg-light h-full flex flex-col rounded"
+    >
       <div className="bg-main-dark rounded-t p-4">
         {!!header && <h2 style={limitLine(2)}>{header}</h2>}
         {!!date && (
@@ -49,7 +52,9 @@ const TurnModal = ({ params }) => {
           />
         )}
       </div>
-      <div className="h-full overflow-auto p-4">{!!text && <p>{text}</p>}</div>
+      <div className="h-full overflow-auto p-4 dark:text-main-text text-dark-light">
+        {!!text && <p>{text}</p>}
+      </div>
       {/* {!!contentType && <p>{contentType}</p>} */}
     </div>
   );

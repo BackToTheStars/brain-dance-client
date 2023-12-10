@@ -11,12 +11,12 @@ const TextInput = ({ label, value, onChange }) => {
       <div className="relative">
         <label
           htmlFor="search_input"
-          className="absolute left-[32px] text-xl top-[-12px] bg-black px-3 text-main-text"
+          className="absolute left-[32px] text-xl top-[-12px] dark:bg-black bg-light px-3 dark:text-main-text text-dark-light"
         >
           {label}
         </label>
         <input
-          className="border-2 border-main px-6 py-4 rounded-full outline-none bg-transparent w-full"
+          className="border-2 border-main px-6 py-4 rounded-full outline-none bg-transparent w-full dark:text-main-text text-dark-light"
           type="text"
           value={value}
           onChange={onChange}
@@ -59,7 +59,7 @@ const EnterGame = ({ params }) => {
 
   return (
     <form
-      className="w-full h-full bg-black py-3 flex flex-col"
+      className="w-full h-full dark:bg-black bg-light py-3 flex flex-col"
       onSubmit={handleSubmit}
     >
       <TextInput

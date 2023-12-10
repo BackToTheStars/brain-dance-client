@@ -48,7 +48,7 @@ export const VerticalSplit = ({ resize, minW, maxW, element }) => {
       className={`absolute right-[-30px] top-[50%] translate-y-[-50%] xl:flex hidden justify-center items-center h-full select-none`}
     >
       <span
-        className="flex justify-center items-center rounded-full border-2 dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 w-[25px] h-[25px] dark:bg-dark bg-white text-sm cursor-pointer"
+        className="flex justify-center items-center rounded-full border-2 dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 w-[25px] h-[25px] dark:bg-dark bg-white dark:text-white text-dark text-sm cursor-pointer"
         ref={resizeBtn}
       >
         ⇄

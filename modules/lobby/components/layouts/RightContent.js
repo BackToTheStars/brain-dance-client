@@ -2,6 +2,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Button from '@/modules/lobby/components/ui/Button';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  AppstoreOutlined,
+  CalendarOutlined,
+  BranchesOutlined,
+} from '@ant-design/icons';
 import TurnCard from '../turns/Card';
 import { loadTurns, switchMode } from '../../redux/actions';
 import SettingsRightContent from '../ui/SettingsRightContent';
@@ -70,13 +75,7 @@ export const ContentToolbar = () => {
             e.preventDefault();
             dispatch(switchMode('byGame'));
           }}
-          title={
-            <img
-              src="/icons/calendar-icon.svg"
-              className={'sm:w-[30px] w-[25px]'}
-              alt="icon"
-            />
-          }
+          title={<CalendarOutlined className="text-[24px]" />}
           className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
         />
         <Button
@@ -84,19 +83,15 @@ export const ContentToolbar = () => {
             e.preventDefault();
             dispatch(switchMode('chrono'));
           }}
-          title={
-            <img
-              src="/icons/step-icon.svg"
-              className={'sm:w-[30px] w-[25px]'}
-              alt="icon"
-            />
-          }
+          title={<BranchesOutlined className="text-[24px]" />}
           className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
         />
       </div>
       <div className={'relative md:block hidden ms-auto'}>
         <Button
-          title={<GridIcon />}
+          title={
+            <AppstoreOutlined className="text-[24px] pointer-events-none" />
+          }
           className={'sm:h-[60px] sm:w-[60px] w-[45px] h-[45px] lg:px-4 px-2'}
           onClick={(e) => {
             e.preventDefault();

@@ -13,7 +13,7 @@ const SliderModal = ({ open, closeModal, children }) => {
       ></div>
       <div className="w-full relative">
         <div
-          className="absolute right-[12px] top-[8px] text-xl cursor-pointer"
+          className="absolute right-[12px] top-[8px] text-xl cursor-pointer text-white"
           onClick={() => {
             closeModal();
           }}

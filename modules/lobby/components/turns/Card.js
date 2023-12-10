@@ -62,7 +62,7 @@ const TurnCard = ({ turn }) => {
   return (
     <>
       <div
-        className={`relative w-full group/item overflow-hidden rounded bg-dark-light`}
+        className={`relative w-full group/item overflow-hidden rounded dark:bg-dark-light bg-light`}
         style={{ maxHeight: `${maxHeight}px`, minHeight: `${minHeight}px` }}
       >
         {contentType !== 'comment' && (
@@ -92,7 +92,7 @@ const TurnCard = ({ turn }) => {
           </div>
         )}
         <div
-          className="bg-dark-light flex flex-col gap-y-4"
+          className="dark:bg-dark-light bg-light flex flex-col gap-y-4"
           style={{ padding: `${cardPadding}px` }}
         >
           {!!imageUrl && (
@@ -150,7 +150,7 @@ const TurnCard = ({ turn }) => {
 
             {/* КНОПКА (ПЕРЕХОД В САМУ ИГРУ)  */}
 
-            <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border bg-dark-light border border-main">
+            <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border dark:bg-dark-light bg-light border border-main">
               <div
                 className="h-[16px] flex items-center justify-center pe-3 border-r border-main cursor-pointer"
                 onClick={() => {
@@ -167,13 +167,13 @@ const TurnCard = ({ turn }) => {
                   );
                 }}
               >
-                <InfoCircleOutlined />
+                <InfoCircleOutlined className="dark:text-white text-dark" />
               </div>
               <Link
                 href={'#'}
                 className="h-[16px] flex items-center justify-center ps-3"
               >
-                <ArrowRightOutlined />
+                <ArrowRightOutlined className="dark:text-white text-dark" />
               </Link>
             </div>
           </div>

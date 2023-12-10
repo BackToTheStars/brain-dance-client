@@ -1,13 +1,20 @@
-const Search = ({ clsInput, clsLabel, placeholder = "Введите запрос поиска", showLabel = true }) => {
+const Search = ({
+  clsInput,
+  clsLabel,
+  placeholder = 'Введите запрос поиска',
+  showLabel = true,
+}) => {
   return (
     <form className="form w-full">
       <div className="form-group relative w-full">
-        {showLabel && <label
-          htmlFor="search_input"
-          className={`absolute sm:left-[32px] sm:top-[-12px] top-[-8px] left-[6px] dark:bg-dark bg-white px-3 text-main-text sm:text-base text-xs ${clsLabel}`}
-        >
-          Поиск
-        </label>}
+        {showLabel && (
+          <label
+            htmlFor="search_input"
+            className={`absolute sm:left-[32px] sm:top-[-12px] top-[-8px] left-[6px] dark:bg-dark bg-light px-3 dark:text-main-text text-dark sm:text-base text-xs ${clsLabel}`}
+          >
+            Поиск
+          </label>
+        )}
         <input
           type="text"
           id="search_input"

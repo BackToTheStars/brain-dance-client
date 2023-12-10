@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import Button from '../ui/Button';
 // import SwitchTheme from '../ui/SwitchTheme';
 import { openModal } from '../../redux/actions';
+import { DollarOutlined } from '@ant-design/icons';
 import {
   MODAL_CREATE_GAME,
   MODAL_DONATE,
@@ -38,13 +39,13 @@ const Header = () => {
             <ContentToolbar />
             <Button
               link={'#'}
-              title={'$'}
+              title={<DollarOutlined className="text-[24px]" />}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(openModal(MODAL_DONATE));
               }}
               className={
-                'sm:flex-[0_0_60px] sm:h-[60px] py-2 lg:px-3 px-3 sm:w-auto w-full dark:text-white text-dark-light text-opacity-80 inline-block ms-auto text-[35px]'
+                'sm:flex-[0_0_60px] sm:h-[60px] py-2 lg:px-3 px-3 sm:w-auto w-full dark:text-white text-dark-light text-opacity-80 inline-block'
               }
             />
           </div>

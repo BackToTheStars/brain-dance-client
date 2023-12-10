@@ -1,6 +1,7 @@
 import Button from '../ui/Button';
 import Search from '../ui/Search';
 import { VerticalSplit } from '../ui/VerticalSplit';
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 
 const GameModal = ({ params }) => {
   const { title, image, status, turns, description, width } = params;
@@ -13,18 +14,12 @@ const GameModal = ({ params }) => {
       <div className="flex items-center gap-x-4">
         <div className="w-[50px] h-[50px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
           {status === 'public' ? (
-            <img
-              src="/icons/open.png"
-              className="w-[25px] h-[25px] object-contain"
-            ></img>
+            <LockOutlined className="text-[24px] dark:text-light text-dark" />
           ) : (
-            <img
-              src="/icons/close.png"
-              className="w-[25px] h-[25px] object-contain"
-            ></img>
+            <UnlockOutlined className="text-[24px] dark:text-light text-dark" />
           )}
         </div>
-        <div className="text-xl font-semibold w-full pe-10 leading-[1.2]">
+        <div className="text-xl font-semibold w-full pe-10 leading-[1.2] dark:text-white text-dark">
           {!!title && title}
         </div>
       </div>
