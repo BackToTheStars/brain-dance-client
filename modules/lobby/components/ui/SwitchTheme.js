@@ -8,25 +8,20 @@ import { switchTheme } from '../../redux/actions';
 export const useTheme = () => {
   const theme = useSelector((s) => s.lobby.textSettings.theme);
   const dispatch = useDispatch();
-  const [html, setHtml] = useState(null);
 
   const toggleTheme = () => {
     dispatch(switchTheme());
-    localStorage.setItem('theme', theme);
-    if (html) {
-      html.classList.remove(theme);
-      html.classList.add(localStorage.getItem('theme'));
-    }
   };
 
   useEffect(() => {
     if (!document) return;
     const html = document.querySelector('html');
-    html.classList.add(
-      localStorage.getItem('theme') ? localStorage.getItem('theme') : theme
-    );
 
-    setHtml(html);
+    if (theme !== localStorage.getItem('theme')) {
+      dispatch(switchTheme());
+    }
+
+    html.classList.add(theme);
   }, []);
 
   return {
@@ -52,7 +47,7 @@ export const ThemeSwitcher = () => {
   return (
     <Button
       link={'#'}
-      title={theme ? 'dark' : 'light'}
+      title={theme === 'light' ? 'dark' : 'light'}
       onClick={(e) => {
         e.preventDefault();
         toggleTheme();

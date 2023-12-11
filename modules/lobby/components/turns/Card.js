@@ -62,12 +62,12 @@ const TurnCard = ({ turn }) => {
   return (
     <>
       <div
-        className={`relative w-full group/item overflow-hidden rounded dark:bg-dark-light bg-light`}
+        className={`relative w-full group/item overflow-hidden border-2 border-main-light rounded dark:bg-main-dark bg-light`}
         style={{ maxHeight: `${maxHeight}px`, minHeight: `${minHeight}px` }}
       >
         {contentType !== 'comment' && (
           <div
-            className={`bg-main-dark`}
+            className={`bg-main`}
             style={{
               fontFamily: `var(--${fontFamily.className})`,
               padding: `${cardPadding}px`,
@@ -76,7 +76,7 @@ const TurnCard = ({ turn }) => {
             {!!header && (
               <Link
                 href={'#'}
-                className="text-lg"
+                className="text-lg text-white text-opacity-70"
                 style={{
                   ...limitLine(),
                 }}
@@ -87,7 +87,7 @@ const TurnCard = ({ turn }) => {
           </div>
         )}
         <div
-          className="dark:bg-dark-light bg-light flex flex-col gap-y-4"
+          className="dark:bg-main-dark bg-light flex flex-col gap-y-4"
           style={{ padding: `${cardPadding}px` }}
         >
           {!!imageUrl && (
@@ -103,7 +103,7 @@ const TurnCard = ({ turn }) => {
               }}
             >
               <p
-                className={`dark:text-white text-dark ${fontFamily.className}`}
+                className={`dark:text-white text-opacity-90 text-dark ${fontFamily.className}`}
                 style={{ fontFamily: `var(--${fontFamily.className})` }}
               >
                 {text}
@@ -124,7 +124,7 @@ const TurnCard = ({ turn }) => {
 
           {/* НАЗВАНИЕ ИГРЫ ИНФА И КНОПКА ПРИ ХОВЕРЕ */}
           <div
-            className="absolute bottom-0 translate-y-[100%] group-hover/item:translate-y-[0] left-0 bg-main-dark bg-opacity-90 rounded-b w-full text-white transition-all"
+            className="absolute bottom-0 translate-y-[100%] group-hover/item:translate-y-[0] left-0 bg-main bg-opacity-90 rounded-b w-full text-white transition-all"
             style={{
               maxHeight: `calc(100% - 45px)`,
               padding: `${cardPadding}px`,
@@ -149,7 +149,7 @@ const TurnCard = ({ turn }) => {
 
             {/* КНОПКА (ПЕРЕХОД В САМУ ИГРУ)  */}
 
-            <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border dark:bg-dark-light bg-light border border-main">
+            <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border dark:bg-main-dark bg-light border border-main">
               <div
                 className="h-[16px] flex items-center justify-center pe-3 border-r border-main cursor-pointer"
                 onClick={() => {

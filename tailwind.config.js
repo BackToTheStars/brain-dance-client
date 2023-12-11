@@ -14,11 +14,11 @@ module.exports = {
     },
     extend: {
       colors: {
-        main: '#829af7',
-        'main-light': '#9baffd',
-        'main-dark': '#21306e',
+        main: '#294377',
+        'main-light': '#426498',
+        'main-dark': '#0c1e35',
         'main-text': '#d6d6d6',
-        dark: '#151819',
+        dark: '#070d11',
         'dark-light': '#212121',
         black: '#000000',
         white: '#ffffff',

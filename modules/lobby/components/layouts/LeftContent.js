@@ -12,8 +12,8 @@ const LeftContent = ({ games }) => {
       {/* <div className="mb-3 pt-[7px]">
         <Search />
       </div> */}
-      <div className="dark:bg-dark-light bg-light flex-[0_1_100%] rounded overflow-y-auto sm:px-8 sm:pb-8 p-3">
-        <div className="w-full flex sm:gap-6 gap-3 sm:pb-4 pb-3 sm:pt-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0 dark:bg-dark-light bg-light">
+      <div className="dark:bg-main-dark dark:bg-opacity-40 bg-light flex-[0_1_100%] rounded overflow-y-auto sm:px-8 sm:pb-8 p-3">
+        <div className="w-full flex sm:gap-6 gap-3 sm:pb-4 pb-3 sm:pt-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0">
           <div className="flex-[0_0_30px] flex sm:justify-center dark:text-white text-dark-light sm:text-xl text-base font-bold">
             №
           </div>

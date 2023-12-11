@@ -49,7 +49,15 @@ export const closeSliderModal = () => (dispatch) => {
 };
 
 export const switchTheme = () => (dispatch, getState) => {
+  const html = document.querySelector('html');
   const theme = getState().lobby.textSettings.theme;
+  localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
+
+  if (html) {
+    html.classList.remove(theme);
+    html.classList.add(localStorage.getItem('theme'));
+  }
+
   dispatch({
     type: types.LOBBY_THEME,
     payload: theme === 'light' ? 'dark' : 'light',
