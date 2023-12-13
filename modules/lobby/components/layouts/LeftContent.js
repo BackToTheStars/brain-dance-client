@@ -5,7 +5,6 @@ import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
 
 const LeftContent = ({ games }) => {
   const dispatch = useDispatch();
-  console.log(games);
 
   return (
     <div className={`rounded h-full flex flex-col dark:bg-dark bg-white`}>

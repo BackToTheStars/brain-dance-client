@@ -11,6 +11,7 @@ import { changeTextSettings } from '../../redux/actions';
 import { fontSettings } from '@/config/lobby/fonts';
 import { ThemeSwitcher } from './SwitchTheme';
 import { SettingOutlined } from '@ant-design/icons';
+import { Slider } from 'antd';
 
 const SettingsRightContent = () => {
   const dispatch = useDispatch();
@@ -25,10 +26,14 @@ const SettingsRightContent = () => {
     (s) => s.lobby.textSettings.limitLineHeader
   );
 
-  const incLineCount = () =>
-    lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
-  const decLineCount = () =>
-    lineCount > 5 && dispatch(changeTextSettings('lineCount', lineCount - 1));
+  const changeLineCount = (newValue) => {
+    dispatch(changeTextSettings('lineCount', newValue));
+  };
+
+  // const incLineCount = () =>
+  //   lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
+  // const decLineCount = () =>
+  //   lineCount > 5 && dispatch(changeTextSettings('lineCount', lineCount - 1));
 
   const incFontSize = () =>
     fontSize < 30 && dispatch(changeTextSettings('fontSize', fontSize + 1));
@@ -100,7 +105,7 @@ const SettingsRightContent = () => {
         onClick={toggleList}
       />
       <div
-        className={`absolute top-0 right-[calc(100%+10px)] rounded-btn-border border-2 border-main z-10 w-[380px] p-4 dark:bg-dark-light bg-light ${
+        className={`absolute top-0 right-[calc(100%+10px)] rounded-btn-border border-2 border-main z-10 w-[380px] p-4 dark:bg-main-dark bg-light ${
           openList ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
@@ -144,14 +149,13 @@ const SettingsRightContent = () => {
           <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
             <div className="dark:text-white text-dark">Кол-во строк</div>
             <div className="flex gap-x-3 items-center">
-              <div className={`${btnStyle}`} onClick={decLineCount}>
-                -
-              </div>
-              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
-                {lineCount}
-              </div>
-              <div className={`${btnStyle}`} onClick={incLineCount}>
-                +
+              <div className="w-[140px] h-full text-center dark:text-white text-dark font-medium">
+                <Slider
+                  min={5}
+                  max={30}
+                  onChange={changeLineCount}
+                  value={typeof lineCount === 'number' ? lineCount : 0}
+                />
               </div>
             </div>
           </div>
@@ -215,8 +219,10 @@ const SettingsRightContent = () => {
                 {fontFamilyOptions.map((el) => {
                   return (
                     <li
-                      className={`dark:text-white text-dark ${
-                        el.active ? 'dark:text-main text-main' : ''
+                      className={` ${
+                        el.active
+                          ? 'dark:text-main-light text-main-light'
+                          : 'dark:text-white text-dark'
                       }`}
                       key={el.label}
                       onClick={() => setActiveFontFamily(el.key)}
@@ -233,5 +239,17 @@ const SettingsRightContent = () => {
     </div>
   );
 };
+
+{
+  /* <div className={`${btnStyle}`} onClick={decLineCount}>
+                -
+              </div>
+              <div className="w-[36px] h-full text-center dark:text-white text-dark font-medium">
+                {lineCount}
+              </div>
+              <div className={`${btnStyle}`} onClick={incLineCount}>
+                +
+                </div> */
+}
 
 export default SettingsRightContent;

@@ -34,7 +34,6 @@ const TurnCard = ({ turn }) => {
   const { header, imageUrl, videoUrl, paragraph, date, contentType } = turn;
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
-  const newDate = new Date(date);
 
   const limitLine = () => {
     return {

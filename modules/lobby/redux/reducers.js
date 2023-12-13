@@ -18,6 +18,8 @@ const initialState = {
   },
   layoutSettings: {
     desiredNumCols: 2,
+    turnLimit: 5,
+    contentType: {},
   },
   dictionaryGame: {},
   sidebar: {},

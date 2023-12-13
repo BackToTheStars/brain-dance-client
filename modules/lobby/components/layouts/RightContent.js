@@ -15,6 +15,9 @@ import {
 } from '../../redux/actions';
 import SettingsRightContent from '../ui/SettingsRightContent';
 import { GridIcon } from '../iconsComponents/SvgIcons';
+import DropdownList from '../ui/DropdownList';
+import { contentType } from '@/config/lobby/contentType';
+import { Slider } from 'antd';
 
 const DEFAULT_GRID_WIDTH = 1200;
 const MIN_TURN_WIDTH = 200;
@@ -37,6 +40,11 @@ const factor = (index) => {
 export const ContentToolbar = () => {
   const dispatch = useDispatch();
   const [gridWidth, setGridWidth] = useState(DEFAULT_GRID_WIDTH);
+  const titleList = useSelector(
+    (s) => s.lobby.layoutSettings.contentType?.label
+  );
+  const turnLimit = useSelector((s) => s.lobby.layoutSettings.turnLimit);
+  console.log(turnLimit);
 
   const [displayVariantGridList, setDisplayVariantGridList] = useState(false);
   const desiredNumCols = useSelector(
@@ -70,6 +78,28 @@ export const ContentToolbar = () => {
           }}
           title={<BranchesOutlined className="text-[16px]" />}
           className={'sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'}
+        />
+        <DropdownList
+          defaultValue={titleList ? titleList : contentType[0].label}
+          onChange={(value) => {
+            dispatch(changeLayoutSettings('contentType', value));
+          }}
+          options={contentType}
+        />
+        <DropdownList
+          defaultValue={turnLimit}
+          title={turnLimit}
+          elements={
+            <Slider
+              style={{ width: `100px` }}
+              min={5}
+              max={10}
+              onChange={(value) =>
+                dispatch(changeLayoutSettings('turnLimit', value))
+              }
+              value={typeof turnLimit === 'number' ? turnLimit : 0}
+            />
+          }
         />
       </div>
       <div className={'relative md:block hidden ms-auto'}>
