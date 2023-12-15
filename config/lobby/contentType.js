@@ -17,7 +17,7 @@
 //   },
 // };
 
-export const contentType = [
+export const contentTypes = [
   {
     label: 'Видео',
     value: 'video',

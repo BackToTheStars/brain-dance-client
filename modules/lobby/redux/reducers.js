@@ -19,7 +19,7 @@ const initialState = {
   layoutSettings: {
     desiredNumCols: 2,
     turnLimit: 5,
-    contentType: {},
+    contentType: 'video',
   },
   dictionaryGame: {},
   sidebar: {},

@@ -15,8 +15,8 @@ import {
 } from '../../redux/actions';
 import SettingsRightContent from '../ui/SettingsRightContent';
 import { GridIcon } from '../iconsComponents/SvgIcons';
-import DropdownList from '../ui/DropdownList';
-import { contentType } from '@/config/lobby/contentType';
+import { DropdownList, DropdownBlock } from '../ui/DropdownList';
+import { contentTypes } from '@/config/lobby/contentType';
 import { Slider } from 'antd';
 
 const DEFAULT_GRID_WIDTH = 1200;
@@ -40,11 +40,10 @@ const factor = (index) => {
 export const ContentToolbar = () => {
   const dispatch = useDispatch();
   const [gridWidth, setGridWidth] = useState(DEFAULT_GRID_WIDTH);
-  const titleList = useSelector(
-    (s) => s.lobby.layoutSettings.contentType?.label
+  const activeContentType = useSelector(
+    (s) => s.lobby.layoutSettings.contentType
   );
   const turnLimit = useSelector((s) => s.lobby.layoutSettings.turnLimit);
-  console.log(turnLimit);
 
   const [displayVariantGridList, setDisplayVariantGridList] = useState(false);
   const desiredNumCols = useSelector(
@@ -80,27 +79,23 @@ export const ContentToolbar = () => {
           className={'sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'}
         />
         <DropdownList
-          defaultValue={titleList ? titleList : contentType[0].label}
+          value={activeContentType}
           onChange={(value) => {
             dispatch(changeLayoutSettings('contentType', value));
           }}
-          options={contentType}
+          options={contentTypes}
         />
-        <DropdownList
-          defaultValue={turnLimit}
-          title={turnLimit}
-          elements={
-            <Slider
-              style={{ width: `100px` }}
-              min={5}
-              max={10}
-              onChange={(value) =>
-                dispatch(changeLayoutSettings('turnLimit', value))
-              }
-              value={typeof turnLimit === 'number' ? turnLimit : 0}
-            />
-          }
-        />
+        <DropdownBlock title={turnLimit}>
+          <Slider
+            style={{ width: `100px` }}
+            min={5}
+            max={10}
+            onChange={(value) =>
+              dispatch(changeLayoutSettings('turnLimit', value))
+            }
+            value={+turnLimit || 0}
+          />
+        </DropdownBlock>
       </div>
       <div className={'relative md:block hidden ms-auto'}>
         <Button
