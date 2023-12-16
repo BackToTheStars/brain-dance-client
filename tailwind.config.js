@@ -14,15 +14,15 @@ module.exports = {
     },
     extend: {
       colors: {
-        main: '#294377',
-        'main-light': '#426498',
-        'main-dark': '#0c1e35',
+        main: 'var(--main)',
+        'main-light': 'var(--main-light)',
+        'main-dark': 'var(--main-dark)',
         'main-text': '#d6d6d6',
-        dark: '#070d11',
+        dark: 'var(--dark)',
         'dark-light': '#212121',
         black: '#000000',
         white: '#ffffff',
-        light: '#f3f4f6',
+        light: 'var(--light)',
       },
       padding: {
         'section-padding': '48px',

@@ -18,6 +18,29 @@
   background-clip: content-box;
 }
 
+:root {
+  --main: #294377;
+  --main-dark: #0c1e35;
+  --main-light: #426498;
+
+  --dark: #070d11;
+  --light: #f3f4f6;
+
+  --bg-main: var(--dark);
+}
+
+html.light {
+  --main-dark: var(--light);
+  --main: #294377;
+  --main-light: #426498;
+}
+
+html.dark {
+  --main: #294377;
+  --main-dark: #0c1e35;
+  --main-light: #426498;
+}
+
 body {
   @apply dark:bg-dark text-main-text;
 }
