@@ -1,16 +1,43 @@
+import { useRef, useState } from 'react';
 import Button from '../ui/Button';
 import Search from '../ui/Search';
 import { VerticalSplit } from '../ui/VerticalSplit';
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 
 const GameModal = ({ params }) => {
-  const { title, image, status, turns, description, width } = params;
+  const {
+    title,
+    image,
+    status,
+    turns,
+    description,
+    width: originalWidth,
+  } = params;
+  const minMaxDelta = [-200, 200]; // @todo: get from redux
+  const modalRef = useRef();
+  const [width, setWidth] = useState(originalWidth);
+
+  const move = (delta) => {
+    if (typeof window === 'undefined') return;
+    if (!modalRef.current) return;
+    const [minDelta, maxDelta] = minMaxDelta;
+    if (minDelta === null || maxDelta === null) return;
+    if (delta > maxDelta) return;
+    if (delta < minDelta) return;
+    const { width: w } = modalRef.current.parentNode.getBoundingClientRect();
+    const middle = Math.floor(w / 2); // @todo: get from redux
+    if (width !== middle + delta) {
+      setWidth(middle + delta);
+    }
+  };
+
   return (
     <div
       className="flex flex-col h-full dark:bg-dark-light bg-light rounded p-4 relative"
       style={{ width }}
+      ref={modalRef}
     >
-      <VerticalSplit minW={50} maxW={100} element="#main-sidebar" />
+      <VerticalSplit move={move} />
       <div className="flex items-center gap-x-4">
         <div className="w-[30px] h-[30px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
           {status === 'public' ? (

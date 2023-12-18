@@ -1,65 +1,22 @@
 'use client';
+import CommonModal from '@/modules/lobby/components/modals/Common';
+import GridLayout from '@/modules/lobby/components/layouts/GridLayout';
+import { loadSettings } from '@/modules/settings/redux/actions';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import '@/theme/scss/index.scss';
+import '../themes/lobby/index.scss';
 
-import CreateEnterGameBlock from '@/modules/game/components/blocks/CreateEnterGameBlock';
-import GameDetails from '@/modules/game/components/cards/GameDetails';
-
-import GameTable from '@/modules/game/components/tables/GameListTable';
-
-import { loadGames } from '@/modules/game/games-redux/actions';
-import AdminMode from '@/modules/admin/components/profile/AdminMode';
-import { AdminProvider } from '@/modules/admin/contexts/AdminContext';
-import { useRouter } from 'next/navigation';
-
-import { useDispatch } from 'react-redux';
-import ErrorGameModal from '@/modules/game/components/modals/ErrorGameModal';
-import LastTurns from '@/modules/game/components/blocks/LastTurns';
-
-const MainDashboard = () => {
-  const router = useRouter();
-  const enterGame = (hash, nickname) => {
-    router.push(`/code?hash=${hash}&nickname=${nickname}`);
-  };
+export default function Home() {
   const dispatch = useDispatch();
-  const loadGamesAction = () => dispatch(loadGames());
 
+  useEffect(() => {
+    dispatch(loadSettings());
+  }, []);
   return (
-    <div className="container-fluid col-lg-10">
-      <div className="row h-100 vh-100 game-dashboard">
-        <div className="col-sm-6 col-xl-8 pt-4 game-dashboard-list">
-          <AdminMode />
-          <CreateEnterGameBlock
-            enterGame={enterGame}
-            onGameCreate={loadGamesAction}
-          />
-          <div
-            style={{ /*overflowY: 'auto',*/ flex: '1' }}
-            className="mainTableWrapper"
-          >
-            <GameTable />
-          </div>
-        </div>
-        <div className="col-sm-6 col-xl-4 game-dashboard-detail">
-          <div className="sticky-top top-4">
-            <GameDetails />
-            <LastTurns />
-          </div>
-        </div>
-      </div>
-    </div>
+    <>
+      <GridLayout />
+      <CommonModal />
+    </>
   );
-};
-
-const IndexPageOld = () => {
-  return (
-    <AdminProvider>
-      <MainDashboard />
-      <ErrorGameModal />
-    </AdminProvider>
-  );
-};
-
-const IndexPage = () => {
-  return "Index Page";
 }
-
-export default IndexPage;

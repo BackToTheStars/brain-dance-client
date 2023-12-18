@@ -32,6 +32,8 @@ export class TurnHelper {
         {
           id: 's_1',
           show: (!!turn.sourceUrl || !!turn.date) && turn.dontShowHeader,
+          date: turn.date,
+          url: turn.sourceUrl,
         },
       ],
       [WIDGET_PARAGRAPH]: [
@@ -85,6 +87,11 @@ export class TurnHelper {
       originalId: turn.originalId,
       date: turn.date,
       sourceUrl: turn.sourceUrl,
+
+      // COMPRESSED PARAGRAPH
+      compressed: turn.compressed,
+      paragraph: turn.paragraph,
+      compressedHeight: turn.compressedHeight,
 
       colors: {
         background: turn.backgroundColor,
