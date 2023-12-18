@@ -8,13 +8,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadGames } from '../../redux/actions';
 import CommonSliderModal from '../sliderModals/CommonSliderModal';
 
+const MIN_LEFT_SIDE_WIDTH = 400;
+
 const GridLayout = () => {
   const settingsGame = useSelector((s) => s.settings.games);
   const [mobileSwitcherWidth, setMobileSwitcherWidth] = useState(false);
   const originalGames = useSelector((s) => s.lobby.games);
-  const [resize, setResize] = useState('');
-  const [size, setSize] = useState(false);
+  const [minMaxDelta, setMinMaxDelta] = useState([null, null]);
+  const [leftSideWidth, setLeftSideWidth] = useState(null);
   const dispatch = useDispatch();
+  const move = (delta) => {
+    if (typeof window === 'undefined') return;
+    const [minDelta, maxDelta] = minMaxDelta;
+    if (minDelta === null || maxDelta === null) return;
+    if (delta > maxDelta) return;
+    if (delta < minDelta) return;
+    const middle = Math.floor(window.innerWidth / 2);
+    if (leftSideWidth !== middle + delta) {
+      setLeftSideWidth(middle + delta);
+    }
+  };
+
   const games = useMemo(() => {
     return originalGames.map((g) => ({
       title: g.name,
@@ -28,19 +42,10 @@ const GridLayout = () => {
   }, [originalGames]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    if (window.innerWidth < 1280) {
-      setSize('100%');
-    }
-
-    window.onresize = () => {
-      if (window.innerWidth < 1280) {
-        setSize(true);
-      } else {
-        setSize(false);
-      }
-    };
+    setMinMaxDelta([
+      -Math.floor(window.innerWidth / 2) + MIN_LEFT_SIDE_WIDTH,
+      0,
+    ]);
   }, []);
 
   useEffect(() => {
@@ -63,15 +68,10 @@ const GridLayout = () => {
                   ? 'invisible delay-150 transition-all'
                   : 'visible delay-0'
               }`}
-              style={
-                !size
-                  ? {
-                      width: `${
-                        resize !== 0 ? `calc(${resize}% - 15px)` : `50%`
-                      }`,
-                    }
-                  : { width: `100%` }
-              }
+              style={{
+                transition: 'width 0.05s',
+                width: leftSideWidth === null ? '50%' : leftSideWidth + 'px',
+              }}
             >
               <div
                 className={`${
@@ -82,7 +82,7 @@ const GridLayout = () => {
               >
                 <LeftContent games={games} />
               </div>
-              <VerticalSplit resize={setResize} />
+              <VerticalSplit move={move} />
             </div>
             <div
               className="w-full h-full xl:relative absolute left-0 top-0 -z-10 rounded overflow-hidden"
