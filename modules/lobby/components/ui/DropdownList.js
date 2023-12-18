@@ -22,7 +22,7 @@ const DropdownWrapper = ({ title, children, show, toggleList }) => {
   );
 };
 
-export const DropdownList = ({ value, options = [], onChange, elements }) => {
+export const DropdownList = ({ value, options = [], onChange }) => {
   const [show, setShow] = useState(false);
   const toggleList = () => {
     setShow((prev) => !prev);
@@ -52,7 +52,6 @@ export const DropdownList = ({ value, options = [], onChange, elements }) => {
             </div>
           );
         })}
-      {!!elements && elements}
     </DropdownWrapper>
   );
 };

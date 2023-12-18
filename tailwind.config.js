@@ -26,6 +26,10 @@ module.exports = {
       },
       padding: {
         'section-padding': '48px',
+        sm: 'var(--padding-sm)',
+        md: 'var(--padding-md)',
+        lg: 'var(--padding-lg)',
+        xl: 'var(--padding-xl)',
       },
     },
 
