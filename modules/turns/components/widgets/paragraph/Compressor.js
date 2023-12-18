@@ -11,10 +11,11 @@ import {
   startLoggingTime,
   stopLoggingTime,
 } from '@/modules/telemetry/utils/logger';
-import { changeParagraphStage } from '@/modules/turns/redux/actions';
+import {
+  changeParagraphStage,
+  resetCompressedParagraphState,
+} from '@/modules/turns/redux/actions';
 // import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
-// import { calculateTextPiecesFromQuotes } from 'old/components/turn/paragraph/helper';
-const calculateTextPiecesFromQuotes = () => {}
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -31,6 +32,7 @@ import {
   TextAroundQuoteOptimized,
 } from './TextWrappers';
 import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
+import { calculateTextPiecesFromQuotes } from './oldHelper';
 
 const Compressor = ({
   turnId,
@@ -122,12 +124,11 @@ const Compressor = ({
       setCompressedHeight(height);
       return;
     }
-
     const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
     const textPieces = calculateTextPiecesFromQuotes(
       quotes,
       wrapperRef?.current
-    ) || [];
+    );
     setCompressedTextPieces(textPieces);
 
     const widgetMinHeight = textPieces.reduce(
@@ -147,12 +148,20 @@ const Compressor = ({
   }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
 
   useEffect(() => {
-    if (!compressedTextPieces?.length) return;
     if (!!compressedParagraphState) {
       const { width: widthFromDB } = compressedParagraphState;
       if (width === widthFromDB) return;
     }
+    dispatch(resetCompressedParagraphState(turnId));
+  }, [width]);
 
+  useEffect(() => {
+    if (!compressedTextPieces?.length) return;
+    if (!!compressedParagraphState) {
+            const { width: widthFromDB } = compressedParagraphState;
+      if (width === widthFromDB) return;
+    }
+    
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
     const spans = [...wrapperRef.current.querySelectorAll('span, br')]; // @learn возвращает коллекцию
@@ -170,12 +179,12 @@ const Compressor = ({
     textPieces[textPieceIndex].startLettersCount = lettersCount;
 
     const filteredSpans = spans.filter((span) => {
-      if (span.parentNode.style.background) return false;
+      if (span.parentNode.style.background) return;
       if (
         !span.style.background &&
         span.parentNode.classList.contains('compressor')
       )
-        return false;
+        return;
       return true;
     });
 
@@ -283,7 +292,6 @@ const Compressor = ({
       0
     );
 
-    console.log({ id: 'log7', textPieces, turnId });
     paragraphStateSaveToLocalStorage({
       textPieces,
       turnId,
@@ -300,11 +308,11 @@ const Compressor = ({
   }, [width, compressedTextPieces]); // , wrapperRef
 
   useEffect(() => {
-    // console.log(
+        // console.log(
     //   `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
     // );
     if (!textsReadyCount) return;
-    if (textsReadyCount === compressedTexts.length) {
+        if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
         // dispatch(setCallsQueueIsBlocked(false));
         // setParagraphIsReady(true);
@@ -314,11 +322,11 @@ const Compressor = ({
   }, [textsReadyCount, compressedTexts]);
 
   useEffect(() => {
-    if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
+        if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
 
   useEffect(() => {
-    if (stage === COMP_READY) {
+        if (stage === COMP_READY) {
       stopLoggingTime('paragraphStageReady' + turnId);
     } else if (stage === COMP_READY_TO_RECEIVE_PARAMS) {
       startLoggingTime('paragraphStageReady' + turnId);
@@ -332,8 +340,6 @@ const Compressor = ({
   }, [stage]);
 
   const textsAroundQuotes = useMemo(() => {
-    increment('txt_compressor', { turnId, count: compressedTexts.length });
-
     if (!widget) return [];
 
     let deltaTop = 0;
@@ -368,7 +374,7 @@ const Compressor = ({
   }, [compressedTexts, widget]);
 
   const paragraphCompressorTextWrapper = useMemo(() => {
-    return <ParagraphCompressorTextWrapper arrText={paragraph} />;
+        return <ParagraphCompressorTextWrapper arrText={paragraph} />;
   }, []);
 
   return (

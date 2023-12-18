@@ -23,6 +23,7 @@ const GridLayout = () => {
       link: '#',
       image: g.image || '/img/game_screenshot.png',
       id: g._id,
+      hash: g.hash,
     }));
   }, [originalGames]);
 

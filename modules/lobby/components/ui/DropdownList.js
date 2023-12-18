@@ -29,7 +29,6 @@ export const DropdownList = ({ value, options = [], onChange, elements }) => {
   };
 
   const label = useMemo(() => {
-    console.log({ options, value });
     return options.find((o) => o.value === value)?.label || '';
   }, [value, options]);
 

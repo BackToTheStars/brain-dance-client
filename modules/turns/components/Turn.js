@@ -155,7 +155,7 @@ const Turn = ({ id }) => {
       i_1: { url: imageUrl },
       v_1: { url: videoUrl },
       h_1: { show: headerShow },
-      s_1: { url: sourceUrl, date },
+      s_1: { url: sourceUrl, date, show: sourceShow },
     },
     // paragraph, // contentType, dontShowHeader
     compressed,
@@ -509,7 +509,7 @@ const Turn = ({ id }) => {
           // })}
         />
       )}
-      {dontShowHeader && !!date && !!sourceUrl && (
+      {sourceShow && (
         <div className="bottom-date-and-sourceurl">
           <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />
         </div>

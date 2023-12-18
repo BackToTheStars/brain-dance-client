@@ -1,8 +1,6 @@
 'use client';
 
 import 'jquery-ui/themes/base/all.css';
-import '@/theme/scss/index.scss';
-import '../themes/lobby/index.scss';
 import { Provider } from 'react-redux';
 import { useStore } from '../redux/store';
 import { Inter, Nova_Square } from 'next/font/google';
@@ -28,6 +26,7 @@ export default function RootLayout({ children }) {
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
         {/* <script src="/quill/quill.min.js"></script> */}
         <link rel="stylesheet" href="/quill/quill.snow.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
       </head>
       <Provider store={store}>
         <body className={`${nova.variable} ${inter.variable}`}>{children}</body>

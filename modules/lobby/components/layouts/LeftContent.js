@@ -2,10 +2,10 @@ import Search from '@/modules/lobby/components/ui/Search';
 import { useDispatch } from 'react-redux';
 import { openSliderModal } from '../../redux/actions';
 import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
+import Link from 'next/link';
 
 const LeftContent = ({ games }) => {
   const dispatch = useDispatch();
-
   return (
     <div className={`rounded h-full flex flex-col dark:bg-dark bg-white`}>
       {/* <div className="mb-3 pt-[7px]">
@@ -29,11 +29,12 @@ const LeftContent = ({ games }) => {
           <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold">
             Статус
           </div>
+          <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold" />
         </div>
 
         <div className="flex flex-col select-none">
           {games.map((el, index) => {
-            const { title, image, status, turns, description } = el;
+            const { title, image, status, turns, description, hash } = el;
             const params = { title, image, status, turns, description };
             return (
               <div
@@ -70,6 +71,11 @@ const LeftContent = ({ games }) => {
                   className={`sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center items-center dark:text-white text-dark-light md:text-lg text-[14px]`}
                 >
                   {el.status}
+                </div>
+                <div
+                  className={`sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center items-center dark:text-white text-dark-light md:text-lg text-[14px]`}
+                >
+                  <Link href={`/game?hash=${hash}`}>Открыть</Link>
                 </div>
               </div>
             );

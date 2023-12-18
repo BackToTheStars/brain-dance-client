@@ -6,6 +6,7 @@
       "@/modules/*": ["modules/*"],
       "@/components/*": ["components/*"],
       "@/config/*": ["config/*"],
+      "@/themes/*": ["themes/*"],
       // "@/theme/*": ["themes/v1/*"],
       "@/theme/*": ["themes/v2/*"],
     }
