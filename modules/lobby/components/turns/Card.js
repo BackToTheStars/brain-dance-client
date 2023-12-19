@@ -138,13 +138,13 @@ const TurnCard = ({ turn }) => {
             ) : (
               <h4 className="pe-[70px] mb-1">Нет тайтла</h4>
             )}
-            <p
+            {/* <p
               className={`mb-0 text-sm ${fontFamily.className}`}
               style={{ textAlign: alignment }}
             >
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam,
               asperiores!
-            </p>
+            </p> */}
 
             {/* КНОПКА (ПЕРЕХОД В САМУ ИГРУ)  */}
 
