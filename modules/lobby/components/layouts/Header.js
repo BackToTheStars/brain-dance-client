@@ -34,7 +34,7 @@ const Header = () => {
               title={'Создать игру'}
               className={'sm:flex-[0_0_auto] h-[32px] pb-3 sm:w-auto w-full'}
             />
-            <Link href="/lobby-old">Lobby Old</Link>
+            {/* <Link href="/lobby-old">Lobby Old</Link> */}
           </div>
           {/* @todo: remove pl */}
           <div className="flex flex-1 sm:gap-x-6 gap-x-4 items-center pl-16 pr-3">

@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { openSliderModal } from '../../redux/actions';
 import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
 import Link from 'next/link';
+import { DoubleRightOutlined } from '@ant-design/icons';
+import Button from '../ui/Button';
 
 const LeftContent = ({ games }) => {
   const dispatch = useDispatch();
@@ -29,7 +31,6 @@ const LeftContent = ({ games }) => {
           <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold">
             Статус
           </div>
-          <div className="sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center dark:text-white text-dark-light sm:text-xl text-sm font-bold" />
         </div>
 
         <div className="flex flex-col select-none">
@@ -38,7 +39,7 @@ const LeftContent = ({ games }) => {
             const params = { title, image, status, turns, description };
             return (
               <div
-                className="w-full flex items-center sm:gap-6 gap-3 pb-[12px] pt-[12px] border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10"
+                className="display-hovered w-full flex items-center sm:gap-6 gap-3 pb-[12px] pt-[12px] border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10"
                 key={index}
               >
                 <div
@@ -50,7 +51,7 @@ const LeftContent = ({ games }) => {
                   </span>
                 </div>
                 <div
-                  className="flex-[0_1_100%] sm:text-xl text-[15px] dark:text-white text-dark-light cursor-pointer game-item"
+                  className="flex-[0_1_100%] flex justify-between sm:text-xl text-[15px] dark:text-white text-dark-light cursor-pointer game-item"
                   onClick={() => {
                     dispatch(
                       openSliderModal(SLIDER_MODAL_GAME, {
@@ -61,6 +62,21 @@ const LeftContent = ({ games }) => {
                   }}
                 >
                   {el.title}
+
+                  <Button
+                    title={
+                      <DoubleRightOutlined className="text-[16px] pointer-events-none" />
+                      // <Link href={`/game?hash=${hash}`}>
+                      // </Link>
+                    }
+                    className={
+                      'display-with-hover sm:h-[30px] sm:w-[30px] w-[26px] h-[26px] lg:px-4 px-2'
+                    }
+                    // onClick={(e) => {
+                    //   e.preventDefault();
+                    //   setDisplayVariantGridList((prev) => !prev);
+                    // }}
+                  />
                 </div>
                 <div
                   className={`sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center items-center dark:text-white text-dark-light md:text-lg text-[14px]`}
@@ -71,11 +87,6 @@ const LeftContent = ({ games }) => {
                   className={`sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center items-center dark:text-white text-dark-light md:text-lg text-[14px]`}
                 >
                   {el.status}
-                </div>
-                <div
-                  className={`sm:flex-[0_0_100px] flex-[0_0_60px] flex justify-center items-center dark:text-white text-dark-light md:text-lg text-[14px]`}
-                >
-                  <Link href={`/game?hash=${hash}`}>Открыть</Link>
                 </div>
               </div>
             );

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './standard.scss';
 
 ::-webkit-scrollbar {
   width: 10px;

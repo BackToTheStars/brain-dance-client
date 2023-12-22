@@ -21,6 +21,7 @@ import { Slider } from 'antd';
 
 const DEFAULT_GRID_WIDTH = 1200;
 const MIN_TURN_WIDTH = 200;
+const ST_GAP = 16;
 
 const factor = (index) => {
   let elements = [];
@@ -153,6 +154,11 @@ const RightContent = () => {
     return Math.min(variantGrid.length, desiredNumCols);
   }, [desiredNumCols, variantGrid]);
 
+  const cellDelta = useMemo(
+    () => parseFloat(((numCols - 1) * ST_GAP) / numCols),
+    [numCols]
+  );
+
   const turnGroups = useMemo(() => {
     const arrTurns = new Array(numCols).fill(null).map(() => []);
     const delta = Math.floor(turns.length / numCols);
@@ -173,14 +179,15 @@ const RightContent = () => {
   return (
     <div className={'flex flex-col h-full'} ref={turnsGridRef}>
       <div
-        className={`flex flex-wrap gap-x-6 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}
+        // @todo: взять скролл из игры
+        className={`s_scrolled flex flex-wrap s_gap-2 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}
       >
         {turnGroups.map((innerTurns, i) => {
           return (
             <div
               key={i}
-              style={{ width: `calc(${widthCol}% - 24px)` }}
-              className={`flex flex-col gap-y-6 w-[calc(${widthCol}%-24px)] transition-all duration-500`}
+              style={{ width: `calc(${widthCol}% - ${cellDelta}px)` }}
+              className={`flex flex-col s_gap-2 transition-all duration-500`}
             >
               {innerTurns.map((turn) => {
                 return (
