@@ -1,0 +1,129 @@
+:root {
+  --color-main: #294377;
+  --color-main-dark: #0c1e35;
+  --color-main-light: #426498;
+
+  --color-dark: #070d11;
+  --color-black: #000000;
+  --color-light: #f3f4f6;
+  --color-white: #ffffff;
+
+  //переменные которые меняются при изменении темы
+  --color-text: var(--color-dark);
+  --color-bg-body: var(--color-dark);
+  --color-bg-card: var(--color-main-dark);
+  --color-bg-button: var(--color-main-dark);
+  --color-bg-dropdown: var(--color-main-dark);
+}
+
+.storybook.dark {
+  --color-text: var(--color-white);
+  --color-bg-body: var(--color-dark);
+  --color-bg-card: var(--color-main-dark);
+  --color-bg-button: var(--color-main-dark);
+  --color-bg-dropdown: var(--color-main-dark);
+}
+
+.storybook.light {
+  --color-text: var(--color-dark);
+  --color-bg-body: var(--color-white);
+  --color-bg-card: var(--color-light);
+  --color-bg-button: var(--color-main);
+  --color-bg-dropdown: var(--color-light);
+}
+
+$prefix: 'bd' !default;
+
+//colors
+$color-text: var(--color-text);
+$bg-main: var(--color-bg-body);
+
+//border
+$default-border-radius: 6px;
+$default-border-width: 2px;
+
+//opacity
+$disabled-opacity: 0.38 !default;
+
+//fonts
+$default-font-size: 1em !default;
+$default-line-height: 1.4 !default;
+
+//spacing
+$default-spacing: 0.2em 0.7em !default;
+$default-spacing-sm: 0.1em 0.6em !default;
+$default-spacing-lg: 0.4em 0.9em !default;
+$default-spacing-xl: 0.7em 1.2em !default;
+
+$default-icon-spacing: 0.5em !default;
+
+//transition
+$transition-base: all 0.3s ease-in-out;
+
+//BUTTONS
+//BUTTONS-color
+$button-color: var(--color-white);
+$button-bg-color: var(--color-bg-button);
+$button-border-color: var(--color-main-light);
+
+// BUTTONS-Spacing
+$button-padding: $default-spacing;
+$button-icon-padding: 0.2em 0.5em !default;
+$button-icon-spacing: $default-icon-spacing;
+
+$button-sm-padding: $default-spacing-sm;
+$button-sm-icon-padding: 0.1em 0.4em !default;
+
+$button-lg-padding: $default-spacing-lg;
+$button-lg-icon-padding: 0.4em 0.7em !default;
+
+$button-xl-padding: $default-spacing-xl;
+$button-xl-icon-padding: 0.7em 1em !default;
+
+//BUTTONS-fonts
+$button-font-size: $default-font-size;
+$button-line-height: $default-line-height;
+
+//BUTTONS-opacity
+$button-disabled-opacity: $disabled-opacity !default;
+
+//BUTTONS-border
+$button-border-radius: $default-border-radius;
+$button-border-width: $default-border-width;
+
+//DROPDOWN
+//colors
+$dropdown-list-color: var(--color-text);
+$dropdown-list-bg-color: var(--color-bg-dropdown);
+$dropdown-border-color: var(--color-main-light);
+$dropdown-label-color: var(--color-white);
+$dropdown-label-bg-color: var(--color-bg-button);
+
+// DROPDOWN-Spacing
+$dropdown-padding: $default-spacing;
+$dropdown-icon-padding: 0.2em 0.5em !default;
+$dropdown-icon-spacing: $default-icon-spacing;
+
+$dropdown-sm-padding: $default-spacing-sm;
+$dropdown-sm-icon-padding: 0.1em 0.4em !default;
+
+$dropdown-lg-padding: $default-spacing-lg;
+$dropdown-lg-icon-padding: 0.4em 0.7em !default;
+
+$dropdown-xl-padding: $default-spacing-xl;
+$dropdown-xl-icon-padding: 0.7em 1em !default;
+
+//DROPDOWN-fonts
+$dropdown-font-size: $default-font-size;
+$dropdown-line-height: $default-line-height;
+
+//DROPDOWN-opacity
+$dropdown-disabled-opacity: $disabled-opacity !default;
+
+//DROPDOWN-border
+$dropdown-border-radius: $default-border-radius;
+$dropdown-border-width: $default-border-width;
+
+//dropdown-list
+$dropdown-offset: 6px;
+$dropdown-width: 180px;

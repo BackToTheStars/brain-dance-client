@@ -28,6 +28,16 @@
   --light: #f3f4f6;
 
   --bg-main: var(--dark);
+
+  --padding-sm: 8px;
+  --padding-md: 12px;
+  --padding-lg: 24px;
+  --padding-xl: 48px;
+}
+
+.btn {
+  font-size: var(--font-size);
+  $primary: #435345;
 }
 
 html.light {
