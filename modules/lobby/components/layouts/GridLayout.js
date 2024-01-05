@@ -59,11 +59,11 @@ const GridLayout = () => {
         <Header />
         <div
           // className={`s_mt-2 s_pt-2 sm:border-t-2 dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 sm:h-[calc(100vh-60px-60px)] h-[calc(100vh-44px-48px)] relative`}
-          className={`flex-1 s_mt-2 s_pt-2 sm:border-t-2 h-full dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 relative`}
+          className={`flex-1 s_mt-2 sm:border-t-2 h-full dark:border-white border-dark-light dark:border-opacity-5 border-opacity-5 relative`}
         >
           <div className="flex gap-x-9 h-full relative z-[1] overflow-hidden">
             <div
-              className={`xl:w-1/2 w-full flex-[0_0_auto] relative ${
+              className={`s_mt-2 xl:w-1/2 w-full flex-[0_0_auto] relative ${
                 mobileSwitcherWidth
                   ? 'invisible delay-150 transition-all'
                   : 'visible delay-0'
@@ -85,7 +85,7 @@ const GridLayout = () => {
               <VerticalSplit move={move} />
             </div>
             <div
-              className="w-full h-full xl:relative absolute left-0 top-0 -z-10 rounded overflow-hidden"
+              className="w-full h-full xl:relative absolute left-0 top-0 -z-10 overflow-hidden"
               id="right-content"
             >
               <RightContent />

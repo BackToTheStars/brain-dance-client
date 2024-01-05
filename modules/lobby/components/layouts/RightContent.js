@@ -179,8 +179,7 @@ const RightContent = () => {
   return (
     <div className={'flex flex-col h-full'} ref={turnsGridRef}>
       <div
-        // @todo: взять скролл из игры
-        className={`s_scrolled flex flex-wrap s_gap-2 overflow-y-auto h-full rounded select-none flex-[0_1_100%]`}
+        className={`s_pt-2 s_scrolled flex flex-wrap s_gap-2 overflow-y-auto h-full select-none flex-[0_1_100%] pr-2`}
       >
         {turnGroups.map((innerTurns, i) => {
           return (

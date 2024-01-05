@@ -19,7 +19,8 @@ const Search = ({
           type="text"
           id="search_input"
           placeholder={placeholder}
-          className={`border-2 border-main px-8 sm:py-4 py-3 rounded-btn-border outline-none bg-transparent w-full ${clsInput}`}
+          className={`border-2 border-main rounded-btn-border outline-none bg-transparent w-full ${clsInput}`}
+          // className={`border-2 border-main px-8 sm:py-4 py-3 rounded-btn-border outline-none bg-transparent w-full ${clsInput}`}
         />
       </div>
     </form>

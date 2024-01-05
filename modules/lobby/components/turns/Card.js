@@ -138,16 +138,6 @@ const TurnCard = ({ turn }) => {
             ) : (
               <h4 className="pe-[70px] mb-1">Нет тайтла</h4>
             )}
-            {/* <p
-              className={`mb-0 text-sm ${fontFamily.className}`}
-              style={{ textAlign: alignment }}
-            >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam,
-              asperiores!
-            </p> */}
-
-            {/* КНОПКА (ПЕРЕХОД В САМУ ИГРУ)  */}
-
             <div className="absolute z-[1] top-[-15px] right-0 translate-x-full flex group-hover/item:translate-x-[-5px] transition-all py-[6px] px-3 rounded-btn-border dark:bg-main-dark bg-light border border-main">
               <div
                 className="h-[16px] flex items-center justify-center pe-3 border-r border-main cursor-pointer"
@@ -177,16 +167,6 @@ const TurnCard = ({ turn }) => {
           </div>
         </div>
       </div>
-      {/* <pre
-        style={{
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          maxHeight: '700px',
-          overflow: 'scroll',
-        }}
-      >
-        {JSON.stringify(turn, null, 2)}
-      </pre> */}
     </>
   );
 };

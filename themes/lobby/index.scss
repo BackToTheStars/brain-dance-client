@@ -3,20 +3,30 @@
 @tailwind utilities;
 @import './standard.scss';
 
+// ::-webkit-scrollbar {
+//   width: 10px;
+// }
 ::-webkit-scrollbar {
-  width: 10px;
+  margin-top: 2*$unit;
+  width: 6px;
+  height: 80px;
 }
 
-::-webkit-scrollbar-track {
-  @apply dark:bg-dark-light bg-light;
-  border-radius: 5px;
-}
+// ::-webkit-scrollbar-track {
+//   @apply dark:bg-dark-light bg-light;
+//   border-radius: 5px;
+// }
 
+// ::-webkit-scrollbar-thumb {
+//   @apply dark:bg-[#0f0f0f] bg-gray-300;
+//   border-radius: 5px;
+//   border: 2px solid transparent;
+//   background-clip: content-box;
+// }
 ::-webkit-scrollbar-thumb {
-  @apply dark:bg-[#0f0f0f] bg-gray-300;
-  border-radius: 5px;
-  border: 2px solid transparent;
-  background-clip: content-box;
+  margin-top: 2*$unit;
+  background-color: $turn-scrollbar-color;
+  border-radius: 8px;
 }
 
 :root {

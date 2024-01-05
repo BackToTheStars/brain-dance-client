@@ -13,8 +13,10 @@ const LeftContent = ({ games }) => {
       {/* <div className="mb-3 pt-[7px]">
         <Search />
       </div> */}
-      <div className="dark:bg-main-dark dark:bg-opacity-40 bg-light flex-[0_1_100%] rounded overflow-y-auto sm:px-8 sm:pb-8 p-3">
-        <div className="w-full flex sm:gap-6 gap-3 sm:pb-4 pb-3 sm:pt-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0">
+      {/* <div className="dark:bg-main-dark dark:bg-opacity-40 bg-light flex-[0_1_100%] rounded overflow-y-auto sm:px-8 sm:pb-8 s_px-2"> */}
+      <div className="dark:bg-main-dark dark:bg-opacity-40 bg-light flex-[0_1_100%] rounded overflow-y-auto sm:pb-8 s_p-2">
+        {/* <div className="w-full flex sm:gap-6 gap-3 sm:pb-4 pb-3 sm:pt-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0"> */}
+        <div className="w-full flex sm:gap-6 gap-3 p-0 s_pb-3 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 static top-0">
           <div className="flex-[0_0_30px] flex sm:justify-center dark:text-white text-dark-light sm:text-xl text-base font-bold">
             №
           </div>
@@ -39,7 +41,7 @@ const LeftContent = ({ games }) => {
             const params = { title, image, status, turns, description };
             return (
               <div
-                className="display-hovered w-full flex items-center sm:gap-6 gap-3 pb-[12px] pt-[12px] border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10"
+                className="display-hovered w-full flex items-center sm:gap-6 gap-3 s_py-1 border-b-2 dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10"
                 key={index}
               >
                 <div
