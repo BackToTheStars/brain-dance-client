@@ -1,3 +1,0 @@
-export const MODAL_CREATE_GAME = 'MODAL_CREATE_GAME';
-export const MODAL_ENTER_GAME = 'MODAL_ENTER_GAME';
-export const MODAL_DONATE = 'MODAL_DONATE';
