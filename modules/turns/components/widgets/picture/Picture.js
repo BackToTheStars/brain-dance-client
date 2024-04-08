@@ -113,7 +113,7 @@ const Picture = ({
 
   return (
     <div
-      className={`picture-content ${isActive ? 'active' : ''}`}
+      className={`picture-content ${isActive ? 'active' : ''} turn-widget`}
       style={{
         minHeight: `${widgetSettings?.minHeight}px`,
         maxHeight: `${widgetSettings?.maxHeight}px`,

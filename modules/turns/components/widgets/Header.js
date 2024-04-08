@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
-import ButtonsMenu from './header/ButtonsMenu';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
 import { useSelector } from 'react-redux';
 //const HEADER_HEIGHT = 105;
@@ -48,15 +47,12 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
 
   return (
     <>
-      <div className="headerText" ref={headerEl} style={style}>
+      <div className="headerText turn-widget" ref={headerEl} style={style}>
         <div className="headerTextTitle">{text}</div>
         {!!(date || url) && <DateAndSourceUrl {...{ date, url }} />}
       </div>
-      <ButtonsMenu {...{ _id }} />
     </>
   );
 };
 
-const MemorizedHeader = React.memo(Header);
-
-export default MemorizedHeader;
+export default Header;

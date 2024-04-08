@@ -39,6 +39,18 @@ import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
 
+export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
+  const state = getState();
+  const isSnapToGrid = isSnapToGridSelector(state);
+  const gameFieldMoveVector = isSnapToGrid
+    ? {
+        left: snapRound(turn.position.x, GRID_CELL_X),
+        top: snapRound(turn.position.y, GRID_CELL_Y),
+      }
+    : { left: turn.position.x, top: turn.position.y };
+  dispatch(moveField(gameFieldMoveVector));
+};
+
 export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
   const state = getState();
   const prevTurn = state.turns.d[_id];
@@ -133,8 +145,8 @@ export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
     type: types.TURN_UPDATE_WIDGET,
     payload: { turnId, widgetId, widget },
   });
-  dispatch(markTurnAsChanged({ _id: turnId }))
-}
+  dispatch(markTurnAsChanged({ _id: turnId }));
+};
 
 export const markTurnAsChanged =
   ({ _id }) =>
@@ -174,9 +186,10 @@ export const unCompressParagraph = () => (dispatch, getState) => {
   dispatch(
     changeTurnStage(editTurnId, TURN_LOADING_FIXED, {
       compressed: false,
-      compressedHeight: activeTurn.height,
+      compressedHeight: activeTurn.size.height,
       paragraphStage: ORIG_ACTIVE,
-      height: activeTurn.uncompressedHeight,
+      height: activeTurn.size.height,
+      // height: activeTurn.uncompressedHeight,
       // paragraphIsReady: false,
     })
   );
@@ -275,8 +288,8 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
       ...data.item,
       compressedHeight: 0,
       compressedParagraphState: null,
-      x: turn.position.x + zeroPoint.position.x,
-      y: turn.position.y + zeroPoint.position.y,
+      x: turn.x + zeroPoint.position.x,
+      y: turn.y + zeroPoint.position.y,
     };
     dispatch({
       type: types.TURN_RESAVE,
@@ -292,12 +305,12 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   });
 };
 
-export const cloneTurn = (turn) => (dispatch, getState) => {
+export const cloneTurn = (newFormatTurn) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     try {
+      const turn = TurnHelper.toOldFields(newFormatTurn);
       const state = getState();
       const lines = state.lines.lines;
-
       const copiedTurn = dataCopy(turn);
       // @todo: проверить, откуда появляется _id в quotes
       copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
@@ -357,22 +370,24 @@ export const insertTurnFromBuffer =
   (dispatch, getState) => {
     const state = getState();
     const timeStamps = getTimeStamps();
-    const copiedTurn = getTurnFromBufferAndRemove(
+    const copiedTurnOldFormat = getTurnFromBufferAndRemove(
       timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
     );
+    const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
     const position = state.game.position;
     const viewport = state.ui.viewport;
+    copiedTurn.position = {};
     if (!!pasteNextTurnPosition) {
-      copiedTurn.position.x = pasteNextTurnPosition.position.x;
-      copiedTurn.position.y = pasteNextTurnPosition.position.y;
+      copiedTurn.position.x = pasteNextTurnPosition.x;
+      copiedTurn.position.y = pasteNextTurnPosition.y;
     } else {
       copiedTurn.position.x =
         position.left +
-        Math.floor((viewport.size.width - copiedTurn.size.width) / 2);
+        Math.floor((viewport.width - copiedTurn.size.width) / 2);
       copiedTurn.position.y =
         position.top +
-        Math.floor((viewport.size.height - copiedTurn.size.height) / 2);
+        Math.floor((viewport.height - copiedTurn.size.height) / 2);
     }
 
     if (!copiedTurn) {
@@ -391,8 +406,9 @@ export const insertTurnFromBuffer =
 
     // // @todo: get lines, connected with copied turn and display them
     dispatch(
-      createTurn(copiedTurn, zeroPoint, {
+      createTurn(TurnHelper.toOldFields(copiedTurn), zeroPoint, {
         success: (turn) => {
+          console.log({ turn });
           dispatch({
             type: types.TURN_NEXT_PASTE_POSITION,
             payload: {
@@ -409,8 +425,8 @@ export const insertTurnFromBuffer =
           const turnId = copiedTurn.originalId;
           // оставить только те линии, которые связаны с turn по originalId
           const savedLinesToPaste = state.lines.linesToPaste;
-          const sourceLines = [];
-          const targetLines = [];
+          const sourceLines = []; // заменить sourceTurnId
+          const targetLines = []; // заменить targetTurnId
 
           const turnsDict = state.turns.d;
           Object.keys(savedLinesToPaste)
@@ -435,7 +451,7 @@ export const insertTurnFromBuffer =
               lines.push({
                 ...sourceLine,
                 sourceTurnId: turn._id,
-                targetTurnId: targetLine.sourceTurnId,
+                targetTurnId: sourceLine.targetTurnId,
               });
             }
           }

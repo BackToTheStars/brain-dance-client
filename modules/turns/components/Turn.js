@@ -44,6 +44,7 @@ import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
 import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 import { isSnapToGridSelector, snapRound } from './helpers/grid';
+import ButtonsMenu from './widgets/header/ButtonsMenu';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -144,10 +145,11 @@ const Turn = ({ id }) => {
     _id,
     x,
     y,
+    colors: { background, font },
     size: { width, height },
     //-- header
     contentType,
-    backgroundColor,
+    // backgroundColor,
     // dontShowHeader: dontShowHeaderOriginal,
     //-- paragraph
     dWidgets: {
@@ -191,8 +193,8 @@ const Turn = ({ id }) => {
     height: `${size.height}px`,
   };
 
-  if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {
-    wrapperStyles.backgroundColor = backgroundColor;
+  if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
+    wrapperStyles.backgroundColor = background;
   }
 
   const classNameId = `turn_${_id}`;
@@ -200,7 +202,7 @@ const Turn = ({ id }) => {
   const { isDeveloperModeActive, setDevItem } = useDevPanel();
 
   const widgetsCount =
-    1 + // header
+    !dontShowHeader + // header
     !!imageUrl + // Picture
     !!videoUrl + // Video
     doesParagraphExist; // Paragraph
@@ -310,7 +312,7 @@ const Turn = ({ id }) => {
     }
 
     const newWidgetD = {};
-    const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1']; // позже перенести
+    const widgetIds = ['header1', 'video1', 'i_1', 'p_1']; // позже перенести
 
     let minTop = 0;
     let maxTop = 0;
@@ -376,6 +378,7 @@ const Turn = ({ id }) => {
           .removeClass('translucent-field');
         dispatch(markTurnAsChanged({ _id }));
       },
+      cancel: '.not-draggable',
     });
 
     return () => $(wrapper.current).draggable('destroy');
@@ -463,11 +466,13 @@ const Turn = ({ id }) => {
       className={wrapperClasses.join(' ')}
       style={wrapperStyles}
     >
-      <Header
-        widgetId={'h_1'}
-        registerHandleResize={registerHandleResize}
-        _id={_id}
-      />
+      {!dontShowHeader && (
+        <Header
+          widgetId={'h_1'}
+          registerHandleResize={registerHandleResize}
+          _id={_id}
+        />
+      )}
       {!!videoUrl && (
         <Video
           // videoUrl={videoUrl}
@@ -485,7 +490,7 @@ const Turn = ({ id }) => {
           unregisterHandleResize={unregisterHandleResize}
           widgetType="picture"
           turnId={_id}
-          widgetSettings={widgetD['picture1']}
+          widgetSettings={widgetD['i_1']}
           pictureOnly={pictureOnly}
         />
       )}
@@ -496,7 +501,7 @@ const Turn = ({ id }) => {
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
           // stateIsReady={stateIsReady}
-          widget={widgetD['paragraph1']}
+          widget={widgetD['p_1']}
           notRegisteredWidgetsCount={notRegisteredWidgetsCount}
           // paragraphIsReady={paragraphIsReady}
           // setParagraphIsReady={dispatchParagraphIsReady}
@@ -509,6 +514,7 @@ const Turn = ({ id }) => {
           // })}
         />
       )}
+      <ButtonsMenu _id={_id} />
       {sourceShow && (
         <div className="bottom-date-and-sourceurl">
           <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />

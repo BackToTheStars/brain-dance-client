@@ -4,14 +4,14 @@ import dynamic from 'next/dynamic';
 import { panelSpacer } from '@/config/ui';
 import ClassList from '../classes/components/ClassList';
 
-import AddEditTurnPopup from '@/modules/turns/components/forms/TurnBlocks';
+// import AddEditTurnPopup from '@/modules/turns/components/forms/TurnBlocks';
 
-// const AddEditTurnPopup = dynamic(
-//   () => import('@/modules/turns/components/forms/AddEditTurn'),
-//   {
-//     ssr: false,
-//   }
-// );
+const AddEditTurnPopup = dynamic(
+  () => import('@/modules/turns/components/forms/AddEditTurn'),
+  {
+    ssr: false,
+  }
+);
 
 import SettingsPanel from './components/SettingsPanel';
 import ButtonsPanel from './components/ButtonsPanel';
@@ -127,7 +127,7 @@ export const panels = [
     type: PANEL_LINES,
     position: POSITION_BOTTOM_CENTER,
     component: LinesPanel,
-    isDisplayed: false,
+    isDisplayed: true,
     id: (id += 1),
     width: () => `50vw`,
   },

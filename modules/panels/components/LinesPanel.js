@@ -16,6 +16,15 @@ const cutTextToSize = (text, size) => {
   return text.slice(0, size) + '...';
 };
 
+const getQuoteLabel = (quoteInfo) => {
+  if (!quoteInfo) return '';
+  if (quoteInfo.type === 'picture') return 'picture';
+  {
+    /* сделать резиновую обрезку текста */
+  }
+  return cutTextToSize(quoteInfo.text || '', 22);
+};
+
 const LineRow = ({ line, can, handleDelete }) => {
   const sourceQuoteInfo = useSelector(
     (state) => state.quotes.d[`${line.sourceTurnId}_${line.sourceMarker}`]
@@ -27,13 +36,8 @@ const LineRow = ({ line, can, handleDelete }) => {
     <tr>
       <td>{line.author}</td>
       <td>{line.type}</td>
-      <td>
-        {!!sourceQuoteInfo && cutTextToSize(sourceQuoteInfo.text || '', 22)}
-      </td>
-      <td>
-        {!!targetQuoteInfo && cutTextToSize(targetQuoteInfo.text || '', 22)}
-        {/* сделать резиновую обрезку текста */}
-      </td>
+      <td>{getQuoteLabel(sourceQuoteInfo)}</td>
+      <td>{getQuoteLabel(targetQuoteInfo)}</td>
       {can(RULE_TURNS_CRUD) && (
         <td className="text-end">
           <button
@@ -95,8 +99,6 @@ const LinesPanel = () => {
       </thead>
       <tbody>
         {preparedLines.map((line, index) => {
-          const { sourceQuoteInfo, targetQuoteInfo } = line;
-
           return (
             <LineRow
               key={index}

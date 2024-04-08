@@ -60,7 +60,7 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
           Math.floor((9 * (width - 2 * widgetSpacer)) / 16) + widgetSpacer
         }px`,
       }}
-      className="video"
+      className="video turn-widget"
       ref={videoEl}
     >
       {isDevMode ? (

@@ -4,7 +4,6 @@ import {
   loadTurnsAndLinesToPaste,
   switchEditMode,
 } from '@/modules/game/game-redux/actions';
-import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
 import { resetAndExit } from '@/modules/panels/redux/actions';
@@ -26,6 +25,8 @@ import { registerMoveScene } from './helpers/game';
 
 const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
+let useEffectIsDone = false;
+
 const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
@@ -38,11 +39,13 @@ const Game = ({ hash }) => {
   const { nickname } = info;
 
   useEffect(() => {
-    dispatch(loadFullGame(hash));
-    dispatch(
-      addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
-    );
-    // loadClasses();
+    if (!useEffectIsDone) {
+      dispatch(loadFullGame(hash));
+      dispatch(
+        addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
+      );
+    }
+    useEffectIsDone = true;
   }, []); // token
 
   useEffect(() => {
@@ -93,6 +96,7 @@ const Game = ({ hash }) => {
           $(gameBox.current).removeClass('remove-line-transition');
         }, 100);
       },
+      cancel: '.not-draggable',
     });
     return () => $(gameBox.current).draggable('destroy');
   }, [gameBox]);
@@ -109,7 +113,6 @@ const Game = ({ hash }) => {
           onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
         >
           <Turns />
-          <LinesCalculator />
           <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
         </div>
         <Panels />

@@ -11,6 +11,7 @@ $black-color: rgb(0, 0, 0);
 .translucent-field {
   .react-turn-new {
     opacity: 0.4;
+
     &.ui-draggable-dragging {
       opacity: 1;
     }
@@ -28,8 +29,6 @@ $black-color: rgb(0, 0, 0);
   overflow-y: hidden; //scroll;
   background: $turn-main-color;
   margin: 0;
-  border-top-left-radius: $turn-upper-corners-radius;
-  border-top-right-radius: $turn-upper-corners-radius;
   flex: 1;
 }
 
@@ -79,6 +78,7 @@ $black-color: rgb(0, 0, 0);
   justify-content: space-between;
   align-items: center;
 }
+
 .paragraphText {
   // font-family: 'Nunito', sans-serif;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Apple Color Emoji',
@@ -140,6 +140,7 @@ $black-color: rgb(0, 0, 0);
   overflow-y: auto;
   // max-height: 65vh;
 }
+
 /* подписи для ссылки и для даты */
 .left-bottom-label,
 .right-bottom-label {
@@ -190,6 +191,7 @@ $black-color: rgb(0, 0, 0);
   bottom: 0px;
   transform: translate(100%, 50%);
 }
+
 .bottom-date-and-sourceurl {
   .flex_mod {
     margin-top: 6px;
@@ -202,10 +204,12 @@ $black-color: rgb(0, 0, 0);
   margin-bottom: $turn-header-url-date-margin-bottom;
   align-items: center;
 }
+
 .flex_mod_site {
   color: $turn-header-link-color !important;
   text-decoration: none;
   margin: 0 12px 0 0;
+
   &:hover {
     opacity: 0.8;
     transition: 0.3s;
@@ -226,6 +230,7 @@ $black-color: rgb(0, 0, 0);
   font-size: $turn-header-date-font-size;
   line-height: 100%;
   display: inline-block;
+
   span {
     padding-left: 4px;
   }

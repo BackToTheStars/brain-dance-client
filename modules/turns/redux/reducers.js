@@ -21,6 +21,12 @@ export const getStageHistory = (currentStages, newStage) => {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
+    case types.TURNS_SET_TO_RENDER: {
+      return {
+        ...state,
+        turnsToRender: payload,
+      };
+    }
     case types.LOAD_TURNS: {
       const d = payload.turns.reduce((a, turn) => {
         a[turn._id] = turn;
@@ -56,7 +62,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     case types.TURN_UPDATE_WIDGET: {
       const { turnId, widgetId, widget } = payload;
-      const prevTurn = state.d[turnId]
+      const prevTurn = state.d[turnId];
       return {
         ...state,
         d: {
@@ -72,7 +78,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
       };
     }
-      
+
     // case types.TURN_PARAGRAPH_SET_IS_READY:
     //   return {
     //     ...state,
@@ -150,6 +156,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       const { left, top, viewport } = payload;
       const newState = { ...state };
       const turnsToRender = [];
+      newState.d = { ...state.d };
       for (let id in state.d) {
         newState.d[id] = {
           ...newState.d[id],

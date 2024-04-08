@@ -82,7 +82,7 @@ export class TurnHelper {
     return {
       _id: turn._id,
       contentType: turn.contentType, // turn.pictureOnly
-      pictureOnly: false, // @todo: remove
+      pictureOnly: turn.pictureOnly || false, // @todo: remove
       gameId: turn.gameId,
       originalId: turn.originalId,
       date: turn.date,
@@ -121,6 +121,7 @@ export class TurnHelper {
       fontColor: turn.colors.font,
       quotes: [...turn.dWidgets.p_1.quotes, ...turn.dWidgets.i_1.quotes],
       contentType: turn.contentType, // turn.pictureOnly
+      pictureOnly: turn.pictureOnly || false, // @todo: remove
       gameId: turn.gameId,
       originalId: turn.originalId,
       x: turn.position.x,
@@ -135,9 +136,11 @@ export class TurnHelper {
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       scrollPosition: turn.dWidgets.p_1.scrollPosition,
-      compressed: turn.dWidgets.c_1.show,
+      // compressed: turn.dWidgets.c_1.show,
+      compressed: turn.compressed || false,
       compressedHeight: turn.dWidgets.c_1.compressedHeight,
-      uncompressedHeight: turn.dWidgets.c_1.uncompressedHeight,
+      // uncompressedHeight: turn.dWidgets.c_1.uncompressedHeight,
+      uncompressedHeight: turn.size.height,
     };
   }
 }

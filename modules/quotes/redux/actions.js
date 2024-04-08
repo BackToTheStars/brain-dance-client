@@ -50,8 +50,8 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
                 quote.id === activeQuoteId ? pictureQuote : quote
               )
             : [...turn.quotes, pictureQuote],
-          x: turn.x - zeroPoint.x,
-          y: turn.y - zeroPoint.y,
+          x: turn.position.x - zeroPoint.position.x,
+          y: turn.position.y - zeroPoint.position.y,
         },
         zeroPoint,
 
@@ -122,8 +122,8 @@ export const deleteQuote = () => (dispatch, getState) => {
         {
           _id: turn._id,
           quotes: turn.quotes.filter((quote) => quote.id !== id), // @todo find quote and update
-          x: turn.x - zeroPoint.x,
-          y: turn.y - zeroPoint.y,
+          x: turn.position.x - zeroPoint.position.x,
+          y: turn.position.y - zeroPoint.position.y,
         },
         zeroPoint,
         {

@@ -138,7 +138,10 @@ const Paragraph = ({
         <Compressor
           {...{
             turnId,
-            widget: compressedWidget,
+            widget: {
+              ...widget,
+              ...compressedWidget,
+            },
             widgetId,
             compressedHeight,
             setCompressedHeight,

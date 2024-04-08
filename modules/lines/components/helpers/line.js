@@ -60,14 +60,14 @@ export const getLinesCoords = (
       continue;
     }
     let sourceCoords = {
-      left: turnsDictionary[line.sourceTurnId].x,
-      top: turnsDictionary[line.sourceTurnId].y,
+      left: turnsDictionary[line.sourceTurnId].position.x,
+      top: turnsDictionary[line.sourceTurnId].position.y,
       width: 10,
       height: 10,
     };
     let targetCoords = {
-      left: turnsDictionary[line.targetTurnId].x,
-      top: turnsDictionary[line.targetTurnId].y,
+      left: turnsDictionary[line.targetTurnId].position.x,
+      top: turnsDictionary[line.targetTurnId].position.y,
       width: 10,
       height: 10,
     };
@@ -88,11 +88,11 @@ export const getLinesCoords = (
         // если есть такая цитаты, то привязать к ней вместо шага
         sourceCoords = {
           left:
-            turnsDictionary[line.sourceTurnId].x +
+            turnsDictionary[line.sourceTurnId].position.x +
             sourceQuoteCoords.left +
             (sourceQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           top:
-            turnsDictionary[line.sourceTurnId].y +
+            turnsDictionary[line.sourceTurnId].position.y +
             sourceQuoteCoords.top +
             (sourceQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           width: sourceQuoteCoords.width,
@@ -116,11 +116,11 @@ export const getLinesCoords = (
       if (targetQuoteCoords) {
         targetCoords = {
           left:
-            turnsDictionary[line.targetTurnId].x +
+            turnsDictionary[line.targetTurnId].position.x +
             targetQuoteCoords.left +
             (targetQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           top:
-            turnsDictionary[line.targetTurnId].y +
+            turnsDictionary[line.targetTurnId].position.y +
             targetQuoteCoords.top +
             (targetQuoteCoords.type === 'text' ? TURN_BORDER_THICKNESS : 0),
           width: targetQuoteCoords.width,

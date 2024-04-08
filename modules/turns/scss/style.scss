@@ -4,12 +4,15 @@
   &.picture-only {
     background: rgba(0, 0, 0, 0);
     border-width: 0;
+
     .picture-content {
       padding: 0;
+
       .turn-img {
         border-radius: 0;
       }
     }
+
     .ui-icon {
       transform: translateY(-10px);
     }
@@ -18,6 +21,12 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  .turn-widget:first-child {
+    border-top-left-radius: $turn-upper-corners-radius;
+    border-top-right-radius: $turn-upper-corners-radius;
+  }
+
   position: absolute;
   cursor: move;
   z-index: 2;
@@ -30,13 +39,17 @@
   border-bottom-left-radius: $turn-upper-corners-radius;
   border-bottom-right-radius: $turn-upper-corners-radius;
   border: $turn-border-thickness solid $turn-border-color;
+
   &.was-changed {
     border: $turn-border-thickness solid $turn-changed-border-color;
   }
+
   padding-bottom: $turn-widget-bottom-spacer;
+
   .ui-icon {
     visibility: hidden;
   }
+
   &:hover {
     .ui-icon {
       visibility: visible;
@@ -49,6 +62,7 @@
   }
 
   &.comment {
+
     .ui-icon,
     .ui-widget-content .ui-icon {
       background-image: url(/js/jquery-ui/images/ui-icons_444444_256x240.png);
@@ -94,6 +108,7 @@
       margin-right: 20px;
     }
   }
+
   .bottom-date-and-sourceurl {
     position: absolute;
     bottom: 0;
@@ -118,17 +133,17 @@
     border-top-right-radius: $turn-upper-corners-radius;
     // padding: $turn-pic-padding-top $turn-pic-padding-right
     //   $turn-pic-padding-bottom $turn-pic-padding-left;
-    padding: $turn-widget-bottom-spacer $turn-pic-padding-right 0
-      $turn-pic-padding-left;
+    padding: $turn-widget-bottom-spacer $turn-pic-padding-right 0 $turn-pic-padding-left;
 
     img {
       width: 100%;
     }
 
-    &.active > div {
+    &.active>div {
       outline: 4px solid blue;
       border-radius: $turn-pic-radius;
     }
+
     /* height: 100%; */
     background: $turn-main-color;
 
@@ -166,13 +181,14 @@
   }
 
   .video {
-    & > div {
+    &>div {
       // > означает первый child
       // width: 100%
       height: 100%;
       border-radius: $turn-upper-corners-radius;
       overflow: hidden;
     }
+
     padding-left: $turn-widget-bottom-spacer;
     padding-right: $turn-widget-bottom-spacer;
   }
@@ -182,6 +198,7 @@
     // position: absolute;
     // width: 100%;
     color: #fff;
+
     .paragraphText {
       // padding-top: 10px;
       // padding-bottom: 10px;
@@ -189,11 +206,13 @@
       // margin-bottom: 10px;
 
       box-shadow: 0 -1px 0 $turn-border-color;
+
       &:first-child {
         margin-top: 0;
         padding-top: 0;
         box-shadow: none;
       }
+
       &:last-child {
         margin-bottom: 0;
         padding-bottom: 0;

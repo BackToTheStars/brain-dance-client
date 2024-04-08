@@ -4,20 +4,48 @@
 // } from '../contexts/InteractionContext';
 // import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
 import { utils } from '@/modules/game/components/helpers/game';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Line from './Line';
+import { getLinesCoords } from './helpers/line';
 // import { useUiContext } from '../contexts/UI_Context';
 
+const getSerializedTurnsGeometry = (d) => {
+  return JSON.stringify(
+    Object.values(d).map(({ size, position }) => ({ size, position }))
+  );
+};
+
 const QuotesLinesLayer = ({ svgLayerZIndex }) => {
+  const lines = useSelector((state) => state.lines.lines);
+  const quotesInfo = useSelector((state) => state.lines.quotesInfo);
+  const turnsDictionary = useSelector((state) => state.turns.d);
+
   const svgLayer = useRef();
 
   const viewportHeight = window ? window.innerHeight : 1600;
   const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
   // const { linesWithEndCoords } = useTurnsCollectionContext();
-  const linesWithEndCoords = useSelector(
-    (state) => state.lines.linesWithEndCoords
-  );
+  // const linesWithEndCoords = useSelector(
+  //   (state) => state.lines.linesWithEndCoords
+  // );
+  const serializedTurnsGeometry = useMemo(() => {
+    return getSerializedTurnsGeometry(turnsDictionary);
+  }, [turnsDictionary]);
+
+  const linesWithEndCoords = useMemo(() => {
+    const turnsToRender = Object.keys(turnsDictionary);
+
+    const linesWithEndCoordsNew = getLinesCoords(
+      lines,
+      turnsToRender,
+      turnsDictionary,
+      quotesInfo
+      // pictureQuotesInfo
+    );
+
+    return linesWithEndCoordsNew || [];
+  }, [lines, quotesInfo, serializedTurnsGeometry]);
 
   // turns {_id, x, y, width, height}
   // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}

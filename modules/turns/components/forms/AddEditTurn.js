@@ -253,8 +253,8 @@ const AddEditTurnPopup = () => {
 
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
-      turnObj.x = -zeroPoint.x + turnToEdit.x;
-      turnObj.y = -zeroPoint.y + turnToEdit.y;
+      turnObj.x = -zeroPoint.position.x + turnToEdit.x;
+      turnObj.y = -zeroPoint.position.y + turnToEdit.y;
 
       dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
     } else {

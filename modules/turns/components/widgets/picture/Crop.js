@@ -10,15 +10,7 @@ const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   const dispatch = useDispatch();
 
-  const [crop, setCrop] = useState(
-    stateCrop || {
-      unit: '%',
-      // x: 10,
-      // y: 10,
-      // width: 20,
-      // height: 20,
-    }
-  );
+  const [crop, setCrop] = useState();
 
   // useEffect(() => {
   //     const quote = quotes.find((quote) => quote.id === activeQuote.quoteId);
@@ -27,6 +19,7 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   // }, []);
 
   useEffect(() => {
+    if (!crop) return;
     cropQueue.add(() => {
       dispatch(
         changeWidgetParams({
@@ -54,7 +47,9 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
       onChange={(newCrop, newPercentCrop) => {
         setCrop(newPercentCrop);
       }}
-    />
+    >
+      <img src={imageUrl} alt="crop" />
+    </ReactCrop>
   );
 };
 

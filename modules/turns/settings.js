@@ -228,12 +228,12 @@ const settings = {
 };
 
 const templatesToShow = [
-  TEMPLATE_MIXED,
+  // TEMPLATE_MIXED,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
   TEMPLATE_COMMENT,
-  TEMPLATE_CAROUSEL,
-  TEMPLATE_PICTURE_ONLY,
+  // TEMPLATE_CAROUSEL,
+  // TEMPLATE_PICTURE_ONLY,
 ];
 
 const fieldSettings = {
@@ -347,6 +347,7 @@ const fieldSettings = {
 
 const fieldsToShow = Object.keys(fieldSettings); // возвращает массив строк-ключей объекта
 
+// @todo: choose only one format
 const fieldsToClone = [
   'originalId',
   'header',
@@ -364,6 +365,7 @@ const fieldsToClone = [
   'scrollPosition',
   'height',
   'width',
+  'size',
 ];
 
 const turnSettings = {

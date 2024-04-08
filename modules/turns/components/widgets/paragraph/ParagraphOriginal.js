@@ -44,7 +44,7 @@ const ParagraphOriginal = ({
     (state) => state.turns.d[turnId].dWidgets[widgetId]
   );
   const showCompressed = useSelector(
-    (state) => state.turns.d[turnId].dWidgets.c_1.show
+    (state) => state.turns.d[turnId].compressed
   );
   const colors = useSelector((state) => state.turns.d[turnId].colors);
   const contentType = useSelector((state) => state.turns.d[turnId].contentType);
@@ -182,7 +182,7 @@ const ParagraphOriginal = ({
   }, [paragraphEl]);
 
   return (
-    <div className="wrapperParagraphText" style={style}>
+    <div className="wrapperParagraphText turn-widget" style={style}>
       <p
         className="paragraphText original-text noselect"
         ref={paragraphEl}

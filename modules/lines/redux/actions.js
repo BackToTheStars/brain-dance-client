@@ -12,6 +12,7 @@ export const quoteCoordsUpdate =
     });
   };
 
+// @deprecated
 export const linesWithEndCoordsUpdate = (linesWithEndCoords) => (dispatch) => {
   increment('LINES_WITH_END_COORDS_UPDATE');
   return dispatch({

@@ -2,6 +2,7 @@ import * as types from './types';
 
 const initialLinesState = {
   lines: [],
+  // @deprecated
   linesWithEndCoords: [],
   quotesInfo: {},
   error: null,
@@ -38,6 +39,7 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         lines: state.lines.filter((line) => !d[line._id]),
       };
 
+    // @deprecated
     case types.LINES_WITH_END_COORDS_UPDATE:
       return {
         ...state,
