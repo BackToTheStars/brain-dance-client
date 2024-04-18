@@ -31,28 +31,20 @@ export const filterLinesByTurnId = (lines, turnId) =>
     (line) => line.sourceTurnId === turnId || line.targetTurnId === turnId
   );
 
+// @deprecated
 export const getLinesCoords = (
   lines,
   turnsToRender,
   turnsDictionary,
   quotesInfo
-  // pictureQuotesInfo
 ) => {
-  // turns {_id, x, y, width, height}
-  // lines {sourceTurnId, targetTurnId}
-
-  // const turnsDictionary = {};
-  // for (let turn of turns) {
-  //   turnsDictionary[turn._id] = turn;
-  // }
-
   const turnsToRenderDictionary = {};
-  for (let turn of turnsToRender) {
-    turnsToRenderDictionary[turn] = true;
+  for (const id of turnsToRender) {
+    turnsToRenderDictionary[id] = true;
   }
 
   const resLines = [];
-  for (let line of lines) {
+  for (const line of lines) {
     if (
       !turnsToRenderDictionary[line.sourceTurnId] &&
       !turnsToRenderDictionary[line.targetTurnId]
@@ -78,11 +70,6 @@ export const getLinesCoords = (
           (quote) => quote.quoteId == line.sourceMarker
         );
       }
-      // if (!sourceQuoteCoords && pictureQuotesInfo[line.sourceTurnId]) {
-      //   sourceQuoteCoords = pictureQuotesInfo[line.sourceTurnId].find(
-      //     (quote) => quote.quoteId == line.sourceMarker
-      //   );
-      // }
 
       if (sourceQuoteCoords) {
         // если есть такая цитаты, то привязать к ней вместо шага
@@ -107,12 +94,6 @@ export const getLinesCoords = (
           (quote) => quote.quoteId == line.targetMarker
         );
       }
-
-      // if (!targetQuoteCoords && pictureQuotesInfo[line.targetTurnId]) {
-      //   targetQuoteCoords = pictureQuotesInfo[line.targetTurnId].find(
-      //     (quote) => quote.quoteId == line.targetMarker
-      //   );
-      // }
       if (targetQuoteCoords) {
         targetCoords = {
           left:

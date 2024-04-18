@@ -7,7 +7,7 @@ import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
 import { updateCoordinatesRequest } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { loadTurns, moveField } from '@/modules/turns/redux/actions';
+import { loadTurnsGeometry, moveField } from '@/modules/turns/redux/actions';
 import {
   getLinesNotExpired,
   getTurnsFromBuffer,
@@ -45,28 +45,15 @@ export const loadFullGame = (hash) => (dispatch, getState) => {
       payload: data.item.lines,
     });
 
-    dispatch(loadTurns(hash, viewport));
-
-    // GET TURNS DATA
-    // getTurnsRequest(hash).then((data) => {
-    //   dispatch({
-    //     type: turnsTypes.LOAD_TURNS,
-    //     payload: {
-    //       turns: data.items.map((turn) => ({
-    //         ...turn,
-    //         x: turn.x - viewport.x,
-    //         y: turn.y - viewport.y,
-    //       })),
-    //     },
-    //   });
-    // });
+    dispatch(loadTurnsGeometry(hash, viewport));
   });
 };
 
 export const saveField =
-  (d, zeroPoint, gamePosition) => (dispatch, getState) => {
-    //
+  () => (dispatch, getState) => {
     const state = getState();
+    const d = state.turns.d;
+    const gamePosition = state.game.position;
     const isSnapToGrid = isSnapToGridSelector(state);
 
     const changedTurns = Object.values(d)

@@ -2,6 +2,7 @@
 import '@/themes/v1/scss/style.scss';
 
 import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { UserProvider } from '@/modules/user/contexts/UserContext';
 const Game = dynamic(() => import('@/modules/game/components/Game'), {
@@ -9,6 +10,14 @@ const Game = dynamic(() => import('@/modules/game/components/Game'), {
 });
 
 const GamePage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GamePageInner />
+    </Suspense>
+  );
+}
+
+const GamePageInner = () => {
   const searchParams = useSearchParams();
   const hash = searchParams.get('hash');
   return (

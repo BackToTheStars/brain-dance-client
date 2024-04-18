@@ -41,13 +41,13 @@ const ParagraphOriginal = ({
   notRegisteredWidgetsCount,
 }) => {
   const widget = useSelector(
-    (state) => state.turns.d[turnId].dWidgets[widgetId]
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId]
   );
   const showCompressed = useSelector(
-    (state) => state.turns.d[turnId].compressed
+    (state) => state.turns.d[turnId].data.compressed
   );
-  const colors = useSelector((state) => state.turns.d[turnId].colors);
-  const contentType = useSelector((state) => state.turns.d[turnId].contentType);
+  const colors = useSelector((state) => state.turns.d[turnId].data.colors);
+  const contentType = useSelector((state) => state.turns.d[turnId].data.contentType);
   const size = useSelector((state) => state.turns.d[turnId].size);
 
   const { width, height } = size;

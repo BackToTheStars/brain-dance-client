@@ -17,6 +17,8 @@ import {
   CURVE_ROMBUS_M_P,
 } from './settings';
 
+import { memo } from 'react';
+
 const getFromToQuoteSettingsX = (source, target) => {
   if (source.left > target.right + lineOffset) {
     return [SIDE_LEFT, SIDE_RIGHT, CURVE_HORIZONTAL];
@@ -88,12 +90,31 @@ const findBezierXYPairs = ({ x1, y1, x2, y2 }, curveType, k = 0.5) => {
 };
 
 const Line = ({
-  sourceCoords: prevSourceCoords,
-  targetCoords: prevTargetCoords,
+  prevSWidth,
+  prevSHeight,
+  prevSLeft,
+  prevSTop,
+  prevTWidth,
+  prevTHeight,
+  prevTLeft,
+  prevTTop,
+  // sourceCoords: prevSourceCoords,
+  // targetCoords: prevTargetCoords,
   stroke = 'red',
   strokeWidth = lineThickness,
 }) => {
-  // console.log({ prevSourceCoords });
+  const prevSourceCoords = {
+    width: prevSWidth,
+    height: prevSHeight,
+    left: prevSLeft,
+    top: prevSTop,
+  }
+  const prevTargetCoords = {
+    width: prevTWidth,
+    height: prevTHeight,
+    left: prevTLeft,
+    top: prevTTop,
+  };
   const sourceCoords = {
     ...prevSourceCoords,
     right: prevSourceCoords.left + prevSourceCoords.width,
@@ -144,4 +165,4 @@ const Line = ({
   );
 };
 
-export default Line;
+export default memo(Line);

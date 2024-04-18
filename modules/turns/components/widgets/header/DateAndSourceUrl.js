@@ -2,6 +2,7 @@ import { getShortLink } from '../../helpers/formatters/urlFormatter';
 import { dateFormatter } from '../../helpers/formatters/dateFormatter';
 import EarthLink from '@/modules/ui/icons/EarthLink';
 import CalendarDate from '@/modules/ui/icons/CalendarDate';
+import { memo } from 'react';
 
 const DateAndSourceUrl = ({ sourceUrl, date }) => {
   return (
@@ -23,4 +24,4 @@ const DateAndSourceUrl = ({ sourceUrl, date }) => {
   );
 };
 
-export default DateAndSourceUrl;
+export default memo(DateAndSourceUrl);

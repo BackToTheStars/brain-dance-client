@@ -16,7 +16,7 @@ const Minimap = ({ settings }) => {
     useSelector((state) => state.panels.d[PANEL_MINIMAP].size) || 100;
 
   const { isMinimized } = settings;
-  // const gamePosition = useSelector(s => s.game.position);
+  const gamePosition = useSelector(s => s.game.position);
   // const uiViewport = useSelector(s => s.ui.viewport);
   // const gameInfo = useSelector(s => ({
   //   vx: s.game.game.viewportPointX,
@@ -124,6 +124,7 @@ const Minimap = ({ settings }) => {
     },
     turns: preparedTurns.filter((turn) => turn.contentType !== 'zero-point'),
     zeroPoint: preparedTurns.find((turn) => turn.contentType === 'zero-point'),
+    gamePosition,
   };
 
   const turnsToRender = value.turns
@@ -147,7 +148,7 @@ const Minimap = ({ settings }) => {
 
   return (
     <>
-      <SVGMiniMap {...value} turnsToRender={turnsToRender} />
+      {!isMinimized && <SVGMiniMap {...value} turnsToRender={turnsToRender} />}
       <MinimapButtons
         {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
       />
@@ -203,6 +204,7 @@ const SVGMiniMap = ({
   onMapClick,
   isMinimized,
   turnsToRender,
+  gamePosition,
 }) => {
   const dispatch = useDispatch();
   const k = width / minimapWidth;
@@ -246,16 +248,23 @@ const SVGMiniMap = ({
         }}
         onClick={(e) => onMapClick(e)}
       >
-        {/* {!!zeroPoint && (
+        {!!zeroPoint && (
           <rect
-            key={zeroPoint._id}
-            x={zeroPoint.x - 20}
-            y={zeroPoint.y - 20}
+            // key={zeroPoint._id}
+            // x={zeroPoint.position.x - 20}
+            // y={zeroPoint.position.y - 20}
+            key={'zero'}
+            // x={0}
+            // x={-gamePosition.left}
+            // y={-gamePosition.top}
+            // y={-gamePosition.y}
+            x={-gamePosition.left}
+            y={-gamePosition.top}
             width={40}
             fill={'red'}
             height={40}
           />
-        )} */}
+        )}
         <g
           filter="url(#blurMe)"
           x={position.left}

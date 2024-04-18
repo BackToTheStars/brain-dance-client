@@ -1,54 +1,12 @@
-// import {
-//   useInteractionContext,
-//   MODE_GAME,
-// } from '../contexts/InteractionContext';
-// import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
 import { utils } from '@/modules/game/components/helpers/game';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import Line from './Line';
-import { getLinesCoords } from './helpers/line';
-// import { useUiContext } from '../contexts/UI_Context';
-
-const getSerializedTurnsGeometry = (d) => {
-  return JSON.stringify(
-    Object.values(d).map(({ size, position }) => ({ size, position }))
-  );
-};
+import LogicLine from './LogicLine';
 
 const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const lines = useSelector((state) => state.lines.lines);
-  const quotesInfo = useSelector((state) => state.lines.quotesInfo);
-  const turnsDictionary = useSelector((state) => state.turns.d);
-
   const svgLayer = useRef();
-
-  const viewportHeight = window ? window.innerHeight : 1600;
-  const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
-  // const { linesWithEndCoords } = useTurnsCollectionContext();
-  // const linesWithEndCoords = useSelector(
-  //   (state) => state.lines.linesWithEndCoords
-  // );
-  const serializedTurnsGeometry = useMemo(() => {
-    return getSerializedTurnsGeometry(turnsDictionary);
-  }, [turnsDictionary]);
-
-  const linesWithEndCoords = useMemo(() => {
-    const turnsToRender = Object.keys(turnsDictionary);
-
-    const linesWithEndCoordsNew = getLinesCoords(
-      lines,
-      turnsToRender,
-      turnsDictionary,
-      quotesInfo
-      // pictureQuotesInfo
-    );
-
-    return linesWithEndCoordsNew || [];
-  }, [lines, quotesInfo, serializedTurnsGeometry]);
-
-  // turns {_id, x, y, width, height}
-  // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
+  const viewport = useSelector((state) => state.ui.viewport);
 
   useEffect(() => {
     if (!svgLayer?.current) return;
@@ -67,21 +25,14 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   return (
     <>
       <svg
-        viewBox={`0 0 ${viewportWidth} ${viewportHeight}`}
+        viewBox={`0 0 ${viewport.width} ${viewport.height}`}
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
         className={svgLayerZIndex ? 'front-elements' : ''}
         ref={svgLayer}
       >
-        {linesWithEndCoords.map((lineWithEndCoords) => {
-          // console.log(lineWithEndCoords.line._id);
-          return (
-            <Line
-              key={lineWithEndCoords.line._id}
-              sourceCoords={lineWithEndCoords.sourceCoords}
-              targetCoords={lineWithEndCoords.targetCoords}
-            />
-          );
+        {lines.map((line) => {
+          return <LogicLine key={line._id} line={line} />
         })}
       </svg>
       {!svgLayerZIndex && (

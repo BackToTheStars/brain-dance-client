@@ -5,7 +5,7 @@ import {
   TURNS_POSITION_TIMEOUT_DELAY,
   widgetSpacer,
 } from '@/config/ui';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
@@ -42,94 +42,101 @@ import {
 } from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
-import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 import { isSnapToGridSelector, snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
+import { Skeleton } from 'antd';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
-const getParagraphHeightOld = ({
-  widgetId,
-  widgetD,
-  compressed,
-  paragraphIsReady,
-  compressedHeight,
-}) => {
-  const widget = widgetD[widgetId];
-  if (!widget) return 0;
-  const { minHeight, maxHeight } = widget;
-  if (!compressed) return 0;
+const TurnAdapter = ({ id }) => {
+  // const { position, size, loaded } = useSelector((state) => state.turns.d[id]);
+  const [isDragging, setIsDragging] = useState(false);
+  const dispatch = useDispatch();
+  const wrapper = useRef(null);
+  const position = useSelector((state) => state.turns.d[id].position);
+  const size = useSelector((state) => state.turns.d[id].size);
+  const loadStatus = useSelector(
+    (state) => state.turns.d[id]?.loadStatus || 'not-loaded'
+  );
+  const contentType = useSelector((state) => state.turns.d[id].contentType);
+  const { wrapperClasses, wrapperStyles } = useMemo(() => {
+    const wrapperStyles = {
+      position: 'absolute',
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+      width: `${size.width}px`,
+      height: `${size.height}px`,
+    };
 
-  // ветка для Compressed Paragraph
-  if (paragraphIsReady) {
-    // параграф уже готов
-    // ещё выясняем первоначальную высоту параграфа
-    if (!!compressedHeight) {
-      // есть сохранённая высота
-      let paragraphHeight = compressedHeight;
-      for (const key in widgetD) {
-        if (key === widgetId) continue;
-        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
-      }
-      // compressedHeight:3000
-      // minHeight:2000
-      // maxHeight:8000
-      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
-        return paragraphHeight;
-      }
+    const wrapperClasses = [
+      `turn_${id}`,
+      contentType,
+      'react-turn-new',
+      'noselect',
+    ].join(' ');
+    return {
+      wrapperClasses,
+      wrapperStyles,
+    };
+  }, [position, size, isDragging]);
 
-      // compressedHeight:1000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight <= minHeight)
-        return paragraphHeight - (minHeight - compressedHeight);
+  // DRAGGABLE
+  useEffect(() => {
+    if (typeof $ === 'undefined') return;
+    $(wrapper.current).draggable({
+      // grid: [GRID_CELL_X, GRID_CELL_X],
+      start: (event, ui) => {
+        setIsDragging(true);
+        $('#gameBox')
+          .addClass('remove-line-transition')
+          .addClass('translucent-field');
+      },
+      drag: (event, ui) => {
+        turnPositionQueue.add(() => {
+          dispatch(
+            updateGeometry({
+              _id: id,
+              position: { x: Math.round(ui.position.left), y: Math.round(ui.position.top) },
+              // x: ui.position.left, // x - left - ui.position.left,
+              // y: ui.position.top, // y - top - ui.position.top,
+            })
+          );
+        });
+      },
+      stop: (event, ui) => {
+        turnPositionQueue.clear();
+        dispatch(
+          updateGeometry({
+            _id: id,
+            position: {
+              x: Math.round(ui.position.left / GRID_CELL_X) * GRID_CELL_X,
+              y: Math.round(ui.position.top / GRID_CELL_X) * GRID_CELL_X,
+            },
+          })
+        );
+        setIsDragging(false);
+        $('#gameBox')
+          .removeClass('remove-line-transition')
+          .removeClass('translucent-field');
+        dispatch(markTurnAsChanged({ _id: id }));
+      },
+      cancel: '.not-draggable',
+    });
 
-      // compressedHeight:9000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight >= maxHeight)
-        return paragraphHeight - (maxHeight - compressedHeight);
-    } else {
-      // до этого момента параграф не сжимался
-      return widget.minHeight;
-    }
-  } else {
-    // ещё выясняем первоначальную высоту параграфа
-    if (!!compressedHeight) {
-      // есть сохранённая высота
-      let paragraphHeight = compressedHeight;
-      for (const key in widgetD) {
-        if (key === widgetId) continue;
-        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
-      }
-      // compressedHeight:3000
-      // minHeight:2000
-      // maxHeight:8000
-      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
-        return paragraphHeight;
-      }
+    return () => $(wrapper.current).draggable('destroy');
+  }, []);
 
-      // compressedHeight:1000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight <= minHeight)
-        return paragraphHeight - (minHeight - compressedHeight);
-
-      // compressedHeight:9000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight >= maxHeight)
-        return paragraphHeight - (maxHeight - compressedHeight);
-    } else {
-      // до этого момента параграф не сжимался
-      return widget.minHeight;
-    }
-  }
+  return (
+    <div style={wrapperStyles} className={wrapperClasses} ref={wrapper}>
+      {loadStatus === 'loaded' ? <Turn id={id} /> : <Skeleton active />}
+    </div>
+  );
 };
 
-const Turn = ({ id }) => {
-  const turn = useSelector((state) => state.turns.d[id]);
+const Turn = memo(({ id }) => {
+  const turnData = useSelector((state) => state.turns.d[id].data);
+  const size = useSelector((state) => state.turns.d[id].size);
   const isSnapToGrid = useSelector(isSnapToGridSelector);
   const dispatch = useDispatch();
 
@@ -138,15 +145,13 @@ const Turn = ({ id }) => {
 
   const wrapper = useRef(null);
 
+  const { width, height } = size;
   const {
     //-- geometry
-    size,
-    position,
+    // position,
     _id,
-    x,
-    y,
     colors: { background, font },
-    size: { width, height },
+    // size: { width, height },
     //-- header
     contentType,
     // backgroundColor,
@@ -165,14 +170,14 @@ const Turn = ({ id }) => {
     pictureOnly,
     // states
     wasChanged,
-  } = turn;
+  } = turnData;
 
   // console.log(turn.dWidgets.p_1.inserts, paragraph);
 
   const dontShowHeaderOriginal = !headerShow;
 
-  const paragraphStage = getParagraphStage(turn);
-  const turnStage = getTurnStage(turn);
+  const paragraphStage = getParagraphStage(turnData);
+  const turnStage = getTurnStage(turnData);
 
   // const callsQueueIsBlockedFlag = useSelector(
   //   (state) => state.ui.callsQueueIsBlocked
@@ -187,10 +192,8 @@ const Turn = ({ id }) => {
   const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
 
   const wrapperStyles = {
-    left: `${position.x}px`,
-    top: `${position.y}px`,
-    width: `${size.width}px`,
-    height: `${size.height}px`,
+    width: '100%',
+    height: '100%',
   };
 
   if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
@@ -199,25 +202,12 @@ const Turn = ({ id }) => {
 
   const classNameId = `turn_${_id}`;
 
-  const { isDeveloperModeActive, setDevItem } = useDevPanel();
-
   const widgetsCount =
     !dontShowHeader + // header
     !!imageUrl + // Picture
     !!videoUrl + // Video
     doesParagraphExist; // Paragraph
   const notRegisteredWidgetsCount = widgetsCount - widgets.length;
-
-  if (isDeveloperModeActive) {
-    setDevItem({
-      itemType: 'turn',
-      id: _id,
-      params: { x, y, w: width, h: height, selector: `.${classNameId}` },
-      parentType: 'window',
-      parentId: '0',
-    });
-    // setDevItem = (itemType, id, params, parentType, parentId) => {
-  }
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -285,7 +275,7 @@ const Turn = ({ id }) => {
 
     const isLocked = // transition from compressed to uncompressed
       paragraphStage === ORIG_LOADING &&
-      turn.paragraphStages.at(-3) === COMP_READY;
+      turnData.paragraphStages.at(-3) === COMP_READY;
 
     if (!isLocked) {
       turnGeometryQueue.add(() => {
@@ -350,40 +340,6 @@ const Turn = ({ id }) => {
     }
   }, [turnStage, paragraphStage]);
 
-  // DRAGGABLE
-  useEffect(() => {
-    if (typeof $ === 'undefined') return;
-    $(wrapper.current).draggable({
-      grid: [GRID_CELL_X, GRID_CELL_X],
-      start: (event, ui) => {
-        $('#gameBox')
-          .addClass('remove-line-transition')
-          .addClass('translucent-field');
-      },
-      drag: (event, ui) => {
-        turnPositionQueue.add(() => {
-          dispatch(
-            updateGeometry({
-              _id,
-              position: { x: ui.position.left, y: ui.position.top },
-              // x: ui.position.left, // x - left - ui.position.left,
-              // y: ui.position.top, // y - top - ui.position.top,
-            })
-          );
-        });
-      },
-      stop: (event, ui) => {
-        $('#gameBox')
-          .removeClass('remove-line-transition')
-          .removeClass('translucent-field');
-        dispatch(markTurnAsChanged({ _id }));
-      },
-      cancel: '.not-draggable',
-    });
-
-    return () => $(wrapper.current).draggable('destroy');
-  }, []);
-
   // RESIZABLE
   useEffect(() => {
     if (paragraphStage === COMP_READY) return;
@@ -443,10 +399,11 @@ const Turn = ({ id }) => {
   // console.log({ widgets });
 
   const wrapperClasses = [
-    contentType,
+    // contentType,
     'react-turn-new',
-    'noselect',
-    classNameId,
+    'react-turn-new_size',
+    // 'noselect',
+    // classNameId,
   ];
 
   if (dontShowHeader) {
@@ -522,6 +479,6 @@ const Turn = ({ id }) => {
       )}
     </div>
   );
-};
+});
 
-export default Turn;
+export default memo(TurnAdapter);

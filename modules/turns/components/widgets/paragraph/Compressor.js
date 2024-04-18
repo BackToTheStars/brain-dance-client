@@ -31,7 +31,6 @@ import {
   ParagraphCompressorTextWrapper,
   TextAroundQuoteOptimized,
 } from './TextWrappers';
-import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 import { calculateTextPiecesFromQuotes } from './oldHelper';
 
 const Compressor = ({
@@ -42,10 +41,10 @@ const Compressor = ({
   setWrapperElCurrent,
   registerHandleResizeWithParams,
 }) => {
-  const turn = useSelector((state) => state.turns.d[turnId]);
+  const turn = useSelector((state) => state.turns.d[turnId].data);
+  const width = useSelector((state) => state.turns.d[turnId].size.width);
   const dispatch = useDispatch();
   const {
-    width,
     paragraph: originalParagraph,
     contentType,
     compressedParagraphState,
@@ -73,24 +72,6 @@ const Compressor = ({
   };
 
   const classNameId = `turn_${turnId}_compressor_${widgetId}`;
-
-  const { isDeveloperModeActive, setDevItem } = useDevPanel();
-
-  if (isDeveloperModeActive) {
-    setDevItem({
-      itemType: 'compressor',
-      id: classNameId,
-      params: {
-        x: 0,
-        y: widget.minTop + widgetSpacer,
-        w: widget.width,
-        h: widget.minHeight,
-        selector: `.${classNameId}`,
-      },
-      parentType: 'turn',
-      parentId: turnId,
-    });
-  }
 
   useEffect(() => {
     if (!quoteCollection.length) return;

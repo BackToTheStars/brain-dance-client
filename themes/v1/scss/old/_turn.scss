@@ -9,6 +9,9 @@
 $black-color: rgb(0, 0, 0);
 
 .translucent-field {
+  #lines path {
+    opacity: 0.4;
+  }
   .react-turn-new {
     opacity: 0.4;
 
@@ -16,6 +19,12 @@ $black-color: rgb(0, 0, 0);
       opacity: 1;
     }
   }
+  .ui-draggable-dragging {
+    .react-turn-new {
+      opacity: 1;
+    }
+  }
+
 }
 
 .wrapperParagraphText::-webkit-scrollbar {

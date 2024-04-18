@@ -5,7 +5,6 @@ import {
 } from '@/config/ui';
 import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
-import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
 
 const ORANGE = '#ffd596';
 const GRAY = '#d2d3d4';
@@ -313,24 +312,6 @@ export const TextAroundQuoteOptimized = ({
 
   const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
 
-  const { isDeveloperModeActive, setDevItem } = useDevPanel();
-
-  if (isDeveloperModeActive) {
-    setDevItem({
-      itemType: 'textaroundquotes',
-      id: classNameId,
-      params: {
-        x: 0,
-        y: deltaTop,
-        w: widgetWidth - TURN_SCROLLBAR_MARGIN,
-        h: height,
-        selector: `.${classNameId}`,
-      },
-      parentType: 'compressor',
-      parentId: parentClassNameId,
-    });
-  }
-
   useEffect(() => {
     // @todo: check if no quotes
     if (!paragraphEl?.current) return;
@@ -371,25 +352,6 @@ export const TextAroundQuoteOptimized = ({
     if (!quotesInfoPart.length) return;
     const blockTop = widgetTop + deltaTop + widgetSpacer;
     const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
-
-    if (isDeveloperModeActive) {
-      const quote = quotesInfoPart[0];
-      const top = quotes[0].top - deltaScrollHeightTop - scrollTop;
-      // quote.top - текущее значение от верха turn
-      setDevItem({
-        itemType: 'quoteincompressedpart',
-        id: `q_${quote.quoteKey}`,
-        params: {
-          x: quote.left,
-          y: top,
-          w: quote.width,
-          h: quote.height,
-          selector: `.q_${quote.quoteKey}`,
-        },
-        parentType: 'textaroundquotes',
-        parentId: classNameId, // id сжатого мини-параграфа, text around quote
-      });
-    }
 
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {

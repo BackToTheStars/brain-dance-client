@@ -1,11 +1,19 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
 import { getGameUserTokenRequest } from '@/modules/user/requests';
 
 const CodePage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CodePageInner />
+    </Suspense>
+  );
+}
+
+const CodePageInner = () => {
   const searchParams = useSearchParams();
   const hash = searchParams.get('hash');
   const nickname = searchParams.get('nickname');

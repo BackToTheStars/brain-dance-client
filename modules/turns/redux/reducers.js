@@ -79,6 +79,40 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     }
 
+    case types.TURNS_SET_LOADING: {
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          ...payload.reduce((a, id) => ({
+            ...a,
+            [id]: {
+              ...state.d[id],
+              loadStatus: 'loading',
+            }
+          }), {}),
+        },
+      }
+    }
+
+    case types.TURNS_LOAD_DATA: {
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          ...payload.turns.reduce((a, { position, size, loadStatus, ...turn}) => {
+            console.log({ turn })
+            a[turn._id] = {
+              ...state.d[turn._id],
+              loadStatus: 'loaded',
+              data: turn,
+            };
+            return a;
+          }, {}),
+        },
+      }
+    }
+
     // case types.TURN_PARAGRAPH_SET_IS_READY:
     //   return {
     //     ...state,

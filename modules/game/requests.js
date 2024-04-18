@@ -63,6 +63,12 @@ export const getTurnsRequest = (hash) => {
   });
 };
 
+export const getTurnsGeometryRequest = (hash) => {
+  return request(`new-turns/geometry?hash=${s.hash}`, {
+    tokenFlag: true,
+  });
+}
+
 export const getGamesLastTurns = () => {
   return request(`games/last-turns`, {
     tokenFlag: true,

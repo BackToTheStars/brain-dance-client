@@ -7,6 +7,7 @@ import { getQueue } from '../../helpers/queueHelper';
 import Compressor from './Compressor';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
+import { memo } from 'react';
 
 const Paragraph = ({
   turnId,
@@ -17,11 +18,11 @@ const Paragraph = ({
   notRegisteredWidgetsCount,
 }) => {
   const compressedWidget = useSelector(
-    (state) => state.turns.d[turnId].dWidgets.c_1
+    (state) => state.turns.d[turnId].data.dWidgets.c_1
   );
-  const compressed = useSelector((state) => state.turns.d[turnId].compressed);
+  const compressed = useSelector((state) => state.turns.d[turnId].data.compressed);
   const turnCompressedHeight = useSelector(
-    (state) => state.turns.d[turnId].compressedHeight
+    (state) => state.turns.d[turnId].data.compressedHeight
   );
   // const compressed = false; // @todo: compressedWidget.show;
   // const turnCompressedHeight = compressedWidget.height;
@@ -179,4 +180,4 @@ const Paragraph = ({
   );
 };
 
-export default Paragraph;
+export default memo(Paragraph);

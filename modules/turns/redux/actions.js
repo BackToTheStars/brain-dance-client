@@ -1,4 +1,7 @@
-import { getTurnsRequest } from '@/modules/game/requests';
+import {
+  getTurnsGeometryRequest,
+  getTurnsRequest,
+} from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
 import * as quotesTypes from '@/modules/quotes/redux/types';
@@ -6,6 +9,7 @@ import {
   createTurnRequest,
   deleteTurnRequest,
   getTokenRequest,
+  getTurnsByIdsRequest,
   updateTurnRequest,
 } from '../requests';
 import {
@@ -63,6 +67,53 @@ export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
   paragraphStateDeleteFromLocalStorage(_id);
 };
 
+export const loadTurnsGeometry = (hash, viewport) => (dispatch, getState) => {
+  const state = getState();
+  return getTurnsGeometryRequest(hash).then((data) => {
+    dispatch({
+      type: types.LOAD_TURNS,
+      payload: {
+        viewport: {
+          position: {
+            x: 0,
+            y: 0,
+          },
+          size: {
+            width: state.ui.viewport.width,
+            height: state.ui.viewport.height,
+          },
+        },
+        turns: data.items.map((turn) => ({
+          ...turn,
+          position: {
+            x: turn.position.x - viewport.x,
+            y: turn.position.y - viewport.y,
+          },
+        })),
+      },
+    });
+  });
+};
+
+export const loadTurnsData = (turnIds) => (dispatch, getState) => {
+  const state = getState();
+  dispatch({
+    type: types.TURNS_SET_LOADING,
+    payload: turnIds,
+  });
+  return getTurnsByIdsRequest(turnIds).then((data) => {
+    dispatch({
+      type: types.TURNS_LOAD_DATA,
+      payload: {
+        turns: data.items.map((turn) =>
+          TurnHelper.toNewFields(turn)
+        ),
+      },
+    });
+  });
+};
+
+// @deprecated
 export const loadTurns = (hash, viewport) => (dispatch, getState) => {
   getTurnsRequest(hash).then((data) => {
     const state = getState();
@@ -98,12 +149,15 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
               new Date(turn.updatedAt).getTime()
               ? compressedParagraphStateOld
               : null;
-          return TurnHelper.toNewFields({
-            ...turn,
-            x: snapRound(turn.x - viewport.x, GRID_CELL_X),
-            y: snapRound(turn.y - viewport.y, GRID_CELL_X),
-            compressedParagraphState,
-          });
+          return {
+            ...TurnHelper.toNewFields({
+              ...turn,
+              x: snapRound(turn.x - viewport.x, GRID_CELL_X),
+              y: snapRound(turn.y - viewport.y, GRID_CELL_X),
+              compressedParagraphState,
+            }),
+            loadStatus: 'loaded',
+          };
         }),
       },
     });

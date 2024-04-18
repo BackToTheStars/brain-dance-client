@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import {
@@ -103,4 +104,4 @@ const ButtonsMenu = ({ _id }) => {
   );
 };
 
-export default ButtonsMenu;
+export default memo(ButtonsMenu);

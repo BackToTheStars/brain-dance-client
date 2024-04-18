@@ -11,7 +11,7 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
   // const [newWidth, setNewWidth] = useState(width);
   const width = useSelector((state) => state.turns.d[turnId].size.width);
   const videoUrl = useSelector(
-    (state) => state.turns.d[turnId].dWidgets[widgetId].url
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url
   );
   const newVideoUrl = useMemo(() => {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {

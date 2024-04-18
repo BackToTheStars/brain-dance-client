@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, memo } from 'react';
 import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
@@ -6,13 +6,13 @@ import { useSelector } from 'react-redux';
 //const HEADER_HEIGHT = 105;
 
 const Header = ({ widgetId, registerHandleResize, _id }) => {
-  const contentType = useSelector((state) => state.turns.d[_id].contentType);
-  const { url, date } = useSelector((state) => state.turns.d[_id].dWidgets.s_1);
+  const contentType = useSelector((state) => state.turns.d[_id].data.contentType);
+  const { url, date } = useSelector((state) => state.turns.d[_id].data.dWidgets.s_1);
   const { text, show } = useSelector(
-    (state) => state.turns.d[_id].dWidgets[widgetId]
+    (state) => state.turns.d[_id].data.dWidgets[widgetId]
   );
   const { font, background } = useSelector(
-    (state) => state.turns.d[_id].colors
+    (state) => state.turns.d[_id].data.colors
   );
 
   const headerEl = useRef(null);
@@ -55,4 +55,4 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
   );
 };
 
-export default Header;
+export default memo(Header);

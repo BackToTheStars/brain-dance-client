@@ -27,7 +27,7 @@ const PictureQuotes = ({
   const dispatch = useDispatch();
   // const { bottomPanelSettings } = []; //useInteractionContext();
   // const { setPanelType } = bottomPanelSettings;
-  const turn = useSelector((state) => state.turns.d[turnId]);
+  const turn = useSelector((state) => state.turns.d[turnId].data);
   const lines = useSelector((store) => store.lines.lines);
 
   const quotes = useMemo(() => {

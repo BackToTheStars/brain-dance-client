@@ -4,7 +4,7 @@ import {
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/modules/panels/settings';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
 import PictureQuotes from './Quotes';
@@ -22,7 +22,7 @@ const Picture = ({
 }) => {
   //
   const imageUrl = useSelector(
-    (state) => state.turns.d[turnId].dWidgets[widgetId].url
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url
   );
   const widgetSpacer = pictureOnly ? 0 : widgetSpacerOriginal;
 
@@ -170,4 +170,4 @@ const Picture = ({
   );
 };
 
-export default Picture;
+export default memo(Picture);

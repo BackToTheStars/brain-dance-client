@@ -83,8 +83,8 @@ const Game = ({ hash }) => {
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(
           moveField({
-            left: -ui.position.left,
-            top: -ui.position.top,
+            left: -Math.round(ui.position.left),
+            top: -Math.round(ui.position.top),
           })
         );
 

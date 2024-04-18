@@ -1,6 +1,12 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
 
+export const getTurnsByIdsRequest = (ids) => {
+  return request(`new-turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
+    tokenFlag: true,
+  });
+}
+
 export const createTurnRequest = (body) => {
   return request(`turns/?hash=${s.hash}`, {
     method: 'POST',

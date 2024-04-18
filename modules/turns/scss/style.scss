@@ -1,7 +1,13 @@
 @import './picture.scss';
 
 .react-turn-new {
-  &.picture-only {
+  overflow: visible;
+  &.react-turn-new_size {
+    padding-bottom: 0px;
+  }
+  &.picture-only,
+  > .picture-only {
+    padding-bottom: 0px;
     background: rgba(0, 0, 0, 0);
     border-width: 0;
 
@@ -18,7 +24,8 @@
     }
   }
 
-  &:last-child {
+  // &:last-child {
+  :last-child {
     margin-bottom: 0;
   }
 
@@ -40,11 +47,13 @@
   border-bottom-right-radius: $turn-upper-corners-radius;
   border: $turn-border-thickness solid $turn-border-color;
 
-  &.was-changed {
+  &.was-changed, > .was-changed {
     border: $turn-border-thickness solid $turn-changed-border-color;
   }
 
-  padding-bottom: $turn-widget-bottom-spacer;
+  > div {
+    padding-bottom: $turn-widget-bottom-spacer;
+  }
 
   .ui-icon {
     visibility: hidden;
@@ -53,6 +62,9 @@
   &:hover {
     .ui-icon {
       visibility: visible;
+    }
+    .mod_icon_wrap {
+      opacity: 1;
     }
   }
 
@@ -69,13 +81,7 @@
     }
   }
 
-  &:hover {
-    .mod_icon_wrap {
-      opacity: 1;
-    }
-  }
-
-  &.dont-show-header {
+  &.dont-show-header, > .dont-show-header {
     &:hover {
       .headerTextActions {
         transform: translateY(15%);
