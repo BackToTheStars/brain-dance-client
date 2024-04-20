@@ -21,12 +21,6 @@ export const getStageHistory = (currentStages, newStage) => {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
-    case types.TURNS_SET_TO_RENDER: {
-      return {
-        ...state,
-        turnsToRender: payload,
-      };
-    }
     case types.LOAD_TURNS: {
       const d = payload.turns.reduce((a, turn) => {
         a[turn._id] = turn;
@@ -41,9 +35,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       return {
         ...state,
         turns: payload.turns,
-        zeroPointId: payload.turns.find(
-          (turn) => turn.contentType === turnSettings.TEMPLATE_ZERO_POINT
-        )._id,
         d,
         turnsToRender,
       };
@@ -187,24 +178,17 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     }
     case types.TURNS_FIELD_WAS_MOVED: {
-      const { left, top, viewport } = payload;
-      const newState = { ...state };
+      const d = state.d;
       const turnsToRender = [];
-      newState.d = { ...state.d };
-      for (let id in state.d) {
-        newState.d[id] = {
-          ...newState.d[id],
-          position: {
-            x: newState.d[id].position.x - left,
-            y: newState.d[id].position.y - top,
-          },
-        };
-        if (isTurnInsideRenderArea(newState.d[id], viewport)) {
+      for (let id in d) {
+        if (isTurnInsideRenderArea(d[id], payload)) {
           turnsToRender.push(id);
         }
       }
-      newState.turnsToRender = turnsToRender;
-      return newState;
+      return {
+        ...state,
+        turnsToRender,
+      };
     }
 
     case types.TURNS_SYNC_DONE: {

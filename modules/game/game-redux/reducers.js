@@ -14,19 +14,17 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
       return {
         ...state,
         game: payload,
-        position: {
-          left: payload.x,
-          top: payload.y,
-        },
+        position: payload.position,
       };
-    case types.GAME_FIELD_MOVE:
+    case types.GAME_FIELD_MOVE:{
       return {
         ...state,
         position: {
-          left: state.position.left + payload.left,
-          top: state.position.top + payload.top,
+          x: state.position.x + payload.left,
+          y: state.position.y + payload.top,
         },
       };
+    }
 
     case types.GAME_EDIT_MODE_SWITCH:
       return {

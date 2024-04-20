@@ -67,36 +67,26 @@ export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
   paragraphStateDeleteFromLocalStorage(_id);
 };
 
-export const loadTurnsGeometry = (hash, viewport) => (dispatch, getState) => {
+export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
   const state = getState();
   return getTurnsGeometryRequest(hash).then((data) => {
     dispatch({
       type: types.LOAD_TURNS,
       payload: {
         viewport: {
-          position: {
-            x: 0,
-            y: 0,
-          },
+          position,
           size: {
             width: state.ui.viewport.width,
             height: state.ui.viewport.height,
           },
         },
-        turns: data.items.map((turn) => ({
-          ...turn,
-          position: {
-            x: turn.position.x - viewport.x,
-            y: turn.position.y - viewport.y,
-          },
-        })),
+        turns: data.items,
       },
     });
   });
 };
 
-export const loadTurnsData = (turnIds) => (dispatch, getState) => {
-  const state = getState();
+export const loadTurnsData = (turnIds) => (dispatch) => {
   dispatch({
     type: types.TURNS_SET_LOADING,
     payload: turnIds,
@@ -289,8 +279,8 @@ export const moveField = (data) => (dispatch, getState) => {
     : data;
   const viewport = {
     position: {
-      x: 0,
-      y: 0,
+      x: state.game.position.x + gameFieldMoveVector.left,
+      y: state.game.position.y + gameFieldMoveVector.top,
     },
     size: {
       width: state.ui.viewport.width,
@@ -303,7 +293,7 @@ export const moveField = (data) => (dispatch, getState) => {
   });
   dispatch({
     type: types.TURNS_FIELD_WAS_MOVED,
-    payload: { ...gameFieldMoveVector, viewport },
+    payload: viewport,
   });
 };
 

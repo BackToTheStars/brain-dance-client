@@ -23,21 +23,13 @@ import { TurnHelper } from '@/modules/turns/redux/helpers';
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
   getGameRequest(hash).then((data) => {
-    const state = getState();
-    const isSnapToGrid = isSnapToGridSelector(state);
-    const viewport = isSnapToGrid
-      ? {
-          x: snapRound(data.item.viewportPointX, GRID_CELL_X),
-          y: snapRound(data.item.viewportPointY, GRID_CELL_X),
-        }
-      : {
-          x: data.item.viewportPointX,
-          y: data.item.viewportPointY,
-        };
-
+    const position = {
+      x: snapRound(data.item.viewportPointX, GRID_CELL_X),
+      y: snapRound(data.item.viewportPointY, GRID_CELL_X),
+    };
     dispatch({
       type: types.LOAD_GAME,
-      payload: { ...data.item, ...viewport },
+      payload: { ...data.item, position },
     });
 
     dispatch({
@@ -45,7 +37,7 @@ export const loadFullGame = (hash) => (dispatch, getState) => {
       payload: data.item.lines,
     });
 
-    dispatch(loadTurnsGeometry(hash, viewport));
+    dispatch(loadTurnsGeometry(hash, position));
   });
 };
 

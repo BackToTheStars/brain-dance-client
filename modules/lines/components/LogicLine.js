@@ -34,6 +34,8 @@ const LogicLine = ({ line }) => {
   const targetTurnPosition = useSelector(
     (state) => state.turns.d[targetTurnId]?.position
   );
+  const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.ui.viewport);
   // const quotesInfo = useSelector((state) => state.lines.quotesInfo);
   // // const d = useSelector((state) => state.turns.d);
   // // const sourceMarkerQuote = quotesInfo[`${sourceTurnId}_${sourceMarker}`];
@@ -56,6 +58,20 @@ const LogicLine = ({ line }) => {
     return getCoordsByTurnPositionAndMarkerQuote(targetTurnPosition, targetMarkerQuote);
   }, [targetTurnPosition, targetMarkerQuote]);
 
+  const { prevSleft, prevSTop } = useMemo(() => {
+    return {
+      prevSleft: sourceCoords?.left - gamePosition.x + viewport.width,
+      prevSTop: sourceCoords?.top - gamePosition.y + viewport.height,
+    };
+  }, [sourceCoords, gamePosition, viewport]);
+
+  const { prevTLeft, prevTTop } = useMemo(() => {
+    return {
+      prevTLeft: targetCoords?.left - gamePosition.x + viewport.width,
+      prevTTop: targetCoords?.top - gamePosition.y + viewport.height,
+    };
+  }, [targetCoords, gamePosition, viewport]);
+
   if (!sourceCoords || !targetCoords) {
     return null;
   }
@@ -63,12 +79,12 @@ const LogicLine = ({ line }) => {
   return <Line
     prevSWidth={sourceCoords.width}
     prevSHeight={sourceCoords.height}
-    prevSLeft={sourceCoords.left}
-    prevSTop={sourceCoords.top}
+    prevSLeft={prevSleft}
+    prevSTop={prevSTop}
     prevTWidth={targetCoords.width}
     prevTHeight={targetCoords.height}
-    prevTLeft={targetCoords.left}
-    prevTTop={targetCoords.top}
+    prevTLeft={prevTLeft}
+    prevTTop={prevTTop}
   />
 };
 

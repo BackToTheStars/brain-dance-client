@@ -1,5 +1,5 @@
 import { utils } from '@/modules/game/components/helpers/game';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import LogicLine from './LogicLine';
 
@@ -22,17 +22,30 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
     };
   }, [svgLayer?.current]);
 
+  const { viewBox, styles } = useMemo(() => {
+    return {
+      viewBox: `0 0 ${viewport.width * 3} ${viewport.height * 3}`,
+      styles: {
+        width: `${viewport.width * 3}px`,
+        height: `${viewport.height * 3}px`,
+        left: `${-viewport.width}px`,
+        top: `${-viewport.height}px`,
+      },
+    };
+  }, [viewport])
+
   return (
     <>
       <svg
-        viewBox={`0 0 ${viewport.width} ${viewport.height}`}
+        viewBox={viewBox}
+        style={styles}
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
         className={svgLayerZIndex ? 'front-elements' : ''}
         ref={svgLayer}
       >
         {lines.map((line) => {
-          return <LogicLine key={line._id} line={line} />
+          return <LogicLine key={line._id} line={line} />;
         })}
       </svg>
       {!svgLayerZIndex && (

@@ -51,6 +51,7 @@ const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
 const TurnAdapter = ({ id }) => {
   // const { position, size, loaded } = useSelector((state) => state.turns.d[id]);
+  const gamePosition = useSelector((state) => state.game.position);
   const [isDragging, setIsDragging] = useState(false);
   const dispatch = useDispatch();
   const wrapper = useRef(null);
@@ -63,8 +64,8 @@ const TurnAdapter = ({ id }) => {
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       position: 'absolute',
-      left: `${position.x}px`,
-      top: `${position.y}px`,
+      left: `${position.x - gamePosition.x}px`,
+      top: `${position.y - gamePosition.y}px`,
       width: `${size.width}px`,
       height: `${size.height}px`,
     };
@@ -79,7 +80,7 @@ const TurnAdapter = ({ id }) => {
       wrapperClasses,
       wrapperStyles,
     };
-  }, [position, size, isDragging]);
+  }, [gamePosition, position, size, isDragging]);
 
   // DRAGGABLE
   useEffect(() => {
@@ -97,7 +98,10 @@ const TurnAdapter = ({ id }) => {
           dispatch(
             updateGeometry({
               _id: id,
-              position: { x: Math.round(ui.position.left), y: Math.round(ui.position.top) },
+              position: {
+                x: Math.round(ui.position.left + gamePosition.x),
+                y: Math.round(ui.position.top + gamePosition.y),
+              },
               // x: ui.position.left, // x - left - ui.position.left,
               // y: ui.position.top, // y - top - ui.position.top,
             })
@@ -110,8 +114,10 @@ const TurnAdapter = ({ id }) => {
           updateGeometry({
             _id: id,
             position: {
-              x: Math.round(ui.position.left / GRID_CELL_X) * GRID_CELL_X,
-              y: Math.round(ui.position.top / GRID_CELL_X) * GRID_CELL_X,
+              // x: Math.round(ui.position.left / GRID_CELL_X) * GRID_CELL_X,
+              // y: Math.round(ui.position.top / GRID_CELL_X) * GRID_CELL_X,
+              x: Math.round((ui.position.left + gamePosition.x) / GRID_CELL_X) * GRID_CELL_X,
+              y: Math.round((ui.position.top + gamePosition.y) / GRID_CELL_X) * GRID_CELL_X,
             },
           })
         );
@@ -125,7 +131,7 @@ const TurnAdapter = ({ id }) => {
     });
 
     return () => $(wrapper.current).draggable('destroy');
-  }, []);
+  }, [gamePosition]);
 
   return (
     <div style={wrapperStyles} className={wrapperClasses} ref={wrapper}>

@@ -10,6 +10,7 @@ import MinimapButtons from './MinimapButtons';
 import { isTurnInsideRenderArea } from '@/modules/turns/components/helpers/sizeHelper';
 
 const Minimap = ({ settings }) => {
+  return null
   const dispatch = useDispatch();
 
   const minimapSizePercents =
