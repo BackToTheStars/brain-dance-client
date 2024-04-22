@@ -2,10 +2,10 @@
 import { useSelector } from 'react-redux';
 import UIPanel from './UIPanel';
 import SettingsButton from './SettingsButton';
-import { PANEL_ADD_EDIT_TURN, POSITION_POPUP } from '../settings';
+import { POSITION_POPUP } from '../settings';
 import PanelPopup from './Popup';
-import { useEffect, useMemo, memo } from 'react';
-import { setInitialPanels } from '../redux/storage';
+import { useMemo, memo } from 'react';
+// import { setInitialPanels } from '../redux/storage';
 
 const shortListIds = [
   // 'panel_buttons',
@@ -31,7 +31,7 @@ const PanelAdapter = memo(({ id }) => {
       isMinimized={panel.isMinimized}
       priorityStyle={panel?.priorityStyle}
     >
-      <panel.component settings={panel} id={id} />
+      <panel.component id={id} />
     </Wrapper>
   );
 });

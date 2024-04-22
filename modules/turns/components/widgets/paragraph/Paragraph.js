@@ -1,6 +1,6 @@
 import { widgetSpacer } from '@/config/ui';
 import { setPanelMode } from '@/modules/panels/redux/actions';
-import { MODE_WIDGET_PARAGRAPH } from '@/modules/panels/settings';
+import { MODE_WIDGET_PARAGRAPH } from '@/config/panel';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';

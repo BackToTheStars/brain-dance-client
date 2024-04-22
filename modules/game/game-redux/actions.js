@@ -20,25 +20,33 @@ import {
 } from '@/modules/turns/components/helpers/grid';
 import { TurnHelper } from '@/modules/turns/redux/helpers';
 
+export const setGameStage = (stage) => (dispatch) => {
+  dispatch({ type: types.GAME_SET_STAGE, payload: stage });
+}
+
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
-  getGameRequest(hash).then((data) => {
-    const position = {
-      x: snapRound(data.item.viewportPointX, GRID_CELL_X),
-      y: snapRound(data.item.viewportPointY, GRID_CELL_X),
-    };
-    dispatch({
-      type: types.LOAD_GAME,
-      payload: { ...data.item, position },
-    });
+  return new Promise((resolve, reject) => {
+    getGameRequest(hash).then((data) => {
+      const position = {
+        x: snapRound(data.item.viewportPointX, GRID_CELL_X),
+        y: snapRound(data.item.viewportPointY, GRID_CELL_X),
+      };
+      dispatch({
+        type: types.LOAD_GAME,
+        payload: { ...data.item, position },
+      });
 
-    dispatch({
-      type: linesTypes.LINES_LOAD,
-      payload: data.item.lines,
-    });
+      dispatch({
+        type: linesTypes.LINES_LOAD,
+        payload: data.item.lines,
+      });
 
-    dispatch(loadTurnsGeometry(hash, position));
-  });
+      dispatch(loadTurnsGeometry(hash, position)).then(() => {
+        resolve();
+      });
+    });
+  })
 };
 
 export const saveField =

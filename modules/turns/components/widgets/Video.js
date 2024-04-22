@@ -6,6 +6,8 @@ import { youtubeFormatter } from '../helpers/youtubeFormatter';
 import { useSelector } from 'react-redux';
 
 let timeoutId;
+
+// @fixme
 const Video = ({ registerHandleResize, turnId, widgetId }) => {
   const videoEl = useRef(null);
   // const [newWidth, setNewWidth] = useState(width);

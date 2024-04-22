@@ -1,4 +1,5 @@
-import { MODE_GAME, panels as panelState } from '../settings';
+import { MODE_GAME } from '@/config/panel';
+import { panels as panelState } from '../settings';
 import { getInitialPanels } from './storage';
 import * as types from './types';
 
@@ -10,7 +11,6 @@ for (let panel of panels) {
 }
 
 const initialPanelState = {
-  panels: panels,
   d: d,
   editTurnId: null,
   editWidgetId: null,
@@ -34,12 +34,6 @@ const initialPanelState = {
 export const panelReducer = (state = initialPanelState, { type, payload }) => {
   switch (type) {
     case types.PANEL_TOGGLE: {
-      let open = null;
-      if (typeof payload.open === 'undefined') {
-        open = !state.d[payload.type].isDisplayed;
-      } else {
-        open = payload.open;
-      }
       return {
         ...state,
         ...payload.params,
@@ -47,19 +41,13 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isDisplayed: open,
+            isDisplayed: !!payload?.open || !state.d[payload.type].isDisplayed,
           },
         },
       };
     }
 
     case types.PANEL_TOGGLE_MINIMIZE: {
-      let minimize = null;
-      if (typeof payload.minimize === 'undefined') {
-        minimize = !state.d[payload.type].isMinimized;
-      } else {
-        minimize = payload.minimize;
-      }
       return {
         ...state,
         ...payload.params,
@@ -67,7 +55,7 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isMinimized: minimize,
+            isMinimized: !!payload?.minimize || !state.d[payload.type].isMinimized,
           },
         },
       };

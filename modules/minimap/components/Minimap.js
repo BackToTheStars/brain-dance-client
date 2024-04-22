@@ -75,12 +75,6 @@ const MinimapDataAdapter = () => {
       Math.round((screenRect.width * 100) / screenRect.height) / 100;
     const mWidth = width - 2 * INNER_PADDING;
     const mHeight = Math.round(mWidth / minimapK);
-    console.log({
-      minimapK,
-      koeff: screenRect.width / mWidth,
-      width,
-      screenRect,
-    });
     return {
       mWidth,
       mHeight,
@@ -154,7 +148,7 @@ const SVGMiniMap = memo(({ width, height }) => {
     const targetY = Math.round((e.clientY - rect.top) * k) + screenRect.top;
     const currentX = Math.round(gamePosition.x + viewport.width / 2);
     const currentY = Math.round(gamePosition.y + viewport.height / 2);
-    utils.moveScene(currentX - targetX, targetY - currentY, 300);
+    utils.moveScene(currentX - targetX, targetY - currentY);
   }, [k, screenRect, gamePosition, viewport]);
 
   if (!k) {

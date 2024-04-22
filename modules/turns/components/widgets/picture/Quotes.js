@@ -1,4 +1,9 @@
 import {
+  MODE_GAME,
+  MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
+  MODE_WIDGET_PICTURE_QUOTE_ADD,
+} from '@/config/panel';
+import {
   quoteRectangleThickness,
   TURN_BORDER_THICKNESS,
   widgetSpacer,
@@ -6,11 +11,6 @@ import {
 import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
-import {
-  MODE_GAME,
-  MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
-  MODE_WIDGET_PICTURE_QUOTE_ADD,
-} from '@/modules/panels/settings';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
 import { useEffect, useMemo } from 'react';

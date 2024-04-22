@@ -1,6 +1,8 @@
+import { GAME_STAGE_INIT } from '@/config/game';
 import * as types from './types';
 
 const initialGameState = {
+  stage: GAME_STAGE_INIT,
   game: null,
   position: { left: 0, top: 0 },
   screenRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
@@ -44,6 +46,12 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
         ...state,
         screenRect: payload,
       };
+
+    case types.GAME_SET_STAGE:
+      return {
+        ...state,
+        stage: payload,
+      }
 
     default:
       return state;

@@ -1,15 +1,13 @@
 import { switchEditMode } from '@/modules/game/game-redux/actions';
-import { GAME_EDIT_MODE_SWITCH } from '@/modules/game/game-redux/types';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 import {
   MODE_GAME,
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
-  PANEL_ADD_EDIT_TURN,
-  PANEL_BUTTONS,
-} from '../settings';
+} from '@/config/panel';
 import * as types from './types';
+import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '../settings';
 
 export const resetAndExit =
   ({ exitEditMode = true } = {}) =>

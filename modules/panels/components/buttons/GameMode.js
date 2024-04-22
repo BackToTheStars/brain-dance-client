@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPanelMode, togglePanel } from '../../redux/actions';
 import {
-  MODE_OPERATION_PASTE,
   PANEL_ADD_EDIT_TURN,
   PANEL_CLASSES,
   PANEL_INFO,
@@ -13,6 +12,7 @@ import {
   PANEL_TURNS_PASTE,
 } from '../../settings';
 import { Buttons } from '../ButtonsPanel';
+import { MODE_OPERATION_PASTE } from '@/config/panel';
 
 const GameMode = () => {
   //

@@ -2,6 +2,7 @@ import { GRID_CELL_X, TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
   loadTurnsAndLinesToPaste,
+  setGameStage,
   switchEditMode,
 } from '@/modules/game/game-redux/actions';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
@@ -22,6 +23,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
+import { GAME_STAGE_INIT, GAME_STAGE_READY } from '@/config/game';
 
 const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
@@ -31,6 +33,7 @@ const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
   const svgLayerZIndex = useSelector((state) => !state.game.editMode);
+  const stage = useSelector((state) => state.game.stage);
   const setSvgLayerZIndex = (booleanValue) => {
     dispatch(switchEditMode(booleanValue));
   };
@@ -40,12 +43,16 @@ const Game = ({ hash }) => {
 
   useEffect(() => {
     if (!useEffectIsDone) {
-      dispatch(loadFullGame(hash));
+      dispatch(loadFullGame(hash))
+        .then(() => {
+          dispatch(setGameStage(GAME_STAGE_READY));
+        })
       dispatch(
         addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
       );
     }
     useEffectIsDone = true;
+    return () => dispatch(setGameStage(GAME_STAGE_INIT));
   }, []); // token
 
   useEffect(() => {
@@ -112,10 +119,14 @@ const Game = ({ hash }) => {
           ref={gameBox}
           onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
         >
-          <Turns />
-          <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
+          {stage === GAME_STAGE_READY && (
+            <>
+              <Turns />
+              <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
+            </>
+          )}
         </div>
-        <Panels />
+        {stage === GAME_STAGE_READY && <Panels />}
       </div>
     </div>
   );

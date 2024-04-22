@@ -28,8 +28,7 @@ import {
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
-import { MODE_GAME, PANEL_TURNS_PASTE } from '@/modules/panels/settings';
-
+import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 import { STATIC_API_URL } from '@/config/server';
 import {
   COMP_ACTIVE,
@@ -48,6 +47,7 @@ import {
   isBorderCoincides,
   isRectInsideArea,
 } from '../components/helpers/sizeHelper';
+import { MODE_GAME } from '@/config/panel';
 
 export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   const state = getState();
@@ -74,27 +74,30 @@ export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
 };
 
 export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
-  const state = getState();
-  const viewport = {
-    position,
-    size: {
-      width: state.ui.viewport.width,
-      height: state.ui.viewport.height,
-    },
-  };
-  return getTurnsGeometryRequest(hash).then((data) => {
-    dispatch({
-      type: types.LOAD_TURNS,
-      payload: {
-        viewport,
-        turns: data.items,
+  return new Promise((resolve, reject) => {
+    const state = getState();
+    const viewport = {
+      position,
+      size: {
+        width: state.ui.viewport.width,
+        height: state.ui.viewport.height,
       },
+    };
+    return getTurnsGeometryRequest(hash).then((data) => {
+      dispatch({
+        type: types.LOAD_TURNS,
+        payload: {
+          viewport,
+          turns: data.items,
+        },
+      });
+      dispatch({
+        type: gameTypes.GAME_SCREEN_RECT_SET,
+        payload: getBoundingScreenRect([...data.items], viewport),
+      });
+      resolve();
     });
-    dispatch({
-      type: gameTypes.GAME_SCREEN_RECT_SET,
-      payload: getBoundingScreenRect([...data.items], viewport),
-    });
-  });
+  })
 };
 
 export const loadTurnsData = (turnIds) => (dispatch) => {
@@ -585,6 +588,8 @@ export const uploadImage = (image) => () => {
 };
 
 export const changeTurnStage = (_id, turnStage, params) => (dispatch) => {
+  // @fixme
+  return;
   dispatch({
     type: types.TURN_SET_STAGE,
     payload: { _id, turnStage, ...params },
@@ -592,6 +597,8 @@ export const changeTurnStage = (_id, turnStage, params) => (dispatch) => {
 };
 
 export const changeParagraphStage = (_id, stage) => (dispatch) => {
+  // @fixme
+  return;
   dispatch({
     type: types.TURN_PARAGRAPH_SET_STAGE,
     payload: { _id, stage },

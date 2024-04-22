@@ -3,7 +3,7 @@ import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
-} from '@/modules/panels/settings';
+} from '@/config/panel';
 import { useEffect, useState, useRef, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';

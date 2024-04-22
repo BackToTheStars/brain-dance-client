@@ -16,7 +16,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
       e.shiftKey ? utils.moveScene(2 * delta, 0) : utils.moveScene(0, delta);
     };
 
-    svgLayer.current.addEventListener('wheel', scrollMove);
+    svgLayer.current.addEventListener('wheel', scrollMove, { passive: false });
     return () => {
       svgLayer?.current?.removeEventListener('wheel', scrollMove);
     };
