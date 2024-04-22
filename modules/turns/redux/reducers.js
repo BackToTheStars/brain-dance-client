@@ -92,7 +92,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         d: {
           ...state.d,
           ...payload.turns.reduce((a, { position, size, loadStatus, ...turn}) => {
-            console.log({ turn })
             a[turn._id] = {
               ...state.d[turn._id],
               loadStatus: 'loaded',

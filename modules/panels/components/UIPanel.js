@@ -25,7 +25,11 @@ const UIPanel = ({
     }
   }
   if (!!height) {
-    style.height = height(d);
+    if (+height == height) {
+      style.height = `${height}px`;
+    } else {
+      style.height = height(d);
+    }
   }
   if (priorityStyle) {
     style = { ...style, ...priorityStyle };

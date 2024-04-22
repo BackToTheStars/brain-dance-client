@@ -42,6 +42,12 @@ import {
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
+import { getBoundingScreenRect } from '@/modules/minimap/components/helpers/screen';
+import {
+  areRectanglesIntersect,
+  isBorderCoincides,
+  isRectInsideArea,
+} from '../components/helpers/sizeHelper';
 
 export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   const state = getState();
@@ -69,19 +75,24 @@ export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
 
 export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
   const state = getState();
+  const viewport = {
+    position,
+    size: {
+      width: state.ui.viewport.width,
+      height: state.ui.viewport.height,
+    },
+  };
   return getTurnsGeometryRequest(hash).then((data) => {
     dispatch({
       type: types.LOAD_TURNS,
       payload: {
-        viewport: {
-          position,
-          size: {
-            width: state.ui.viewport.width,
-            height: state.ui.viewport.height,
-          },
-        },
+        viewport,
         turns: data.items,
       },
+    });
+    dispatch({
+      type: gameTypes.GAME_SCREEN_RECT_SET,
+      payload: getBoundingScreenRect([...data.items], viewport),
     });
   });
 };
@@ -95,9 +106,7 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
     dispatch({
       type: types.TURNS_LOAD_DATA,
       payload: {
-        turns: data.items.map((turn) =>
-          TurnHelper.toNewFields(turn)
-        ),
+        turns: data.items.map((turn) => TurnHelper.toNewFields(turn)),
       },
     });
   });
@@ -257,18 +266,6 @@ export const updateScrollPosition = (data) => (dispatch) =>
   });
 
 export const moveField = (data) => (dispatch, getState) => {
-  // getState сюда придёт сам, через механизм Redux Thunk
-
-  // dispatch(moveField(123))
-
-  // const dispatch = (arg) => {
-  //   if (argIsObj) {
-  //     //
-  //   } else if (callable) {
-  //     arg(dispatch, getState)
-  //   }
-  // }
-
   const state = getState();
   const isSnapToGrid = isSnapToGridSelector(state);
   const gameFieldMoveVector = isSnapToGrid
@@ -277,15 +274,22 @@ export const moveField = (data) => (dispatch, getState) => {
         top: snapRound(data.top, GRID_CELL_X),
       }
     : data;
-  const viewport = {
+  const viewportPrev = {
     position: {
-      x: state.game.position.x + gameFieldMoveVector.left,
-      y: state.game.position.y + gameFieldMoveVector.top,
+      x: state.game.position.x,
+      y: state.game.position.y,
     },
     size: {
       width: state.ui.viewport.width,
       height: state.ui.viewport.height,
     },
+  };
+  const viewport = {
+    ...viewportPrev,
+    position: {
+      x: viewportPrev.position.x + gameFieldMoveVector.left,
+      y: viewportPrev.position.y + gameFieldMoveVector.top,
+    }
   };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
@@ -295,6 +299,32 @@ export const moveField = (data) => (dispatch, getState) => {
     type: types.TURNS_FIELD_WAS_MOVED,
     payload: viewport,
   });
+
+  // проверка, нужно ли менять размеры поля ходов
+  const screenArea = {
+    position: {
+      x: state.game.screenRect.left,
+      y: state.game.screenRect.top,
+    },
+    size: {
+      width: state.game.screenRect.width,
+      height: state.game.screenRect.height,
+    },
+  };
+
+  if (
+    isBorderCoincides(viewportPrev, screenArea) ||
+    isRectInsideArea(viewport, screenArea) !==
+      isRectInsideArea(viewportPrev, screenArea)
+  ) {
+    dispatch({
+      type: gameTypes.GAME_SCREEN_RECT_SET,
+      payload: getBoundingScreenRect([
+        ...Object.values(state.turns.d),
+        viewport,
+      ]),
+    });
+  }
 };
 
 export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {

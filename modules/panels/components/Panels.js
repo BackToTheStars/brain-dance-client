@@ -31,7 +31,7 @@ const PanelAdapter = memo(({ id }) => {
       isMinimized={panel.isMinimized}
       priorityStyle={panel?.priorityStyle}
     >
-      <panel.component settings={panel} />
+      <panel.component settings={panel} id={id} />
     </Wrapper>
   );
 });

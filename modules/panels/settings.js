@@ -117,7 +117,7 @@ export const panels = [
     component: Minimap,
     isDisplayed: true,
     id: (id += 1),
-    width: () => '600px',
+    width: 400, // () => '600px',
     isMinimized: false, // сворачивание в маленькую кнопку
     size: 100,
     fieldsToSave: ['position', 'isDisplayed', 'isMinimized', 'size'],

@@ -1,5 +1,29 @@
 import { PRELOAD_VIEWPORTS_COUNT } from '@/config/ui';
 
+export const isBorderCoincides = (rect, area) => {
+  const { position: position1, size: size1 } = rect;
+  const { position: position2, size: size2 } = area;
+
+  return (
+    position1.x === position2.x ||
+    position1.x + size1.width === position2.x + size2.width ||
+    position1.y === position2.y ||
+    position1.y + size1.height === position2.y + size2.height
+  )
+}
+
+export const isRectInsideArea = (rect, area) => {
+  const { position: position1, size: size1 } = rect;
+  const { position: position2, size: size2 } = area;
+
+  return (
+    position1.x >= position2.x &&
+    position1.x + size1.width <= position2.x + size2.width &&
+    position1.y >= position2.y &&
+    position1.y + size1.height <= position2.y + size2.height
+  );
+}
+
 export const areRectanglesIntersect = (rect1, rect2) => {
   const { position: position1, size: size1 } = rect1;
   const { position: position2, size: size2 } = rect2;

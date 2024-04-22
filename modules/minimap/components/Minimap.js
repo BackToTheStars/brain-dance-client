@@ -1,372 +1,299 @@
-import { utils } from '@/modules/game/components/helpers/game';
-import { changePanelGeometry } from '@/modules/panels/redux/actions';
-import { PANEL_CHANGE_GEOMETRY } from '@/modules/panels/redux/types';
-import { PANEL_MINIMAP } from '@/modules/panels/settings';
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getScreenRect } from './helpers/screen';
-import Line from './line/Line';
 import MinimapButtons from './MinimapButtons';
-import { isTurnInsideRenderArea } from '@/modules/turns/components/helpers/sizeHelper';
+import { PANEL_MINIMAP } from '@/modules/panels/settings';
+import { memo, useCallback, useEffect, useMemo } from 'react';
+import { changePanelGeometry } from '@/modules/panels/redux/actions';
+import { areRectanglesIntersect } from '@/modules/turns/components/helpers/sizeHelper';
+import { utils } from '@/modules/game/components/helpers/game';
 
-const Minimap = ({ settings }) => {
-  return null
+const BUTTONS_SIZE = 38;
+const STANDARD_SQUARE = 60000;
+const INNER_PADDING = 12;
+
+const Minimap = () => {
+  const id = PANEL_MINIMAP;
   const dispatch = useDispatch();
+  const isDisplayed = useSelector((state) => state.panels.d[id].isDisplayed);
+  const isMinimized = useSelector((state) => state.panels.d[id].isMinimized);
+  const size = useSelector((state) => state.panels.d[id].size);
+  const screenRect = useSelector((state) => state.game.screenRect);
 
-  const minimapSizePercents =
-    useSelector((state) => state.panels.d[PANEL_MINIMAP].size) || 100;
-
-  const { isMinimized } = settings;
-  const gamePosition = useSelector(s => s.game.position);
-  // const uiViewport = useSelector(s => s.ui.viewport);
-  // const gameInfo = useSelector(s => ({
-  //   vx: s.game.game.viewportPointX,
-  //   vy: s.game.game.viewportPointY,
-  //   x: s.game.game.x,
-  //   y: s.game.game.y,
-  // }))
-
-  const maxMinimapSizeWidthPlusHeight = Math.round(
-    (500 * minimapSizePercents) / 100
-  );
-
-  const turnsDictionary = useSelector((state) => state.turns.d);
-  const turns = Object.values(turnsDictionary);
-
-  const position = useSelector((state) => state.game.position);
-
-  const setMinimapSizePercents = (size) => {
-    dispatch({
-      type: PANEL_CHANGE_GEOMETRY,
-      payload: { geometryData: { size }, type: PANEL_MINIMAP },
-    });
-  };
-
-  const lines = [];
-  const uiLines = [];
-
-  const { left, right, top, bottom, zeroX, zeroY } = getScreenRect(turns);
-  const isHidden = false; // @todo: remove
-
-  const widthPx = Math.round(right - left) || 600; // ширина всего поля
-  const heightPx = Math.round(bottom - top) || 400; // высота всего поля
-
-  const minimapWidth = isMinimized
-    ? 38
-    : (maxMinimapSizeWidthPlusHeight * widthPx) / (widthPx + heightPx);
-
-  const viewportHeight = window ? window.innerHeight : 1600;
-  const viewportWidth = window ? window.innerWidth : 1200;
-
-  const widthK = 0.3; // коэффициент ширины вокруг мини-карты
-
-  const freeSpaceTopBottom = Math.floor(viewportHeight * widthK);
-  const freeSpaceLeftRight = Math.floor(viewportWidth * widthK);
-
-  const mapPxToFieldPx = (widthPx + freeSpaceLeftRight * 2) / minimapWidth;
-
-  const viewport = {
-    // смещение viewport - это координата левого верхнего шага
-    position: {
-      x: -left + freeSpaceLeftRight - zeroX,
-      y: -top + freeSpaceTopBottom - zeroY,
-    },
-    size: {
-      width: viewportWidth,
-      height: viewportHeight,
-    },
-  };
-
-  const preparedTurns = turns
-    .map((turn) => ({
-      ...turn,
-      // для получения координаты шага на карте достаточно
-      // сместить его координаты на координаты viewport
-      position: {
-        x: turn.position.x - left + freeSpaceLeftRight - zeroX,
-        y: turn.position.y - top + freeSpaceTopBottom - zeroY,
-      },
-    }))
-    .map((turn) => {
-      const isTurnInsideViewport = isTurnInsideRenderArea(turn, viewport);
-      return {
-        ...turn,
-        isTurnInsideViewport,
-      };
-    });
-
-  const value = {
-    position,
-    minimapWidth,
-    width: widthPx + 2 * freeSpaceLeftRight, // ширина field
-    height: heightPx + 2 * freeSpaceTopBottom, // высота field
-    viewport,
-    onMapClick: (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      // координаты клика внутри карты * коэффициент проекции
-      const targetXMap = Math.floor((e.clientX - rect.left) * mapPxToFieldPx);
-      // - freeSpaceLeftRight;
-      const targetYMap = Math.floor((e.clientY - rect.top) * mapPxToFieldPx);
-      // - freeSpaceTopBottom;
-      //   const gf = window[Symbol.for('MyGame')].gameField;
-
-      const left =
-        viewport.position.x -
-        targetXMap +
-        Math.floor(viewport.size.width / 2) +
-        zeroX;
-      const top =
-        viewport.position.y -
-        targetYMap +
-        Math.floor(viewport.size.height / 2) +
-        zeroY;
-
-      utils.moveScene(left, -top, 0);
-    },
-    turns: preparedTurns.filter((turn) => turn.contentType !== 'zero-point'),
-    zeroPoint: preparedTurns.find((turn) => turn.contentType === 'zero-point'),
-    gamePosition,
-  };
-
-  const turnsToRender = value.turns
-    .filter((turn) => turn.isTurnInsideViewport)
-    .map((turn) => turn._id); // отфильтровали какие ходы рендерить на экране
+  const setMinimapSizePercents = useCallback((size) => {
+    dispatch(changePanelGeometry(id, { size }));
+  }, []);
 
   useEffect(() => {
-    if (!value.minimapWidth) return;
-    if (!turnsToRender.length) return;
-    dispatch(changePanelGeometry(PANEL_MINIMAP, { width: value.minimapWidth }));
-  }, [value.minimapWidth]);
+    if (isMinimized) {
+      dispatch(
+        changePanelGeometry(PANEL_MINIMAP, {
+          width: BUTTONS_SIZE,
+          height: BUTTONS_SIZE,
+        })
+      );
+    }
+  }, [isMinimized]);
 
   useEffect(() => {
-    if (turns.length && uiLines.length) {
-      setLines(uiLines);
+    if (isMinimized) {
+      return;
     }
-  }, [uiLines, turns]);
-
-  value.lines = getLinesByTurns(value.turns, lines);
-  value.isMinimized = isMinimized;
-
-  return (
-    <>
-      {!isMinimized && <SVGMiniMap {...value} turnsToRender={turnsToRender} />}
-      <MinimapButtons
-        {...{ minimapSizePercents, setMinimapSizePercents, isMinimized }}
-      />
-    </>
-  );
-};
-
-const getLinesByTurns = (turns, lines) => {
-  // turns {_id, x, y, width, height}
-  // lines {sourceTurnId, targetTurnId}
-  const turnCentersDictionary = {};
-  for (let turn of turns) {
-    turnCentersDictionary[turn._id] = {
-      x: Math.floor(turn.position.x + turn.size.width / 2),
-      y: Math.floor(turn.position.y + turn.size.height / 2),
-    };
-  }
-
-  const resLines = [];
-  for (let line of lines) {
-    if (line.sourceTurnId === line.targetTurnId) {
-      continue;
-    }
-    if (!turnCentersDictionary[line.sourceTurnId]) {
-      console.log(`Нет исходного шага у линии ${line._id}`);
-      continue;
-    }
-    if (!turnCentersDictionary[line.targetTurnId]) {
-      console.log(`Нет целевого шага у линии ${line._id}`);
-      continue;
-    }
-
-    resLines.push({
-      id: line._id,
-      x1: turnCentersDictionary[line.sourceTurnId].position.x,
-      y1: turnCentersDictionary[line.sourceTurnId].position.y,
-      x2: turnCentersDictionary[line.targetTurnId].position.x,
-      y2: turnCentersDictionary[line.targetTurnId].position.y,
-    });
-  }
-  return resLines;
-};
-
-const SVGMiniMap = ({
-  position,
-  minimapWidth,
-  width,
-  height,
-  viewport,
-  turns,
-  zeroPoint,
-  lines,
-  onMapClick,
-  isMinimized,
-  turnsToRender,
-  gamePosition,
-}) => {
-  const dispatch = useDispatch();
-  const k = width / minimapWidth;
-  // 75 -> 1.5 (x1, y1)
-  // 6 -> 4 (x2, y2)
-  const tg = (1.5 - 4) / (75 - 6);
-  const c = 1.5 - 75 * tg;
-  const y = c + tg * k;
-  const lineWidth = Math.floor(y * k);
-
-  const viewportRectangleThickness = 3; // толщина линии белого прямоугольника
-  const viewportLineWidthCorrection = Math.round(
-    (k * viewportRectangleThickness) / 2
-  );
-  const turnRadius = 2;
-  const turnRadiusFactored = Math.round(k * turnRadius);
-
-  // for (let turn of turns) {
-  //   if (turn.height < 50) console.log({ id: turn._id, h: turn.height });
-  // }
-
-  const minimapHeight = isMinimized
-    ? '0'
-    : Math.round((minimapWidth * height) / width);
-
-  useEffect(() => {
-    if (!turns.length) return;
+    const minimapSquare = Math.round((STANDARD_SQUARE * size) / 100);
+    const minimapK =
+      Math.round((screenRect.width * 100) / screenRect.height) / 100;
+    const minimapH = Math.round(Math.sqrt(minimapSquare / minimapK));
+    const minimapW = Math.round(minimapH * minimapK);
     dispatch(
-      changePanelGeometry(PANEL_MINIMAP, { calculatedHeight: minimapHeight })
+      changePanelGeometry(PANEL_MINIMAP, {
+        width: minimapW + INNER_PADDING * 2,
+        height: minimapH + INNER_PADDING * 2 + BUTTONS_SIZE,
+      })
     );
-  }, [minimapHeight]);
+  }, [isMinimized, screenRect, size, STANDARD_SQUARE]);
 
+  if (!isDisplayed) {
+    return null;
+  }
   return (
-    <>
-      <svg
-        viewBox={`${position.left} ${position.top} ${width} ${height}`}
-        xmlns="http://www.w3.org/2000/svg"
-        style={{
-          width: `${isMinimized ? '0' : minimapWidth}px`,
-          height: `${minimapHeight}px`,
-        }}
-        onClick={(e) => onMapClick(e)}
-      >
-        {!!zeroPoint && (
-          <rect
-            // key={zeroPoint._id}
-            // x={zeroPoint.position.x - 20}
-            // y={zeroPoint.position.y - 20}
-            key={'zero'}
-            // x={0}
-            // x={-gamePosition.left}
-            // y={-gamePosition.top}
-            // y={-gamePosition.y}
-            x={-gamePosition.left}
-            y={-gamePosition.top}
-            width={40}
-            fill={'red'}
-            height={40}
-          />
-        )}
-        <g
-          filter="url(#blurMe)"
-          x={position.left}
-          y={position.top}
-          width={width}
-          height={height}
-        >
-          {turns.map((turn, i) => {
-            // viewport x y width height
-            // turn x y width height
-
-            // const fill = turn.isTurnInsideViewport
-            //   ? 'blue'
-            //   : 'rgba(212, 213, 214, 1)';
-            const fill = turnsToRender.includes(turn._id)
-              ? 'blue'
-              : 'rgba(212, 213, 214, 1)';
-
-            return (
-              <rect
-                key={turn._id}
-                x={turn.position.x}
-                y={turn.position.y}
-                width={turn.size.width}
-                height={turn.size.height}
-                rx={turnRadiusFactored}
-                fill={fill}
-                // fill="gray"
-              />
-            );
-          })}
-        </g>
-        {lines.map(({ x1, y1, x2, y2, id }) => {
-          return (
-            <Line
-              sourceCoords={{ left: x1, top: y1, height: 0, width: 0 }}
-              targetCoords={{ left: x2, top: y2, height: 0, width: 0 }}
-              key={id}
-              stroke="red"
-              strokeWidth={lineWidth}
-            />
-          );
-        })}
-
-        <rect
-          className="map-focus"
-          rx={turnRadiusFactored}
-          // ry={60}
-          stroke="#FFFFFF"
-          strokeWidth={Math.round(k * viewportRectangleThickness)}
-          x={viewport.position.x - viewportLineWidthCorrection}
-          y={viewport.position.y - viewportLineWidthCorrection}
-          width={viewport.size.width + 2 * viewportLineWidthCorrection}
-          height={viewport.size.height + 2 * viewportLineWidthCorrection}
-          // fill="rgba(0, 247, 255, 0.5)"
-          fill="transparent"
-        />
-
-        {turns
-          .filter((turn) => turn.isTurnInsideViewport)
-          .map((turn) => {
-            // viewport x y width height
-            // turn x y width height
-
-            const fill = turn.isTurnInsideViewport
-              ? 'blue'
-              : 'rgba(212, 213, 214, 1)';
-
-            return (
-              <rect
-                key={`viewport_${turn._id}`}
-                x={turn.position.x}
-                y={turn.position.y}
-                width={turn.size.width}
-                height={turn.size.height}
-                rx={turnRadiusFactored}
-                // fill={fill}
-                fill="#489BC1"
-                clipPath="url(#viewPort)"
-              />
-            );
-          })}
-        <filter id="blurMe">
-          <feGaussianBlur
-            in="SourceGraphic"
-            stdDeviation={Math.round((width * 3) / 1000)}
-          />
-        </filter>
-
-        <defs>
-          <clipPath id="viewPort">
-            <rect
-              x={viewport.position.x}
-              y={viewport.position.y}
-              width={viewport.size.width}
-              height={viewport.size.height}
-            />
-          </clipPath>
-        </defs>
-      </svg>
-    </>
+    <div className="flex flex-col h-full">
+      <div className="flex-1">
+        {isMinimized ? null : <MinimapDataAdapter />}
+      </div>
+      <MinimapButtons
+        isMinimized={isMinimized}
+        minimapSizePercents={size}
+        setMinimapSizePercents={setMinimapSizePercents}
+      />
+    </div>
   );
 };
+
+const MinimapDataAdapter = () => {
+  const width = useSelector((state) => state.panels.d[PANEL_MINIMAP].width);
+  const screenRect = useSelector((state) => state.game.screenRect);
+  const { mWidth, mHeight } = useMemo(() => {
+    const minimapK =
+      Math.round((screenRect.width * 100) / screenRect.height) / 100;
+    const mWidth = width - 2 * INNER_PADDING;
+    const mHeight = Math.round(mWidth / minimapK);
+    console.log({
+      minimapK,
+      koeff: screenRect.width / mWidth,
+      width,
+      screenRect,
+    });
+    return {
+      mWidth,
+      mHeight,
+    };
+  }, [width, screenRect]);
+
+  const { minimapStyles, wrapperStyles } = useMemo(() => {
+    return {
+      wrapperStyles: {
+        height: `${mHeight + 2 * INNER_PADDING}px`,
+      },
+      minimapStyles: {
+        width: `${mWidth}px`,
+        height: `${mHeight}px`,
+      },
+    };
+  }, [mWidth, mHeight]);
+
+  return (
+    <div className="flex items-center justify-center" style={wrapperStyles}>
+      <div style={minimapStyles}>
+        <SVGMiniMap width={mWidth} height={mHeight} />
+      </div>
+    </div>
+  );
+};
+
+const SVGMiniMap = memo(({ width, height }) => {
+  const screenRect = useSelector((state) => state.game.screenRect);
+  const d = useSelector((state) => state.turns.d);
+  const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.ui.viewport);
+
+  const gTurns = useMemo(() => {
+    const gTurns = Object.values(d)
+      .filter((turn) => {
+        return turn.contentType !== 'zero-point';
+      })
+      .map((turn) => {
+        return {
+          _id: turn._id,
+          position: turn.position,
+          size: turn.size,
+        };
+      });
+    return gTurns;
+  }, [d]); // @todo: use turns geometry
+
+  const k = useMemo(() => {
+    return Math.round((screenRect.width * 1000) / width) / 1000;
+  }, [width, screenRect]);
+
+  const { sScreenRect, viewBox } = useMemo(() => {
+    const sScreenRect = {
+      left: Math.round(screenRect.left / k),
+      top: Math.round(screenRect.top / k),
+      right: Math.round(screenRect.right / k),
+      bottom: Math.round(screenRect.bottom / k),
+      width: Math.round(screenRect.width / k),
+      height: Math.round(screenRect.height / k),
+    };
+    return {
+      sScreenRect,
+      viewBox: `${sScreenRect.left} ${sScreenRect.top} ${sScreenRect.width} ${sScreenRect.height}`,
+    };
+  }, [k, screenRect]);
+
+  const onMapClick = useCallback((e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const targetX = Math.round((e.clientX - rect.left) * k) + screenRect.left;
+    const targetY = Math.round((e.clientY - rect.top) * k) + screenRect.top;
+    const currentX = Math.round(gamePosition.x + viewport.width / 2);
+    const currentY = Math.round(gamePosition.y + viewport.height / 2);
+    utils.moveScene(currentX - targetX, targetY - currentY, 300);
+  }, [k, screenRect, gamePosition, viewport]);
+
+  if (!k) {
+    return null;
+  }
+
+  return (
+    <svg
+      viewBox={viewBox}
+      xmlns="http://www.w3.org/2000/svg"
+      onClick={(e) => onMapClick(e)}
+    >
+      <g
+        filter="url(#blurMe)"
+        x={sScreenRect.left}
+        y={sScreenRect.top}
+        width={sScreenRect.width}
+        height={sScreenRect.height}
+      >
+        {gTurns.map((turn) => {
+          return <TurnRect key={turn._id} id={turn._id} k={k} />;
+        })}
+      </g>
+      <ViewportRect k={k} />
+      <filter id="blurMe">
+        <feGaussianBlur
+          in="SourceGraphic"
+          stdDeviation={Math.round((sScreenRect.width * 3) / 1000)}
+        />
+      </filter>
+    </svg>
+  );
+});
+
+const ViewportRect = memo(({ k }) => {
+  const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.ui.viewport);
+  const d = useSelector((state) => state.turns.d);
+  const gTurns = useMemo(() => {
+    const gTurns = Object.values(d)
+      .filter((turn) => {
+        return turn.contentType !== 'zero-point';
+      })
+      .map((turn) => {
+        return {
+          _id: turn._id,
+          position: turn.position,
+          size: turn.size,
+        };
+      });
+    return gTurns;
+  }, [d]); // @todo: use turns geometry
+  const gTurnsInsideViewport = useMemo(() => {
+    return gTurns.filter((turn) => {
+      return areRectanglesIntersect(turn, {
+        position: gamePosition,
+        size: viewport,
+      });
+    });
+  }, [gTurns, gamePosition, viewport]);
+
+  const sViewport = useMemo(() => {
+    return {
+      width: Math.round(viewport.width / k),
+      height: Math.round(viewport.height / k),
+    };
+  }, [k, viewport]);
+  const sGamePosition = useMemo(() => {
+    return {
+      x: Math.round(gamePosition.x / k),
+      y: Math.round(gamePosition.y / k),
+    };
+  }, [k, gamePosition]);
+  return (
+    <>
+      <rect
+        key="map-focus"
+        x={sGamePosition.x}
+        y={sGamePosition.y}
+        width={sViewport.width}
+        height={sViewport.height}
+        className="map-focus"
+        stroke="#FFFFFF"
+        strokeWidth="3"
+        fill="transparent"
+      />
+      {gTurnsInsideViewport.map((turn) => {
+        return (
+          <TurnRect
+            key={turn._id}
+            id={turn._id}
+            k={k}
+            fill="#489BC1"
+            clipPath="url(#viewPort)"
+          />
+        );
+      })}
+      <defs>
+        <clipPath id="viewPort">
+          <rect
+            x={sGamePosition.x}
+            y={sGamePosition.y}
+            width={sViewport.width}
+            height={sViewport.height}
+          />
+        </clipPath>
+      </defs>
+    </>
+  );
+});
+
+const TurnRect = memo(({ id, k, clipPath, fill = 'blue' }) => {
+  const position = useSelector((state) => state.turns.d[id].position);
+  const size = useSelector((state) => state.turns.d[id].size);
+  const sPosition = useMemo(() => {
+    return {
+      x: Math.round(position.x / k),
+      y: Math.round(position.y / k),
+    };
+  }, [position, k]);
+
+  const sSize = useMemo(() => {
+    return {
+      width: Math.round(size.width / k),
+      height: Math.round(size.height / k),
+    };
+  }, [size, k]);
+
+  return (
+    <rect
+      x={sPosition.x}
+      y={sPosition.y}
+      width={sSize.width}
+      height={sSize.height}
+      className="minimap-turn"
+      fill={fill}
+      clipPath={clipPath}
+    />
+  );
+});
+
 export default Minimap;
