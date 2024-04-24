@@ -48,7 +48,7 @@ const ParagraphOriginal = ({
   );
   const colors = useSelector((state) => state.turns.d[turnId].data.colors);
   const contentType = useSelector((state) => state.turns.d[turnId].data.contentType);
-  const size = useSelector((state) => state.turns.d[turnId].size);
+  const size = useSelector((state) => state.turns.g[turnId].size);
 
   const { width, height } = size;
   const wasReady = true; // @todo убрать

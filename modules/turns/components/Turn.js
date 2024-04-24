@@ -55,12 +55,12 @@ const TurnAdapter = ({ id }) => {
   const [isDragging, setIsDragging] = useState(false);
   const dispatch = useDispatch();
   const wrapper = useRef(null);
-  const position = useSelector((state) => state.turns.d[id].position);
-  const size = useSelector((state) => state.turns.d[id].size);
+  const position = useSelector((state) => state.turns.g[id].position);
+  const size = useSelector((state) => state.turns.g[id].size);
   const loadStatus = useSelector(
     (state) => state.turns.d[id]?.loadStatus || 'not-loaded'
   );
-  const contentType = useSelector((state) => state.turns.d[id].contentType);
+  const contentType = useSelector((state) => state.turns.g[id].contentType);
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       position: 'absolute',
@@ -142,7 +142,7 @@ const TurnAdapter = ({ id }) => {
 
 const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id].data);
-  const size = useSelector((state) => state.turns.d[id].size);
+  const size = useSelector((state) => state.turns.g[id].size);
   const isSnapToGrid = useSelector(isSnapToGridSelector);
   const dispatch = useDispatch();
 

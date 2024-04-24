@@ -29,13 +29,13 @@ const getCoordsByTurnPositionAndMarkerQuote = ( turnPosition, markerQuote ) => {
 const LogicLine = ({ line }) => {
   const { _id, sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
   const sourceTurnPosition = useSelector(
-    (state) => state.turns.d[sourceTurnId]?.position
+    (state) => state.turns.g[sourceTurnId]?.position
   );
   const targetTurnPosition = useSelector(
-    (state) => state.turns.d[targetTurnId]?.position
+    (state) => state.turns.g[targetTurnId]?.position
   );
   const gamePosition = useSelector((state) => state.game.position);
-  const viewport = useSelector((state) => state.ui.viewport);
+  const viewport = useSelector((state) => state.game.viewport);
   // const quotesInfo = useSelector((state) => state.lines.quotesInfo);
   // // const d = useSelector((state) => state.turns.d);
   // // const sourceMarkerQuote = quotesInfo[`${sourceTurnId}_${sourceMarker}`];

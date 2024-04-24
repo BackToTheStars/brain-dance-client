@@ -7,11 +7,6 @@
 import { widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import {
-  increment,
-  startLoggingTime,
-  stopLoggingTime,
-} from '@/modules/telemetry/utils/logger';
-import {
   changeParagraphStage,
   resetCompressedParagraphState,
 } from '@/modules/turns/redux/actions';
@@ -42,7 +37,7 @@ const Compressor = ({
   registerHandleResizeWithParams,
 }) => {
   const turn = useSelector((state) => state.turns.d[turnId].data);
-  const width = useSelector((state) => state.turns.d[turnId].size.width);
+  const width = useSelector((state) => state.turns.g[turnId].size.width);
   const dispatch = useDispatch();
   const {
     paragraph: originalParagraph,
@@ -87,7 +82,6 @@ const Compressor = ({
 
   useEffect(() => {
     dispatch(changeParagraphStage(turnId, COMP_LOADING));
-    increment('CompressorInit');
   }, []);
 
   useEffect(() => {
@@ -305,20 +299,6 @@ const Compressor = ({
   useEffect(() => {
         if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
   }, [wrapperRef]);
-
-  useEffect(() => {
-        if (stage === COMP_READY) {
-      stopLoggingTime('paragraphStageReady' + turnId);
-    } else if (stage === COMP_READY_TO_RECEIVE_PARAMS) {
-      startLoggingTime('paragraphStageReady' + turnId);
-      stopLoggingTime('paragraphStageReceivePRMS' + turnId);
-    } else if (stage === COMP_LOADING) {
-      startLoggingTime('paragraphStageReceivePRMS' + turnId);
-      stopLoggingTime('paragraphStageOther' + turnId);
-    } else {
-      startLoggingTime('paragraphStageOther' + turnId);
-    }
-  }, [stage]);
 
   const textsAroundQuotes = useMemo(() => {
     if (!widget) return [];

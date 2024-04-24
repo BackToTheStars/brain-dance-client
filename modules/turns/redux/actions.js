@@ -41,9 +41,8 @@ import {
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
-import { getBoundingScreenRect } from '@/modules/minimap/components/helpers/screen';
+import { getBoundingAreaRect } from '@/modules/minimap/components/helpers/screen';
 import {
-  areRectanglesIntersect,
   isBorderCoincides,
   isRectInsideArea,
 } from '../components/helpers/sizeHelper';
@@ -79,13 +78,13 @@ export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
     const viewport = {
       position,
       size: {
-        width: state.ui.viewport.width,
-        height: state.ui.viewport.height,
+        width: state.game.viewport.width,
+        height: state.game.viewport.height,
       },
     };
     return getTurnsGeometryRequest(hash).then((data) => {
       dispatch({
-        type: types.LOAD_TURNS,
+        type: types.TURNS_LOAD_GEOMETRY,
         payload: {
           viewport,
           turns: data.items,
@@ -93,7 +92,7 @@ export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
       });
       dispatch({
         type: gameTypes.GAME_SCREEN_RECT_SET,
-        payload: getBoundingScreenRect([...data.items], viewport),
+        payload: getBoundingAreaRect([...data.items], viewport),
       });
       resolve();
     });
@@ -137,8 +136,8 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
             y: 0,
           },
           size: {
-            width: state.ui.viewport.width,
-            height: state.ui.viewport.height,
+            width: state.game.viewport.width,
+            height: state.game.viewport.height,
           },
         },
         turns: data.items.map((turn) => {
@@ -167,20 +166,6 @@ export const loadTurns = (hash, viewport) => (dispatch, getState) => {
       type: quotesTypes.QUOTES_SET_DICTIONARY,
       payload: quotesD,
     });
-
-    // const viewportNew = {
-    //   // временный только для первой загрузки
-    //   // x: state.game.position.left,
-    //   x: -viewport.x,
-    //   // y: state.game.position.top,
-    //   y: -viewport.y,
-    //   width: state.ui.viewport.width,
-    //   height: state.ui.viewport.height,
-    // };
-    // dispatch({
-    //   type: types.TURNS_FIELD_WAS_MOVED,
-    //   payload: { left: 0, top: 0, viewport: viewportNew },
-    // });
   });
 };
 
@@ -283,8 +268,8 @@ export const moveField = (data) => (dispatch, getState) => {
       y: state.game.position.y,
     },
     size: {
-      width: state.ui.viewport.width,
-      height: state.ui.viewport.height,
+      width: state.game.viewport.width,
+      height: state.game.viewport.height,
     },
   };
   const viewport = {
@@ -306,12 +291,12 @@ export const moveField = (data) => (dispatch, getState) => {
   // проверка, нужно ли менять размеры поля ходов
   const screenArea = {
     position: {
-      x: state.game.screenRect.left,
-      y: state.game.screenRect.top,
+      x: state.game.areaRect.left,
+      y: state.game.areaRect.top,
     },
     size: {
-      width: state.game.screenRect.width,
-      height: state.game.screenRect.height,
+      width: state.game.areaRect.width,
+      height: state.game.areaRect.height,
     },
   };
 
@@ -322,24 +307,19 @@ export const moveField = (data) => (dispatch, getState) => {
   ) {
     dispatch({
       type: gameTypes.GAME_SCREEN_RECT_SET,
-      payload: getBoundingScreenRect([
-        ...Object.values(state.turns.d),
+      payload: getBoundingAreaRect([
+        ...Object.values(state.turns.g),
         viewport,
       ]),
     });
   }
 };
 
-export const createTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
+export const createTurn = (turn, callbacks) => (dispatch) => {
   createTurnRequest(turn).then((data) => {
-    const preparedTurn = {
-      ...data.item,
-      x: turn.x + zeroPoint.position.x,
-      y: turn.y + zeroPoint.position.y,
-    };
     dispatch({
       type: types.TURN_CREATE,
-      payload: TurnHelper.toNewFields(preparedTurn),
+      payload: TurnHelper.toNewFields(data.item),
     });
     callbacks?.success(TurnHelper.toNewFields(data.item));
   });
@@ -382,11 +362,19 @@ export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
   });
 };
 
-export const cloneTurn = (newFormatTurn) => (dispatch, getState) => {
+export const cloneTurn = (_id) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     try {
-      const turn = TurnHelper.toOldFields(newFormatTurn);
       const state = getState();
+      const turnData = state.turns.d[_id].data;
+      const turnGeometry = state.turns.g[_id];
+      // @fixme
+      const newFormatTurn = {
+        ...turnData,
+        position: turnGeometry.position,
+        size: turnGeometry.size,
+      }
+      const turn = TurnHelper.toOldFields(newFormatTurn);
       const lines = state.lines.lines;
       const copiedTurn = dataCopy(turn);
       // @todo: проверить, откуда появляется _id в quotes
@@ -453,17 +441,17 @@ export const insertTurnFromBuffer =
     const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
     const position = state.game.position;
-    const viewport = state.ui.viewport;
+    const viewport = state.game.viewport;
     copiedTurn.position = {};
     if (!!pasteNextTurnPosition) {
       copiedTurn.position.x = pasteNextTurnPosition.x;
       copiedTurn.position.y = pasteNextTurnPosition.y;
     } else {
       copiedTurn.position.x =
-        position.left +
+        position.x +
         Math.floor((viewport.width - copiedTurn.size.width) / 2);
       copiedTurn.position.y =
-        position.top +
+        position.y +
         Math.floor((viewport.height - copiedTurn.size.height) / 2);
     }
 
@@ -480,10 +468,9 @@ export const insertTurnFromBuffer =
       dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
       dispatch(setPanelMode({ mode: MODE_GAME }));
     }
-
     // // @todo: get lines, connected with copied turn and display them
     dispatch(
-      createTurn(TurnHelper.toOldFields(copiedTurn), zeroPoint, {
+      createTurn(TurnHelper.toOldFields(copiedTurn), {
         success: (turn) => {
           console.log({ turn });
           dispatch({

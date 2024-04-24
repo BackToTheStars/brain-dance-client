@@ -16,7 +16,7 @@ const Minimap = () => {
   const isDisplayed = useSelector((state) => state.panels.d[id].isDisplayed);
   const isMinimized = useSelector((state) => state.panels.d[id].isMinimized);
   const size = useSelector((state) => state.panels.d[id].size);
-  const screenRect = useSelector((state) => state.game.screenRect);
+  const areaRect = useSelector((state) => state.game.areaRect);
 
   const setMinimapSizePercents = useCallback((size) => {
     dispatch(changePanelGeometry(id, { size }));
@@ -39,7 +39,7 @@ const Minimap = () => {
     }
     const minimapSquare = Math.round((STANDARD_SQUARE * size) / 100);
     const minimapK =
-      Math.round((screenRect.width * 100) / screenRect.height) / 100;
+      Math.round((areaRect.width * 100) / areaRect.height) / 100;
     const minimapH = Math.round(Math.sqrt(minimapSquare / minimapK));
     const minimapW = Math.round(minimapH * minimapK);
     dispatch(
@@ -48,7 +48,7 @@ const Minimap = () => {
         height: minimapH + INNER_PADDING * 2 + BUTTONS_SIZE,
       })
     );
-  }, [isMinimized, screenRect, size, STANDARD_SQUARE]);
+  }, [isMinimized, areaRect, size, STANDARD_SQUARE]);
 
   if (!isDisplayed) {
     return null;
@@ -69,17 +69,17 @@ const Minimap = () => {
 
 const MinimapDataAdapter = () => {
   const width = useSelector((state) => state.panels.d[PANEL_MINIMAP].width);
-  const screenRect = useSelector((state) => state.game.screenRect);
+  const areaRect = useSelector((state) => state.game.areaRect);
   const { mWidth, mHeight } = useMemo(() => {
     const minimapK =
-      Math.round((screenRect.width * 100) / screenRect.height) / 100;
+      Math.round((areaRect.width * 100) / areaRect.height) / 100;
     const mWidth = width - 2 * INNER_PADDING;
     const mHeight = Math.round(mWidth / minimapK);
     return {
       mWidth,
       mHeight,
     };
-  }, [width, screenRect]);
+  }, [width, areaRect]);
 
   const { minimapStyles, wrapperStyles } = useMemo(() => {
     return {
@@ -103,13 +103,13 @@ const MinimapDataAdapter = () => {
 };
 
 const SVGMiniMap = memo(({ width, height }) => {
-  const screenRect = useSelector((state) => state.game.screenRect);
-  const d = useSelector((state) => state.turns.d);
+  const areaRect = useSelector((state) => state.game.areaRect);
+  const g = useSelector((state) => state.turns.g);
   const gamePosition = useSelector((state) => state.game.position);
-  const viewport = useSelector((state) => state.ui.viewport);
+  const viewport = useSelector((state) => state.game.viewport);
 
   const gTurns = useMemo(() => {
-    const gTurns = Object.values(d)
+    const gTurns = Object.values(g)
       .filter((turn) => {
         return turn.contentType !== 'zero-point';
       })
@@ -121,35 +121,35 @@ const SVGMiniMap = memo(({ width, height }) => {
         };
       });
     return gTurns;
-  }, [d]); // @todo: use turns geometry
+  }, [g]);
 
   const k = useMemo(() => {
-    return Math.round((screenRect.width * 1000) / width) / 1000;
-  }, [width, screenRect]);
+    return Math.round((areaRect.width * 1000) / width) / 1000;
+  }, [width, areaRect]);
 
-  const { sScreenRect, viewBox } = useMemo(() => {
-    const sScreenRect = {
-      left: Math.round(screenRect.left / k),
-      top: Math.round(screenRect.top / k),
-      right: Math.round(screenRect.right / k),
-      bottom: Math.round(screenRect.bottom / k),
-      width: Math.round(screenRect.width / k),
-      height: Math.round(screenRect.height / k),
+  const { sAreaRect, viewBox } = useMemo(() => {
+    const sAreaRect = {
+      left: Math.round(areaRect.left / k),
+      top: Math.round(areaRect.top / k),
+      right: Math.round(areaRect.right / k),
+      bottom: Math.round(areaRect.bottom / k),
+      width: Math.round(areaRect.width / k),
+      height: Math.round(areaRect.height / k),
     };
     return {
-      sScreenRect,
-      viewBox: `${sScreenRect.left} ${sScreenRect.top} ${sScreenRect.width} ${sScreenRect.height}`,
+      sAreaRect,
+      viewBox: `${sAreaRect.left} ${sAreaRect.top} ${sAreaRect.width} ${sAreaRect.height}`,
     };
-  }, [k, screenRect]);
+  }, [k, areaRect]);
 
   const onMapClick = useCallback((e) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const targetX = Math.round((e.clientX - rect.left) * k) + screenRect.left;
-    const targetY = Math.round((e.clientY - rect.top) * k) + screenRect.top;
+    const targetX = Math.round((e.clientX - rect.left) * k) + areaRect.left;
+    const targetY = Math.round((e.clientY - rect.top) * k) + areaRect.top;
     const currentX = Math.round(gamePosition.x + viewport.width / 2);
     const currentY = Math.round(gamePosition.y + viewport.height / 2);
     utils.moveScene(currentX - targetX, targetY - currentY);
-  }, [k, screenRect, gamePosition, viewport]);
+  }, [k, areaRect, gamePosition, viewport]);
 
   if (!k) {
     return null;
@@ -163,10 +163,10 @@ const SVGMiniMap = memo(({ width, height }) => {
     >
       <g
         filter="url(#blurMe)"
-        x={sScreenRect.left}
-        y={sScreenRect.top}
-        width={sScreenRect.width}
-        height={sScreenRect.height}
+        x={sAreaRect.left}
+        y={sAreaRect.top}
+        width={sAreaRect.width}
+        height={sAreaRect.height}
       >
         {gTurns.map((turn) => {
           return <TurnRect key={turn._id} id={turn._id} k={k} />;
@@ -176,7 +176,7 @@ const SVGMiniMap = memo(({ width, height }) => {
       <filter id="blurMe">
         <feGaussianBlur
           in="SourceGraphic"
-          stdDeviation={Math.round((sScreenRect.width * 3) / 1000)}
+          stdDeviation={Math.round((sAreaRect.width * 3) / 1000)}
         />
       </filter>
     </svg>
@@ -185,10 +185,10 @@ const SVGMiniMap = memo(({ width, height }) => {
 
 const ViewportRect = memo(({ k }) => {
   const gamePosition = useSelector((state) => state.game.position);
-  const viewport = useSelector((state) => state.ui.viewport);
-  const d = useSelector((state) => state.turns.d);
+  const viewport = useSelector((state) => state.game.viewport);
+  const g = useSelector((state) => state.turns.g);
   const gTurns = useMemo(() => {
-    const gTurns = Object.values(d)
+    const gTurns = Object.values(g)
       .filter((turn) => {
         return turn.contentType !== 'zero-point';
       })
@@ -200,7 +200,7 @@ const ViewportRect = memo(({ k }) => {
         };
       });
     return gTurns;
-  }, [d]); // @todo: use turns geometry
+  }, [g]);
   const gTurnsInsideViewport = useMemo(() => {
     return gTurns.filter((turn) => {
       return areRectanglesIntersect(turn, {
@@ -261,8 +261,8 @@ const ViewportRect = memo(({ k }) => {
 });
 
 const TurnRect = memo(({ id, k, clipPath, fill = 'blue' }) => {
-  const position = useSelector((state) => state.turns.d[id].position);
-  const size = useSelector((state) => state.turns.d[id].size);
+  const position = useSelector((state) => state.turns.g[id].position);
+  const size = useSelector((state) => state.turns.g[id].size);
   const sPosition = useMemo(() => {
     return {
       x: Math.round(position.x / k),

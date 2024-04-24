@@ -1,11 +1,9 @@
-import { increment } from '@/modules/telemetry/utils/logger';
 import { createLinesRequest, deleteLinesRequest } from '../requests';
 import * as types from './types';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 
 export const quoteCoordsUpdate =
   (turnId, type, quotesWithCoords) => (dispatch) => {
-    increment('quoteCoordsUpdate');
     return dispatch({
       type: types.LINES_QUOTE_COORDS_UPDATE,
       payload: { turnId, quotesWithCoords, type },
@@ -14,7 +12,6 @@ export const quoteCoordsUpdate =
 
 // @deprecated
 export const linesWithEndCoordsUpdate = (linesWithEndCoords) => (dispatch) => {
-  increment('LINES_WITH_END_COORDS_UPDATE');
   return dispatch({
     type: types.LINES_WITH_END_COORDS_UPDATE,
     payload: linesWithEndCoords,

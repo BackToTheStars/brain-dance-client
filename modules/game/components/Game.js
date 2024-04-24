@@ -4,10 +4,10 @@ import {
   loadTurnsAndLinesToPaste,
   setGameStage,
   switchEditMode,
+  updateViewportGeometry,
 } from '@/modules/game/game-redux/actions';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
-import { resetAndExit } from '@/modules/panels/redux/actions';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import {
@@ -16,16 +16,14 @@ import {
 } from '@/modules/turns/redux/actions';
 import {
   addNotification,
-  viewportGeometryUpdate,
 } from '@/modules/ui/redux/actions';
-import { VIEWPORT_UPDATE } from '@/modules/ui/redux/types';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
 import { GAME_STAGE_INIT, GAME_STAGE_READY } from '@/config/game';
 
-const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
+const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
 let useEffectIsDone = false;
 
@@ -43,10 +41,9 @@ const Game = ({ hash }) => {
 
   useEffect(() => {
     if (!useEffectIsDone) {
-      dispatch(loadFullGame(hash))
-        .then(() => {
-          dispatch(setGameStage(GAME_STAGE_READY));
-        })
+      dispatch(loadFullGame(hash)).then(() => {
+        dispatch(setGameStage(GAME_STAGE_READY));
+      });
       dispatch(
         addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
       );
@@ -59,13 +56,14 @@ const Game = ({ hash }) => {
     if (!window) return;
     const update = () => {
       dispatch(
-        viewportGeometryUpdate({
-          viewport: { width: window.innerWidth, height: window.innerHeight },
+        updateViewportGeometry({
+          width: window.innerWidth,
+          height: window.innerHeight,
         })
       );
     };
     window.addEventListener('resize', () => {
-      viewportGeometryUpdateQueue.add(update);
+      updateViewportGeometryQueue.add(update);
     });
     update();
     dispatch(loadTurnsAndLinesToPaste());

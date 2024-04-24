@@ -1,4 +1,4 @@
-export const getBoundingScreenRect = (turnObjects) => {
+export const getBoundingAreaRect = (turnObjects) => {
   let left = turnObjects[0]?.position.x || 0;
   let right = turnObjects[0]?.position.x + turnObjects[0]?.size.width || 0;
   let top = turnObjects[0]?.position.y || 0;
@@ -33,7 +33,7 @@ export const getBoundingScreenRect = (turnObjects) => {
   }
 }
 
-export const getScreenRect = (turnObjects) => {
+export const getAreaRect = (turnObjects) => {
   let left = turnObjects[0]?.position.x || 0,
     right = turnObjects[0]?.position.x + turnObjects[0]?.size.width || 0,
     top = turnObjects[0]?.position.y || 0,

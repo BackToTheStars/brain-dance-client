@@ -1,5 +1,4 @@
 import * as types from './types';
-import * as turnTypes from '@/modules/turns/redux/types';
 
 import { NOTIFICATION_SHOWTIME, NOTIFICATION_TRANSITION } from '@/config/ui';
 
@@ -24,16 +23,3 @@ export const addNotification =
       });
     }, NOTIFICATION_SHOWTIME + NOTIFICATION_TRANSITION);
   };
-
-export const viewportGeometryUpdate =
-  ({ viewport }) =>
-  (dispatch) => {
-    dispatch({
-      type: types.VIEWPORT_UPDATE,
-      payload: { viewport },
-    });
-  };
-
-// export const setCallsQueueIsBlocked = (value) => (dispatch) => {
-//   dispatch({ type: types.SET_CALLS_QUEUE_IS_BLOCKED, payload: value });
-// };

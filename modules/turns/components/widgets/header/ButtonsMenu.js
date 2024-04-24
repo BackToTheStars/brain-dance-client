@@ -68,7 +68,7 @@ const ButtonsMenu = ({ _id }) => {
 
   const handleClone = (e) => {
     e.preventDefault();
-    dispatch(cloneTurn(turn));
+    dispatch(cloneTurn(_id));
   };
 
   return (

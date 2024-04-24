@@ -6,7 +6,7 @@ import LogicLine from './LogicLine';
 const QuotesLinesLayer = ({ svgLayerZIndex }) => {
   const lines = useSelector((state) => state.lines.lines);
   const svgLayer = useRef();
-  const viewport = useSelector((state) => state.ui.viewport);
+  const viewport = useSelector((state) => state.game.viewport);
 
   useEffect(() => {
     if (!svgLayer?.current) return;

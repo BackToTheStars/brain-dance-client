@@ -1,4 +1,3 @@
-import { isDevMode } from '@/config/mode';
 import { widgetSpacer } from '@/config/ui';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import YouTube from 'react-youtube';
@@ -7,11 +6,11 @@ import { useSelector } from 'react-redux';
 
 let timeoutId;
 
-// @fixme
 const Video = ({ registerHandleResize, turnId, widgetId }) => {
+  const previewMode = true; // @fixme
   const videoEl = useRef(null);
   // const [newWidth, setNewWidth] = useState(width);
-  const width = useSelector((state) => state.turns.d[turnId].size.width);
+  const width = useSelector((state) => state.turns.g[turnId].size.width);
   const videoUrl = useSelector(
     (state) => state.turns.d[turnId].data.dWidgets[widgetId].url
   );
@@ -65,16 +64,19 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
       className="video turn-widget"
       ref={videoEl}
     >
-      {isDevMode ? (
-        <img
-          src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
-          style={{
-            display: 'block',
-            margin: '0 auto',
-            maxWidth: '100%',
-            maxHeight: '100%',
-          }}
-        />
+      {previewMode ? (
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <img
+            src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
+            style={{
+              display: 'block',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              width: '100%',
+              height: '100%',
+            }}
+          />
+        </div>
       ) : (
         <YouTube
           videoId={newVideoUrl}

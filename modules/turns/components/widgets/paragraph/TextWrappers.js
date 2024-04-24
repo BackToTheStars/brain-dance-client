@@ -3,7 +3,6 @@ import {
   TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
 } from '@/config/ui';
-import { increment } from '@/modules/telemetry/utils/logger';
 import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
 
 const ORANGE = '#ffd596';
@@ -208,7 +207,6 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
             return (
               <Fragment key={'item' + index}>
                 {words.map((word, index2) => {
-                  increment('WordMap');
                   return (
                     <span key={`item-${index}-${index2}`}>
                       {word}
@@ -250,7 +248,6 @@ export const TextAroundQuote = ({
     paragraphEl.current.scrollTop = scrollPosition;
     setTimeout(() => {
       // console.log(`${!paragraph?.current}, []`);
-      increment('txt_textAroundQuote');
       if (!paragraphEl?.current) return;
       paragraphEl.current.scrollTop = scrollPosition;
       const quotes = [

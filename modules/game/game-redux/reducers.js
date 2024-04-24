@@ -5,7 +5,8 @@ const initialGameState = {
   stage: GAME_STAGE_INIT,
   game: null,
   position: { left: 0, top: 0 },
-  screenRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
+  viewport: { width: 1600, height: 1200 },
+  areaRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
   error: null,
   editMode: false,
   cancelCallback: () => {},
@@ -13,7 +14,7 @@ const initialGameState = {
 
 export const gameReducer = (state = initialGameState, { type, payload }) => {
   switch (type) {
-    case types.LOAD_GAME:
+    case types.GAME_LOAD:
       return {
         ...state,
         game: payload,
@@ -44,14 +45,20 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
     case types.GAME_SCREEN_RECT_SET:
       return {
         ...state,
-        screenRect: payload,
+        areaRect: payload,
       };
 
-    case types.GAME_SET_STAGE:
+    case types.GAME_STAGE_SET:
       return {
         ...state,
         stage: payload,
-      }
+      };
+
+    case types.GAME_VIEWPORT_SET:
+      return {
+        ...state,
+        viewport: payload,
+      };
 
     default:
       return state;

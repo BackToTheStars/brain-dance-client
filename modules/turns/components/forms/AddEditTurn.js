@@ -256,7 +256,8 @@ const AddEditTurnPopup = () => {
       turnObj.x = -zeroPoint.position.x + turnToEdit.x;
       turnObj.y = -zeroPoint.position.y + turnToEdit.y;
 
-      dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
+      // @fixme
+      dispatch(resaveTurn(turnObj, saveCallbacks));
     } else {
       turnObj.height = 600;
       turnObj.width = 800;
@@ -265,7 +266,8 @@ const AddEditTurnPopup = () => {
       turnObj.y =
         -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
 
-      dispatch(createTurn(turnObj, zeroPoint, saveCallbacks));
+      // @fixme
+      dispatch(createTurn(turnObj, saveCallbacks));
     }
   };
 

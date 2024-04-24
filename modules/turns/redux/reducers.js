@@ -3,9 +3,9 @@ import turnSettings, { TURN_READY } from '../settings';
 import * as types from './types';
 
 const initialTurnsState = {
-  turns: [],
   turnsToRender: [],
   d: {},
+  g: {},
   error: null,
   zeroPointId: null,
   turnsToPaste: [],
@@ -21,31 +21,41 @@ export const getStageHistory = (currentStages, newStage) => {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
-    case types.LOAD_TURNS: {
-      const d = payload.turns.reduce((a, turn) => {
+    case types.TURNS_LOAD_GEOMETRY: {
+      const g = payload.turns.reduce((a, turn) => {
         a[turn._id] = turn;
         return a;
       }, {});
       const turnsToRender = [];
-      for (let id in d) {
-        if (isTurnInsideRenderArea(d[id], payload.viewport)) {
+      for (let id in g) {
+        if (isTurnInsideRenderArea(g[id], payload.viewport)) {
           turnsToRender.push(id);
         }
       }
       return {
         ...state,
-        turns: payload.turns,
-        d,
+        g,
         turnsToRender,
+      }
+    }
+    case types.LOAD_TURNS: {
+      const d = payload.turns.reduce((a, turn) => {
+        a[turn._id] = turn;
+        return a;
+      }, {});
+
+      return {
+        ...state,
+        d,
       };
     }
     case types.TURNS_UPDATE_GEOMETRY:
       return {
         ...state,
-        d: {
-          ...state.d,
+        g: {
+          ...state.g,
           [payload._id]: {
-            ...state.d[payload._id],
+            ...state.g[payload._id],
             ...payload,
             // wasChanged: true,
           },
@@ -70,20 +80,23 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     }
 
-    case types.TURNS_SET_LOADING: {
+    case types.TURNS_SET_LOADING: { // @fixme
       return {
         ...state,
         d: {
           ...state.d,
-          ...payload.reduce((a, id) => ({
-            ...a,
-            [id]: {
-              ...state.d[id],
-              loadStatus: 'loading',
-            }
-          }), {}),
+          ...payload.reduce(
+            (a, id) => ({
+              ...a,
+              [id]: {
+                ...state.d[id],
+                loadStatus: 'loading',
+              },
+            }),
+            {}
+          ),
         },
-      }
+      };
     }
 
     case types.TURNS_LOAD_DATA: {
@@ -91,16 +104,19 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         d: {
           ...state.d,
-          ...payload.turns.reduce((a, { position, size, loadStatus, ...turn}) => {
-            a[turn._id] = {
-              ...state.d[turn._id],
-              loadStatus: 'loaded',
-              data: turn,
-            };
-            return a;
-          }, {}),
+          ...payload.turns.reduce(
+            (a, { position, size, loadStatus, ...turn }) => {
+              a[turn._id] = {
+                ...state.d[turn._id],
+                loadStatus: 'loaded',
+                data: turn,
+              };
+              return a;
+            },
+            {}
+          ),
         },
-      }
+      };
     }
 
     // case types.TURN_PARAGRAPH_SET_IS_READY:
@@ -177,10 +193,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       };
     }
     case types.TURNS_FIELD_WAS_MOVED: {
-      const d = state.d;
+      const g = state.g;
       const turnsToRender = [];
-      for (let id in d) {
-        if (isTurnInsideRenderArea(d[id], payload)) {
+      for (let id in g) {
+        if (isTurnInsideRenderArea(g[id], payload)) {
           turnsToRender.push(id);
         }
       }
@@ -204,10 +220,13 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
     case types.TURN_CREATE: {
       return {
         ...state,
-        turns: [...state.turns, payload],
-        d: {
-          ...state.d,
-          [payload._id]: payload,
+        // d: {
+        //   ...state.d,
+        //   [payload._id]: payload, // @todo: data fields
+        // },
+        g: {
+          ...state.g,
+          [payload._id]: payload, // @todo: geometry fields
         },
         turnsToRender: [...state.turnsToRender, payload._id],
       };
@@ -227,11 +246,13 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       // в payload прилетит _id
       const preparedD = { ...state.d };
       delete preparedD[payload];
+      const preparedG = { ...state.g };
+      delete preparedG[payload];
 
       return {
         ...state,
-        turns: state.turns.filter((turn) => turn._id !== payload),
         d: preparedD,
+        g: preparedG,
         turnsToRender: state.turnsToRender.filter(
           (turnId) => turnId !== payload
         ),
