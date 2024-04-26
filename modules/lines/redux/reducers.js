@@ -1,9 +1,6 @@
 import * as types from './types';
 
 const initialLinesState = {
-  // lines: [],
-  // @deprecated
-  linesWithEndCoords: [],
   quotesInfo: {},
   error: null,
   linesToPaste: {},
@@ -70,13 +67,6 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
         ...getDictionariesByLines(newLines),
       }
     }
-
-    // @deprecated
-    case types.LINES_WITH_END_COORDS_UPDATE:
-      return {
-        ...state,
-        linesWithEndCoords: payload,
-      };
 
     case types.LINES_QUOTE_COORDS_UPDATE: {
       const { turnId, quotesWithCoords, type } = payload;

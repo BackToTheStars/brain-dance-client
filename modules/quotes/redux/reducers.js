@@ -2,7 +2,6 @@ import * as types from './types';
 
 const initialState = {
   activeQuoteKey: null,
-  d: {},
 };
 
 export const quoteReducer = (state = initialState, { type, payload }) => {
@@ -12,17 +11,6 @@ export const quoteReducer = (state = initialState, { type, payload }) => {
         ...state,
         activeQuoteKey: payload,
       };
-    case types.QUOTES_SET_DICTIONARY:
-      return {
-        ...state,
-        d: payload,
-      };
-    case types.QUOTES_UPDATE_DICTIONARY:
-      return {
-        ...state,
-        d: { ...state.d, ...payload },
-      };
-
     default:
       return state;
   }

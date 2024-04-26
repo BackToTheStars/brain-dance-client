@@ -10,14 +10,6 @@ export const quoteCoordsUpdate =
     });
   };
 
-// @deprecated
-export const linesWithEndCoordsUpdate = (linesWithEndCoords) => (dispatch) => {
-  return dispatch({
-    type: types.LINES_WITH_END_COORDS_UPDATE,
-    payload: linesWithEndCoords,
-  });
-};
-
 export const lineDelete = (id) => (dispatch) => {
   deleteLinesRequest([id]).then((data) => {
     dispatch({

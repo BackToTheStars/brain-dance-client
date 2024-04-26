@@ -114,61 +114,6 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
   });
 };
 
-// @deprecated
-export const loadTurns = (hash, viewport) => (dispatch, getState) => {
-  getTurnsRequest(hash).then((data) => {
-    const state = getState();
-    const isSnapToGrid = isSnapToGridSelector(state);
-
-    const quotesD = {};
-    for (let turn of data.items) {
-      if (!turn.quotes) continue;
-      for (let quote of turn.quotes) {
-        quotesD[`${turn._id}_${quote.id}`] = quote;
-      }
-    }
-    dispatch({
-      type: types.LOAD_TURNS,
-      payload: {
-        viewport: {
-          position: {
-            x: 0,
-            y: 0,
-          },
-          size: {
-            width: state.game.viewport.width,
-            height: state.game.viewport.height,
-          },
-        },
-        turns: data.items.map((turn) => {
-          const compressedParagraphStateOld = paragraphStateGetFromLocalStorage(
-            turn._id
-          );
-          const compressedParagraphState =
-            compressedParagraphStateOld?.width === turn.width &&
-            compressedParagraphStateOld?.updatedAt >=
-              new Date(turn.updatedAt).getTime()
-              ? compressedParagraphStateOld
-              : null;
-          return {
-            ...TurnHelper.toNewFields({
-              ...turn,
-              x: snapRound(turn.x - viewport.x, GRID_CELL_X),
-              y: snapRound(turn.y - viewport.y, GRID_CELL_X),
-              compressedParagraphState,
-            }),
-            loadStatus: 'loaded',
-          };
-        }),
-      },
-    });
-    dispatch({
-      type: quotesTypes.QUOTES_SET_DICTIONARY,
-      payload: quotesD,
-    });
-  });
-};
-
 // export const setParagraphIsReady = (_id, value) => (dispatch) =>
 //   dispatch({
 //     type: types.TURN_PARAGRAPH_SET_IS_READY,
@@ -352,12 +297,6 @@ export const resaveTurn = (turn, callbacks) => (dispatch) => {
     dispatch({
       type: types.TURN_RESAVE,
       payload: TurnHelper.toNewFields(preparedTurn),
-    });
-    dispatch({
-      type: quotesTypes.QUOTES_UPDATE_DICTIONARY,
-      payload: turn.quotes.reduce((acc, quote) => {
-        return { ...acc, [`${turn._id}_${quote.id}`]: quote };
-      }, {}),
     });
     callbacks?.success();
   });
