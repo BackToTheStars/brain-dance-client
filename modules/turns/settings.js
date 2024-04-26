@@ -86,13 +86,6 @@ export const widgetSettings = {
         component: SourceAddForm,
         defaultParams: { url: '', date: null, show: true },
       },
-
-      // {
-      //   field: 'headers',
-      //   label: 'Headers',
-      //   component: HeaderAddForm,
-      //   defaultParams: { show: false, text: '' },
-      // },
     ],
   },
   [WIDGET_PARAGRAPH]: {
@@ -308,14 +301,6 @@ const fieldSettings = {
               }}
             />{' '}
             <span style={{ fontSize: '1rem' }}>Picture only</span>
-            {/* <Input
-              placeholder={`${label}:`}
-              value={value}
-              onChange={(e) => {
-                changeHandler(e.target.value);
-              }}
-            />
-            <ImageUploading setImageUrl={changeHandler} /> */}
           </>
         );
       },
@@ -331,11 +316,6 @@ const fieldSettings = {
     prefixClass: 'date',
     inputType: 'date',
     valueCallback: (value) => value.date.slice(0, 10),
-    // valueCallback: (value) => {
-    //   // console.log({ value });
-    //   console.log(value.date);
-    //   return value.date;
-    // },
     separate: true,
   },
   [FIELD_SOURCE]: {

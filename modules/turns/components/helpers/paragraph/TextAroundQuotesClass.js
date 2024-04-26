@@ -24,7 +24,6 @@ class TextAroundQuotesClass {
     return this.originalQuotes[quoteIndex];
   }
 }
-// t.getOriginalQuoteInfo(0);
 
 const store = {};
 
@@ -36,12 +35,3 @@ export const createTextAroundQuotesObject = (params) => {
   const key = `${params.turnId}_${params.index}`;
   store[key] = new TextAroundQuotesClass(params);
 };
-
-// const t = new TextAroundQuotesClass(params);
-
-// t.getQuoteInfo(0);
-
-// t.widgetCoordsInTurn;
-// t.originalMiniParagraphTop;
-// t.realMiniParagraphTop;
-// t.scrollTop;

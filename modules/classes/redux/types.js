@@ -1,4 +1,4 @@
-export const LOAD_CLASSES = 'load_classes';
-export const CLASS_DELETE = 'class_delete';
-export const CLASS_ADD = 'class_add';
-export const CLASS_UPDATE = 'class_update';
+export const LOAD_CLASSES = 'LOAD_CLASSES';
+export const CLASS_DELETE = 'CLASS_DELETE';
+export const CLASS_ADD = 'CLASS_ADD';
+export const CLASS_UPDATE = 'CLASS_UPDATE';

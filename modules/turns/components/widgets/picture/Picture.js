@@ -140,11 +140,6 @@ const Picture = ({
           widgetSettings={widgetSettings}
           wrapperEl={imgWrapperEl?.current}
           pictureOnly={pictureOnly}
-          // quotes={
-          //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
-          //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
-          //     : quotes
-          // }
         />
 
         <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
@@ -154,7 +149,6 @@ const Picture = ({
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            // setDisplayCrop(true);
             dispatch(
               setPanelMode({
                 mode: MODE_WIDGET_PICTURE,

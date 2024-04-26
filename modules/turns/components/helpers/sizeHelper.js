@@ -84,10 +84,7 @@ export const getTurnMinMaxHeight = (widgets, newTurnWidth) => {
     if (!widget.variableHeight) {
       minHeightBasic = minHeightBasic + widget.minHeightCallback(newTurnWidth);
     }
-    // console.log({ desiredHeight });
   }
-
-  // if (!!desiredHeight) desiredHeight = desiredHeight + 2 * widgetSpacer;
 
   return {
     minHeight,

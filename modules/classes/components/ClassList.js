@@ -3,20 +3,16 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addClass, loadClasses } from '../redux/actions';
 import ClassComponent from './ClassComponent';
-// import { useClassContext } from '../contexts/ClassContext';
 
 const ClassList = () => {
   const classes = useSelector((state) => state.classes.classesTree);
   const maxId = useSelector((state) => state.classes.maxId);
 
-  // const [classes, setClasses] = useState(classesTree);
   const [title, setTitle] = useState('');
   const dispatch = useDispatch();
 
   const submitAddClass = (e) => {
     e.preventDefault();
-    // подготовить данные для payload
-    // addClass(title);
     dispatch(addClass(title, maxId + 1));
     setTitle('');
   };

@@ -34,7 +34,10 @@ const GameDetails = () => {
           {!!description && <p className="card-text">{description}</p>}
 
           <div className="card-game-buttons">
-            <Link className="btn btn-success me-2 mb-2" href={`/game?hash=${hash}`}>
+            <Link
+              className="btn btn-success me-2 mb-2"
+              href={`/game?hash=${hash}`}
+            >
               Open
             </Link>
             {adminUser?.mode === USER_MODE_ADMIN && (

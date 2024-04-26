@@ -135,10 +135,6 @@ const AddEditTurnPopup = () => {
 
     const resTextArr = [];
     let i = 0;
-    // const paragraphQuotes =
-    //   turnToEdit && turnToEdit.quotes
-    //     ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-    //     : [];
     const spans = document.querySelectorAll('.ql-editor span');
 
     let j = 0;
@@ -239,7 +235,6 @@ const AddEditTurnPopup = () => {
       contentType: activeTemplate,
       quotes: [
         ...quotes,
-        // ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
       ],
     };
 
@@ -306,10 +301,6 @@ const AddEditTurnPopup = () => {
                   <Input
                     placeholder="Header:"
                     value={form[FIELD_HEADER]}
-                    // onChange={(e) => {
-                    //   if (!!error) setError(null);
-                    //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
-                    // }}
                     onChange={(e) =>
                       formChangeHandler(FIELD_HEADER, e.target.value)
                     }
@@ -391,10 +382,6 @@ const AddEditTurnPopup = () => {
                   <Input
                     placeholder="Header:"
                     value={form[FIELD_HEADER]}
-                    // onChange={(e) => {
-                    //   if (!!error) setError(null);
-                    //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
-                    // }}
                     onChange={(e) =>
                       formChangeHandler(FIELD_HEADER, e.target.value)
                     }
@@ -414,7 +401,6 @@ const AddEditTurnPopup = () => {
                   />
                 </div>
               </div>
-              {/* <input type="hidden" id="idInput" /> */}
               <div className="form-group panel-flex mb-2">
                 <div className="col-sm-7">
                   <Input
@@ -432,7 +418,6 @@ const AddEditTurnPopup = () => {
                     style={{ width: '100%' }}
                     onChange={(moment) => {
                       if (!!error) setError(null);
-                      // console.log(moment.format('YYYY-MM-DD'));
                       setForm({
                         ...form,
                         [FIELD_DATE]: moment?.format('YYYY-MM-DD'),

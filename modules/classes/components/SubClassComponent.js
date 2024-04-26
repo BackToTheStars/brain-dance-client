@@ -7,7 +7,6 @@ const SubClassComponent = ({ subClassItemId }) => {
   const dispatch = useDispatch();
   const inputRef = useRef();
   const subClassItem = useSelector((state) => state.classes.d[subClassItemId]);
-  const hash = useSelector((state) => state.game.game.hash);
   const [editTitleMode, setEditTitleMode] = useState(false);
 
   const [title, setTitle] = useState(subClassItem.title);
@@ -40,7 +39,7 @@ const SubClassComponent = ({ subClassItemId }) => {
             onChange={(e) => setTitle(e.target.value)}
           />
           <button className="btn btn-success btn-sm panel-button">
-            {/* <img src="/icons/ok.svg" /> */}Ok
+            Ok
           </button>
         </form>
       ) : (
@@ -50,9 +49,6 @@ const SubClassComponent = ({ subClassItemId }) => {
             {title}
           </div>
           <div className="btn-group classes-btn-group">
-            {/* <button className="btn btn-success" onClick={handleAddSubClass}>
-              <img src="/icons/add.svg" />
-            </button> */}
             <button
               className="btn btn-success btn-sm panel-button"
               onClick={(e) => setEditTitleMode(true)}

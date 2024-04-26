@@ -16,19 +16,6 @@ const initialPanelState = {
   editWidgetId: null,
   editWidgetParams: {},
   mode: MODE_GAME,
-
-  //   [{
-  //     type: PANEL_CLASSES,
-  //     position: POSITION_UPPER_LEFT,
-  //     component: ClassList,
-  //     isDisplayed: true,
-  //     id: 1,
-  //     height: () => {
-  //       console.log(window.innerHeight, panelSpacer);
-  //       return `${window.innerHeight - 2 * panelSpacer}px`;
-  //     },
-  //     width: () => '500px',
-  //   }]
 };
 
 export const panelReducer = (state = initialPanelState, { type, payload }) => {

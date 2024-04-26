@@ -50,7 +50,7 @@ const Game = ({ hash }) => {
     }
     useEffectIsDone = true;
     return () => dispatch(setGameStage(GAME_STAGE_INIT));
-  }, []); // token
+  }, []);
 
   useEffect(() => {
     if (!window) return;
@@ -67,12 +67,10 @@ const Game = ({ hash }) => {
     });
     update();
     dispatch(loadTurnsAndLinesToPaste());
-    // dispatch(resetAndExit());
   }, []);
 
   useEffect(() => {
     if (!window) return;
-    // if (!dispatch) return;
     if (!gameBox.current) return;
     registerMoveScene(dispatch, gameBox.current);
   }, [gameBox.current]);

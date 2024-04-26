@@ -4,7 +4,6 @@ import {
 } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
-import * as uiTypes from '@/modules/ui/redux/types';
 import * as types from './types';
 import { updateCoordinatesRequest } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
@@ -111,7 +110,6 @@ export const saveField = () => (dispatch, getState) => {
     }); // ход был изменён, сохранить только его
 
   updateCoordinatesRequest(changedTurns).then((data) => {
-    // for (const turn of data.items) {
     for (const turn of changedTurns) {
       // @todo: оптимизировать
       dispatch({

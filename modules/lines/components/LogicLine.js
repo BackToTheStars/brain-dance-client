@@ -37,9 +37,6 @@ const LogicLine = ({ id }) => {
   );
   const gamePosition = useSelector((state) => state.game.position);
   const viewport = useSelector((state) => state.game.viewport);
-  // const quotesInfo = useSelector((state) => state.lines.quotesInfo);
-  // // const d = useSelector((state) => state.turns.d);
-  // // const sourceMarkerQuote = quotesInfo[`${sourceTurnId}_${sourceMarker}`];
   const sourceMarkerQuote = useSelector((state) =>
     state.lines.quotesInfo[sourceTurnId]?.find(
       (q) => +q.quoteId === sourceMarker

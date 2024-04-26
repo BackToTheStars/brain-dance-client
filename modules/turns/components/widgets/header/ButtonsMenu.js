@@ -12,10 +12,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 
 const ButtonsMenu = ({ _id }) => {
-  // const handleInfo = (e) => {
-  //   dispatch(togglePanel({ type: PANEL_TURN_INFO }));
-  //   // dispatch(setTurnToEdit(_id));
-  // };
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[_id]);
@@ -23,8 +19,6 @@ const ButtonsMenu = ({ _id }) => {
   const handleCut = (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
-      // clone();
-      // confirm - глобальная функция браузера
       dispatch(cloneTurn(turn)).then(() => {
         dispatch(deleteTurn(_id));
       });
@@ -34,7 +28,6 @@ const ButtonsMenu = ({ _id }) => {
   const handleDelete = (e) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
-      // confirm - глобальная функция браузера
       dispatch(deleteTurn(_id));
     }
   };
@@ -69,25 +62,16 @@ const ButtonsMenu = ({ _id }) => {
       </a>
       {can(RULE_TURNS_CRUD) && (
         <a key="edit" className="edit-btn" onClick={handleEdit}>
-          {/*<img src="/images/cloud.svg" />*/}
-          {/*<i className="fas fa-pen-square"></i>*/}
-
           <EditIcon />
         </a>
       )}
       {can(RULE_TURNS_CRUD) && (
         <a key="cut" className="cut-btn" onClick={handleCut}>
-          {/*<img src="/images/scissor.svg" />*/}
-          {/*<i className="fas fa-cut"></i>*/}
-
           <ScissorIcon />
         </a>
       )}
       {can(RULE_TURNS_CRUD) && (
         <a key="delete" className="delete-btn" onClick={handleDelete}>
-          {/*<img src="/images/delete.svg" />*/}
-          {/*<i className="fas fa-trash-alt"></i>*/}
-
           <DeleteIcon />
         </a>
       )}

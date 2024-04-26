@@ -1,9 +1,3 @@
-// @fixme: цитата делит одно слово на несколько слов
-// const words = paragraph
-//   .map((textItem) => textItem.insert)
-//   .join(' ')
-//   .split(' '); // слили всё в один большой текст и разделили по словам
-
 import { widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import {
@@ -185,9 +179,6 @@ const Compressor = ({
         // if (span.parentNode.tagName !== 'SPAN') {
         // если br находится в span
         lettersCount += 1;
-        // } else {
-        // debugger;
-        // }
       }
     }
 
@@ -214,7 +205,6 @@ const Compressor = ({
           lettersCount += insertLength;
           //
         } else if (insertLength + lettersCount > startLettersCount) {
-          // const difference = insertLength + lettersCount - startLettersCount;
           const difference = startLettersCount - lettersCount;
           paragraphCountingBuffer.push({
             insert: paragraph[j].insert.slice(0, difference),
@@ -226,7 +216,6 @@ const Compressor = ({
           paragraphIndex = j + 1;
           textPieces[i].paragraph = paragraphCountingBuffer;
           paragraphCountingBuffer = [];
-          // lettersCount -= insertLength;
           lettersCount += difference;
           break;
           //
@@ -258,7 +247,6 @@ const Compressor = ({
           2 -
         textPiece.top;
       textPiece.scrollTop = centerLine - textPiece.height / 2;
-      // textPiece.scrollTop = (textPiece.scrollHeight - textPiece.height) / 2;
     }
 
     const height = textPieces.reduce(
@@ -277,20 +265,12 @@ const Compressor = ({
     setCompressedTexts(textPieces);
 
     setCompressedHeight(height);
-    // setTimeout(() => {
-    //   if (!!compressedHeight) setCompressedHeight(null);
-    // }, 300);
   }, [width, compressedTextPieces]); // , wrapperRef
 
   useEffect(() => {
-        // console.log(
-    //   `useEffect [textsReadyCount ${textsReadyCount}, compressedTexts ${compressedTexts}]`
-    // );
     if (!textsReadyCount) return;
         if (textsReadyCount === compressedTexts.length) {
       setTimeout(() => {
-        // dispatch(setCallsQueueIsBlocked(false));
-        // setParagraphIsReady(true);
         dispatch(changeParagraphStage(turnId, COMP_READY_TO_RECEIVE_PARAMS));
       }, 50);
     }
@@ -305,8 +285,6 @@ const Compressor = ({
 
     let deltaTop = 0;
     let deltaScrollHeightTop = 0;
-    // const widgetTop = wrapperRef.current.getBoundingClientRect().top - turn.y;
-    let newDeltaScrollHightTop = 0;
 
     return compressedTexts.map((text, i) => {
       deltaTop += text.height;

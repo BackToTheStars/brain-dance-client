@@ -6,7 +6,6 @@ import { Buttons } from '../../ButtonsPanel';
 import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '@/config/panel';
 
 const PictureMode = () => {
-  //
   const { can } = useUserContext();
   const dispatch = useDispatch();
 

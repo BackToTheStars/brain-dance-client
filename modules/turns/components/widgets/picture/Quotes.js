@@ -25,8 +25,6 @@ const PictureQuotes = ({
   pictureOnly,
 }) => {
   const dispatch = useDispatch();
-  // const { bottomPanelSettings } = []; //useInteractionContext();
-  // const { setPanelType } = bottomPanelSettings;
   const turn = useSelector((state) => state.turns.d[turnId].data);
   const dLines = useSelector((store) => store.lines.d); // @fixme
   const lines = useMemo(() => Object.values(dLines), [dLines]);
@@ -51,6 +49,8 @@ const PictureQuotes = ({
       height = widgetSettings.minHeight - widgetSpacer; // - TURN_BORDER_THICKNESS;
     }
 
+    if (!width || !height) return;
+    if (!quotes.length) return;
     dispatch(
       quoteCoordsUpdate(
         turnId,
@@ -81,33 +81,6 @@ const PictureQuotes = ({
       )
     );
   }, [quotes, widgetSettings]);
-
-  // useEffect(() => {
-  //   if (!wrapperEl) return;
-
-  //   const { height, left, top, width } = wrapperEl.getBoundingClientRect();
-  //   console.log({ height, left, top, width });
-  //   dispatch(
-  //     quoteCoordsUpdate(
-  //       turnId,
-  //       TYPE_QUOTE_PICTURE,
-  //       quotes.map((quote) => {
-  //         return {
-  //           type: TYPE_QUOTE_PICTURE,
-  //           initialCoords: {},
-  //           quoteId: quote.id,
-  //           quoteKey: `${turnId}_${quote.id}`,
-  //           turnId,
-  //           text: `pictureQuote_${quote.id}`,
-  //           left: Math.round((width * quote.x) / 100) + left,
-  //           top: Math.round((height * quote.y) / 100) + top,
-  //           width: Math.round((width * quote.width) / 100),
-  //           height: Math.round((height * quote.height) / 100),
-  //         };
-  //       })
-  //     )
-  //   );
-  // }, [quotes, wrapperEl, widgetSettings]);
 
   return (
     <div>
@@ -163,14 +136,6 @@ const PictureQuotes = ({
                 })
               );
               dispatch(processQuoteClicked(`${turnId}_${quote.id}`));
-              // onQuoteClick(quote.id);
-              // if (isQuoteActive) {
-              //   setInteractionMode(MODE_GAME);
-              //   setPanelType(null);
-              // } else {
-              //   setInteractionMode(MODE_WIDGET_PICTURE_QUOTE_ACTIVE);
-              //   setPanelType(PANEL_LINES);
-              // }
             }}
           />
         );

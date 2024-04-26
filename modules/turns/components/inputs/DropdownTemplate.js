@@ -9,26 +9,6 @@ const DropdownTemplate = ({
   setError = () => {},
   setActiveTemplate,
 }) => {
-  // const menu = (
-  //   <Menu
-  //     onClick={({ key }) => {
-  //       setActiveTemplate(templatesToShow[key]);
-  //       setError(null);
-  //     }}
-  // items={templatesToShow.map((el, i) => {
-  //   const templateSettings = settings[el];
-  //   return {
-  //     key: i,
-  //     label: (
-  //       <a href="#" style={{ paddingLeft: '10px' }}>
-  //         {templateSettings.label}
-  //       </a>
-  //     ),
-  //   };
-  // })}
-  //   />
-  // );
-
   const items = templatesToShow.map((el, i) => {
     const templateSettings = settings[el];
     return {
@@ -59,7 +39,6 @@ const DropdownTemplate = ({
           borderColor: '#667480',
           opacity: 0.65,
         }}
-        // style={{ color: '#1b4d76' }}
       >
         {settings[activeTemplate].label}
         <DownOutlined style={{ fontSize: '15px' }} />

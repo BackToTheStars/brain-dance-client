@@ -50,7 +50,6 @@ const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
 const TurnAdapter = ({ id }) => {
-  // const { position, size, loaded } = useSelector((state) => state.turns.d[id]);
   const gamePosition = useSelector((state) => state.game.position);
   const [isDragging, setIsDragging] = useState(false);
   const dispatch = useDispatch();
@@ -114,8 +113,6 @@ const TurnAdapter = ({ id }) => {
           updateGeometry({
             _id: id,
             position: {
-              // x: Math.round(ui.position.left / GRID_CELL_X) * GRID_CELL_X,
-              // y: Math.round(ui.position.top / GRID_CELL_X) * GRID_CELL_X,
               x: Math.round((ui.position.left + gamePosition.x) / GRID_CELL_X) * GRID_CELL_X,
               y: Math.round((ui.position.top + gamePosition.y) / GRID_CELL_X) * GRID_CELL_X,
             },
@@ -178,20 +175,10 @@ const Turn = memo(({ id }) => {
     wasChanged,
   } = turnData;
 
-  // console.log(turn.dWidgets.p_1.inserts, paragraph);
-
   const dontShowHeaderOriginal = !headerShow;
 
   const paragraphStage = getParagraphStage(turnData);
   const turnStage = getTurnStage(turnData);
-
-  // const callsQueueIsBlockedFlag = useSelector(
-  //   (state) => state.ui.callsQueueIsBlocked
-  // );
-
-  // const dispatchParagraphIsReady = (value) => {
-  //   dispatch(setParagraphIsReady(_id, value));
-  // };
 
   const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
 
@@ -205,8 +192,6 @@ const Turn = memo(({ id }) => {
   if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
     wrapperStyles.backgroundColor = background;
   }
-
-  const classNameId = `turn_${_id}`;
 
   const widgetsCount =
     !dontShowHeader + // header
@@ -268,16 +253,7 @@ const Turn = memo(({ id }) => {
           maxHeight,
         });
     }
-
-    // @todo: desiredHeight > minHeight
-    // if (desiredHeight >= minHeight && desiredHeight <= maxHeight) {
-    //   newHeight = desiredHeight;
-    // }
-
-    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;;
-
-    // if (paragraphStage !== ORIG_LOADING) {
-    //  && paragraphStage !== COMP_LOADING) {
+    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
 
     const isLocked = // transition from compressed to uncompressed
       paragraphStage === ORIG_LOADING &&
@@ -463,18 +439,8 @@ const Turn = memo(({ id }) => {
           widgetId={'p_1'}
           registerHandleResize={registerHandleResize}
           unregisterHandleResize={unregisterHandleResize}
-          // stateIsReady={stateIsReady}
           widget={widgetD['p_1']}
           notRegisteredWidgetsCount={notRegisteredWidgetsCount}
-          // paragraphIsReady={paragraphIsReady}
-          // setParagraphIsReady={dispatchParagraphIsReady}
-          // height={getParagraphHeight({
-          //   widgetId: 'paragraph1',
-          //   widgetD,
-          //   compressed,
-          //   paragraphIsReady: paragraphStage === COMP_READY,
-          //   compressedHeight,
-          // })}
         />
       )}
       <ButtonsMenu _id={_id} />

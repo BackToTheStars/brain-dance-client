@@ -114,12 +114,6 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
   });
 };
 
-// export const setParagraphIsReady = (_id, value) => (dispatch) =>
-//   dispatch({
-//     type: types.TURN_PARAGRAPH_SET_IS_READY,
-//     payload: { _id, value },
-//   });
-
 export const updateGeometry = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_UPDATE_GEOMETRY,
@@ -179,16 +173,6 @@ export const unCompressParagraph = () => (dispatch, getState) => {
       // paragraphIsReady: false,
     })
   );
-  // dispatch(
-  //   updateGeometry({
-  //     _id: editTurnId,
-  //     compressed: false,
-  //     compressedHeight: activeTurn.height,
-  //     height: activeTurn.uncompressedHeight,
-  //     paragraphIsReady: false,
-  //   })
-  //   );
-
   dispatch(markTurnAsChanged({ _id: editTurnId }));
 };
 

@@ -23,7 +23,6 @@ const PictureQuoteActive = () => {
       text: 'Delete',
       callback: () => {
         dispatch(deleteQuote()).then(() => {
-          // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
           dispatch(resetAndExit());
         });
       },

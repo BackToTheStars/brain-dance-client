@@ -24,8 +24,6 @@ const Paragraph = ({
   const turnCompressedHeight = useSelector(
     (state) => state.turns.d[turnId].data.compressedHeight
   );
-  // const compressed = false; // @todo: compressedWidget.show;
-  // const turnCompressedHeight = compressedWidget.height;
 
   const [compressedHeight, setCompressedHeight] =
     useState(turnCompressedHeight);
@@ -59,10 +57,6 @@ const Paragraph = ({
             return newHeight;
           },
           maxHeightCallback: () => {
-            // if (!!compressed) {
-            // } else if (!paragraphElCurrent) {
-            //   return 0;
-            // }
             return paragraphElCurrent.scrollHeight + widgetSpacer + 5;
           },
         });
@@ -118,17 +112,6 @@ const Paragraph = ({
       },
       maxHeightCallback: () => {
         return widgetMaxHeight;
-
-        // if (!!compressed) {
-        // } else if (!paragraphElCurrent) {
-        //   return 0;
-        // }
-        // return (
-        //   // (compressed ? compressedHeight : paragraphElCurrent.scrollHeight) +
-        //   // widgetSpacer +
-        //   // 5
-        //   wrapperElCurrent.scrollHeight + widgetSpacer + 5
-        // );
       },
     });
   };

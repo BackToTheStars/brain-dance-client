@@ -12,7 +12,6 @@ export default function RootLayout({ children }) {
       <head>
         <script src="/js/jquery.js"></script>
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
-        {/* <script src="/quill/quill.min.js"></script> */}
         <link rel="stylesheet" href="/quill/quill.snow.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
       </head>

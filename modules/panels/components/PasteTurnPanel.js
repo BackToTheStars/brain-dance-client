@@ -6,16 +6,7 @@ import {
   insertTurnFromBuffer,
   removeTurnFromBuffer,
 } from '@/modules/turns/redux/actions';
-// import dynamic from 'next/dynamic';
 
-// const quillHelper = dynamic(
-//   () => import('@/modules/turns/components/helpers/quillHelper'),
-//   {
-//     ssr: false,
-//   }
-// );
-// const { paragraphToString } = quillHelper;
-// import { paragraphToString } from '@/modules/turns/components/helpers/quillHelper';
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
     .map((item) => item.insert)
@@ -28,23 +19,16 @@ const paragraphToString = (paragraph, length = 200) => {
 const PasteTurnPanel = () => {
   //
   const dispatch = useDispatch();
-  const getTurnFromBufferAndRemove = () => {};
   const setPanelType = () => {};
 
   const { can } = useUserContext();
-  // const { insertTurnFromBuffer } = useTurnsCollectionContext();
   const turnsToPaste = useSelector((state) => state.turns.turnsToPaste);
-
-  // const {
-  //   bottomPanelSettings: { setPanelType }, // @learn {} второго уровня в деструктуризаторе (можно любую вложенность)
-  // } = useInteractionContext();
 
   useEffect(() => {
     if (!turnsToPaste.length) {
       setPanelType(null);
     }
-  }); // @learn усли второго аргумента нет, то компонент реагирует на любые изменения,
-  // через props, contexts, на все хуки и пропсы
+  });
 
   return (
     <table className="table m-0 table-dark table-striped">

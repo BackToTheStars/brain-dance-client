@@ -51,7 +51,6 @@ const ParagraphOriginal = ({
   const size = useSelector((state) => state.turns.g[turnId].size);
 
   const { width, height } = size;
-  const wasReady = true; // @todo убрать
 
   const paragraph = widget.inserts;
   const scrollPosition = widget.scrollPosition;
@@ -76,19 +75,6 @@ const ParagraphOriginal = ({
     style.visibility = 'hidden';
     style.position = 'absolute';
   }
-  // if (!!variableHeight) {
-  //   style.height = `${variableHeight}px`;
-  // }
-
-  // const topQuotesCount = quotesWithCoords.filter((quote) => {
-  //   return !!lineEnds[quote.quoteKey] && quote.position === 'top';
-  // }).length;
-
-  // const bottomQuotesCount = quotesWithCoords.filter((quote) => {
-  //   return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
-  // }).length;
-
-  // PARAGRAPH STAGE OF STATE MACHINE (same in Compressor.js)
   useEffect(() => {
     dispatch(changeParagraphStage(turnId, ORIG_LOADING));
   }, []);
@@ -104,13 +90,7 @@ const ParagraphOriginal = ({
         getScrolledQuotes(quotes, paragraphEl, scrollTop)
       )
     );
-
-    // dispatch(markTurnAsChanged({ _id: turnId }));
   }, [width]);
-
-  // useEffect(() => {
-
-  // }, [width, wasReady]);
 
   useEffect(() => {
     if (!quotesWithoutScroll.length) return;
@@ -126,7 +106,7 @@ const ParagraphOriginal = ({
 
       dispatch(markTurnAsChanged({ _id: turnId }));
     });
-  }, [height, scrollTop, wasReady]); // stage, stateIsReady
+  }, [height, scrollTop]); // stage, stateIsReady
   // @todo: нужно учитывать stage
 
   useEffect(() => {
@@ -160,16 +140,6 @@ const ParagraphOriginal = ({
           );
           // @todo: сообщить сервисам минимапа и линий
         });
-
-        // dispatch({
-        //   type: ACTION_TURN_WAS_CHANGED,
-        //   payload: {
-        //     _id: turnId,
-        //     wasChanged: true,
-        //     scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-        //   },
-        // });
-      } else {
       }
     };
 
@@ -188,23 +158,14 @@ const ParagraphOriginal = ({
         ref={paragraphEl}
         style={style}
       >
-        {/* {!!topQuotesCount && (
-            <span className="top-quotes-counter">{topQuotesCount}</span>
-          )} */}
-        {/* <ParagraphOriginalTextWrapper */}
         <ParagraphOriginalTexts
           arrText={paragraph || []}
           turnId={turnId}
           turnType={contentType}
         />
-        {/* {!!bottomQuotesCount && (
-            <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
-          )} */}
       </p>
     </div>
   );
 };
-
-// export default React.memo(ParagraphOriginal);
 
 export default ParagraphOriginal;

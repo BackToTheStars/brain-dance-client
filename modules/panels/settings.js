@@ -4,8 +4,6 @@ import dynamic from 'next/dynamic';
 import { panelSpacer } from '@/config/ui';
 import ClassList from '../classes/components/ClassList';
 
-// import AddEditTurnPopup from '@/modules/turns/components/forms/TurnBlocks';
-
 const AddEditTurnPopup = dynamic(
   () => import('@/modules/turns/components/forms/AddEditTurn'),
   {

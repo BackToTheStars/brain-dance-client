@@ -55,10 +55,7 @@ export const ParagraphOriginalTexts = ({
   turnId,
   turnType,
   compressed = false,
-  // setTextIsReady = () => {},
-  // scrollPosition = -1, // специально ненастоящее значение, чтобы проверять
 }) => {
-  //
   const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
 
   return (
@@ -86,8 +83,6 @@ export const ParagraphOriginalTexts = ({
     </>
   );
 };
-
-// export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
 export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   // const spanFragment = useRef(null);
@@ -126,14 +121,6 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
         if (startPosition < element.length) {
           items.push({ value: element.slice(startPosition), type: 'text' });
         }
-        // console.log(items);
-        // [{
-        //   value: 'Я пишу про ',
-        //   type: 'text',
-        // }, {
-        //   value: 'https://google.com',
-        //   type: 'link',
-        // }]
         return items.map((item, index2) => {
           if (item.type === 'text') return item.value;
           return (
@@ -157,11 +144,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
 };
 
 export const ParagraphCompressorTextWrapper = ({ arrText }) => {
-  // if (!arrText) return;
-  // console.log({ arrText });
   const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
-  // console.log('ParagraphCompressorTextWrapper', arrText.length);
-  // return 'check';
   return (
     <>
       {(modifiedArrText || []).map((textItem, i) => {
@@ -267,10 +250,6 @@ export const TextAroundQuote = ({
       const fixScroll = Math.floor(middleLineParagraph - middleLine);
       paragraphEl.current.scrollTop -= fixScroll;
       setTextIsReady();
-      // for (let quote of quotes) {
-      // const { top, bottom } = quote.getBoundingClientRect();
-      // }
-      // console.log(middleLine, ' ', middleLineParagraph);
     }, 300);
   }, []);
 

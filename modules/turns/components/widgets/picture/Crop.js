@@ -9,14 +9,7 @@ const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 
 const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   const dispatch = useDispatch();
-
   const [crop, setCrop] = useState();
-
-  // useEffect(() => {
-  //     const quote = quotes.find((quote) => quote.id === activeQuote.quoteId);
-  //     const { x, y, height, width } = quote;
-  //     setCrop({ unit: '%', x, y, width, height });
-  // }, []);
 
   useEffect(() => {
     if (!crop) return;

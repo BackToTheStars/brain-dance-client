@@ -3,10 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClass, updateClass } from '../redux/actions';
 import SubClassList from './SubClassList';
-// import { useClassContext } from '../contexts/ClassContext';
 
-const ClassComponent = ({ classItemId, _id }) => {
-  // const { removeClass, updateClass } = useClassContext();
+const ClassComponent = ({ classItemId }) => {
   const dispatch = useDispatch();
   const inputRef = useRef();
 
@@ -22,24 +20,12 @@ const ClassComponent = ({ classItemId, _id }) => {
     e.preventDefault();
     setEditTitleMode(false);
     dispatch(updateClass({ id: classItem.id, title }));
-    // classesDispatch({
-    //   type: ACTION_CLASS_UPDATE,
-    //   payload: { id: classItem.id, title },
-    // });
   };
 
   const handleAddSubClass = (e) => {
     e.preventDefault();
     setEditSubclassMode(!editSubclassMode);
   };
-
-  // const removeClass = () => {
-  //   classesDispatch({
-  //     type: ACTION_CLASS_DELETE,
-  //     payload: { id: classItem.id },
-  //   });
-  //   // setClasses(classes.filter((classItem) => classItem.id !== classId));
-  // };
 
   useEffect(() => {
     setTitle(classItem.title);
@@ -63,7 +49,7 @@ const ClassComponent = ({ classItemId, _id }) => {
             onChange={(e) => setTitle(e.target.value)}
           />
           <button className="btn btn-success panel-button">
-            {/* <img src="/icons/ok.svg" /> */}Ok
+            Ok
           </button>
         </form>
       ) : (
@@ -87,7 +73,7 @@ const ClassComponent = ({ classItemId, _id }) => {
               <img src="/icons/white/edit.svg" />
             </button>
 
-            {!classItem?.children?.length && ( // @learn
+            {!classItem?.children?.length && (
               <button
                 className="btn btn-success btn-sm panel-button"
                 onClick={() => dispatch(removeClass(classItem.id))}

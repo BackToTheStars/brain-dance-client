@@ -3,7 +3,6 @@ const Modal = ({
   title = '',
   close,
   buttons = null,
-  closeBtn = true,
 }) => {
   return (
     <>
@@ -24,16 +23,6 @@ const Modal = ({
             {!!buttons && (
               <div className="modal-footer">
                 {buttons}
-                {/* {closeBtn && (
-                  <button
-                    onClick={close}
-                    type="button"
-                    className="btn btn-secondary-outline"
-                    data-dismiss="modal"
-                  >
-                    Cancel
-                  </button>
-                )} */}
               </div>
             )}
           </div>

@@ -22,12 +22,8 @@ const getQuoteLabel = (quoteInfo) => {
 };
 
 const LineRow = ({ line, can, handleDelete }) => {
-  const sourceQuoteInfo = useSelector(
-    (state) => state.quotes.d[`${line.sourceTurnId}_${line.sourceMarker}`]
-  );
-  const targetQuoteInfo = useSelector(
-    (state) => state.quotes.d[`${line.targetTurnId}_${line.targetMarker}`]
-  );
+  const sourceQuoteInfo = useSelector(s => s.lines.quotesInfo[line.sourceTurnId][line.sourceMarker]);
+  const targetQuoteInfo = useSelector(s => s.lines.quotesInfo[line.targetTurnId][line.targetMarker]);
   return (
     <tr>
       <td>{line.author}</td>

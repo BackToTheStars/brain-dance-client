@@ -9,7 +9,6 @@ import SubWidgetBlocks from '../../forms/SubWidgetBlocks';
 
 const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
   const field = 'url';
-  const form = {};
   const settings = widgetSettings[WIDGET_PICTURE];
 
   const updateField = (field, value) => {
@@ -18,27 +17,6 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
       [field]: value,
     });
   };
-
-  // const sourceActions = {
-  //   remove: (index) => {
-  //     console.log({ index });
-  //     const sourcesCopy = [...widget.sources];
-  //     updateField('sources', [
-  //       ...sourcesCopy.slice(0, index),
-  //       ...sourcesCopy.slice(index + 1),
-  //     ]);
-  //   },
-  //   addBelow: () => {
-  //     const sources = widget.sources || [];
-  //     sources.push({ url: '', date: null });
-  //     updateField('sources', sources);
-  //   },
-  // };
-
-  const subWidgets = settings.subWidgets;
-
-  // const [subWidget] = subWidgets
-  // const s = subWidgets[0];
 
   return (
     <div>
@@ -67,43 +45,6 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
         }}
         form={widget}
       />
-      {/* {subWidgets.map((s, i) => {
-        s.actions = getSubWidgetActions(s.field, s.defaultParams);
-        return (
-          <div key={i}>
-            <h4>{s.label}</h4>
-            {!!widget &&
-              !!widget[s.field] &&
-              widget[s.field].map((data, index) => {
-                const Component = s.component;
-                return (
-                  <div className="d-flex" key={index}>
-                    <div className="flex-1">
-                      <Component
-                        widgetBlock={data}
-                        updateWidgetBlock={(newData) => {
-                          const items = [...widget[s.field]];
-                          items[index] = newData;
-                          updateField(s.field, items);
-                          // updateField(widget.sources.map((s, i) => i === index ? newSource : s))
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Button onClick={() => s.actions.remove(index)}>
-                        <DeleteOutlined />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            <Button onClick={s.actions.addBelow}>
-              <PlusOutlined />
-            </Button>
-          </div>
-        );
-      })} */}
-
       <SubWidgetBlocks
         settings={settings}
         widget={widget}

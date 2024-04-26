@@ -3,8 +3,6 @@ const getShortLink = (url) => {
     const shortLink = new URL(url).hostname;
     return shortLink
   } catch (err) {
-    // console.log(url);
-    // console.log(err);
     return url;
   }
 }

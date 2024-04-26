@@ -1,64 +1,5 @@
-// export const getParagraphQoutesFromDomOld = (turnId, paragraphEl) => {
-//   const spans = [...paragraphEl.current.querySelectorAll('span')];
-//   const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
-//   const paragraphRect = paragraphEl.current.getBoundingClientRect();
-//   const turnElRect = paragraphEl.current.parentElement.getBoundingClientRect();
-//   const quotes = [];
-//   for (let quoteEl of quoteEls) {
-//     const rect = quoteEl.getBoundingClientRect();
-//     let left = rect.left - turnElRect.left;
-//     let top = rect.top - turnElRect.top;
-//     let width = rect.width;
-//     let height = rect.height;
-
 import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
-
-//     let position = 'default';
-//     const outlineWidth = 2; // ещё в Turn.js строчка 466
-
-//     const initialCoords = { left, top, width, height };
-
-//     if (rect.top + rect.height / 2 < paragraphRect.top) {
-//       //
-//       height = 0;
-//       width = paragraphRect.width - outlineWidth; // 2 ширины рамки
-//       left = paragraphRect.left - turnElRect.left + outlineWidth;
-//       top = paragraphRect.top - turnElRect.top + outlineWidth;
-//       position = 'top';
-//       //
-//     } else if (
-//       rect.top + rect.height / 2 >
-//       paragraphRect.top + paragraphRect.height
-//     ) {
-//       height = 0;
-//       width = paragraphRect.width - outlineWidth;
-//       left = paragraphRect.left - turnElRect.left + outlineWidth;
-//       top =
-//         paragraphRect.top +
-//         paragraphRect.height -
-//         turnElRect.top +
-//         outlineWidth;
-//       position = 'bottom';
-//     }
-
-//     // const quoteId = quoteEl.attributes.id || new Date().getTime(); // ???
-//     const quoteId = quoteEl.getAttribute('data-id') || new Date().getTime();
-//     quotes.push({
-//       initialCoords,
-//       quoteId,
-//       quoteKey: `${turnId}_${quoteId}`,
-//       turnId,
-//       width,
-//       height,
-//       left,
-//       top,
-//       text: quoteEl.textContent.trim(), // !!!
-//       position,
-//     });
-//   }
-//   return quotes;
-// };
 
 export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
   const spans = [...paragraphEl.current.querySelectorAll('span')];
@@ -90,12 +31,7 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
       quoteId,
       quoteKey: `${turnId}_${quoteId}`,
       turnId,
-      // width,
-      // height,
-      // left,
-      // top,
-      text: quoteEl.textContent.trim(), // !!!
-      // position,
+      text: quoteEl.textContent.trim(), 
     });
   }
   return quotes;
