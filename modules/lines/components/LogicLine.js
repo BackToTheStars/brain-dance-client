@@ -26,8 +26,9 @@ const getCoordsByTurnPositionAndMarkerQuote = ( turnPosition, markerQuote ) => {
   };
 }
 
-const LogicLine = ({ line }) => {
-  const { _id, sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
+const LogicLine = ({ id }) => {
+  const line = useSelector((state) => state.lines.d[id]);
+  const { sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
   const sourceTurnPosition = useSelector(
     (state) => state.turns.g[sourceTurnId]?.position
   );
@@ -58,6 +59,7 @@ const LogicLine = ({ line }) => {
     return getCoordsByTurnPositionAndMarkerQuote(targetTurnPosition, targetMarkerQuote);
   }, [targetTurnPosition, targetMarkerQuote]);
 
+  // @todo: нужен ли viewport?
   const { prevSleft, prevSTop } = useMemo(() => {
     return {
       prevSleft: sourceCoords?.left - gamePosition.x + viewport.width,

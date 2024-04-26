@@ -15,7 +15,8 @@ const ParagraphQuotes = ({ turnId }) => {
     return allQuotes.filter((quote) => quote.type === TYPE_QUOTE_TEXT);
   }, [allQuotes]);
 
-  const lines = useSelector((store) => store.lines.lines);
+  const dLines = useSelector((store) => store.lines.d); // @fixme
+  const lines = useMemo(() => Object.values(dLines), [dLines]);
   const activeQuoteKey = useSelector((store) => store.quotes.activeQuoteKey);
 
   const activeQuotesDictionary = useMemo(() => {

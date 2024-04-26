@@ -58,14 +58,14 @@ export const setPanelMode = (payload) => (dispatch, getState) => {
       };
     } else if (payload.mode === MODE_WIDGET_PICTURE_QUOTE_ADD) {
       const state = getState();
-      const { turn, editWidgetParams, editWidgetId } =
+      const { turnData, editWidgetParams, editWidgetId } =
         getWidgetDataFromState(state);
       if (!!editWidgetParams?.activeQuoteId) {
         const activeQuote =
-          state.quotes.d[`${turn._id}_${editWidgetParams.activeQuoteId}`];
+          state.quotes.d[`${turnData._id}_${editWidgetParams.activeQuoteId}`];
         params = {
           editWidgetParams: {
-            [`${turn._id}_${editWidgetId}`]: {
+            [`${turnData._id}_${editWidgetId}`]: {
               activeQuoteId: editWidgetParams.activeQuoteId,
               crop: {
                 unit: '%',

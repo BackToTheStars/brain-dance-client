@@ -25,7 +25,8 @@ export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
 
 export const savePictureQuoteByCrop = () => (dispatch, getState) => {
   const state = getState();
-  const { turn, editWidgetParams, zeroPoint } = getWidgetDataFromState(state);
+  const { turnData, turnGeometry, editWidgetParams } =
+    getWidgetDataFromState(state);
   const { x, y, width, height } = editWidgetParams.crop;
   const { activeQuoteId } = editWidgetParams;
 
@@ -44,17 +45,15 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
     dispatch(
       resaveTurn(
         {
-          _id: turn._id,
+          _id: turnData._id,
           quotes: activeQuoteId
-            ? turn.quotes.map((quote) =>
+            ? turnData.quotes.map((quote) =>
                 quote.id === activeQuoteId ? pictureQuote : quote
               )
-            : [...turn.quotes, pictureQuote],
-          x: turn.position.x - zeroPoint.position.x,
-          y: turn.position.y - zeroPoint.position.y,
+            : [...turnData.quotes, pictureQuote],
+          x: turnGeometry.position.x,
+          y: turnGeometry.position.y,
         },
-        zeroPoint,
-
         {
           success: resolve,
         }
@@ -67,29 +66,36 @@ export const processQuoteClicked =
   (currentQuoteKey) => (dispatch, getState) => {
     const state = getState();
     const cancelCallback = state.game.cancelCallback;
+    // прежняя выбранная цитата
     const activeQuoteKey = state.quotes.activeQuoteKey;
-    const turnId = currentQuoteKey.split('_')[0];
-    const lines = state.lines.lines;
+    const [turnId, marker] = currentQuoteKey.split('_');
+    // линии, соединённые с выбранной цитатой
+    const oneSideConnectedLines =
+      (state.lines.dByTurnIdAndMarker[turnId] &&
+        state.lines.dByTurnIdAndMarker[turnId][marker]) ||
+      [];
     cancelCallback();
     setTimeout(() => {
+      // если выбранная цитата уже активна, то снимаем выделение
       if (activeQuoteKey === currentQuoteKey) {
         dispatch(setActiveQuoteKey(null));
-        // setInteractionMode(MODE_GAME);
-        // setPanelType(null);
       } else {
+        // если ещё нет активной цитаты, то активируем выбранную
         if (!activeQuoteKey) {
           dispatch(setActiveQuoteKey(currentQuoteKey));
           return;
         }
-        // if (activeQuoteKey.split('_')[0] === turnId) {
-        //   dispatch(setActiveQuoteKey(currentQuoteKey));
-        //   return;
-        // }
-        const connectedLines = filterLinesByQuoteKey(lines, currentQuoteKey);
-        if (findLineByQuoteKey(connectedLines, activeQuoteKey)) {
+        // находим установленные связи между активной и выбираемой цитатой
+        const twoSideConnectedLines = filterLinesByQuoteKey(
+          oneSideConnectedLines,
+          activeQuoteKey
+        );
+        // если есть связь между активной и выбираемой цитатой, то просто переключаемся на новую
+        if (twoSideConnectedLines.length) {
           dispatch(setActiveQuoteKey(currentQuoteKey));
           return;
         }
+        // если нет связи, то создаем связь между активной цитатой и выбираемой
         dispatch(
           lineCreate({
             sourceTurnId: activeQuoteKey.split('_')[0],
@@ -105,12 +111,13 @@ export const processQuoteClicked =
 
 export const deleteQuote = () => (dispatch, getState) => {
   const state = getState();
-  const { turn, editWidgetParams, zeroPoint } = getWidgetDataFromState(state);
+  const { turnData, turnGeometry, editWidgetParams } =
+    getWidgetDataFromState(state);
   const { lines } = state.lines;
 
   let id = editWidgetParams.activeQuoteId;
 
-  const linesToDelete = filterLinesByQuoteKey(lines, `${turn._id}_${id}`);
+  const linesToDelete = filterLinesByQuoteKey(lines, `${turnData._id}_${id}`);
 
   if (!!linesToDelete.length) {
     dispatch(linesDelete(linesToDelete.map((l) => l._id)));
@@ -120,12 +127,11 @@ export const deleteQuote = () => (dispatch, getState) => {
     dispatch(
       resaveTurn(
         {
-          _id: turn._id,
+          _id: turnData._id,
           quotes: turn.quotes.filter((quote) => quote.id !== id), // @todo find quote and update
-          x: turn.position.x - zeroPoint.position.x,
-          y: turn.position.y - zeroPoint.position.y,
+          x: turnGeometry.position.x,
+          y: turnGeometry.position.y,
         },
-        zeroPoint,
         {
           success: resolve, // @todo: заменить на Promise
           error: reject,

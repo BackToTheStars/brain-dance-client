@@ -7,7 +7,6 @@ const initialTurnsState = {
   d: {},
   g: {},
   error: null,
-  zeroPointId: null,
   turnsToPaste: [],
   pasteNextTurnPosition: null,
 };
@@ -239,6 +238,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...state.d,
           [payload._id]: payload,
         },
+        g: {
+          ...state.g,
+          [payload._id]: payload,
+        }
       };
     }
 

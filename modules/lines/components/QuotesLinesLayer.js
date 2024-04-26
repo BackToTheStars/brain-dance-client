@@ -4,9 +4,10 @@ import { useSelector } from 'react-redux';
 import LogicLine from './LogicLine';
 
 const QuotesLinesLayer = ({ svgLayerZIndex }) => {
-  const lines = useSelector((state) => state.lines.lines);
+  const d = useSelector((state) => state.lines.d);
   const svgLayer = useRef();
   const viewport = useSelector((state) => state.game.viewport);
+  const lines = useMemo(() => Object.values(d), [d]);
 
   useEffect(() => {
     if (!svgLayer?.current) return;
@@ -32,7 +33,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         top: `${-viewport.height}px`,
       },
     };
-  }, [viewport])
+  }, [viewport]);
 
   return (
     <>
@@ -45,7 +46,7 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         ref={svgLayer}
       >
         {lines.map((line) => {
-          return <LogicLine key={line._id} line={line} />;
+          return <LogicLine key={line._id} id={line._id} />;
         })}
       </svg>
       {!svgLayerZIndex && (

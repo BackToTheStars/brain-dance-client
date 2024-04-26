@@ -7,7 +7,7 @@ import {
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
@@ -41,15 +41,14 @@ const getDate = (mixedDate) => {
 
 const AddEditTurnPopup = () => {
   // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
+  const gamePosition = useSelector((state) => state.game.position);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const turn = useSelector((state) => state.turns.d[editTurnId]);
+  // @fixme
   const turnToEdit = useMemo(
     () => (!!turn ? TurnHelper.toOldFields(turn) : null),
     [turn]
   );
-  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
-  const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
-
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const [error, setError] = useState(null);
@@ -70,7 +69,8 @@ const AddEditTurnPopup = () => {
     dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
     dispatch(toggleMaximizeQuill(false));
   };
-  const lines = useSelector((state) => state.lines.lines);
+  const dLines = useSelector((state) => state.lines.d);
+  const lines = useMemo(() => Object.values(lines), [dLines]);
 
   const toggleMaximize = (value) => {
     setIsMaximized(value);
@@ -253,8 +253,8 @@ const AddEditTurnPopup = () => {
 
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
-      turnObj.x = -zeroPoint.position.x + turnToEdit.x;
-      turnObj.y = -zeroPoint.position.y + turnToEdit.y;
+      turnObj.x = turnToEdit.x;
+      turnObj.y = turnToEdit.y;
 
       // @fixme
       dispatch(resaveTurn(turnObj, saveCallbacks));
@@ -262,9 +262,10 @@ const AddEditTurnPopup = () => {
       turnObj.height = 600;
       turnObj.width = 800;
       turnObj.x =
-        -zeroPoint.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
+        gamePosition.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
       turnObj.y =
-        -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
+        gamePosition.y +
+        Math.round(window.innerHeight / 2 - turnObj.height / 2);
 
       // @fixme
       dispatch(createTurn(turnObj, saveCallbacks));

@@ -78,10 +78,7 @@ const CreateTurnForm = () => {
   const [errors, setErrors] = useState({});
   const [activeTemplate, setActiveTemplate] = useState(templatesToShow[0]);
   const templateSettings = settings[activeTemplate];
-
-  const zeroPoint = useSelector(
-    (state) => state.turns.d[state.turns.zeroPointId]
-  );
+  const gamePosition = useSelector((state) => state.game.position);
 
   const commonFields = {
     colors: {
@@ -91,10 +88,10 @@ const CreateTurnForm = () => {
     position: {
       // @todo: get vieport size from redux
       x:
-        -zeroPoint.position.x +
+        gamePosition.x +
         Math.round(window.innerWidth / 2 - TURN_SIZE_WIDTH / 2),
       y:
-        -zeroPoint.position.y +
+        gamePosition.y +
         Math.round(window.innerHeight / 2 - TURN_SIZE_HEIGHT / 2),
     },
     size: {

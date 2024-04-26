@@ -33,6 +33,7 @@ export const getBoundingAreaRect = (turnObjects) => {
   }
 }
 
+// @deprecated
 export const getAreaRect = (turnObjects) => {
   let left = turnObjects[0]?.position.x || 0,
     right = turnObjects[0]?.position.x + turnObjects[0]?.size.width || 0,

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
 import * as panelTypes from '@/modules/panels/redux/types';
 import { lineDelete } from '@/modules/lines/redux/actions';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { PANEL_LINES } from '../settings';
 
 const cutTextToSize = (text, size) => {
@@ -49,9 +49,17 @@ const LineRow = ({ line, can, handleDelete }) => {
 };
 
 const LinesPanel = () => {
-  const lines = useSelector((state) => state.lines.lines);
+  const dByTurnIdAndMarker = useSelector(
+    (state) => state.lines.dByTurnIdAndMarker
+  );
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
-  const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
+  const connectedLines = useMemo(() => {
+    if (!activeQuoteKey) return {};
+    const [turnId, marker] = activeQuoteKey.split('_');
+    return (
+      (dByTurnIdAndMarker[turnId] && dByTurnIdAndMarker[turnId][marker]) || []
+    );
+  }, [dByTurnIdAndMarker, activeQuoteKey]);
 
   const dispatch = useDispatch();
   const { can } = useUserContext();
@@ -64,15 +72,15 @@ const LinesPanel = () => {
   };
 
   // useEffect(() => {
-  //   if (!preparedLines.length) {
+  //   if (!connectedLines.length) {
   //     dispatch({
   //       type: panelTypes.PANEL_TOGGLE,
   //       payload: { open: false, type: PANEL_LINES },
   //     });
   //   }
-  // }, [preparedLines]);
+  // }, [connectedLines]);
 
-  if (!preparedLines.length) {
+  if (!connectedLines.length) {
     return null;
   }
 
@@ -88,7 +96,7 @@ const LinesPanel = () => {
         </tr>
       </thead>
       <tbody>
-        {preparedLines.map((line, index) => {
+        {connectedLines.map((line, index) => {
           return (
             <LineRow
               key={index}

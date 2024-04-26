@@ -19,8 +19,6 @@ const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[_id]);
-  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
-  const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
 
   const handleCut = (e) => {
     e.preventDefault();
@@ -53,15 +51,8 @@ const ButtonsMenu = ({ _id }) => {
 
     dispatch(
       centerViewportAtPosition({
-        x:
-          turn.position.x -
-          zeroPoint.position.x +
-          Math.floor(turn.size.width / 2) +
-          450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
-        y:
-          turn.position.y -
-          zeroPoint.position.y +
-          Math.floor(turn.size.height / 2),
+        x: turn.position.x + Math.floor(turn.size.width / 2) + 450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
+        y: turn.position.y + Math.floor(turn.size.height / 2),
       })
     );
   };

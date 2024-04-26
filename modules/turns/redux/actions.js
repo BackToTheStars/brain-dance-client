@@ -327,7 +327,8 @@ export const createTurn = (turn, callbacks) => (dispatch) => {
 
 export const deleteTurn = (_id) => (dispatch, getState) => {
   const state = getState();
-  const lines = filterLinesByTurnId(state.lines.lines, _id);
+  const allLines = Object.values(state.lines.d)
+  const lines = filterLinesByTurnId(allLines, _id);
   dispatch(linesDelete(lines.map((line) => line._id))).then(() => {
     deleteTurnRequest(_id).then((data) => {
       dispatch({
@@ -338,15 +339,15 @@ export const deleteTurn = (_id) => (dispatch, getState) => {
   });
 };
 
-export const resaveTurn = (turn, zeroPoint, callbacks) => (dispatch) => {
+export const resaveTurn = (turn, callbacks) => (dispatch) => {
   updateTurnRequest(turn._id, turn).then((data) => {
     paragraphStateDeleteFromLocalStorage(turn._id);
     const preparedTurn = {
       ...data.item,
       compressedHeight: 0,
       compressedParagraphState: null,
-      x: turn.x + zeroPoint.position.x,
-      y: turn.y + zeroPoint.position.y,
+      x: turn.x,
+      y: turn.y,
     };
     dispatch({
       type: types.TURN_RESAVE,
@@ -375,7 +376,7 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
         size: turnGeometry.size,
       }
       const turn = TurnHelper.toOldFields(newFormatTurn);
-      const lines = state.lines.lines;
+      const lines = Object.values(state.lines.d);
       const copiedTurn = dataCopy(turn);
       // @todo: проверить, откуда появляется _id в quotes
       copiedTurn.quotes = copiedTurn.quotes.map((quote) => ({
@@ -460,8 +461,6 @@ export const insertTurnFromBuffer =
       return false;
     }
 
-    const zeroPointId = state.turns.zeroPointId;
-    const zeroPoint = state.turns.d[zeroPointId];
     dispatch(loadTurnsAndLinesToPaste());
 
     if (timeStamps.length === 1) {

@@ -110,9 +110,6 @@ const SVGMiniMap = memo(({ width, height }) => {
 
   const gTurns = useMemo(() => {
     const gTurns = Object.values(g)
-      .filter((turn) => {
-        return turn.contentType !== 'zero-point';
-      })
       .map((turn) => {
         return {
           _id: turn._id,
@@ -189,9 +186,6 @@ const ViewportRect = memo(({ k }) => {
   const g = useSelector((state) => state.turns.g);
   const gTurns = useMemo(() => {
     const gTurns = Object.values(g)
-      .filter((turn) => {
-        return turn.contentType !== 'zero-point';
-      })
       .map((turn) => {
         return {
           _id: turn._id,
