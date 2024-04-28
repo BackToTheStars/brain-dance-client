@@ -37,16 +37,19 @@ const Quote = memo(({ isActive, quote }) => {
 const ParagraphQuotes = ({ turnId }) => {
   //
   const dispatch = useDispatch();
-  const allQuotes = useSelector((state) => state.lines.quotesInfo[turnId]);
+  const allQuotes = useSelector(
+    // @fixme: update for storybook
+    (state) => (state.lines ? state.lines.quotesInfo[turnId] : []),
+  );
   const paragraphQuotes = useMemo(() => {
     // экономия вычислений на filter allQuotes
     if (!allQuotes) return [];
     return allQuotes.filter((quote) => quote.type === TYPE_QUOTE_TEXT);
   }, [allQuotes]);
 
-  const dLines = useSelector((store) => store.lines.d); // @fixme
+  const dLines = useSelector((store) => (store.lines ? store.lines.d : {})); // @fixme: optimize and update for storybook
   const lines = useMemo(() => Object.values(dLines), [dLines]);
-  const activeQuoteKey = useSelector((store) => store.quotes.activeQuoteKey);
+  const activeQuoteKey = useSelector((store) => store?.quotes?.activeQuoteKey); // @fixme: update for storybook
 
   const activeQuotesDictionary = useMemo(() => {
     return getActiveQuotesDictionary(paragraphQuotes, lines);

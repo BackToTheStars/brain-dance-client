@@ -63,8 +63,8 @@ const TurnAdapter = ({ id }) => {
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       position: 'absolute',
-      left: `${position.x - gamePosition.x}px`,
-      top: `${position.y - gamePosition.y}px`,
+      left: `${position.x - (gamePosition.x || 0)}px`, // @fixme: update for storybook
+      top: `${position.y - (gamePosition.y || 0)}px`,
       width: `${size.width}px`,
       height: `${size.height}px`,
     };
@@ -140,7 +140,7 @@ const TurnAdapter = ({ id }) => {
 const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id].data);
   const size = useSelector((state) => state.turns.g[id].size);
-  const isSnapToGrid = useSelector(isSnapToGridSelector);
+  const isSnapToGrid = true; // useSelector(isSnapToGridSelector); // @fixme: update for storybook
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);

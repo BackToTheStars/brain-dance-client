@@ -37,17 +37,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         turnsToRender,
       }
     }
-    case types.LOAD_TURNS: {
-      const d = payload.turns.reduce((a, turn) => {
-        a[turn._id] = turn;
-        return a;
-      }, {});
-
-      return {
-        ...state,
-        d,
-      };
-    }
     case types.TURNS_UPDATE_GEOMETRY:
       return {
         ...state,
