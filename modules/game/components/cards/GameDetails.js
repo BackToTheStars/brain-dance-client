@@ -25,7 +25,7 @@ const GameDetails = () => {
     <>
       <div className="card">
         <img
-          className="card-img-top d-none d-sm-block"
+          className="card-img-top d-none d-sm-block w-full"
           src={image || DEFAULT_GAME_IMG}
           alt="Game image"
         />

@@ -87,7 +87,7 @@ const Picture = ({
             Math.floor(
               (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
                 imgEl.current.naturalWidth
-            ) + widgetSpacer;
+            )
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
@@ -96,7 +96,7 @@ const Picture = ({
             Math.floor(
               (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
                 imgEl.current.naturalWidth
-            ) + widgetSpacer;
+            )
           return newImgHeight;
         },
         resizeCallback: () => {},

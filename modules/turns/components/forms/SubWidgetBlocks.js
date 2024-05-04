@@ -31,7 +31,7 @@ const SubWidgetBlocks = ({ settings, widget, updateField }) => {
               widget[s.field].map((data, index) => {
                 const Component = s.component;
                 return (
-                  <div className="d-flex" key={index}>
+                  <div className="flex" key={index}>
                     <div className="flex-1">
                       <Component
                         widgetBlock={data}

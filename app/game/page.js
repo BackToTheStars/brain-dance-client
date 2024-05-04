@@ -1,5 +1,5 @@
 'use client';
-import '@/themes/v1/scss/style.scss';
+import '@/themes/game/index.scss';
 
 import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
 import { Suspense } from 'react';

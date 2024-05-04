@@ -27,7 +27,7 @@ const GameListTable = () => {
         <tr style={{ boxShadow: '0 -1px 0 #aaa inset' }}>
           <th>
             <div className="row">
-              <label className="col-auto col-form-label d-flex align-items-center">
+              <label className="col-auto col-form-label flex align-items-center">
                 Name
               </label>
               <div className="col">

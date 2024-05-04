@@ -51,7 +51,7 @@ export const HeaderAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
 
   return (
     <div className="panel-flex" style={{ flexDirection: 'column' }}>
-      <div className="d-flex">
+      <div className="flex">
         <div className="col-sm-9">
           <Input
             placeholder="Header:"

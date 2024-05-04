@@ -11,7 +11,7 @@ import { Button } from 'antd';
 export const WidgetMenu = ({ label, actions }) => {
   const { remove } = actions;
   return (
-    <div className="d-flex flex-column">
+    <div className="flex flex-column">
       <div>{label}</div>
       <div className="">
         <Button onClick={actions.moveUp}>

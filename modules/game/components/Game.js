@@ -14,9 +14,7 @@ import {
   moveField,
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
-import {
-  addNotification,
-} from '@/modules/ui/redux/actions';
+import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,7 +43,10 @@ const Game = ({ hash }) => {
         dispatch(setGameStage(GAME_STAGE_READY));
       });
       dispatch(
-        addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
+        addNotification({
+          title: 'Info:',
+          text: `User ${nickname} logged in.`,
+        }),
       );
     }
     useEffectIsDone = true;
@@ -59,7 +60,7 @@ const Game = ({ hash }) => {
         updateViewportGeometry({
           width: window.innerWidth,
           height: window.innerHeight,
-        })
+        }),
       );
     };
     window.addEventListener('resize', () => {
@@ -88,7 +89,7 @@ const Game = ({ hash }) => {
           moveField({
             left: -Math.round(ui.position.left),
             top: -Math.round(ui.position.top),
-          })
+          }),
         );
 
         dispatch(resetTurnNextPastePosition());
@@ -109,9 +110,7 @@ const Game = ({ hash }) => {
       <div className="gameFieldWrapper">
         <div
           id="gameBox"
-          className={`ui-widget-content ${
-            svgLayerZIndex ? 'hide-controls' : ''
-          }`}
+          className={svgLayerZIndex ? 'hide-controls' : ''}
           ref={gameBox}
           onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
         >

@@ -85,10 +85,12 @@ const MinimapDataAdapter = () => {
     return {
       wrapperStyles: {
         height: `${mHeight + 2 * INNER_PADDING}px`,
+        transition: '0.5s',
       },
       minimapStyles: {
         width: `${mWidth}px`,
         height: `${mHeight}px`,
+        transition: '0.5s',
       },
     };
   }, [mWidth, mHeight]);

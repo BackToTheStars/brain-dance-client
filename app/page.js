@@ -1,5 +1,5 @@
 'use client';
-import '@/themes/v1/scss/style.scss';
+import '@/themes/game/index.scss';
 
 import CreateEnterGameBlock from '@/modules/game/components/blocks/CreateEnterGameBlock';
 import GameDetails from '@/modules/game/components/cards/GameDetails';
@@ -24,25 +24,24 @@ const MainDashboard = () => {
   const loadGamesAction = () => dispatch(loadGames());
 
   return (
-    <div className="container-fluid col-lg-10">
-      <div className="row h-100 vh-100 game-dashboard">
-        <div className="col-sm-6 col-xl-8 pt-4 game-dashboard-list">
-          <AdminMode />
-          <CreateEnterGameBlock
-            enterGame={enterGame}
-            onGameCreate={loadGamesAction}
-          />
-          <div
-            style={{ flex: '1' }}
-            className="mainTableWrapper"
-          >
-            <GameTable />
+    <div className="container">
+      <div className="flex flex-col h-full w-full">
+        <div className="flex flex-row flex-grow">
+          <div className="w-full lg:w-2/3 p-4">
+            <AdminMode />
+            <CreateEnterGameBlock
+              enterGame={enterGame}
+              onGameCreate={loadGamesAction}
+            />
+            <div className="flex-grow">
+              <GameTable />
+            </div>
           </div>
-        </div>
-        <div className="col-sm-6 col-xl-4 game-dashboard-detail">
-          <div className="sticky-top top-4">
-            <GameDetails />
-            <LastTurns />
+          <div className="w-full lg:w-1/3 p-4 main-dashboard__sidebar">
+            <div className="sticky top-4">
+              <GameDetails />
+              <LastTurns />
+            </div>
           </div>
         </div>
       </div>

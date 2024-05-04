@@ -29,6 +29,7 @@ import {
   ParagraphOriginalTexts,
   // ParagraphOriginalTextWrapper,
 } from './TextWrappers';
+import ParagraphEditButton from './EditButton';
 // import { useTurnData } from '../contexts/TurnData';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
@@ -67,9 +68,9 @@ const ParagraphOriginal = ({
 
   const style = {};
 
-  if (contentType === 'comment') {
-    style.backgroundColor = backgroundColor;
-    style.color = fontColor || 'black';
+  if (contentType === 'comment' && fontColor) {
+    // style.backgroundColor = backgroundColor;
+    style.color = fontColor; // || 'black';
   }
   if (showCompressed) {
     style.visibility = 'hidden';
@@ -152,7 +153,10 @@ const ParagraphOriginal = ({
   }, [paragraphEl]);
 
   return (
-    <div className="wrapperParagraphText turn-widget" style={style}>
+    <div
+      className="wrapperParagraphText turn-widget stb-widget-paragraph"
+      style={style}
+    >
       <p
         className="paragraphText original-text noselect"
         ref={paragraphEl}
@@ -164,6 +168,7 @@ const ParagraphOriginal = ({
           turnType={contentType}
         />
       </p>
+      <ParagraphEditButton />
     </div>
   );
 };

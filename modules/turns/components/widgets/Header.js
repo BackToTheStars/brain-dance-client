@@ -3,6 +3,7 @@ import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
 import { useSelector } from 'react-redux';
+import { getNeedBlackText } from '../helpers/color';
 //const HEADER_HEIGHT = 105;
 
 const Header = ({ widgetId, registerHandleResize, _id }) => {
@@ -24,10 +25,11 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
       height: `${headerHeight}px`,
     };
     if (contentType === 'comment' && show) {
+      const backgroundColor = getCommentHeaderColor(background);
       style = {
         ...style,
-        backgroundColor: getCommentHeaderColor(background),
-        color: font || 'black',
+        backgroundColor,
+        color: font || getNeedBlackText(backgroundColor) ? '#000' : '#fff',
       };
     }
     return style;
@@ -47,8 +49,12 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
 
   return (
     <>
-      <div className="headerText turn-widget" ref={headerEl} style={style}>
-        <div className="headerTextTitle">{text}</div>
+      <div
+        className="stb-widget-header headerText turn-widget"
+        ref={headerEl}
+        style={style}
+      >
+        <div className="headerTextTitle stb-widget-header__title">{text}</div>
         {!!(date || url) && <DateAndSourceUrl {...{ date, url }} />}
       </div>
     </>

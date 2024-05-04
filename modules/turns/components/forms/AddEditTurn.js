@@ -278,7 +278,7 @@ const AddEditTurnPopup = () => {
   if (Component) {
     return (
       <div
-        className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
+        className={`panel-inner flex flex-column h-100 flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
         }`}
       >
@@ -359,7 +359,7 @@ const AddEditTurnPopup = () => {
   return (
     <>
       <div
-        className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
+        className={`panel-inner flex flex-column h-100 flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
         }`}
       >

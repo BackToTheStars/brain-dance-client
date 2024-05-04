@@ -143,22 +143,7 @@ const Paragraph = ({
           }}
         />
       )}
-      <ParagraphQuotes turnId={turnId} />
-      <a
-        className="widget-button"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          dispatch(
-            setPanelMode({
-              mode: MODE_WIDGET_PARAGRAPH,
-              params: { editTurnId: turnId, editWidgetId: widgetId },
-            })
-          );
-        }}
-      >
-        <i className="fas fa-highlighter"></i>
-      </a>
+      {/* <ParagraphQuotes turnId={turnId} /> */}
     </>
   );
 };

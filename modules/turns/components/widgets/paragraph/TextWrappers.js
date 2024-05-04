@@ -4,33 +4,10 @@ import {
   widgetSpacer,
 } from '@/config/ui';
 import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
+import { colorSet, getNeedBlackText } from '../../helpers/color';
 
-const ORANGE = '#ffd596';
-const GRAY = '#d2d3d4';
-const PINK = '#fdc9ff';
-const LIGHT_BLUE = '#9cf5ff';
-const GREEN = '#8aff24';
-const YELLOW = '#ffff00';
 
 const modifyQuoteBackgrounds = (arrText, turnType) => {
-  const colorSet = {};
-  colorSet.turn = {
-    [ORANGE]: '#8f480d',
-    [GRAY]: '#525354',
-    [PINK]: '#85176d',
-    [LIGHT_BLUE]: '#1f717a',
-    [GREEN]: '#3f6e17',
-    [YELLOW]: '#87862b',
-  };
-  colorSet.comment = {
-    [ORANGE]: '#edb193',
-    [GRAY]: '#d2d3d4',
-    [PINK]: '#fdc9ff',
-    [LIGHT_BLUE]: '#9cf5ff',
-    [GREEN]: '#8aff24',
-    [YELLOW]: '#ffff00',
-  };
-
   const colors = colorSet?.[turnType] || colorSet.turn;
 
   return arrText.map((textItem) => {
@@ -38,14 +15,18 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
     // console.log(textItem?.attributes?.background);
     const rectColor =
       colors[textItem.attributes.background] || textItem.attributes.background;
+    const attributes = {
+      ...textItem.attributes,
+      background: rectColor,
+      borderRadius: TURN_QUOTE_BORDER_RADIUS,
+      outline: `solid 2px ${rectColor}`,
+    };
+
+    attributes.color = getNeedBlackText(rectColor) ? '#000' : '#fff';
+
     return {
       ...textItem,
-      attributes: {
-        ...textItem.attributes,
-        background: rectColor,
-        borderRadius: TURN_QUOTE_BORDER_RADIUS,
-        outline: `solid 2px ${rectColor}`,
-      },
+      attributes,
     };
   });
 };
@@ -57,7 +38,6 @@ export const ParagraphOriginalTexts = ({
   compressed = false,
 }) => {
   const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
-
   return (
     <>
       {modifiedArrText.map((textItem, i) => {
@@ -98,7 +78,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
         if (typeof element !== 'string') return element;
         const iterator = element.matchAll(
           /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/gm,
-          '<a href="$&" target="_blank">$&</a>'
+          '<a href="$&" target="_blank">$&</a>',
         );
         const matches = [];
         for (const item of iterator) {
@@ -360,7 +340,7 @@ export const TextAroundQuoteOptimized = ({
           ...params,
         };
       }),
-      index
+      index,
     );
   }, [scrollTop, quotesInfoPart]);
 

@@ -1,0 +1,129 @@
+
+body {
+  margin: 0;
+  font-family: var(--turn-font-family);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+p {
+  margin: 0;
+}
+
+// .ui-widget-content {
+//   border: none; // rewrite jqurey-ui-style
+// }
+// @import '../../modules/game/scss/style.scss';
+
+$corners-radius: 9px;
+// $white: rgba(255, 255, 255, 0.842);
+
+// $dark-grey: rgba(53, 58, 64, 1); // подогнал под bootstrap table-dark
+
+// @import '../../modules/panels/scss/style.scss';
+
+@mixin red-border {
+  outline: 3px solid red;
+}
+// cтили turn
+$turn-widget-bottom-spacer: 14px; // 14px; // такая же переменная дублируется в config/ui.js
+
+$turn-menu-right-spacing: 20px;
+$turn-header-color: #294377;
+$turn-main-color: #0c1e35;
+$turn-header-text-color: #c3c3c3;
+$turn-paragraph-text-color: #dbdbdb;
+$turn-upper-menu-color: #ffffff;
+$turn-corners-radius: 5px;
+$turn-border-thickness: 2px; // такая же переменная дублируется в config/ui.js
+$turn-border-color: rgba(98, 143, 211, 0.623);
+$turn-changed-border-color: rgba(249, 157, 30, 0.623);
+
+$turn-header-link-color: #78adff;
+$turn-header-link-color-hover: #add8e6;
+$turn-header-date-color: #c3c2c2;
+
+$turn-scrollbar-color: #183968;
+$turn-scrollbar-margin: 8px; // такая же переменная дублируется в config/ui.js
+
+$turn-edit-icon-color: #16272c;
+$turn-delete-icon-color: #d72929;
+$turn-scissor-icon-color: #16272c;
+$turn-copy-icon-color: #16272c;
+
+$turn-upper-corners-radius: 14px;
+
+$turn-upper-menu-lift: 15px; //    1/2 of height
+$turn-upper-menu-padding-left: 10px;
+$turn-upper-menu-padding-right: 10px;
+
+$turn-header-padding-top: 2px;
+$turn-header-padding-right: 15px;
+$turn-header-padding-bottom: 6px;
+$turn-header-padding-left: 15px;
+
+$turn-header-text-padding-top: 5px;
+$turn-header-text-padding-bottom: 6px;
+
+$turn-header-url-date-margin-bottom: 5px;
+$turn-header-date-font-size: 16px;
+$turn-date-and-url-bottom-spacer: 2px;
+
+$turn-pic-padding-top: $turn-widget-bottom-spacer;
+$turn-pic-padding-right: $turn-widget-bottom-spacer;
+$turn-pic-padding-bottom: $turn-widget-bottom-spacer;
+$turn-pic-padding-left: $turn-widget-bottom-spacer;
+
+$turn-text-padding-top: 10px;
+$turn-text-padding-right: 10px;
+$turn-text-padding-bottom: 15px;
+$turn-text-padding-left: 15px;
+$turn-quote-border-radius: 5px; // такая же переменная дублируется в config/ui.js
+
+$turn-pic-radius: 10px;
+
+$turn-header-text-font-size: 24px;
+$turn-header-text-font-weight: 500;
+
+$turn-main-text-font-size: 18px;
+$turn-main-text-font-weight: 400;
+
+// @import '../../modules/turns/scss/style.scss';
+// @import '../v1/scss/old/turn';
+@import './turn.scss';
+@import './other.scss';
+
+// @todo:
+// @import '../v1/scss/old/style2';
+
+// $panel-buttons-font-color: rgb(255, 255, 255);
+// $panel-buttons-bg-color: #1b4d76;
+// $panel-buttons-border-color: #667480;
+
+// $first-circle-width: 300px;
+// $first-circle-height: 300px;
+// $first-circle-color: #184269;
+// $first-circle-top: 0px;
+// $first-circle-left: 0px;
+// $first-circle-blur: 130px;
+
+// $second-circle-width: 300px;
+// $second-circle-height: 300px;
+// $second-circle-color: #183e63;
+// $second-circle-top: -160px;
+// $second-circle-right: 500px;
+// $second-circle-blur: 130px;
+
+// $third-circle-width: 300px;
+// $third-circle-height: 300px;
+// $third-circle-color: #143656;
+// $third-circle-bottom: 0px;
+// $third-circle-right: 0px;
+// $third-circle-blur: 130px;
+
+// $map-background-color: #181616;
+// @import '../v1/scss/old/styles.scss';

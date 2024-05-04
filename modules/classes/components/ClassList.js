@@ -22,7 +22,7 @@ const ClassList = () => {
   }, []);
 
   return (
-    <div className="class-list p-2 d-flex flex-column h-100">
+    <div className="class-list p-2 flex flex-col h-full base-ff">
       {classes.map((classItem, i) => (
         <ClassComponent
           key={classItem.id}
@@ -30,17 +30,18 @@ const ClassList = () => {
           _id={classItem._id}
         />
       ))}
-      <div className="flex-grow-1"></div>
-      <form className="add-class form-inline d-flex" onSubmit={submitAddClass}>
+      <div className="flex-grow" />
+      <form className="flex items-center gap-2" onSubmit={submitAddClass}>
         <Input
+          type="text"
+          className="border border-gray-300 rounded px-2 py-1 flex-1"
+          placeholder="Enter class name..."
           value={title}
-          className="form-group me-2 flex-grow-1"
           onChange={(e) => {
             setTitle(e.target.value);
           }}
-          placeholder="Enter class name..."
         />
-        <button className="btn btn-primary panel-button">Add</button>
+        <button className="btn btn-primary p-2">Add</button>
       </form>
     </div>
   );

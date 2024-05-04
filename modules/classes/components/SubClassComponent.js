@@ -29,34 +29,32 @@ const SubClassComponent = ({ subClassItemId }) => {
   }, [editTitleMode]);
 
   return (
-    <div className="class-item ml-3">
+    <div className="ml-3 class-item flex items-center">
       {editTitleMode ? (
-        <form onSubmit={updateTitle} className="d-flex pt-1 class-title-row">
+        <form onSubmit={updateTitle} className="flex pt-1 class-title-row">
           <Input
             ref={inputRef}
             className="me-2 flex-grow-1"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button className="btn btn-success btn-sm panel-button">
-            Ok
-          </button>
+          <button className="btn btn-success btn-sm panel-button">Ok</button>
         </form>
       ) : (
-        <div className="d-flex class-title-row">
-          <div className="me-3 pt-1 ps-2">
+        <div className="flex items-center gap-2">
+          <div className="px-2 py-1">
             {'- '}
             {title}
           </div>
-          <div className="btn-group classes-btn-group">
+          <div className="flex classes-btn-group">
             <button
-              className="btn btn-success btn-sm panel-button"
+              className="btn btn-success btn-sm"
               onClick={(e) => setEditTitleMode(true)}
             >
               <img src="/icons/white/edit.svg" />
             </button>
             <button
-              className="btn btn-success btn-sm panel-button"
+              className="btn btn-success btn-sm class-item-delete"
               onClick={() => dispatch(removeClass(subClassItem.id))}
             >
               <img src="/icons/white/delete.svg" />

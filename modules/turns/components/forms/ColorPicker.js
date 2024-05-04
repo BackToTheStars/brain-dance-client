@@ -11,7 +11,7 @@ const ColorPicker = ({ value, changeHandler, widgetSettings, label }) => {
   }, [widgetSettings.defaultColor]);
 
   return (
-    <div className="d-flex align-items-center">
+    <div className="flex align-items-center">
       <label className="me-2" style={{ fontSize: '16px', width: '95px' }}>
         {label}:
       </label>

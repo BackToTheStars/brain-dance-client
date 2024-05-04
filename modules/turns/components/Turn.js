@@ -45,6 +45,7 @@ import Video from './widgets/Video';
 import { isSnapToGridSelector, snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { Skeleton } from 'antd';
+import ParagraphQuotes from './widgets/paragraph/ParagraphQuotes';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -57,12 +58,11 @@ const TurnAdapter = ({ id }) => {
   const position = useSelector((state) => state.turns.g[id].position);
   const size = useSelector((state) => state.turns.g[id].size);
   const loadStatus = useSelector(
-    (state) => state.turns.d[id]?.loadStatus || 'not-loaded'
+    (state) => state.turns.d[id]?.loadStatus || 'not-loaded',
   );
   const contentType = useSelector((state) => state.turns.g[id].contentType);
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
-      position: 'absolute',
       left: `${position.x - (gamePosition.x || 0)}px`, // @fixme: update for storybook
       top: `${position.y - (gamePosition.y || 0)}px`,
       width: `${size.width}px`,
@@ -70,6 +70,7 @@ const TurnAdapter = ({ id }) => {
     };
 
     const wrapperClasses = [
+      'stb-react-turn',
       `turn_${id}`,
       contentType,
       'react-turn-new',
@@ -103,7 +104,7 @@ const TurnAdapter = ({ id }) => {
               },
               // x: ui.position.left, // x - left - ui.position.left,
               // y: ui.position.top, // y - top - ui.position.top,
-            })
+            }),
           );
         });
       },
@@ -113,10 +114,14 @@ const TurnAdapter = ({ id }) => {
           updateGeometry({
             _id: id,
             position: {
-              x: Math.round((ui.position.left + gamePosition.x) / GRID_CELL_X) * GRID_CELL_X,
-              y: Math.round((ui.position.top + gamePosition.y) / GRID_CELL_X) * GRID_CELL_X,
+              x:
+                Math.round((ui.position.left + gamePosition.x) / GRID_CELL_X) *
+                GRID_CELL_X,
+              y:
+                Math.round((ui.position.top + gamePosition.y) / GRID_CELL_X) *
+                GRID_CELL_X,
             },
-          })
+          }),
         );
         setIsDragging(false);
         $('#gameBox')
@@ -205,7 +210,7 @@ const Turn = memo(({ id }) => {
       setWidgets((widgets) => {
         const newWidgets = [...widgets];
         const index = newWidgets.findIndex(
-          (newWidget) => newWidget.id === widget.id
+          (newWidget) => newWidget.id === widget.id,
         );
         if (index === -1) {
           newWidgets.push(widget);
@@ -215,18 +220,18 @@ const Turn = memo(({ id }) => {
         return newWidgets;
       });
     },
-    [widgets]
+    [widgets],
   );
 
   const unregisterHandleResize = useCallback(
     (widget) => {
       setWidgets((widgets) => {
         return widgets.filter(
-          (widgetToReturn) => widget.id !== widgetToReturn.id
+          (widgetToReturn) => widget.id !== widgetToReturn.id,
         );
       });
     },
-    [widgets]
+    [widgets],
   );
 
   const recalculateSize = (width, height) => {
@@ -241,7 +246,7 @@ const Turn = memo(({ id }) => {
     } = getTurnMinMaxHeight(widgets, width);
 
     let newHeight = Math.round(
-      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer // @todo: для компрессора проверить
+      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer, // @todo: для компрессора проверить
     );
     if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
       newHeight = widgets
@@ -269,7 +274,7 @@ const Turn = memo(({ id }) => {
               height: newHeight,
             },
             [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
-          })
+          }),
         );
       });
 
@@ -311,12 +316,12 @@ const Turn = memo(({ id }) => {
       if (paragraphStage === ORIG_READY_TO_RECEIVE_PARAMS) {
         // @todo: проверить необходимо ли передать высоту
         dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: ORIG_READY })
+          changeTurnStage(_id, TURN_READY, { paragraphStage: ORIG_READY }),
         );
       }
       if (paragraphStage === COMP_READY_TO_RECEIVE_PARAMS) {
         dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: COMP_READY })
+          changeTurnStage(_id, TURN_READY, { paragraphStage: COMP_READY }),
         );
       }
     }
@@ -334,11 +339,11 @@ const Turn = memo(({ id }) => {
           isSnapToGrid
             ? recalculateSize(
                 snapRound(ui.size.width, GRID_CELL_X),
-                snapRound(ui.size.height, GRID_CELL_Y)
+                snapRound(ui.size.height, GRID_CELL_Y),
               )
             : recalculateSize(
                 Math.round(ui.size.width),
-                Math.round(ui.size.height)
+                Math.round(ui.size.height),
               );
           dispatch(markTurnAsChanged({ _id }));
         }
@@ -381,6 +386,7 @@ const Turn = memo(({ id }) => {
   // console.log({ widgets });
 
   const wrapperClasses = [
+    'stb-react-turn__inner',
     // contentType,
     'react-turn-new',
     'react-turn-new_size',
@@ -400,56 +406,61 @@ const Turn = memo(({ id }) => {
   }
 
   return (
-    <div
-      ref={wrapper}
-      className={wrapperClasses.join(' ')}
-      style={wrapperStyles}
-    >
-      {!dontShowHeader && (
-        <Header
-          widgetId={'h_1'}
-          registerHandleResize={registerHandleResize}
-          _id={_id}
-        />
-      )}
-      {!!videoUrl && (
-        <Video
-          // videoUrl={videoUrl}
-          widgetId={'v_1'}
-          registerHandleResize={registerHandleResize}
-          turnId={_id}
-          // width={width}
-        />
-      )}
-      {!!imageUrl && (
-        <Picture
-          // imageUrl={imageUrl}
-          widgetId={'i_1'}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          widgetType="picture"
-          turnId={_id}
-          widgetSettings={widgetD['i_1']}
-          pictureOnly={pictureOnly}
-        />
-      )}
-      {doesParagraphExist && (
-        <Paragraph
-          turnId={_id}
-          widgetId={'p_1'}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          widget={widgetD['p_1']}
-          notRegisteredWidgetsCount={notRegisteredWidgetsCount}
-        />
-      )}
+    <>
+      <div
+        ref={wrapper}
+        className={wrapperClasses.join(' ')}
+        style={wrapperStyles}
+      >
+        {!dontShowHeader ? (
+          <Header
+            widgetId={'h_1'}
+            registerHandleResize={registerHandleResize}
+            _id={_id}
+          />
+        ) : (
+          <div style={{ height: '0px' }} />
+        )}
+        {!!videoUrl && (
+          <Video
+            // videoUrl={videoUrl}
+            widgetId={'v_1'}
+            registerHandleResize={registerHandleResize}
+            turnId={_id}
+            // width={width}
+          />
+        )}
+        {!!imageUrl && (
+          <Picture
+            // imageUrl={imageUrl}
+            widgetId={'i_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            widgetType="picture"
+            turnId={_id}
+            widgetSettings={widgetD['i_1']}
+            pictureOnly={pictureOnly}
+          />
+        )}
+        {doesParagraphExist && (
+          <Paragraph
+            turnId={_id}
+            widgetId={'p_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            widget={widgetD['p_1']}
+            notRegisteredWidgetsCount={notRegisteredWidgetsCount}
+          />
+        )}
+      </div>
       <ButtonsMenu _id={_id} />
       {sourceShow && (
-        <div className="bottom-date-and-sourceurl">
+        <div className="bottom-date-and-sourceurl stb-react-turn__bottom-subtitle">
           <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />
         </div>
       )}
-    </div>
+      {doesParagraphExist && <ParagraphQuotes turnId={_id} />}
+    </>
   );
 });
 

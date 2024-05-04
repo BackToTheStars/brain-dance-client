@@ -283,7 +283,7 @@ const CreateTurnForm = () => {
 
   return (
     <>
-      <div className="d-flex">
+      <div className="flex">
         <div className="col-sm-3">
           <DropdownTemplate
             {...{
@@ -305,7 +305,7 @@ const CreateTurnForm = () => {
           )}
         </div>
       </div>
-      {/* <div className="d-flex">{commonFields}</div> */}
+      {/* <div className="flex">{commonFields}</div> */}
       {widgetBlocks.map((widgetBlock, index) => {
         if (index === addWidgetBlockPos) {
           return (
@@ -423,7 +423,7 @@ const TurnBlocksForm = () => {
 
   return (
     <div
-      className="panel-inner d-flex flex-column h-100 flex-1 add-edit-form"
+      className="panel-inner flex flex-column h-100 flex-1 add-edit-form"
       style={{
         overflowY: 'auto',
         padding: '20px',

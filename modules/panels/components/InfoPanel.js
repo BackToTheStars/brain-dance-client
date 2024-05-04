@@ -26,81 +26,84 @@ const InfoPanel = () => {
   const { name, description, public: publicStatus, codes = [] } = game;
 
   return (
-    <div className="pb-3">
-      {!viewMode && <EditGameForm />}
-      <table className="table game-info-table table-dark table-striped">
-        <tbody>
-          {viewMode && (
-            <>
-              <tr className="td-no-borders">
-                <td>Game name:</td>
-                <td>
-                  {name}{' '}
-                  {can(RULE_GAME_EDIT) && (
-                    <a
-                      className="edit-btn"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setViewMode(false);
-                      }}
-                    >
-                      <i className="fas fa-pen-square"></i>
-                    </a>
-                  )}
-                </td>
-              </tr>
-              <tr>
-                <td>Game type:</td>
-                <td>
-                  {publicStatus
-                    ? 'This game is public'
-                    : 'This game is private'}
-                </td>
-              </tr>
-              <tr>
-                <td>Visitor link:</td>
-                <td>
-                  <a href={getUrl(info)}>{getUrl(info)}</a>
-                </td>
-              </tr>
-              <tr>
-                <td>Game description:</td>
-                <td>{description}</td>
-              </tr>
-            </>
+    <>
+      <div className="pb-3">
+        {!viewMode && <EditGameForm />}
+        <table className="table-auto w-full text-left border-collapse border border-gray-300 rounded-lg">
+          <tbody>
+            {viewMode && (
+              <>
+                <tr className="border-b border-gray-300">
+                  <td className="py-2 px-4">Game name:</td>
+                  <td className="py-2 px-4">
+                    {name}{' '}
+                    {can(RULE_GAME_EDIT) && (
+                      <a
+                        className="edit-btn"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setViewMode(false);
+                        }}
+                      >
+                        <i className="fas fa-pen-square"></i>
+                      </a>
+                    )}
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-300">
+                  <td className="py-2 px-4">Game type:</td>
+                  <td className="py-2 px-4">
+                    {publicStatus
+                      ? 'This game is public'
+                      : 'This game is private'}
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-300">
+                  <td className="py-2 px-4">Visitor link:</td>
+                  <td className="py-2 px-4">
+                    <a href={getUrl(info)}>{getUrl(info)}</a>
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-300">
+                  <td className="py-2 px-4">Game description:</td>
+                  <td className="py-2 px-4">{description}</td>
+                </tr>
+              </>
+            )}
+            <tr className="border-b border-gray-300">
+              <td className="py-2 px-4">Your nickname:</td>
+              <td className="py-2 px-4">{nickname}</td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <td className="py-2 px-4">Your role:</td>
+              <td className="py-2 px-4">
+                {ROLES[role].name}
+                {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="p-3">
+          {viewMode ? (
+            <button
+              onClick={() => dispatch(togglePanel({ type: PANEL_INFO }))}
+              className="px-3 py-2 bg-blue-500 text-white rounded"
+            >
+              Close
+            </button>
+          ) : (
+            <button
+              className="px-3 py-2 bg-blue-500 text-white rounded"
+              onClick={() => {
+                setViewMode(true);
+              }}
+            >
+              Cancel
+            </button>
           )}
-          <tr className="td-no-borders">
-            <td>Your nickname:</td>
-            <td>{nickname}</td>
-          </tr>
-          <tr>
-            <td>Your role:</td>
-            <td>
-              {ROLES[role].name}
-              {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      {viewMode ? (
-        <button
-          onClick={() => dispatch(togglePanel({ type: PANEL_INFO }))}
-          className="btn btn-primary ms-3"
-        >
-          Close
-        </button>
-      ) : (
-        <button
-          style={{ minWidth: '75px' }}
-          className="btn btn-danger ms-3"
-          onClick={() => {
-            setViewMode(true);
-          }}
-        >
-          Cancel
-        </button>
-      )}
-    </div>
+        </div>
+      </div>
+    </>
   );
 };
 

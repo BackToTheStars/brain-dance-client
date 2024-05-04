@@ -56,7 +56,7 @@ const ButtonsMenu = ({ _id }) => {
   };
 
   return (
-    <div className="mod_icon_wrap">
+    <div className="mod_icon_wrap action-icons">
       <a key="clone" className="clone-btn" onClick={handleClone}>
         <CopyIcon />
       </a>

@@ -1,3 +1,4 @@
+import { Button, Form, Input, Radio } from 'antd';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -40,70 +41,47 @@ const EditGameForm = () => {
   };
 
   return (
-    <form className="card" onSubmit={(e) => handleSubmit(e)}>
-      <div className="card-body ">
-        <div className="form-group">
-          <div className="form-check form-check-inline">
-            <input
-              onChange={(e) => setGameIsPublic(true)}
-              name="gameIsPublic"
-              value="true"
-              type="radio"
-              className="form-check-input"
-              checked={gameIsPublic}
-            />
-            <label className="form-check-label">Public</label>
-          </div>
-          <div className="form-check form-check-inline ml-3s">
-            <input
-              onChange={(e) => setGameIsPublic(false)}
-              name="gameIsPublic"
-              value="false"
-              type="radio"
-              className="form-check-input"
-              checked={!gameIsPublic}
-            />
-            <label className="form-check-label ">Private</label>
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Name</label>
-          <input
-            className="form-control"
-            name="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Screenshot</label>
-          <input
-            className="form-control"
-            name="image"
-            type="text"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Description</label>
-          <textarea
-            className="form-control"
-            rows="3"
-            onChange={(e) => setDescription(e.target.value)}
-            defaultValue={description}
-          ></textarea>
-        </div>
-        <button
-          style={{ minWidth: '75px' }}
-          type="submit"
-          className="btn btn-primary mt-3"
-        >
+    <Form className="ant-card p-3" onFinish={(e) => handleSubmit(e)}
+      labelCol={{ span: 4 }}
+      wrapperCol={{ span: 20 }}
+    >
+      <Form.Item
+        name="gameIsPublic"
+        valuePropName="checked"
+        initialValue={gameIsPublic}
+      >
+        <Radio.Group>
+          <Radio className="text-white" value={true}>
+            Public
+          </Radio>
+          <Radio className="text-white" value={false}>
+            Private
+          </Radio>
+        </Radio.Group>
+      </Form.Item>
+      <Form.Item
+        name="name"
+        label={<span className="text-white">Name</span>}
+        rules={[{ required: true, message: 'Please input name!' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        name="image"
+        label={<span className="text-white">Screenshot</span>}
+        rules={[{ required: true, message: 'Please input image!' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item name="description" label={<span className="text-white">Description</span>}>
+        <Input.TextArea rows={3} />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
           Save
-        </button>
-      </div>
-    </form>
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
