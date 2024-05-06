@@ -6,6 +6,7 @@ import { memo, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Quote = memo(({ isActive, quote }) => {
+  const dispatch = useDispatch();
   const { style, className } = useMemo(() => {
     let outline = '0px solid transparent';
     if (isActive) {
@@ -35,8 +36,6 @@ const Quote = memo(({ isActive, quote }) => {
 });
 
 const ParagraphQuotes = ({ turnId }) => {
-  //
-  const dispatch = useDispatch();
   const allQuotes = useSelector(
     // @fixme: update for storybook
     (state) => (state.lines ? state.lines.quotesInfo[turnId] : []),

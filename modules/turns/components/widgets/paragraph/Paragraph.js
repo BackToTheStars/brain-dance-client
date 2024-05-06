@@ -143,7 +143,7 @@ const Paragraph = ({
           }}
         />
       )}
-      {/* <ParagraphQuotes turnId={turnId} /> */}
+      <ParagraphQuotes turnId={turnId} />
     </>
   );
 };

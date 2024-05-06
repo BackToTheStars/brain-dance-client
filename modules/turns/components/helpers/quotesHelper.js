@@ -4,6 +4,7 @@ import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
   const spans = [...paragraphEl.current.querySelectorAll('span')];
   const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
+  const paragraphLeftPadding = 6; // @todo: get from size settings
 
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
   // const turnElRect = paragraphEl.current.parentElement.getBoundingClientRect();
@@ -12,8 +13,8 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
   for (let quoteEl of quoteEls) {
     const rect = quoteEl.getBoundingClientRect();
-    let left = Math.round(rect.left - paragraphRect.left); // КРАСНАЯ РАМКА
-    let top = Math.round((rect.top - paragraphRect.top) * 100) / 100;
+    let left = Math.round(rect.left - paragraphRect.left) + paragraphLeftPadding; // КРАСНАЯ РАМКА
+    let top = Math.round((rect.top - paragraphRect.top) * 100) / 100 + 2;
     let width = Math.round(rect.width);
     let height = Math.round(rect.height * 100) / 100;
 

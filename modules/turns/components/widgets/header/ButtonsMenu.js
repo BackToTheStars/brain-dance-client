@@ -14,12 +14,12 @@ import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
-  const turn = useSelector((state) => state.turns.d[_id]);
+  const turnGeometry = useSelector((state) => state.turns.g[_id]);
 
   const handleCut = (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
-      dispatch(cloneTurn(turn)).then(() => {
+      dispatch(cloneTurn(_id)).then(() => {
         dispatch(deleteTurn(_id));
       });
     }
@@ -39,14 +39,17 @@ const ButtonsMenu = ({ _id }) => {
         type: PANEL_ADD_EDIT_TURN,
         open: true,
         params: { editTurnId: _id },
-      })
+      }),
     );
 
     dispatch(
       centerViewportAtPosition({
-        x: turn.position.x + Math.floor(turn.size.width / 2) + 450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
-        y: turn.position.y + Math.floor(turn.size.height / 2),
-      })
+        x:
+          turnGeometry.position.x +
+          Math.floor(turnGeometry.size.width / 2) +
+          450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
+        y: turnGeometry.position.y + Math.floor(turnGeometry.size.height / 2),
+      }),
     );
   };
 

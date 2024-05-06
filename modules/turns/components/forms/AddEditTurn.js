@@ -35,19 +35,25 @@ const getDate = (mixedDate) => {
   const d = new Date(mixedDate);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
     2,
-    '0'
+    '0',
   )}-${String(d.getDay()).padStart(2, '0')}`;
 };
 
 const AddEditTurnPopup = () => {
-  // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
   const gamePosition = useSelector((state) => state.game.position);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const turn = useSelector((state) => state.turns.d[editTurnId]);
+  const turnData = useSelector((state) => state.turns.d[editTurnId]?.data);
+  const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
   // @fixme
   const turnToEdit = useMemo(
-    () => (!!turn ? TurnHelper.toOldFields(turn) : null),
-    [turn]
+    () =>
+      turnData && turnGeometry
+        ? TurnHelper.toOldFields({
+            ...turnData,
+            ...turnGeometry,
+          })
+        : null,
+    [turnData, turnGeometry],
   );
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
@@ -70,7 +76,7 @@ const AddEditTurnPopup = () => {
     dispatch(toggleMaximizeQuill(false));
   };
   const dLines = useSelector((state) => state.lines.d);
-  const lines = useMemo(() => Object.values(lines), [dLines]);
+  const lines = useMemo(() => Object.values(dLines), [dLines]);
 
   const toggleMaximize = (value) => {
     setIsMaximized(value);
@@ -123,7 +129,7 @@ const AddEditTurnPopup = () => {
 
   useEffect(() => {
     setQuillConstants(
-      getQuill('#editor-container-new', '#toolbar-container-new')
+      getQuill('#editor-container-new', '#toolbar-container-new'),
     );
   }, []);
 
@@ -222,7 +228,7 @@ const AddEditTurnPopup = () => {
 
     const linesToDelete = filterLinesByQuoteKeys(
       lines,
-      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`)
+      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`),
     );
 
     if (!!quotesDeleted.length) {
@@ -233,9 +239,7 @@ const AddEditTurnPopup = () => {
       ...preparedForm,
       paragraph: resTextArr,
       contentType: activeTemplate,
-      quotes: [
-        ...quotes,
-      ],
+      quotes: [...quotes],
     };
 
     const saveCallbacks = {
@@ -278,7 +282,7 @@ const AddEditTurnPopup = () => {
   if (Component) {
     return (
       <div
-        className={`panel-inner flex flex-column h-100 flex-1 add-edit-form ${
+        className={`panel-inner flex flex-col h-full flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
         }`}
       >
@@ -359,7 +363,7 @@ const AddEditTurnPopup = () => {
   return (
     <>
       <div
-        className={`panel-inner flex flex-column h-100 flex-1 add-edit-form ${
+        className={`panel-inner flex flex-col h-full flex-1 add-edit-form ${
           isMaximized ? 'maximized' : ''
         }`}
       >
@@ -496,7 +500,7 @@ const AddEditTurnPopup = () => {
               className="btn btn-primary"
               onClick={() => {
                 const cleanedText = cleanText(
-                  quillConstants.quill.editor.getText(0, Infinity)
+                  quillConstants.quill.editor.getText(0, Infinity),
                 );
                 quillConstants.quill.setText(cleanedText);
                 console.log({ cleanedText });

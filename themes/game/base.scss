@@ -1,0 +1,18 @@
+body {
+  font-family: var(--turn-font-family);
+  background-color: var(--base-body-bg-color);
+  color: var(--base-text-color);
+}
+
+a {
+  color: var(--base-link-color);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--base-link-hover-color);
+  }
+}
+
+button {
+  cursor: pointer;
+}

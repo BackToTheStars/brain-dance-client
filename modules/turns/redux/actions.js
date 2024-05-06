@@ -39,7 +39,7 @@ import {
   paragraphStateGetFromLocalStorage,
 } from '../components/helpers/store';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
-import { isSnapToGridSelector, snapRound } from '../components/helpers/grid';
+import { snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
 import { getBoundingAreaRect } from '@/modules/minimap/components/helpers/screen';
 import {
@@ -50,7 +50,7 @@ import { MODE_GAME } from '@/config/panel';
 
 export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   const state = getState();
-  const isSnapToGrid = isSnapToGridSelector(state);
+  const isSnapToGrid = true
   const gameFieldMoveVector = isSnapToGrid
     ? {
         left: snapRound(turn.position.x, GRID_CELL_X),
@@ -65,7 +65,7 @@ export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
   const prevTurn = state.turns.d[_id];
   if (prevTurn.compressedParagraphState || prevTurn.compressedHeight) {
     dispatch({
-      type: types.TURNS_UPDATE_GEOMETRY,
+      type: types.TURN_UPDATE_GEOMETRY,
       payload: { compressedParagraphState: null, _id, compressedHeight: 0 },
     });
   }
@@ -116,7 +116,7 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
 
 export const updateGeometry = (data) => (dispatch) =>
   dispatch({
-    type: types.TURNS_UPDATE_GEOMETRY,
+    type: types.TURN_UPDATE_GEOMETRY,
     payload: data,
   });
 
@@ -184,7 +184,7 @@ export const updateScrollPosition = (data) => (dispatch) =>
 
 export const moveField = (data) => (dispatch, getState) => {
   const state = getState();
-  const isSnapToGrid = isSnapToGridSelector(state);
+  const isSnapToGrid = true;
   const gameFieldMoveVector = isSnapToGrid
     ? {
         left: snapRound(data.left, GRID_CELL_X),

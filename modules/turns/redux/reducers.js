@@ -37,7 +37,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         turnsToRender,
       }
     }
-    case types.TURNS_UPDATE_GEOMETRY:
+    case types.TURN_UPDATE_GEOMETRY:
       return {
         ...state,
         g: {
@@ -45,10 +45,26 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.g[payload._id],
             ...payload,
-            // wasChanged: true,
           },
         },
       };
+    case types.TURNS_UPDATE_GEOMETRY:
+      return {
+        ...state,
+        g: {
+          ...state.g,
+          ...payload.turns.reduce(
+            (a, turn) => ({
+              ...a,
+              [turn._id]: {
+                ...state.g[turn._id],
+                ...turn,
+              },
+            }),
+            {}
+          ),
+        },
+      }
     case types.TURN_UPDATE_WIDGET: {
       const { turnId, widgetId, widget } = payload;
       const prevTurn = state.d[turnId];

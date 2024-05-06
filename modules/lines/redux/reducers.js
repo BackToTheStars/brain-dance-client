@@ -4,6 +4,8 @@ const initialLinesState = {
   quotesInfo: {},
   error: null,
   linesToPaste: {},
+  d: {},
+  dByTurnIdAndMarker: {},
 };
 
 const getDictionariesByLines = (lines) => {

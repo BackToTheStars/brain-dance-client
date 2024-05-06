@@ -11,7 +11,6 @@ const shortListIds = [
   // 'panel_buttons',
   'panel_minimap',
   // 'panel_notifications',
-  // 'PANEL_SNAP_TO_GRID',
   // 'panel_add_edit_turn',
   // 'panel_info',
   'panel_lines',

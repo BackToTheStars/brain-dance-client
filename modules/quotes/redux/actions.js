@@ -48,7 +48,7 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
           _id: turnData._id,
           quotes: activeQuoteId
             ? turnData.quotes.map((quote) =>
-                quote.id === activeQuoteId ? pictureQuote : quote
+                quote.id === activeQuoteId ? pictureQuote : quote,
               )
             : [...turnData.quotes, pictureQuote],
           x: turnGeometry.position.x,
@@ -56,8 +56,8 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
         },
         {
           success: resolve,
-        }
-      )
+        },
+      ),
     );
   });
 };
@@ -88,7 +88,7 @@ export const processQuoteClicked =
         // находим установленные связи между активной и выбираемой цитатой
         const twoSideConnectedLines = filterLinesByQuoteKey(
           oneSideConnectedLines,
-          activeQuoteKey
+          activeQuoteKey,
         );
         // если есть связь между активной и выбираемой цитатой, то просто переключаемся на новую
         if (twoSideConnectedLines.length) {
@@ -102,7 +102,7 @@ export const processQuoteClicked =
             sourceMarker: activeQuoteKey.split('_')[1],
             targetTurnId: currentQuoteKey.split('_')[0],
             targetMarker: currentQuoteKey.split('_')[1],
-          })
+          }),
         );
         dispatch(setActiveQuoteKey(null));
       }
@@ -135,8 +135,8 @@ export const deleteQuote = () => (dispatch, getState) => {
         {
           success: resolve, // @todo: заменить на Promise
           error: reject,
-        }
-      )
+        },
+      ),
     );
   });
 };

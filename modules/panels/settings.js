@@ -29,7 +29,6 @@ export const POSITION_BOTTOM_LEFT = 'position_bottom_left';
 export const POSITION_BOTTOM_CENTER = 'position_bottom_center';
 export const POSITION_NOTIFICATIONS = 'position_notifications';
 export const POSITION_FLEXIBLE = 'position_flexible';
-export const POSITION_INVISIBLE = 'POSITION_INVISIBLE';
 
 export const PANEL_CLASSES = 'panel_classes';
 export const PANEL_SETTINGS = 'panel_settings';
@@ -41,7 +40,6 @@ export const PANEL_NOTIFICATIONS = 'panel_notifications';
 export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
 export const PANEL_TURNS_PASTE = 'panel_turns_paste';
-export const PANEL_SNAP_TO_GRID = 'PANEL_SNAP_TO_GRID';
 
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles';
 export const PANEL_BUTTONS_STYLES = 'actions';
@@ -138,17 +136,6 @@ export const panels = [
     position: POSITION_BOTTOM_CENTER,
     component: PasteTurnPanel,
     isDisplayed: false,
-    id: (id += 1),
-    width: () => `50vw`,
-  },
-
-  {
-    type: PANEL_SNAP_TO_GRID,
-    position: POSITION_INVISIBLE,
-    component: () => {
-      return null;
-    },
-    isDisplayed: true, // пока решили оставить так, потом переключить на isSwitchOn или подобное
     id: (id += 1),
     width: () => `50vw`,
   },

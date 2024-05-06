@@ -15,7 +15,6 @@ import {
 import { resetAndExit } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import {
-  isSnapToGridSelector,
   snapRound,
 } from '@/modules/turns/components/helpers/grid';
 import { TurnHelper } from '@/modules/turns/redux/helpers';
@@ -53,10 +52,9 @@ export const loadFullGame = (hash) => (dispatch, getState) => {
 
 export const saveField = () => (dispatch, getState) => {
   const state = getState();
-  const d = state.turns.d; // @fixme
-  const g = state.game.g;
+  const g = state.turns.g;
   const gamePosition = state.game.position;
-  const isSnapToGrid = isSnapToGridSelector(state);
+  const isSnapToGrid = true;
 
   const changedTurns = Object.values(g)
     .filter((turn) => {
@@ -76,52 +74,33 @@ export const saveField = () => (dispatch, getState) => {
       return false;
     })
     .map((turn) => {
-      const {
-        _id,
-        x,
-        y,
-        height,
-        compressed,
-        compressedHeight,
-        uncompressedHeight,
-        width,
-        scrollPosition,
-      } = TurnHelper.toOldFields(turn);
-      const coords = {
-        x: x + gamePosition.left,
-        y: y + gamePosition.top,
-        height,
-        width,
-      };
-      if (isSnapToGrid) {
-        coords.x = snapRound(coords.x, GRID_CELL_X);
-        coords.y = snapRound(coords.y, GRID_CELL_X);
-        coords.width = snapRound(coords.width, GRID_CELL_X);
-        coords.height = snapRound(coords.height, GRID_CELL_Y);
-      }
       return {
-        _id,
-        ...coords,
-        compressed,
-        compressedHeight,
-        uncompressedHeight,
-        scrollPosition,
+        _id: turn._id,
+        x: snapRound(turn.position.x, GRID_CELL_X),
+        y: snapRound(turn.position.y, GRID_CELL_X),
+        width: snapRound(turn.size.width, GRID_CELL_X),
+        height: snapRound(turn.size.height, GRID_CELL_Y),
       };
     }); // ход был изменён, сохранить только его
 
+  console.log({ changedTurns });
+
+  const turnsWithUpdatedGeometry = changedTurns.map((turn) => {
+    return {
+      _id: turn._id,
+      position: { x: turn.x, y: turn.y },
+      size: { width: turn.width, height: turn.height },
+      wasChanged: false,
+    };
+  })
+
   updateCoordinatesRequest(changedTurns).then((data) => {
-    for (const turn of changedTurns) {
-      // @todo: оптимизировать
-      dispatch({
-        type: turnsTypes.TURNS_UPDATE_GEOMETRY,
-        payload: TurnHelper.toNewFields({
-          ...TurnHelper.toOldFields(d[turn._id]),
-          ...turn,
-          x: turn.x - state.game.position.left,
-          y: turn.y - state.game.position.top,
-        }),
-      });
-    }
+    dispatch({
+      type: turnsTypes.TURNS_UPDATE_GEOMETRY,
+      payload: {
+        turns: turnsWithUpdatedGeometry,
+      }
+    })
     dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
     dispatch(resetAndExit());

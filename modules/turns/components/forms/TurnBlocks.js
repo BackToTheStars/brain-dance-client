@@ -423,7 +423,7 @@ const TurnBlocksForm = () => {
 
   return (
     <div
-      className="panel-inner flex flex-column h-100 flex-1 add-edit-form"
+      className="panel-inner flex flex-col h-full flex-1 add-edit-form"
       style={{
         overflowY: 'auto',
         padding: '20px',

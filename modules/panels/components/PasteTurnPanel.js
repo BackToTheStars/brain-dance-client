@@ -63,6 +63,7 @@ const PasteTurnPanel = () => {
                         insertTurnFromBuffer(timeStamp, {
                           successCallback: () => {
                             console.log('success inserted turn from buffer');
+                            dispatch(removeTurnFromBuffer(timeStamp));
                           },
                           errorCallback: (message) => {
                             console.log(message);

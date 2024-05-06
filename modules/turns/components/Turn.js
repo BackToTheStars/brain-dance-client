@@ -42,7 +42,7 @@ import {
 } from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
-import { isSnapToGridSelector, snapRound } from './helpers/grid';
+import { snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { Skeleton } from 'antd';
 import ParagraphQuotes from './widgets/paragraph/ParagraphQuotes';
@@ -102,8 +102,7 @@ const TurnAdapter = ({ id }) => {
                 x: Math.round(ui.position.left + gamePosition.x),
                 y: Math.round(ui.position.top + gamePosition.y),
               },
-              // x: ui.position.left, // x - left - ui.position.left,
-              // y: ui.position.top, // y - top - ui.position.top,
+              wasChanged: true,
             }),
           );
         });
@@ -145,7 +144,7 @@ const TurnAdapter = ({ id }) => {
 const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id].data);
   const size = useSelector((state) => state.turns.g[id].size);
-  const isSnapToGrid = true; // useSelector(isSnapToGridSelector); // @fixme: update for storybook
+  const isSnapToGrid = true;
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
@@ -459,7 +458,6 @@ const Turn = memo(({ id }) => {
           <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />
         </div>
       )}
-      {doesParagraphExist && <ParagraphQuotes turnId={_id} />}
     </>
   );
 });

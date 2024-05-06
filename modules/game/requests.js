@@ -79,9 +79,6 @@ export const saveGamePositionRequest = (gamePosition) => {
   return request(`games/viewport?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'PUT',
-    body: {
-      x: gamePosition.left,
-      y: gamePosition.top,
-    },
+    body: gamePosition,
   });
 };

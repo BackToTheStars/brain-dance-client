@@ -1,7 +1,7 @@
 // @todo: проверить, нужна ли функция
 export const getWidgetDataFromState = (state) => {
   const editTurnId = state.panels.editTurnId;
-  const turnData = state.turns.d[editTurnId];
+  const turnData = state.turns.d[editTurnId].data;
   const turnGeometry = state.turns.g[editTurnId];
   const editWidgetId = state.panels.editWidgetId;
   const editWidgetParams =
