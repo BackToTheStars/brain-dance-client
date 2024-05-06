@@ -8,7 +8,6 @@ const initialGameState = {
   viewport: { width: 1600, height: 1200 },
   areaRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
   error: null,
-  editMode: false,
   cancelCallback: () => {},
 };
 
@@ -29,12 +28,6 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
         },
       };
     }
-
-    case types.GAME_EDIT_MODE_SWITCH:
-      return {
-        ...state,
-        editMode: payload,
-      };
 
     case types.GAME_CREATE_CANCEL_CALLBACK:
       return {

@@ -17,14 +17,14 @@ export const VideoAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
 
   return (
     <div className="panel-flex">
-      <div className="col-sm-9">
+      <div className="w-3/4">
         <Input
           placeholder={`${capitalizeFirstLetter(widget.provider)} video:`}
           value={widget.url}
           onChange={(e) => updateField('url', e.target.value)}
         />
       </div>
-      <div className="col-sm-3">
+      <div className="w-1/4">
         <Switch
           defaultChecked={widget.show}
           checked={widget.show}

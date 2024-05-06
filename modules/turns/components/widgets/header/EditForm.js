@@ -18,15 +18,15 @@ export const HeaderEditForm = ({ turnId, widgetId }) => {
     );
   };
   return (
-    <div className="form-group panel-flex mb-2">
-      <div className="col-sm-8">
+    <div className="panel-flex mb-2">
+      <div className="w-2/3">
         <Input
           placeholder="Header:"
           value={widget.text}
           onChange={(e) => updateField('text', e.target.value)}
         />
       </div>
-      <div className="col-sm-2">
+      <div className="w-1/6">
         <Switch
           defaultChecked={widget.show}
           checked={widget.show}
@@ -50,16 +50,16 @@ export const HeaderAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
   };
 
   return (
-    <div className="panel-flex" style={{ flexDirection: 'column' }}>
+    <div className="panel-flex flex-col">
       <div className="flex">
-        <div className="col-sm-9">
+        <div className="w-3/4">
           <Input
             placeholder="Header:"
             value={widget.text}
             onChange={(e) => updateField('text', e.target.value)}
           />
         </div>
-        <div className="col-sm-3">
+        <div className="w-1/4">
           <Switch
             defaultChecked={widget.show}
             checked={widget.show}

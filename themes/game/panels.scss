@@ -10,7 +10,12 @@
   // AddEditForm
   .quill-wrapper {
     color: initial;
-    background-color: var(--white-color);
+    background-color: #fff;
+  }
+
+  .ql-container {
+    font-size: 22px;
+    overflow-y: auto;
   }
 
   .panel-inner {
@@ -24,6 +29,15 @@
       gap: 10px;
       display: flex;
     }
+  }
+
+  .drag-n-drop {
+    border: 1px solid #fff;
+    border-radius: .25rem;
+    margin-top: .75rem;
+    padding: 10px;
+    font-size: medium;
+    cursor: pointer;
   }
 
   input,
@@ -317,54 +331,6 @@
   max-width: 20vw;
 }
 
-// MODAL
-#modalBackground {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  left: 0;
-  top: 0;
-  z-index: 1500;
-  background-color: rgba(89, 89, 89, 0.9);
-}
-
-#modal {
-  position: fixed;
-  min-width: 20%;
-  max-width: 70vw;
-  height: 80vh;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2000;
-  background-color: whitesmoke;
-  border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-
-  &>.row>* {
-    overflow: auto;
-    max-height: 75vh;
-  }
-}
-
-.radio-group {
-  padding: 0 15px 10px;
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid #999;
-  margin-bottom: 35px;
-}
-
-.radio-group .form-group {
-  display: flex;
-  align-items: center;
-}
-
-.radio-group input {
-  margin-right: 10px;
-}
-
 .quill-wrapper {
   display: flex;
   flex-direction: column;
@@ -376,12 +342,6 @@
   flex: 1;
   background-color: white;
   max-height: 60vh;
-}
-
-#modal label,
-#modal .form-control,
-#modal .radio-group span {
-  font-size: 1.3rem;
 }
 
 .color-picker-widget {

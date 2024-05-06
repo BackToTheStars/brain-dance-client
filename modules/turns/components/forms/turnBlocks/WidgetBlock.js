@@ -43,8 +43,8 @@ export const WidgetBlockComponent = ({
     (() => <>{widgetBlock.type}</>);
 
   return (
-    <div className="form-group panel-flex mb-2">
-      <div className="col-sm-3">
+    <div className="panel-flex mb-2">
+      <div className="w-1/4">
         {widgetBlock.id}
         <WidgetMenu
           label={widgetSettings[widgetBlock.type].label}
@@ -56,7 +56,7 @@ export const WidgetBlockComponent = ({
           }}
         />
       </div>
-      <div className="col-sm-9">
+      <div className="w-3/4">
         <Component
           widgetBlock={widgetBlock}
           updateWidgetBlock={updateWidgetBlock}

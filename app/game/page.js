@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'; // позволяет динамически
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { UserProvider } from '@/modules/user/contexts/UserContext';
+import { Spin } from 'antd';
 const Game = dynamic(() => import('@/modules/game/components/Game'), {
   ssr: false,
 });
@@ -22,24 +23,13 @@ const GamePageInner = () => {
   const hash = searchParams.get('hash');
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css?family=Nunito"
-        rel="stylesheet"
-      ></link>
+      <div className="circle" />
 
-      <div className="circle"></div>
-
-      <div
-        style={{
-          width: '100vw',
-          height: '100vh',
-          overflow: 'hidden',
-          position: 'relative',
-        }}
-        className="game-bg"
-      >
+      <div className="game-bg">
         {!hash ? (
-          <div style={{ color: '#aaa' }}>Loading...</div>
+          <div className="w-full h-full flex items-center justify-center gap-2">
+            <Spin size="large" /> Loading...
+          </div>
         ) : (
           <UserProvider hash={hash}>
             <Game hash={hash} />

@@ -158,7 +158,7 @@ const ParagraphOriginal = ({
       style={style}
     >
       <p
-        className="paragraphText original-text noselect"
+        className="paragraphText original-text"
         ref={paragraphEl}
         style={style}
       >

@@ -3,7 +3,6 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import {
   PANEL_ADD_EDIT_TURN,
-  PANEL_TURN_INFO,
 } from '@/modules/panels/settings';
 import { cloneTurn, deleteTurn } from '../../../redux/actions';
 import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../../icons/Turn';
@@ -59,7 +58,7 @@ const ButtonsMenu = ({ _id }) => {
   };
 
   return (
-    <div className="mod_icon_wrap action-icons">
+    <div className="action-icons">
       <a key="clone" className="clone-btn" onClick={handleClone}>
         <CopyIcon />
       </a>

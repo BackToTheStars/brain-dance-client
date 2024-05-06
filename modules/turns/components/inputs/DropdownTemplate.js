@@ -32,7 +32,7 @@ const DropdownTemplate = ({
   return (
     <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
       <Button
-        className="w-100"
+        className="w-full"
         style={{
           color: 'rgb(255, 255, 255)',
           backgroundColor: '#1b4d76',

@@ -272,8 +272,6 @@ const AddEditTurnPopup = () => {
   };
 
   const formChangeHandler = (field, value) => {
-    console.log('formChangeHandler');
-    console.log({ form });
     if (!!error) setError(null);
 
     setForm({ ...form, [field]: value });
@@ -282,13 +280,11 @@ const AddEditTurnPopup = () => {
   if (Component) {
     return (
       <div
-        className={`panel-inner flex flex-col h-full flex-1 add-edit-form ${
-          isMaximized ? 'maximized' : ''
-        }`}
+        className={`panel-inner flex flex-col h-full flex-1`}
       >
         <div className="panel-cell">
-          <div className="form-group panel-flex mb-2">
-            <div className="col-sm-2">
+          <div className="panel-flex mb-2">
+            <div className="w-1/6">
               <DropdownTemplate
                 {...{
                   templatesToShow,
@@ -301,7 +297,7 @@ const AddEditTurnPopup = () => {
             </div>
             {templateSettings.optionalWidgets.includes(WIDGET_HEADER) && (
               <>
-                <div className="col-sm-8">
+                <div className="w-2/3">
                   <Input
                     placeholder="Header:"
                     value={form[FIELD_HEADER]}
@@ -310,7 +306,7 @@ const AddEditTurnPopup = () => {
                     }
                   />
                 </div>
-                <div className="col-sm-2">
+                <div className="w-1/6">
                   <Switch
                     defaultChecked={true}
                     checked={!form[FIELD_DONT_SHOW_HEADER]}
@@ -326,8 +322,8 @@ const AddEditTurnPopup = () => {
               </>
             )}
           </div>
-          <div className="form-group panel-flex mb-2">
-            <div className="col-sm-7">
+          <div className="panel-flex mb-2">
+            <div className="w-7/12">
               <Input
                 placeholder="Source URL:"
                 value={form[FIELD_SOURCE]}
@@ -337,7 +333,7 @@ const AddEditTurnPopup = () => {
                 }}
               />
             </div>
-            <div className="col-sm-3">
+            <div className="w-1/4">
               <DatePicker
                 value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
                 style={{ width: '100%' }}
@@ -363,15 +359,13 @@ const AddEditTurnPopup = () => {
   return (
     <>
       <div
-        className={`panel-inner flex flex-col h-full flex-1 add-edit-form ${
-          isMaximized ? 'maximized' : ''
-        }`}
+        className={`panel-inner flex flex-col h-full flex-1`}
       >
         {!isMaximized && (
           <>
             <div className="panel-cell">
-              <div className="form-group panel-flex mb-2">
-                <div className="col-sm-2">
+              <div className="panel-flex mb-2">
+                <div className="w-1/6">
                   <DropdownTemplate
                     {...{
                       templatesToShow,
@@ -382,7 +376,7 @@ const AddEditTurnPopup = () => {
                     }}
                   />
                 </div>
-                <div className="col-sm-8">
+                <div className="w-2/3">
                   <Input
                     placeholder="Header:"
                     value={form[FIELD_HEADER]}
@@ -391,7 +385,7 @@ const AddEditTurnPopup = () => {
                     }
                   />
                 </div>
-                <div className="col-sm-2">
+                <div>
                   <Switch
                     defaultChecked={true}
                     checked={!form[FIELD_DONT_SHOW_HEADER]}
@@ -405,8 +399,8 @@ const AddEditTurnPopup = () => {
                   />
                 </div>
               </div>
-              <div className="form-group panel-flex mb-2">
-                <div className="col-sm-7">
+              <div className="panel-flex mb-2">
+                <div className="w-7/12">
                   <Input
                     placeholder="Source URL:"
                     value={form[FIELD_SOURCE]}
@@ -416,7 +410,7 @@ const AddEditTurnPopup = () => {
                     }}
                   />
                 </div>
-                <div className="col-sm-3">
+                <div className="w-1/4">
                   <DatePicker
                     value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
                     style={{ width: '100%' }}
@@ -503,8 +497,6 @@ const AddEditTurnPopup = () => {
                   quillConstants.quill.editor.getText(0, Infinity),
                 );
                 quillConstants.quill.setText(cleanedText);
-                console.log({ cleanedText });
-                console.log(quillConstants.quill.editor);
               }}
             >
               Format

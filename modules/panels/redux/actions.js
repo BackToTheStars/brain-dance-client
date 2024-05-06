@@ -1,4 +1,3 @@
-import { switchEditMode } from '@/modules/game/game-redux/actions';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 import {
@@ -9,13 +8,10 @@ import {
 import * as types from './types';
 import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '../settings';
 
-export const resetAndExit =
-  ({ exitEditMode = true } = {}) =>
-  (dispatch) => {
-    if (exitEditMode) dispatch(switchEditMode(false));
-    dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
-    dispatch(setActiveQuoteKey(null));
-  };
+export const resetAndExit = () => (dispatch) => {
+  dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
+  dispatch(setActiveQuoteKey(null));
+};
 
 export const togglePanel = (payload) => (dispatch) => {
   dispatch({
@@ -56,7 +52,10 @@ export const setPanelMode = (payload) => (dispatch, getState) => {
       const { turnData, editWidgetParams, editWidgetId } =
         getWidgetDataFromState(state);
       if (!!editWidgetParams?.activeQuoteId) {
-        const activeQuote = state.lines.dByTurnIdAndMarker[turnData._id][editWidgetParams.activeQuoteId];
+        const activeQuote =
+          state.lines.dByTurnIdAndMarker[turnData._id][
+            editWidgetParams.activeQuoteId
+          ];
         params = {
           editWidgetParams: {
             [`${turnData._id}_${editWidgetId}`]: {
@@ -95,7 +94,7 @@ export const toggleMaximizeQuill = (isMaximized) => (dispatch) => {
   dispatch(
     changePanelGeometry(PANEL_ADD_EDIT_TURN, {
       priorityStyle: isMaximized ? { bottom: '10px' } : { bottom: null },
-    })
+    }),
   );
   dispatch(togglePanel({ type: PANEL_BUTTONS, open: !isMaximized }));
 };

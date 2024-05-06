@@ -3,16 +3,17 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import YouTube from 'react-youtube';
 import { youtubeFormatter } from '../helpers/youtubeFormatter';
 import { useSelector } from 'react-redux';
+import { PlayCircleFilled } from '@ant-design/icons';
 
 let timeoutId;
 
 const Video = ({ registerHandleResize, turnId, widgetId }) => {
-  const previewMode = true; // @fixme
+  const [previewMode, setPreviewMode] = useState(true);
   const videoEl = useRef(null);
   // const [newWidth, setNewWidth] = useState(width);
   const width = useSelector((state) => state.turns.g[turnId].size.width);
   const videoUrl = useSelector(
-    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url,
   );
   const newVideoUrl = useMemo(() => {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -65,7 +66,13 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
       ref={videoEl}
     >
       {previewMode ? (
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <img
             src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
             style={{
@@ -74,6 +81,12 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
               objectPosition: 'center',
               width: '100%',
               height: '100%',
+            }}
+          />
+          <PlayCircleFilled
+            className="video__play"
+            onClick={() => {
+              setPreviewMode(false);
             }}
           />
         </div>

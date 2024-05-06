@@ -22,7 +22,7 @@ const NewGameInfoForm = ({ code, enterGame, gameIsPublic }) => {
         <p>Type the nickname below.</p>
       </div>
       <form className="form-inline" onSubmit={handleSubmit}>
-        <div className="form-group mx-sm-3 mb-2">
+        <div className="mx-sm-3 mb-2">
           <input type="hidden" name="code" value={code.hash} />
           <input
             type="text"

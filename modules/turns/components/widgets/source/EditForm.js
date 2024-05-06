@@ -14,15 +14,15 @@ export const SourceAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
 
   return (
     <div className="panel-flex">
-      <div className="col-sm-9 row">
-        <div className="col-sm-9">
+      <div className="w-3/4 row">
+        <div className="w-3/4">
           <Input
             placeholder="URL:"
             value={widget.url}
             onChange={(e) => updateField('url', e.target.value)}
           />
         </div>
-        <div className="col-sm-3">
+        <div className="w-1/4">
           <DatePicker
             value={widget.date ? moment(widget.date) : null}
             style={{ width: '100%' }}
@@ -32,7 +32,7 @@ export const SourceAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
           />
         </div>
       </div>
-      <div className="col-sm-3">
+      <div className="w-1/4">
         <Switch
           defaultChecked={widget.show}
           checked={widget.show}

@@ -29,7 +29,7 @@ const NewGameInfoModal = ({ close, newGameInfo, enterGame }) => {
         <p className='modal-text'>Type the nickname below.</p>
       </div>
       <form className="form-inline" onSubmit={handleSubmit}>
-        <div className="form-group mb-2">
+        <div className="mb-2">
           <input
             type="text"
             name="nickname"

@@ -138,7 +138,7 @@ export const centerViewportAtPosition =
 
     if (typeof $ === 'undefined') return;
 
-    const gameBoxEl = $('#gameBox');
+    const gameBoxEl = $('#game-box');
 
     gameBoxEl.addClass('remove-line-transition');
     gameBoxEl.animate(
@@ -162,10 +162,6 @@ export const centerViewportAtPosition =
       }
     );
   };
-
-export const switchEditMode = (booleanValue) => (dispatch) => {
-  dispatch({ type: types.GAME_EDIT_MODE_SWITCH, payload: booleanValue });
-};
 
 export const createCancelCallback = (callback) => (dispatch) => {
   dispatch({ type: types.GAME_CREATE_CANCEL_CALLBACK, payload: callback });

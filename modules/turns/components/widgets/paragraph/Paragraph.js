@@ -1,7 +1,7 @@
 import { widgetSpacer } from '@/config/ui';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { MODE_WIDGET_PARAGRAPH } from '@/config/panel';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import Compressor from './Compressor';
@@ -31,7 +31,12 @@ const Paragraph = ({
   const [paragraphElCurrent, setParagraphElCurrent] = useState(null);
   const [wrapperElCurrent, setWrapperElCurrent] = useState(null);
 
-  const dispatch = useDispatch();
+  const resultWidget = useMemo(()=> {
+    return {
+      ...widget,
+      ...compressedWidget
+    }
+  }, [widget, compressedWidget])
 
   useEffect(() => {
     if (!compressed) {
@@ -73,74 +78,65 @@ const Paragraph = ({
     }
   }, [wrapperElCurrent, paragraphElCurrent, compressed]);
 
-  const registerHandleResizeWithParams = ({
-    widgetMinHeight,
-    widgetMaxHeight,
-    widgetDesiredHeight,
-  }) => {
-    registerHandleResize({
-      type: 'paragraph',
-      id: widgetId,
-      // этот виджет является гибким
-      variableHeight: true,
-      desiredHeightCallback: () => {
-        return widgetDesiredHeight;
-      },
-      minWidthCallback: () => {
-        return 300;
-      },
-      minHeightCallback: () => {
-        return widgetMinHeight;
-      },
-      getDesiredTurnHeight: ({
-        minHeightBasic,
-        newHeight,
-        minHeight,
-        maxHeight,
-      }) => {
-        // это для случая compressed
-        if (compressedHeight) {
-          return newHeight;
-        } else {
-          const resultHeight = minHeightBasic + widgetMinHeight;
-          if (resultHeight >= minHeight && resultHeight <= maxHeight) {
-            return resultHeight;
-          } else {
+  const registerHandleResizeWithParams = useCallback(
+    ({ widgetMinHeight, widgetMaxHeight, widgetDesiredHeight }) => {
+      registerHandleResize({
+        type: 'paragraph',
+        id: widgetId,
+        // этот виджет является гибким
+        variableHeight: true,
+        desiredHeightCallback: () => {
+          return widgetDesiredHeight;
+        },
+        minWidthCallback: () => {
+          return 300;
+        },
+        minHeightCallback: () => {
+          return widgetMinHeight;
+        },
+        getDesiredTurnHeight: ({
+          minHeightBasic,
+          newHeight,
+          minHeight,
+          maxHeight,
+        }) => {
+          // это для случая compressed
+          if (compressedHeight) {
             return newHeight;
+          } else {
+            const resultHeight = minHeightBasic + widgetMinHeight;
+            if (resultHeight >= minHeight && resultHeight <= maxHeight) {
+              return resultHeight;
+            } else {
+              return newHeight;
+            }
           }
-        }
-      },
-      maxHeightCallback: () => {
-        return widgetMaxHeight;
-      },
-    });
-  };
+        },
+        maxHeightCallback: () => {
+          return widgetMaxHeight;
+        },
+      });
+    },
+    [compressedHeight]);
 
   return (
     <>
       {compressed ? (
         <Compressor
-          {...{
-            turnId,
-            widget: {
-              ...widget,
-              ...compressedWidget,
-            },
-            widgetId,
-            compressedHeight,
-            setCompressedHeight,
-            setWrapperElCurrent,
-            registerHandleResizeWithParams,
-          }}
+          turnId={turnId}
+          widget={resultWidget}
+          widgetId={widgetId}
+          compressedHeight={compressedHeight}
+          setCompressedHeight={setCompressedHeight}
+          setWrapperElCurrent={setWrapperElCurrent}
+          registerHandleResizeWithParams={registerHandleResizeWithParams}
         />
       ) : (
         <ParagraphOriginal
-          {...{
-            turnId,
-            widgetId,
-            setParagraphElCurrent,
-            notRegisteredWidgetsCount,
-          }}
+          turnId={turnId}
+          widgetId={widgetId}
+          setParagraphElCurrent={setParagraphElCurrent}
+          notRegisteredWidgetsCount={notRegisteredWidgetsCount}
         />
       )}
       <ParagraphQuotes turnId={turnId} />

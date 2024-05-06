@@ -22,7 +22,6 @@ import PasteTurnPanel from './components/PasteTurnPanel';
 
 export const POSITION_UPPER_LEFT = 'position_upper_left';
 export const POSITION_UPPER_CENTER = 'position_upper_center';
-export const POSITION_POPUP = 'position_popup';
 export const POSITION_UPPER_RIGHT = 'position_upper_right';
 export const POSITION_BOTTOM_RIGHT = 'position_bottom_right';
 export const POSITION_BOTTOM_LEFT = 'position_bottom_left';
@@ -78,7 +77,7 @@ export const panels = [
     component: AddEditTurnPopup,
     isDisplayed: false,
     id: (id += 1),
-    width: () => '1000px',
+    width: () => '900px',
   },
   {
     type: PANEL_BUTTONS,

@@ -142,7 +142,7 @@ const Picture = ({
           pictureOnly={pictureOnly}
         />
 
-        <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
+        <img src={imageUrlToRender} ref={imgEl} />
 
         <a
           className="widget-button"

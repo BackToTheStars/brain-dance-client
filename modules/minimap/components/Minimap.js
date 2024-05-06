@@ -226,7 +226,6 @@ const ViewportRect = memo(({ k }) => {
         y={sGamePosition.y}
         width={sViewport.width}
         height={sViewport.height}
-        className="map-focus"
         stroke="#FFFFFF"
         strokeWidth="3"
         fill="transparent"
@@ -279,7 +278,6 @@ const TurnRect = memo(({ id, k, clipPath, fill = 'blue' }) => {
       y={sPosition.y}
       width={sSize.width}
       height={sSize.height}
-      className="minimap-turn"
       fill={fill}
       clipPath={clipPath}
     />

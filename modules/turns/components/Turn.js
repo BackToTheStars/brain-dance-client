@@ -69,13 +69,9 @@ const TurnAdapter = ({ id }) => {
       height: `${size.height}px`,
     };
 
-    const wrapperClasses = [
-      'stb-react-turn',
-      `turn_${id}`,
-      contentType,
-      'react-turn-new',
-      'noselect',
-    ].join(' ');
+    const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType].join(
+      ' ',
+    );
     return {
       wrapperClasses,
       wrapperStyles,
@@ -89,7 +85,7 @@ const TurnAdapter = ({ id }) => {
       // grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
         setIsDragging(true);
-        $('#gameBox')
+        $('#game-box')
           .addClass('remove-line-transition')
           .addClass('translucent-field');
       },
@@ -123,12 +119,11 @@ const TurnAdapter = ({ id }) => {
           }),
         );
         setIsDragging(false);
-        $('#gameBox')
+        $('#game-box')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
         dispatch(markTurnAsChanged({ _id: id }));
       },
-      cancel: '.not-draggable',
     });
 
     return () => $(wrapper.current).draggable('destroy');
@@ -144,7 +139,6 @@ const TurnAdapter = ({ id }) => {
 const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id].data);
   const size = useSelector((state) => state.turns.g[id].size);
-  const isSnapToGrid = true;
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
@@ -177,32 +171,66 @@ const Turn = memo(({ id }) => {
     pictureOnly,
     // states
     wasChanged,
-  } = turnData;
+  } = useMemo(() => {
+    return turnData;
+  }, [turnData]);
 
-  const dontShowHeaderOriginal = !headerShow;
+  const { paragraphStage, turnStage } = useMemo(() => {
+    return {
+      paragraphStage: getParagraphStage(turnData),
+      turnStage: getTurnStage(turnData),
+    };
+  }, [turnData]);
 
-  const paragraphStage = getParagraphStage(turnData);
-  const turnStage = getTurnStage(turnData);
+  const dontShowHeader = useMemo(
+    () => pictureOnly || !headerShow,
+    [pictureOnly, headerShow],
+  );
 
-  const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
+  const doesParagraphExist = useMemo(
+    () => !pictureOnly && checkIfParagraphExists(paragraph),
+    [paragraph, pictureOnly],
+  );
 
-  const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
+  const widgetsCount = useMemo(() => {
+    return (
+      !dontShowHeader + // header
+      !!imageUrl + // Picture
+      !!videoUrl + // Video
+      doesParagraphExist
+    ); // Paragraph
+  }, [dontShowHeader, imageUrl, videoUrl, doesParagraphExist]);
 
-  const wrapperStyles = {
-    width: '100%',
-    height: '100%',
-  };
+  const notRegisteredWidgetsCount = useMemo(
+    () => widgetsCount - widgets.length,
+    [widgetsCount, widgets],
+  );
 
-  if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
-    wrapperStyles.backgroundColor = background;
-  }
+  const wrapperStyles = useMemo(() => {
+    const wrapperStyles = {};
 
-  const widgetsCount =
-    !dontShowHeader + // header
-    !!imageUrl + // Picture
-    !!videoUrl + // Video
-    doesParagraphExist; // Paragraph
-  const notRegisteredWidgetsCount = widgetsCount - widgets.length;
+    if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
+      wrapperStyles.backgroundColor = background;
+    }
+    return wrapperStyles;
+  }, [background, contentType]);
+
+  const wrapperClasses = useMemo(() => {
+    const wrapperClasses = ['stb-react-turn__inner'];
+
+    if (dontShowHeader) {
+      wrapperClasses.push('dont-show-header');
+    }
+    if (pictureOnly) {
+      wrapperClasses.push('picture-only');
+    }
+
+    if (wasChanged) {
+      wrapperClasses.push('was-changed');
+    }
+
+    return wrapperClasses.join(' ');
+  }, [dontShowHeader, pictureOnly, wasChanged]);
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -233,82 +261,88 @@ const Turn = memo(({ id }) => {
     [widgets],
   );
 
-  const recalculateSize = (width, height) => {
-    const {
-      minHeight,
-      maxHeight,
-      minWidth,
-      maxWidth,
-      widgetD,
-      desiredHeight,
-      minHeightBasic,
-    } = getTurnMinMaxHeight(widgets, width);
+  const recalculateSize = useCallback(
+    (width, height) => {
+      const {
+        minHeight,
+        maxHeight,
+        minWidth,
+        maxWidth,
+        widgetD,
+        desiredHeight,
+        minHeightBasic,
+      } = getTurnMinMaxHeight(widgets, width);
 
-    let newHeight = Math.round(
-      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer, // @todo: для компрессора проверить
-    );
-    if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
-      newHeight = widgets
-        .find((w) => w.variableHeight)
-        .getDesiredTurnHeight({
-          minHeightBasic,
-          newHeight,
-          minHeight,
-          maxHeight,
-        });
-    }
-    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
-
-    const isLocked = // transition from compressed to uncompressed
-      paragraphStage === ORIG_LOADING &&
-      turnData.paragraphStages.at(-3) === COMP_READY;
-
-    if (!isLocked) {
-      turnGeometryQueue.add(() => {
-        dispatch(
-          updateGeometry({
-            _id,
-            size: {
-              width: newWidth,
-              height: newHeight,
-            },
-            [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
-          }),
-        );
-      });
-
-      if (typeof $ !== 'undefined') {
-        if (newHeight !== height || newWidth !== width) {
-          $(wrapper.current).css({
-            height: `${newHeight}px`,
-            width: `${newWidth}px`,
+      let newHeight = Math.round(
+        Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer, // @todo: для компрессора проверить
+      );
+      if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
+        newHeight = widgets
+          .find((w) => w.variableHeight)
+          .getDesiredTurnHeight({
+            minHeightBasic,
+            newHeight,
+            minHeight,
+            maxHeight,
           });
+      }
+      const newWidth = Math.round(
+        Math.min(Math.max(width, minWidth), maxWidth),
+      ); //+ widgetSpacer;
+
+      const isLocked = // transition from compressed to uncompressed
+        paragraphStage === ORIG_LOADING &&
+        turnData.paragraphStages.at(-3) === COMP_READY;
+
+      if (!isLocked) {
+        turnGeometryQueue.add(() => {
+          dispatch(
+            updateGeometry({
+              _id,
+              size: {
+                width: newWidth,
+                height: newHeight,
+              },
+              [compressed ? 'compressedHeight' : 'uncompressedHeight']:
+                newHeight,
+            }),
+          );
+        });
+
+        if (typeof $ !== 'undefined') {
+          if (newHeight !== height || newWidth !== width) {
+            $(wrapper.current).css({
+              height: `${newHeight}px`,
+              width: `${newWidth}px`,
+            });
+          }
         }
       }
-    }
 
-    const newWidgetD = {};
-    const widgetIds = ['header1', 'video1', 'i_1', 'p_1']; // позже перенести
+      const newWidgetD = {};
+      const widgetIds = ['header1', 'video1', 'i_1', 'p_1']; // позже перенести
 
-    let minTop = 0;
-    let maxTop = 0;
+      let minTop = 0;
+      let maxTop = 0;
 
-    for (let widgetId of widgetIds) {
-      if (!widgetD[widgetId]) continue;
+      for (let widgetId of widgetIds) {
+        if (!widgetD[widgetId]) continue;
 
-      newWidgetD[widgetId] = {
-        ...widgetD[widgetId],
-        minTop,
-        maxTop,
-        width: newWidth,
-      };
+        newWidgetD[widgetId] = {
+          ...widgetD[widgetId],
+          minTop,
+          maxTop,
+          width: newWidth,
+        };
 
-      minTop = minTop + widgetD[widgetId].minHeight;
-      maxTop = maxTop + widgetD[widgetId].maxHeight;
-    }
+        minTop = minTop + widgetD[widgetId].minHeight;
+        maxTop = maxTop + widgetD[widgetId].maxHeight;
+      }
 
-    setWidgetD(newWidgetD);
-  };
+      setWidgetD(newWidgetD);
+    },
+    [widgets, paragraphStage, turnData.paragraphStages],
+  );
 
   useEffect(() => {
     if (turnStage === TURN_LOADING_FIXED) {
@@ -335,15 +369,11 @@ const Turn = memo(({ id }) => {
       grid: [GRID_CELL_X, GRID_CELL_Y],
       resize: (event, ui) => {
         if (notRegisteredWidgetsCount === 0) {
-          isSnapToGrid
-            ? recalculateSize(
-                snapRound(ui.size.width, GRID_CELL_X),
-                snapRound(ui.size.height, GRID_CELL_Y),
-              )
-            : recalculateSize(
-                Math.round(ui.size.width),
-                Math.round(ui.size.height),
-              );
+          recalculateSize(
+            snapRound(ui.size.width, GRID_CELL_X),
+            snapRound(ui.size.height, GRID_CELL_Y),
+          );
+
           dispatch(markTurnAsChanged({ _id }));
         }
       },
@@ -382,35 +412,9 @@ const Turn = memo(({ id }) => {
     dispatch(changeTurnStage(_id, TURN_LOADING));
   }, []);
 
-  // console.log({ widgets });
-
-  const wrapperClasses = [
-    'stb-react-turn__inner',
-    // contentType,
-    'react-turn-new',
-    'react-turn-new_size',
-    // 'noselect',
-    // classNameId,
-  ];
-
-  if (dontShowHeader) {
-    wrapperClasses.push('dont-show-header');
-  }
-  if (pictureOnly) {
-    wrapperClasses.push('picture-only');
-  }
-
-  if (wasChanged) {
-    wrapperClasses.push('was-changed');
-  }
-
   return (
     <>
-      <div
-        ref={wrapper}
-        className={wrapperClasses.join(' ')}
-        style={wrapperStyles}
-      >
+      <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>
         {!dontShowHeader ? (
           <Header
             widgetId={'h_1'}
@@ -422,16 +426,13 @@ const Turn = memo(({ id }) => {
         )}
         {!!videoUrl && (
           <Video
-            // videoUrl={videoUrl}
             widgetId={'v_1'}
             registerHandleResize={registerHandleResize}
             turnId={_id}
-            // width={width}
           />
         )}
         {!!imageUrl && (
           <Picture
-            // imageUrl={imageUrl}
             widgetId={'i_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
@@ -454,8 +455,8 @@ const Turn = memo(({ id }) => {
       </div>
       <ButtonsMenu _id={_id} />
       {sourceShow && (
-        <div className="bottom-date-and-sourceurl stb-react-turn__bottom-subtitle">
-          <DateAndSourceUrl {...{ widgetId: 's_1', date, sourceUrl }} />
+        <div className="stb-react-turn__bottom-subtitle">
+          <DateAndSourceUrl widgetId="s_1" date={date} sourceUrl={sourceUrl} />
         </div>
       )}
     </>

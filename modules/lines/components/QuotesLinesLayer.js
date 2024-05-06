@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import LogicLine from './LogicLine';
 
-const QuotesLinesLayer = ({ svgLayerZIndex }) => {
+const QuotesLinesLayer = () => {
   const d = useSelector((state) => state.lines.d);
   const svgLayer = useRef();
   const viewport = useSelector((state) => state.game.viewport);
@@ -42,19 +42,12 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
         style={styles}
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
-        className={svgLayerZIndex ? 'front-elements' : ''}
         ref={svgLayer}
       >
         {lines.map((line) => {
           return <LogicLine key={line._id} id={line._id} />;
         })}
       </svg>
-      {!svgLayerZIndex && (
-        <div className="rec-rectangle">
-          <div className="rec-label" />
-          <h4 className="rec-text">EDIT</h4>
-        </div>
-      )}
     </>
   );
 };

@@ -2,8 +2,6 @@
 import { useSelector } from 'react-redux';
 import UIPanel from './UIPanel';
 import SettingsButton from './SettingsButton';
-import { POSITION_POPUP } from '../settings';
-import PanelPopup from './Popup';
 import { useMemo, memo } from 'react';
 // import { setInitialPanels } from '../redux/storage';
 
@@ -20,9 +18,8 @@ const shortListIds = [
 
 const PanelAdapter = memo(({ id }) => {
   const panel = useSelector((state) => state.panels.d[id]);
-  const Wrapper = panel.position === POSITION_POPUP ? PanelPopup : UIPanel;
   return (
-    <Wrapper
+    <UIPanel
       key={panel.id}
       position={panel.position}
       height={panel?.height}
@@ -31,7 +28,7 @@ const PanelAdapter = memo(({ id }) => {
       priorityStyle={panel?.priorityStyle}
     >
       <panel.component id={id} />
-    </Wrapper>
+    </UIPanel>
   );
 });
 

@@ -1,9 +1,8 @@
-import { GRID_CELL_X, TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
+import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
   loadTurnsAndLinesToPaste,
   setGameStage,
-  switchEditMode,
   updateViewportGeometry,
 } from '@/modules/game/game-redux/actions';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
@@ -16,7 +15,7 @@ import {
 } from '@/modules/turns/redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
 import { GAME_STAGE_INIT, GAME_STAGE_READY } from '@/config/game';
@@ -28,14 +27,15 @@ let useEffectIsDone = false;
 const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
-  const svgLayerZIndex = useSelector((state) => !state.game.editMode);
+  const [isEditMode, setIsEditMode] = useState(false);
   const stage = useSelector((state) => state.game.stage);
-  const setSvgLayerZIndex = (booleanValue) => {
-    dispatch(switchEditMode(booleanValue));
-  };
 
   const { info } = useUserContext();
   const { nickname } = info;
+
+  const gameBoxClasses = useMemo(() => {
+    return isEditMode ? 'edit-mode' : '';
+  }, [isEditMode])
 
   useEffect(() => {
     if (!useEffectIsDone) {
@@ -63,11 +63,14 @@ const Game = ({ hash }) => {
         }),
       );
     };
-    window.addEventListener('resize', () => {
+    const invokeUpdateWithQueue = () => {
       updateViewportGeometryQueue.add(update);
-    });
+    };
+    window.addEventListener('resize', invokeUpdateWithQueue);
     update();
     dispatch(loadTurnsAndLinesToPaste());
+
+    return window.removeEventListener('resize', invokeUpdateWithQueue);
   }, []);
 
   useEffect(() => {
@@ -82,7 +85,6 @@ const Game = ({ hash }) => {
     if (typeof $ === 'undefined') return;
 
     $(gameBox.current).draggable({
-      // grid: [GRID_CELL_X, GRID_CELL_X],
       stop: (event, ui) => {
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(
@@ -100,29 +102,32 @@ const Game = ({ hash }) => {
           $(gameBox.current).removeClass('remove-line-transition');
         }, 100);
       },
-      cancel: '.not-draggable',
     });
     return () => $(gameBox.current).draggable('destroy');
   }, [gameBox]);
 
   return (
-    <div className="react-wrapper">
-      <div className="gameFieldWrapper">
-        <div
-          id="gameBox"
-          className={svgLayerZIndex ? 'hide-controls' : ''}
-          ref={gameBox}
-          onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
-        >
-          {stage === GAME_STAGE_READY && (
-            <>
-              <Turns />
-              <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
-            </>
-          )}
-        </div>
-        {stage === GAME_STAGE_READY && <Panels />}
+    <div className="game-field-wrapper">
+      <div
+        id="game-box"
+        className={gameBoxClasses}
+        ref={gameBox}
+        onDoubleClick={(e) => setIsEditMode(!isEditMode)}
+      >
+        {stage === GAME_STAGE_READY && (
+          <>
+            <Turns />
+            <QuotesLinesLayer />
+            {isEditMode && (
+              <div className="rec-rectangle">
+                <div className="rec-label" />
+                <h4 className="rec-text">EDIT</h4>
+              </div>
+            )}
+          </>
+        )}
       </div>
+      {stage === GAME_STAGE_READY && <Panels />}
     </div>
   );
 };

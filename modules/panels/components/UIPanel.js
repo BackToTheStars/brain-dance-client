@@ -1,7 +1,4 @@
-import { panelSpacer } from '@/config/ui';
-import useSelection from 'antd/lib/table/hooks/useSelection';
-import { useSelector } from 'react-redux';
-import { POSITION_UPPER_LEFT } from '../settings';
+import { useMemo } from 'react';
 
 const UIPanel = ({
   children,
@@ -11,35 +8,33 @@ const UIPanel = ({
   isMinimized,
   priorityStyle,
 }) => {
-  //
-  let style = {};
-
-  const d = useSelector((state) => state.panels.d);
-
-  if (!!width) {
-    if (+width == width) {
-      style.width = `${width}px`;
-      // @learn приведение к числу и проверка
-    } else {
-      style.width = width();
+  const calcStyles = useMemo(() => {
+    let style = {};
+    if (!!width) {
+      if (+width == width) {
+        style.width = `${width}px`;
+      } else {
+        style.width = width();
+      }
     }
-  }
-  if (!!height) {
-    if (+height == height) {
-      style.height = `${height}px`;
-    } else {
-      style.height = height(d);
+    if (!!height) {
+      if (+height == height) {
+        style.height = `${height}px`;
+      }
     }
-  }
-  if (priorityStyle) {
-    style = { ...style, ...priorityStyle };
-  }
+    if (priorityStyle) {
+      style = { ...style, ...priorityStyle };
+    }
+    return style;
+  }, [width, height, priorityStyle]);
+
+  const classNames = useMemo(
+    () => `${position} panel ${isMinimized ? 'minimized' : ''}`,
+    [position, isMinimized],
+  );
 
   return (
-    <div
-      className={`${position} po panel ${isMinimized ? 'minimized' : ''}`}
-      style={style}
-    >
+    <div className={classNames} style={calcStyles}>
       {children}
     </div>
   );

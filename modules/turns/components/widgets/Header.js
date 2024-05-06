@@ -50,12 +50,12 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
   return (
     <>
       <div
-        className="stb-widget-header headerText turn-widget"
+        className="stb-widget-header turn-widget"
         ref={headerEl}
         style={style}
       >
-        <div className="headerTextTitle stb-widget-header__title">{text}</div>
-        {!!(date || url) && <DateAndSourceUrl {...{ date, url }} />}
+        <div className="stb-widget-header__title">{text}</div>
+        {!!(date || url) && <DateAndSourceUrl date={date} url={url} />}
       </div>
     </>
   );

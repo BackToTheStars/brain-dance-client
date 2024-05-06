@@ -1,6 +1,10 @@
 // GAME BG
 .game-bg {
   background: var(--game-bg-color);
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .main-dashboard__sidebar {
@@ -9,7 +13,7 @@
   }
 }
 
-.gameFieldWrapper {
+.game-field-wrapper {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -43,15 +47,23 @@
 
 #lines {
   position: absolute;
-  z-index: 0;
+  
   // cursor: grab;
-  &.front-elements {
-    z-index: 3;
-  }
+  z-index: 3;
 
   // path {
   //   transition: 0.3s;
   // }
+}
+
+#game-box {
+  width: 100vw;
+  height: 100vh;
+  &.edit-mode {
+    #lines {
+      z-index: 0;
+    }
+  }
 }
 
 // .remove-line-transition {

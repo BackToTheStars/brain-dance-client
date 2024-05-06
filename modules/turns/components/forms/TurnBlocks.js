@@ -247,10 +247,10 @@ const CreateTurnForm = () => {
   const AddWidgetComponent = ({ position }) => {
     return (
       <div className="panel-flex mb-2">
-        <div className="col-sm-2">
+        <div className="w-1/6">
           <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
             <Button
-              className="w-100"
+              className="w-full"
               style={{
                 color: 'rgb(255, 255, 255)',
                 backgroundColor: '#1b4d76',
@@ -284,7 +284,7 @@ const CreateTurnForm = () => {
   return (
     <>
       <div className="flex">
-        <div className="col-sm-3">
+        <div className="w-1/4">
           <DropdownTemplate
             {...{
               templatesToShow,
@@ -294,7 +294,7 @@ const CreateTurnForm = () => {
             }}
           />
         </div>
-        <div className="col-sm-9">
+        <div className="w-3/4">
           <p style={{ fontSize: '16px' }} className="ps-2">
             {settings[activeTemplate].description}
           </p>
@@ -364,7 +364,7 @@ const UpdateTurnForm = () => {
         <div style={{ width: '200px' }}>
           <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
             <Button
-              className="w-100"
+              className="w-full"
               style={{
                 color: 'rgb(255, 255, 255)',
                 backgroundColor: '#1b4d76',
@@ -423,7 +423,7 @@ const TurnBlocksForm = () => {
 
   return (
     <div
-      className="panel-inner flex flex-col h-full flex-1 add-edit-form"
+      className="panel-inner flex flex-col h-full flex-1"
       style={{
         overflowY: 'auto',
         padding: '20px',

@@ -33,7 +33,7 @@ export const ParagraphAddForm = ({
 
   return (
     <div className="panel-flex">
-      <div className="col-sm-9">
+      <div className="w-3/4">
         {/* <Input.TextArea
           placeholder="Text:"
           value={widget?.inserts[0]?.insert}
@@ -60,7 +60,7 @@ export const ParagraphAddForm = ({
           <div id={containerId} />
         </div>
       </div>
-      <div className="col-sm-3">
+      <div className="w-1/4">
         <Switch
           defaultChecked={widget.show}
           checked={widget.show}
