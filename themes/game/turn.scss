@@ -173,7 +173,7 @@
         padding-right: var(--turn-widget-paragraph-scrollbar-padding);
         font-size: var(--turn-widget-paragraph-font-size);
         line-height: var(--turn-widget-paragraph-line-height);
-        height: 100%;
+        max-height: 100%;
         overflow-y: auto;
 
         &::-webkit-scrollbar {
@@ -274,7 +274,8 @@
 
   &__bottom-subtitle {
     position: absolute;
-    bottom: calc(var(--turn-widget-inner-gap) * -1);
+    // bottom: calc(var(--turn-widget-inner-gap) * -1);
+    bottom: calc(var(--turn-widget-gap) * -1);
     left: var(--turn-widgets-gap);
     transform: translateY(100%);
   }

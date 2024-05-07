@@ -274,7 +274,8 @@ const Turn = memo(({ id }) => {
       } = getTurnMinMaxHeight(widgets, width);
 
       let newHeight = Math.round(
-        Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer, // @todo: для компрессора проверить
+        Math.min(Math.max(height, minHeight), maxHeight) +
+          widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
       );
       if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
         newHeight = widgets
@@ -341,7 +342,7 @@ const Turn = memo(({ id }) => {
 
       setWidgetD(newWidgetD);
     },
-    [widgets, paragraphStage, turnData.paragraphStages],
+    [id, widgets, paragraphStage, turnData.paragraphStages, dontShowHeader],
   );
 
   useEffect(() => {

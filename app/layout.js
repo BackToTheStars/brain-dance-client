@@ -2,6 +2,8 @@
 
 import 'jquery-ui/themes/base/all.css';
 import 'react-image-crop/dist/ReactCrop.css';
+import '@/themes/game/index.scss';
+
 import { Provider } from 'react-redux';
 import { useStore } from '../redux/store';
 
