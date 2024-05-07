@@ -1,0 +1,14 @@
+.game-row {
+  @apply flex w-full items-center gap-6 cursor-pointer py-2;
+}
+.circle-cell {
+  @apply w-[30px] h-[30px] flex-[0_0_30px] flex justify-center items-center
+    rounded-full;
+  border: 1px solid var(--border-button);
+  &__text {
+    @apply text-[12px] font-bold;
+  }
+}
+.game-cell {
+  @apply flex-[0_1_100%] flex justify-between text-xl cursor-pointer;
+}

@@ -1,0 +1,10 @@
+.lobby-panel {
+  // padding: calc(2 * var(--standard-unit));
+  border-radius: var(--panel-border-radius);
+  &_with-bg {
+    background-color: var(--bg-panel);
+    .lobby-panel__divider-b {
+      border-bottom: 2px solid var(--border-panel-divider);
+    }
+  }
+}

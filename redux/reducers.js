@@ -7,6 +7,7 @@ import { quoteReducer } from '@/modules/quotes/redux/reducers';
 import { turnsReducer } from '@/modules/turns/redux/reducers';
 import { UIReducer } from '@/modules/ui/redux/reducers';
 import { combineReducers } from 'redux';
+import { lobbyReducer } from '@/modules/lobby/redux/reducers';
 import { settingsReducer } from '@/modules/settings/redux/reducers';
 
 // COMBINED REDUCERS
@@ -21,6 +22,7 @@ const reducers = {
   quotes: quoteReducer,
   // interactions,
   // minimap,
+  lobby: lobbyReducer,
   settings: settingsReducer,
 };
 

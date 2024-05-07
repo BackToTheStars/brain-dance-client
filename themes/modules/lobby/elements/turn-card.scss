@@ -1,0 +1,11 @@
+.base-card_turn {
+  .base-card__header {
+    @apply p-4;
+  }
+  .base-card__body {
+    @apply p-4;
+  }
+  .base-card__widget {
+    @apply mb-3;
+  }
+}

@@ -20,6 +20,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.5.1",
     "autoprefixer": "^10.4.16",
+    "cookie": "^0.6.0",
     "jquery": "^3.7.0",
     "jquery-ui": "^1.13.2",
     "moment": "^2.29.4",

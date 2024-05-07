@@ -1,0 +1,20 @@
+// $size-unit: 2px;
+
+// :root {
+.compact-sizes {
+  --size-unit: 2px;
+
+  --fs-base: 14px;
+
+  --fs-xs: calc(0.75 * var(--fs-base));
+  --fs-sm: calc(0.875 * var(--fs-base));
+  --fs-md: var(--fs-base);
+  --fs-lg: calc(1.125 * var(--fs-base));
+  --fs-xl: calc(1.25 * var(--fs-base));
+
+  --border-radius: 4px;
+  --panel-border-radius: 12px;
+
+  --scrollbar-width: 6px;
+  --scrollbar-radius: 8px;
+}

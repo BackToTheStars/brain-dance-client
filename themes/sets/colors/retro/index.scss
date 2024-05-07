@@ -1,0 +1,75 @@
+// retro colors
+// :root {
+.retro-schema {
+  --skin-retro-1: #f4e4c1; // кремовый
+  --skin-retro-2: #d0a5a5; // бледно-розовый
+  --skin-retro-3: #9d8b8b; // пыльный розовый
+  --skin-retro-4: #7b6161; // темно-коричневато-розовый
+  --skin-retro-5: #5a4242; // глубокий коричнево-розовый
+
+  --skin-retro-text: #382a2a; // темный коричнево-красный
+  --skin-retro-accent: #c17c74; // терракотовый
+
+  --skin-retro-border: #b59a9a; // светло-коричневый
+  --skin-retro-shadow: rgba(56, 42, 42, 0.2); // тень с коричневым оттенком
+}
+
+// .light {
+.retro-schema.light {
+  --text-base: var(--skin-retro-text);
+  --bg-base: var(--skin-retro-1);
+  --bg-panel: var(--skin-retro-3);
+  --bg-card: var(--skin-retro-2);
+
+  --border-base: var(--skin-retro-border);
+  --border-body-divider: var(--skin-retro-4);
+  --border-panel-divider: var(--skin-retro-5);
+
+  --bg-button-hover: var(--skin-retro-accent);
+  --text-button-hover: var(--skin-retro-1);
+  --border-button-hover: var(--skin-retro-4);
+
+  --backdrop-color: rgba(255, 255, 255, 0.7);
+
+  --input-text-color: var(--skin-retro-text);
+  --input-bg-color: var(--skin-retro-1);
+  --input-border-color: var(--skin-retro-4);
+}
+
+// .dark {
+.retro-schema.dark {
+  --text-base: var(--skin-retro-1);
+  --bg-base: var(--skin-retro-5);
+  --bg-panel: var(--skin-retro-4);
+  --bg-card: var(--skin-retro-3);
+
+  --border-base: var(--skin-retro-border);
+  --border-body-divider: var(--skin-retro-2);
+  --border-panel-divider: var(--skin-retro-1);
+
+  --bg-button-hover: var(--skin-retro-accent);
+  --text-button-hover: var(--skin-retro-5);
+  --border-button-hover: var(--skin-retro-2);
+
+  --backdrop-color: rgba(0, 0, 0, 0.7);
+
+  --input-text-color: var(--skin-retro-1);
+  --input-bg-color: var(--skin-retro-5);
+  --input-border-color: var(--skin-retro-2);
+}
+
+// Блоки и компоненты
+// :root {
+.retro-schema {
+  --text-card-title: var(--text-base);
+
+  --bg-button: var(--bg-panel);
+  --text-button: var(--text-base);
+  --border-button: var(--border-base);
+}
+
+// body {
+body.retro-schema {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+}

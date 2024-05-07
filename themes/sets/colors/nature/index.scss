@@ -1,0 +1,75 @@
+// nature colors
+// :root {
+.nature-schema {
+  --skin-nature-1: #f5f8f6; // светлый зеленоватый оттенок, похожий на цвет молодой листвы
+  --skin-nature-2: #c2d4bf; // светло-зеленый, напоминающий листья
+  --skin-nature-3: #97b1a6; // средний оттенок зелени, напоминающий лес
+  --skin-nature-4: #64807c; // насыщенный зеленый, цвет глубокого леса
+  --skin-nature-5: #415d5a; // темно-зеленый, цвет хвойного леса
+
+  --skin-nature-text: #333d3b; // очень темный зеленый, почти черный
+  --skin-nature-accent: #a3c1ad; // яркий акцентный зеленый
+
+  --skin-nature-border: #8c9c92; // нейтральный зеленоватый оттенок для границ
+  --skin-nature-shadow: rgba(51, 61, 59, 0.2); // тень (с зеленоватым оттенком)
+}
+
+// .light {
+.nature-schema.light {
+  --text-base: var(--skin-nature-text);
+  --bg-base: var(--skin-nature-1);
+  --bg-panel: var(--skin-nature-3);
+  --bg-card: var(--skin-nature-2);
+
+  --border-base: var(--skin-nature-border);
+  --border-body-divider: var(--skin-nature-4);
+  --border-panel-divider: var(--skin-nature-5);
+
+  --bg-button-hover: var(--skin-nature-accent);
+  --text-button-hover: var(--skin-nature-5);
+  --border-button-hover: var(--skin-nature-4);
+
+  --backdrop-color: rgba(255, 255, 255, 0.7);
+
+  --input-text-color: var(--skin-nature-text);
+  --input-bg-color: var(--skin-nature-1);
+  --input-border-color: var(--skin-nature-4);
+}
+
+// .dark {
+.nature-schema.dark {
+  --text-base: var(--skin-nature-1);
+  --bg-base: var(--skin-nature-5);
+  --bg-panel: var(--skin-nature-4);
+  --bg-card: var(--skin-nature-3);
+
+  --border-base: var(--skin-nature-border);
+  --border-body-divider: var(--skin-nature-2);
+  --border-panel-divider: var(--skin-nature-1);
+
+  --bg-button-hover: var(--skin-nature-accent);
+  --text-button-hover: var(--skin-nature-1);
+  --border-button-hover: var(--skin-nature-2);
+
+  --backdrop-color: rgba(0, 0, 0, 0.7);
+
+  --input-text-color: var(--skin-nature-1);
+  --input-bg-color: var(--skin-nature-5);
+  --input-border-color: var(--skin-nature-2);
+}
+
+// Блоки и компоненты
+// :root {
+.nature-schema {
+  --text-card-title: var(--text-base);
+
+  --bg-button: var(--bg-panel);
+  --text-button: var(--text-base);
+  --border-button: var(--border-base);
+}
+
+// body {
+body.nature-schema {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+}

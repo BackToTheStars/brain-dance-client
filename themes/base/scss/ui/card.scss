@@ -1,0 +1,15 @@
+.base-card {
+  border-radius: var(--panel-border-radius);
+  border-color: var(--border-button);
+  background-color: var(--bg-panel);
+  @apply border-2 overflow-visible;
+
+  &__header {
+    background-color: var(--bg-button-hover);
+    color: var(--text-base-2);
+  }
+
+  &__body {
+    @apply flex flex-col;
+  }
+}

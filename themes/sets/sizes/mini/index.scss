@@ -1,0 +1,17 @@
+.mini-sizes {
+  --size-unit: 1px;
+
+  --fs-base: 10px;
+
+  --fs-xs: calc(0.75 * var(--fs-base));
+  --fs-sm: calc(0.875 * var(--fs-base));
+  --fs-md: var(--fs-base);
+  --fs-lg: calc(1.125 * var(--fs-base));
+  --fs-xl: calc(1.25 * var(--fs-base));
+
+  --border-radius: 2px;
+  --panel-border-radius: 8px;
+
+  --scrollbar-width: 6px;
+  --scrollbar-radius: 8px;
+}

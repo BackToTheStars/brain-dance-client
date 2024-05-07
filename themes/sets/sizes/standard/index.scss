@@ -1,0 +1,14 @@
+// $size-unit: 4px;
+
+// :root {
+.standard-sizes {
+  --size-unit: 4px;
+
+  --fs-base: 16px;
+
+  --fs-xs: calc(0.75 * var(--fs-base));
+  --fs-sm: calc(0.875 * var(--fs-base));
+  --fs-md: var(--fs-base);
+  --fs-lg: calc(1.125 * var(--fs-base));
+  --fs-xl: calc(1.25 * var(--fs-base));
+}

@@ -1,0 +1,31 @@
+
+@import "./mixins/spacing.scss";
+@import "./ui/button.scss";
+@import "./ui/input.scss";
+@import "./ui/scroll.scss";
+@import "./ui/card.scss";
+
+// === TEMPORARY ===
+.elements-wrapper {
+  > * {
+    margin-right: calc(2 * var(--size-unit));
+    // margin-right: 2 * $size-unit;
+  }
+}
+
+// override tailwindcss
+// input {
+//   color: #333 !important; // @todo: remove
+//   border: 1px solid #aaa;
+//   border-radius: 4px;
+//   padding-left: 4px !important; // @todo: remove
+//   padding-right: 4px !important; // @todo: remove
+// }
+
+.divider-b {
+  border-bottom: 2px solid var(--border-body-divider);
+}
+
+.divider-r {
+  border-right: 2px solid var(--border-body-divider);
+}

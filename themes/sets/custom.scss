@@ -1,0 +1,63 @@
+// варианты темы
+.custom-theme {
+  // ОТСТУПЫ
+  --padding-unit: var(--size-unit);
+
+  --padding-x-multiplier-xs: 2;
+  --padding-x-multiplier-sm: 3;
+  --padding-x-multiplier-md: 4;
+  --padding-x-multiplier-lg: 5;
+  --padding-x-multiplier-xl: 6;
+
+  --padding-y-multiplier-xs: 1;
+  --padding-y-multiplier-sm: 1;
+  --padding-y-multiplier-md: 2;
+  --padding-y-multiplier-lg: 3;
+  --padding-y-multiplier-xl: 4;  
+
+  // ====================
+  // РАМКИ
+  // --border-button-width: 0;
+  // --border-button-width: 1px;
+  --border-button-width: 2px;
+  // --border-button-width: 4px;
+
+  // ====================
+  // с разными закруглениями углов
+  --border-radius-unit: var(--size-unit);
+  // --border-radius-unit: 0px;
+  // --border-radius-unit: 4px;
+  // --border-radius-unit: 8px;
+
+  // ====================
+  // коэффициенты увеличения закругления углов
+  --border-radius-multiplier: 2;
+
+  --border-radius-multiplier-xs: 2;
+  --border-radius-multiplier-sm: 2;
+  --border-radius-multiplier-md: 2;
+  --border-radius-multiplier-lg: 2;
+  --border-radius-multiplier-xl: 2;
+
+  // --border-radius-multiplier-xs: 1;
+  // --border-radius-multiplier-sm: 2;
+  // --border-radius-multiplier-md: 3;
+  // --border-radius-multiplier-lg: 4;
+  // --border-radius-multiplier-xl: 5;
+
+  // ====================
+  // рамки инпутов
+  // с рамками вокруг инпутов
+
+  // без рамок
+
+  // с контрастными инпутами
+
+
+  // с неконтрастными инпутами
+
+
+
+
+
+}

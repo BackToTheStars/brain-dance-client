@@ -1,0 +1,13 @@
+// $size-unit: 8px;
+
+// :root {
+.comfort-sizes {
+  --size-unit: 8px;
+  --fs-base: 20px;
+
+  --fs-xs: calc(0.75 * var(--fs-base));
+  --fs-sm: calc(0.8 * var(--fs-base));
+  --fs-md: var(--fs-base);
+  --fs-lg: calc(1.5 * var(--fs-base));
+  --fs-xl: calc(2 * var(--fs-base));
+}

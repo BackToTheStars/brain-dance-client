@@ -1,7 +1,14 @@
-import Link from "next/link";
+import LobbyLayout from '@/modules/lobby/components/layout/LobbyLayout';
+import CommonModal from '@/modules/ui/components/modal/CommonModal';
 
-const IndexPage = () => {
-  return <Link href="/lobby-old">Lobby</Link>
-}
+// Упрощённая версия лобби, после рефакторинга
+const HomePage = () => {
+  return (
+    <>
+      <LobbyLayout />
+      <CommonModal />
+    </>
+  );
+};
 
-export default IndexPage;
+export default HomePage;
