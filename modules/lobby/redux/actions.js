@@ -34,19 +34,40 @@ export const closeModal = () => (dispatch) => {
   });
 };
 
-export const openSliderModal = (type, params) => (dispatch) => {
+export const toggleSliderModal = (type, params) => (dispatch, getState) => {
+  const prevModal = getState().lobby.sliderModal;
+  const areEqual = prevModal.type === type && JSON.stringify(prevModal.params) === JSON.stringify(params);
   dispatch({
     type: types.LOBBY_SLIDER_MODAL_SET,
-    payload: { open: true, type, params },
+    payload: { open: !areEqual || !prevModal.open, type, params },
   });
 };
 
-export const closeSliderModal = () => (dispatch) => {
-  dispatch({
-    type: types.LOBBY_SLIDER_MODAL_SET,
-    payload: { open: false, type: null, params: {} },
-  });
-};
+export const closeSliderModal =
+  (removeContentDelay = 0) =>
+  (dispatch, getState) => {
+    if (removeContentDelay) {
+      const prevModal = getState().lobby.sliderModal;
+      dispatch({
+        type: types.LOBBY_SLIDER_MODAL_SET,
+        payload: {
+          ...prevModal,
+          open: false
+        },
+      });
+      setTimeout(() => {
+        dispatch({
+          type: types.LOBBY_SLIDER_MODAL_SET,
+          payload: { open: false, type: null, params: {} },
+        })
+      }, removeContentDelay);
+    } else {
+      dispatch({
+        type: types.LOBBY_SLIDER_MODAL_SET,
+        payload: { open: false, type: null, params: {} },
+      });
+    }
+  };
 
 export const switchTheme = () => (dispatch, getState) => {
   const html = document.querySelector('html');

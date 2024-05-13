@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import GamesPanel from './GamesPanel';
 import { VerticalSplit } from '../elements/VerticalSplit';
 import TurnsPanel from './TurnsPanel';
+import CommonSliderModal from '../sliderModals/CommonSliderModal';
 
 const MIN_LEFT_SIDE_WIDTH = 400;
 
@@ -37,13 +38,17 @@ const MainContent = ({ leftSideWidth, setLeftSideWidth }) => {
   }, []);
 
   return (
-    <div className="lobby-block pb-4 flex flex-1 overflow-hidden">
-      <div style={leftSideStyle} className="lobby-block flex flex-col gap-2 pt-2">
+    <div className="lobby-block flex flex-1 overflow-hidden">
+      <div
+        style={leftSideStyle}
+        className="lobby-block flex flex-col gap-2 pt-2"
+      >
         <GamesPanel />
       </div>
       <VerticalSplit move={move} />
-      <div className="flex-1 overflow-auto pt-2">
+      <div className="flex-1 mt-2 relative overflow-hidden">
         <TurnsPanel connectedWidth={leftSideWidth} />
+        <CommonSliderModal />
       </div>
     </div>
   );

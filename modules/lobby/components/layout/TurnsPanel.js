@@ -2,6 +2,7 @@ import { loadTurns } from '@/modules/lobby/redux/actions';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TurnCard from '../elements/TurnCard';
+import Loading from '@/modules/ui/components/common/Loading';
 
 const TurnsPanel = ({ connectedWidth }) => {
   const wrapperRef = useRef(null);
@@ -13,7 +14,7 @@ const TurnsPanel = ({ connectedWidth }) => {
   }, [connectedWidth, wrapperRef.current]);
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className="flex flex-col h-full pr-2 overflow-auto">
       <TurnsPanelInner width={width} />
     </div>
   );
@@ -30,6 +31,7 @@ const TurnsPanelInner = ({ width }) => {
   const turns = useSelector((s) => s.lobby.turns);
 
   const numCols = useMemo(() => {
+    if (!width) return desiredNumCols;
     const maxCols = Math.floor(width / MIN_TURN_WIDTH);
     const minCols = Math.floor(width / MAX_TURN_WIDTH);
     return Math.min(maxCols, Math.max(minCols, columnCount || desiredNumCols));
@@ -54,26 +56,21 @@ const TurnsPanelInner = ({ width }) => {
   }, [mode]);
 
   return (
-    <div className="flex flex-col h-full pr-2">
-      <div className="flex-1 overflow-auto lobby-block">
-        {/* { width } */}
-        {/* {JSON.stringify(turns, null, 2)} */}
-      </div>
-      <div className="flex gap-4">
-        {turnGroups.map((innerTurns, i) => (
-          <div
-            key={i}
-            style={{ width: `${Math.floor(100 / numCols)}%` }}
-            className="turn-group flex flex-col flex-1 gap-2"
-          >
-            {innerTurns.map((turn) => (
-              <div key={turn._id} className="turn-group__item">
-                <TurnCard id={turn._id} />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className="flex gap-4">
+      {turns.length === 0 && <Loading />}
+      {turnGroups.map((innerTurns, i) => (
+        <div
+          key={i}
+          style={{ width: `${Math.floor(100 / numCols)}%` }}
+          className="turn-group flex flex-col flex-1 gap-2"
+        >
+          {innerTurns.map((turn) => (
+            <div key={turn._id} className="turn-group__item">
+              <TurnCard id={turn._id} />
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 };

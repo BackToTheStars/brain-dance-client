@@ -3,6 +3,7 @@ import { loadGames } from '@/modules/lobby/redux/actions';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GameRow from '../ui/GameRow';
+import Loading from '@/modules/ui/components/common/Loading';
 
 const GamesPanel = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const GamesPanel = () => {
         <div className="flex-1">Search</div>
       </div>
       <div className="select-none">
+        {games.length === 0 && <Loading />}
         {games.map((game, index) => {
           return (
             <GameRow key={game._id} game={game} index={index} />

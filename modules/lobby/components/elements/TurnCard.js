@@ -1,5 +1,5 @@
 import { SLIDER_MODAL_TURN } from '@/config/lobby/sliderModal';
-import { openSliderModal } from '@/modules/lobby/redux/actions';
+import { toggleSliderModal } from '@/modules/lobby/redux/actions';
 import { ContentButton as Button } from '@/ui/button';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ const getVideoImg = (url) => {
 const TurnCard = ({ id }) => {
   const turn = useSelector((s) => s.lobby.dTurns[id]);
   const { dontShowHeader, header, imageUrl, videoUrl, paragraph, contentType } =
-    turn;
+    turn || {};
   const dispatch = useDispatch();
   let text = (paragraph && paragraph[0]?.insert) || null;
   if (text) {
@@ -44,7 +44,7 @@ const TurnCard = ({ id }) => {
         )}
         {/* <Button
           size="sm"
-          onClick={() => dispatch(openSliderModal(SLIDER_MODAL_TURN, { id }))}
+          onClick={() => dispatch(toggleSliderModal(SLIDER_MODAL_TURN, { id }))}
         >
           Open
         </Button> */}

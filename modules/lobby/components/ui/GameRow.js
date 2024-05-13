@@ -1,8 +1,15 @@
 import { DoubleRightOutlined } from '@ant-design/icons';
 import { IntButton as Button } from '@/ui/button';
+import { useDispatch } from 'react-redux';
+import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
+import { toggleSliderModal } from '../../redux/actions';
+import { useRouter } from 'next/navigation';
 
 const GameRow = ({ game, index }) => {
-  const { name, image, status, turns, description, hash } = game;
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { name, image, status, description, hash } = game;
+  const params = { hash }
   return (
     <div className="game-row game-item-row lobby-panel__divider-b s_py-1">
       <div className="circle-cell">
@@ -11,12 +18,12 @@ const GameRow = ({ game, index }) => {
       <div
         className="game-item game-cell"
         onClick={() => {
-          // dispatch(
-          //   openSliderModal(SLIDER_MODAL_GAME, {
-          //     ...params,
-          //     width: '50%',
-          //   })
-          // );
+          dispatch(
+            toggleSliderModal(SLIDER_MODAL_GAME, {
+              ...params,
+              width: '50%',
+            })
+          );
         }}
       >
         {name}
@@ -24,7 +31,8 @@ const GameRow = ({ game, index }) => {
           size="sm"
           onClick={(e) => {
             e.preventDefault();
-            // router.push(`/game?hash=${hash}`);
+            e.stopPropagation();
+            router.push(`/game?hash=${hash}`);
           }}
         >
           <DoubleRightOutlined />

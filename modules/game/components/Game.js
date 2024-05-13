@@ -22,8 +22,6 @@ import { GAME_STAGE_INIT, GAME_STAGE_READY } from '@/config/game';
 
 const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
-let useEffectIsDone = false;
-
 const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
@@ -35,23 +33,21 @@ const Game = ({ hash }) => {
 
   const gameBoxClasses = useMemo(() => {
     return isEditMode ? 'edit-mode' : '';
-  }, [isEditMode])
+  }, [isEditMode]);
 
   useEffect(() => {
-    if (!useEffectIsDone) {
-      dispatch(loadFullGame(hash)).then(() => {
-        dispatch(setGameStage(GAME_STAGE_READY));
-      });
-      dispatch(
-        addNotification({
-          title: 'Info:',
-          text: `User ${nickname} logged in.`,
-        }),
-      );
-    }
-    useEffectIsDone = true;
+    if (!hash) return;
+    dispatch(loadFullGame(hash)).then(() => {
+      dispatch(setGameStage(GAME_STAGE_READY));
+    });
+    dispatch(
+      addNotification({
+        title: 'Info:',
+        text: `User ${nickname} logged in.`,
+      }),
+    );
     return () => dispatch(setGameStage(GAME_STAGE_INIT));
-  }, []);
+  }, [hash]);
 
   useEffect(() => {
     if (!window) return;

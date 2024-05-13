@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'; // позволяет динамически
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { UserProvider } from '@/modules/user/contexts/UserContext';
-import { Spin } from 'antd';
+import Loading from '@/modules/ui/components/common/Loading';
 const Game = dynamic(() => import('@/modules/game/components/Game'), {
   ssr: false,
 });
@@ -27,9 +27,7 @@ const GamePageInner = () => {
 
       <div className="game-bg">
         {!hash ? (
-          <div className="w-full h-full flex items-center justify-center gap-2">
-            <Spin size="large" /> Loading...
-          </div>
+          <Loading />
         ) : (
           <UserProvider hash={hash}>
             <Game hash={hash} />
