@@ -14,7 +14,7 @@ import { TogglerPanel, TogglerWrapper } from '../ui/Toggler';
 import ContentSettings from '../elements/ContentSettings';
 import ColumnsSlider from '../controls/ColumnsSlider';
 import { switchMode } from '@/modules/lobby/redux/actions';
-import { BranchesOutlined, CalendarOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import TurnListControls from '../controls/TurnListControls';
 
 const Header = ({ leftSideWidth }) => {
@@ -28,7 +28,7 @@ const Header = ({ leftSideWidth }) => {
     };
   }, [leftSideWidth]);
   return (
-    <header className="lobby-block pt-4 flex justify-between">
+    <header className="lobby-block pt-4 flex justify-between z-10">
       <div
         style={leftSideStyle}
         className="lobby-block flex gap-2 divider-r pb-2"
@@ -63,17 +63,11 @@ const Header = ({ leftSideWidth }) => {
         <ColumnsSlider />
         <TurnListControls />
         <div className="flex-1 flex gap-2">
-          <Button
-            size="sm"
-            onClick={() => dispatch(switchMode('byGame'))}
-          >
-            <BranchesOutlined />
+          <Button size="sm" onClick={() => dispatch(switchMode('byGame'))}>
+            <ApartmentOutlined />
           </Button>
-          <Button
-            size="sm"
-            onClick={() => dispatch(switchMode('chrono'))}
-          >
-            <CalendarOutlined />
+          <Button size="sm" onClick={() => dispatch(switchMode('chrono'))}>
+            <ClockCircleOutlined />
           </Button>
         </div>
         {/* <ContentToolbar showSettings={false} /> */}

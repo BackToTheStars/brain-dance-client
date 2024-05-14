@@ -43,9 +43,16 @@ export const VerticalSplit = ({
   }, [delta]);
 
   return (
-    <div className={`vertical-split ${extraClasses}`} ref={resizeLineRef}>
+    <div
+      className={`vertical-split ${extraClasses}`}
+      ref={resizeLineRef}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
       <div className="vertical-split__icon">⇄</div>
-      <div className="vertical-split__divider"/>
+      <div className="vertical-split__divider" />
     </div>
   );
 };

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start -p $PORT",
+    "start": "next start -p 5018",
     "client": "next dev -p 3002",
     "redux-devtools": "redux-devtools --hostname=localhost --port=8000",
     "storybook": "storybook dev -p 6006",

@@ -1,5 +1,16 @@
 .game-row {
   @apply flex w-full items-center gap-6 cursor-pointer py-2;
+  .game-item {
+    button {
+      transition: opacity 0.2s ease-in-out;
+      opacity: 0;
+    }
+    &:hover {
+      button {
+        opacity: 1;
+      }
+    }
+  }
 }
 .circle-cell {
   @apply w-[30px] h-[30px] flex-[0_0_30px] flex justify-center items-center

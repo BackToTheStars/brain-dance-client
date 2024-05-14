@@ -1,3 +1,5 @@
+import { useSelector } from 'react-redux';
+
 const getVideoImg = (url) => {
   if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
     const newVideoUrl = url.split('=')[1];
@@ -20,14 +22,16 @@ const limitLine = (line) => {
 };
 
 const TurnModal = ({ params }) => {
+  const { id } = params;
+  const turn = useSelector((s) => s.lobby.dTurns[id]);
   const { header, imageUrl, videoUrl, paragraph, date, contentType, width } =
-    params;
+    turn || {};
   const newDate = new Date(date);
   const text = (paragraph && paragraph[0]?.insert) || null;
   const videoImg = getVideoImg(videoUrl || '');
   return (
     <div
-      style={{ width }}
+      style={{ width: '50%' }}
       className="dark:bg-dark-light bg-light h-full flex flex-col rounded"
     >
       <div className="bg-main-dark rounded-t p-4">

@@ -62,7 +62,7 @@ const TurnsPanelInner = ({ width }) => {
         <div
           key={i}
           style={{ width: `${Math.floor(100 / numCols)}%` }}
-          className="turn-group flex flex-col flex-1 gap-2"
+          className="turn-group flex flex-col flex-1 gap-4"
         >
           {innerTurns.map((turn) => (
             <div key={turn._id} className="turn-group__item">

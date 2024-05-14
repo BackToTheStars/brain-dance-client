@@ -10,8 +10,8 @@ const SliderModal = ({ open, closeModal, children }) => {
           open ? 'opacity-[1]' : 'opacity-0'
         }`}
         style={{ filter: `grayscale(1)`, backdropFilter: `blur(1px)` }}
-      ></div>
-      <div className="w-full relative">
+      />
+      <div className="w-full relative flex">
         <div
           className="absolute right-[12px] top-[8px] text-xl cursor-pointer text-white"
           onClick={() => {
@@ -20,7 +20,16 @@ const SliderModal = ({ open, closeModal, children }) => {
         >
           ✕
         </div>
-        <div className="w-full h-full">{children}</div>
+        {children}
+        <div
+          className="tmp-close-field"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (e.target === e.currentTarget) {
+              closeModal(1000);
+            }
+          }}
+        />
       </div>
     </div>
   );

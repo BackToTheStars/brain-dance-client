@@ -7,8 +7,22 @@
     background-color: var(--bg-base);
     border: 2px solid var(--border-body-divider);
   }
+
   &__divider {
     @apply absolute left-[50%] translate-x-[-50%] h-full w-[2px] z-[-1];
     background-color: var(--border-body-divider);
   }
+
+  &.game-modal__split {
+    transform: translateX(-50%);
+    height: calc(100% - 40px);
+    margin-top: 20px;
+  }
+}
+
+// @todo: remove
+.tmp-close-field {
+  margin-left: 50px;
+  flex: 1;
+  height: 100%;
 }
