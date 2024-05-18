@@ -52,13 +52,29 @@ export const AdminProvider = ({ children }) => {
     loginRequest({ nickname, password }).then((data) => {
       const { token } = data;
       setTokenIntoStorage(token);
-      onSuccess();
+      setAdminUser({
+        mode: USER_MODE_ADMIN,
+        token,
+        loaded: true,
+      });
+      setTimeout(() => {
+        onSuccess();
+      }, 500);
+    });
+  };
+
+  const logout = () => {
+    setTokenIntoStorage(null);
+    setAdminUser({
+      ...defaultAdminUser,
+      loaded: true,
     });
   };
 
   const value = {
     adminUser,
     login,
+    logout,
   };
   return (
     <AdminContext.Provider value={value}>{children}</AdminContext.Provider>

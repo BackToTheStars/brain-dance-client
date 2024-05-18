@@ -43,6 +43,16 @@ export const addCodeRequest = (hash) => {
   }).then((res) => res.json()); // вернёт Promise
 };
 
+export const syncDatabaseRequest = () => {
+  return fetch(`${API_URL}/backups/create-and-restore`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      'content-type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
+
 // PUBLIC REQUESTS
 export const createGameRequest = (name, gameIsPublic) => {
   // добавить description, players
