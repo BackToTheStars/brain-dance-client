@@ -4,6 +4,33 @@ let adminToken;
 export const setAdminToken = (nextAdminToken) => (adminToken = nextAdminToken);
 
 // ADMIN REQUESTS WITH TOKEN
+export const getAdminGamesRequest = () => {
+  return fetch(`${API_URL}/admin/games`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+};
+
+export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
+  let url = `${API_URL}/admin/turns`;
+  const params = {};
+
+  if (gameId) {
+    params.gameId = gameId;
+  }
+
+  if (Object.keys(params).length) {
+    url += `?${new URLSearchParams(params).toString()}`;
+  }
+  return fetch(url, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+};
+
+// @deprecated
 export const getGamesRequest = () => {
   return fetch(`${API_URL}/games`, {
     headers: {
