@@ -11,6 +11,7 @@ const createStore = () => {
     settings: {},
   };
   localStorage.setItem(settingsStorageKey, JSON.stringify(store));
+  return store;
 };
 
 // получение данных о сторе

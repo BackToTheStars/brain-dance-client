@@ -12,6 +12,16 @@ export const getAdminGamesRequest = () => {
   }).then((res) => res.json());
 };
 
+export const deleteAdminGameRequest = (id) => {
+  return fetch(`${API_URL}/admin/games/${id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      'content-type': 'application/json',
+    },
+  }).then((res) => res.json()); // вернёт Promise
+};
+
 export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
   let url = `${API_URL}/admin/turns`;
   const params = {};
