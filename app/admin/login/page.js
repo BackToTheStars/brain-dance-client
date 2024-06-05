@@ -6,17 +6,8 @@ import { useRouter } from 'next/navigation';
 const AdminPage = () => {
   const router = useRouter();
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div className="col-md-2">
-        <AdminSigninForm onSuccessSubmit={() => router.push('/admin')} />
-      </div>
+    <div className="admin-layout flex-center all-full">
+      <AdminSigninForm onSuccessSubmit={() => router.push('/admin')} />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { addGame } from '@/modules/settings/redux/actions';
 import {
   loadGamesRequest,
   loadTurnsByGameRequest,
@@ -5,6 +6,10 @@ import {
 } from './requests';
 import * as types from './types';
 // import { loadTurnsRequest } from './requests';
+import { openModal as openUiModal } from '@/modules/ui/redux/actions';
+import { MODAL_CONFIRM } from '@/config/lobby/modal';
+import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
+import { getGameUserTokenRequest } from '@/modules/game/requests';
 
 export const changeTextSettings = (field, value) => (dispatch) => {
   dispatch({
@@ -36,7 +41,9 @@ export const closeModal = () => (dispatch) => {
 
 export const toggleSliderModal = (type, params) => (dispatch, getState) => {
   const prevModal = getState().lobby.sliderModal;
-  const areEqual = prevModal.type === type && JSON.stringify(prevModal.params) === JSON.stringify(params);
+  const areEqual =
+    prevModal.type === type &&
+    JSON.stringify(prevModal.params) === JSON.stringify(params);
   dispatch({
     type: types.LOBBY_SLIDER_MODAL_SET,
     payload: { open: !areEqual || !prevModal.open, type, params },
@@ -52,14 +59,14 @@ export const closeSliderModal =
         type: types.LOBBY_SLIDER_MODAL_SET,
         payload: {
           ...prevModal,
-          open: false
+          open: false,
         },
       });
       setTimeout(() => {
         dispatch({
           type: types.LOBBY_SLIDER_MODAL_SET,
           payload: { open: false, type: null, params: {} },
-        })
+        });
       }, removeContentDelay);
     } else {
       dispatch({
@@ -123,5 +130,49 @@ export const toggleSidebar = (sidebar) => (dispatch, getState) => {
   return dispatch({
     type: types.LOBBY_SIDEBAR,
     payload: { ...sidebarObj },
+  });
+};
+
+export const lobbyEnterGameWithConfirm = (hash, nickname) => (dispatch) => {
+  return new Promise((resolve, reject) => {
+    getGameUserTokenRequest(hash, nickname).then((data) => {
+      if (data.success) {
+        resolve();
+        const { info, token } = data;
+        const { hash, nickname, role, code } = info;
+        dispatch(addGame({ hash, nickname, role, code }));
+        dispatch(
+          openUiModal(MODAL_CONFIRM, {
+            text: 'Перейти в игру?',
+            callback: () => {
+              setGameInfoIntoStorage(info.hash, {
+                info,
+                token,
+              });
+              location.replace(`/game?hash=${hash}`);
+            },
+          }),
+        );
+      } else {
+        reject(data?.message || 'Неизвестная ошибка');
+      }
+    });
+  });
+};
+
+export const lobbyEnterGameForRequest = (hash, nickname) => (dispatch) => {
+  return new Promise((resolve, reject) => {
+    getGameUserTokenRequest(hash, nickname).then((data) => {
+      if (data.success) {
+        const { info, token } = data;
+        setGameInfoIntoStorage(info.hash, {
+          info,
+          token,
+        });
+        resolve();
+      } else {
+        reject(data?.message || 'Неизвестная ошибка');
+      }
+    });
   });
 };

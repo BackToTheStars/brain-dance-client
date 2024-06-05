@@ -1,5 +1,5 @@
 import CodeEnterForm from '@/modules/game/components/forms/CodeEnterForm';
-import CreateGameModal from '@/modules/game/components/modals/CreateGameModal';
+// import CreateGameModal from '@/modules/game/components/modals/CreateGameModal';
 import NewGameInfoModal from '@/modules/game/components/modals/NewGameInfoModal';
 import EnterGameModal from '@/modules/game/components/modals/EnterGameModal';
 
@@ -33,7 +33,7 @@ const CreateEnterGameBlock = ({ enterGame, onGameCreate }) => {
         </div>
       </div>
       {/* POPUPS */}
-      {showCreateModal && (
+      {/* {showCreateModal && (
         <CreateGameModal
           close={() => setShowCreateModal(false)}
           onCreate={(data) => {
@@ -45,7 +45,7 @@ const CreateEnterGameBlock = ({ enterGame, onGameCreate }) => {
             setNewGameInfo(data.item);
           }}
         />
-      )}
+      )} */}
 
       {showEnterGameModal && (
         <EnterGameModal

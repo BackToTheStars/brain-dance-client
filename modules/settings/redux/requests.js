@@ -14,6 +14,16 @@ const createStore = () => {
   return store;
 };
 
+export const isStoreValid = (store) => {
+  if (store.version !== VERSION) {
+    return [
+      false,
+      `Wrong store version. Expected ${VERSION}, got ${store.version}`,
+    ];
+  }
+  return [true];
+};
+
 // получение данных о сторе
 export const getStore = () => {
   const str = localStorage.getItem(settingsStorageKey) || '';
@@ -39,6 +49,10 @@ export const lsUpdateGames = (games) => {
 };
 
 // удаление данных из стора
+export const clearStore = () => {
+  localStorage.removeItem(settingsStorageKey);
+  return createStore();
+};
 
 // работа с настройками
 

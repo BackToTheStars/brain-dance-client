@@ -19,7 +19,7 @@ const CommonSliderModal = () => {
 
   return (
     <SliderModal open={open} closeModal={handleClose}>
-      {!!type && <Component params={params} />}
+      {!!type && <Component params={params} closeModal={handleClose} />}
     </SliderModal>
   );
 };

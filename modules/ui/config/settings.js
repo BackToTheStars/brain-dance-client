@@ -3,12 +3,13 @@ import {
   MODAL_CREATE_GAME,
   MODAL_DONATE,
   MODAL_ENTER_GAME,
-  SLIDER_MODAL_GAME,
+  MODAL_UPLOAD,
 } from '@/config/lobby/modal';
 import EnterGameModal from '@/modules/lobby/components/modals/EnterGame';
 import CreateGameModal from '@/modules/lobby/components/modals/CreateGame';
 import DonateModal from '@/modules/lobby/components/modals/Donate';
 import ConfirmModal from '@/modules/lobby/components/modals/ConfirmModal';
+import UploadModal from '@/modules/lobby/components/modals/UploadModal';
 
 export const settings = {
   [MODAL_ENTER_GAME]: {
@@ -26,5 +27,9 @@ export const settings = {
   [MODAL_CONFIRM]: {
     title: 'Подтверждение',
     component: ConfirmModal,
+  },
+  [MODAL_UPLOAD]: {
+    title: 'Загрузка',
+    component: UploadModal,
   },
 };

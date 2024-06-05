@@ -45,8 +45,8 @@ const Header = ({ leftSideWidth }) => {
       </div>
       <div className="lobby-block flex gap-2 flex-1 justify-between pl-4 pb-2">
         <TogglerWrapper
-          Button={({ toggle }) => (
-            <Button onClick={toggle} size="sm">
+          Button={({ toggle, className = '' }) => (
+            <Button onClick={toggle} size="sm" className={className}>
               Настройки
             </Button>
           )}
@@ -60,16 +60,33 @@ const Header = ({ leftSideWidth }) => {
             </TogglerPanel>
           }
         />
+        <TogglerWrapper
+          Button={({ toggle, className = '' }) => (
+            <Button onClick={toggle} size="sm" className={className}>
+              Параметры
+            </Button>
+          )}
+          Panel={
+            <TogglerPanel style={{ transform: `translateX(-95px)` }}>
+              <div className="base-card w-[350px]">
+                <div className="base-card__body p-2">
+                  <TurnListControls />
+                </div>
+              </div>
+            </TogglerPanel>
+          }
+        />
         <ColumnsSlider />
-        <TurnListControls />
-        <div className="flex-1 flex gap-2">
+        {/* <TurnListControls /> */}
+        {/* <div className="flex-1 flex gap-2">
           <Button size="sm" onClick={() => dispatch(switchMode('byGame'))}>
             <ApartmentOutlined />
           </Button>
           <Button size="sm" onClick={() => dispatch(switchMode('chrono'))}>
             <ClockCircleOutlined />
           </Button>
-        </div>
+        </div> */}
+        <div className="flex-1" />
         {/* <ContentToolbar showSettings={false} /> */}
         {/* <Switchers /> */}
         <Button size="sm" onClick={() => dispatch(openModal(MODAL_DONATE))}>

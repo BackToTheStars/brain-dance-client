@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
-import { getGameUserTokenRequest } from '@/modules/user/requests';
+import { getGameUserTokenRequest } from '@/modules/game/requests';
 
 const CodePage = () => {
   return (

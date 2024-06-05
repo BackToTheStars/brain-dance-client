@@ -1,12 +1,22 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ContentButton as Button } from '@/ui/button';
 import Search from '../ui/Search';
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { VerticalSplit } from '../elements/VerticalSplit';
 import { useRouter } from 'next/navigation';
+import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '@/config/user';
+import { removeGame } from '@/modules/settings/redux/actions';
+import Loading from '@/modules/ui/components/common/Loading';
+import { openModal } from '@/modules/ui/redux/actions';
+import { MODAL_CONFIRM } from '@/config/lobby/modal';
+import { removeGameInfo, setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
+import { deleteGameRequest } from '@/modules/game/requests';
+import { lobbyEnterGameForRequest } from '../../redux/actions';
 
-const GameModal = ({ params }) => {
+const GameModal = ({ params, closeModal = () => {} }) => {
+  const dispatch = useDispatch();
+  const myGames = useSelector((state) => state.settings.games);
   const router = useRouter();
   const minMaxDelta = [-200, 200]; // @todo: get from redux
   const modalRef = useRef();
@@ -15,7 +25,28 @@ const GameModal = ({ params }) => {
   const game = useSelector((state) =>
     state.lobby.games.find((g) => g.hash === hash),
   );
-  const { public: isPublic, name, image, turnsCount, description } = game;
+  const { public: isPublic, name, image, turnsCount, description } = game || {};
+  const { can, existsInList, role, codeData } = useMemo(() => {
+    const info = myGames.find((g) => g.hash === hash);
+    if (!info) {
+      return {
+        existsInList: false,
+        role: ROLE_GAME_VISITOR,
+        can: (rule) => ROLES[ROLE_GAME_VISITOR].rules.includes(rule),
+      };
+    }
+    const mainRole = info.codes.reduce(
+      (acc, codeData) => (codeData.role > acc ? codeData.role : acc),
+      ROLE_GAME_VISITOR,
+    );
+    const codeData = info.codes.find((codeData) => codeData.role === mainRole);
+    return {
+      existsInList: true,
+      role: mainRole,
+      codeData,
+      can: (rule) => ROLES[mainRole].rules.includes(rule),
+    };
+  }, [myGames, hash]);
 
   const move = (delta) => {
     if (typeof window === 'undefined') return;
@@ -30,6 +61,8 @@ const GameModal = ({ params }) => {
       setWidth(middle + delta);
     }
   };
+
+  if (!name) return <Loading />;
   return (
     <>
       <div
@@ -40,9 +73,9 @@ const GameModal = ({ params }) => {
         <div className="flex items-center gap-x-4">
           <div className="w-[30px] h-[30px] flex-[0_0_auto] inline-flex items-center justify-center rounded-btn-border border-2 border-main bg-main bg-opacity-10">
             {isPublic ? (
-              <LockOutlined className="text-[18px] dark:text-light text-dark" />
-            ) : (
               <UnlockOutlined className="text-[18px] dark:text-light text-dark" />
+            ) : (
+              <LockOutlined className="text-[18px] dark:text-light text-dark" />
             )}
           </div>
           <div className="text-xl font-semibold w-full pe-10 leading-[1.2] dark:text-white text-dark">
@@ -82,7 +115,47 @@ const GameModal = ({ params }) => {
           />
         </div> */}
         <div className="mt-6">{!!description && description}</div>
-        <div className="mt-auto text-right">
+        <div className="mt-auto gap-2 flex justify-end">
+          {existsInList && (
+            <Button
+              size="sm"
+              onClick={() => {
+                dispatch(
+                  openModal(MODAL_CONFIRM, {
+                    text: 'Remove item from my games?',
+                    callback: () => {
+                      dispatch(removeGame(hash));
+                      closeModal();
+                    },
+                  }),
+                );
+              }}
+            >
+              Remove from List
+            </Button>
+          )}
+          {can(RULE_GAME_EDIT) && (
+            <Button size="sm" onClick={() => {
+              dispatch(
+                openModal(MODAL_CONFIRM, {
+                  text: 'Delete the game permanently?',
+                  callback: () => {
+                    dispatch(
+                      lobbyEnterGameForRequest(codeData.code, codeData.nickname),
+                    ).then(() => {
+                      deleteGameRequest(hash).then(() => {
+                        dispatch(removeGame(hash));
+                        removeGameInfo(hash);
+                        closeModal();
+                      });
+                    });
+                  },
+                }),
+              );
+            }}>
+              Delete game
+            </Button>
+          )}
           <Button size="sm" onClick={() => router.push(`/game?hash=${hash}`)}>
             Open game
           </Button>

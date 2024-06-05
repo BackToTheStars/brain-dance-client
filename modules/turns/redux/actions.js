@@ -1,7 +1,3 @@
-import {
-  getTurnsGeometryRequest,
-  getTurnsRequest,
-} from '@/modules/game/requests';
 import * as types from './types';
 import * as gameTypes from '@/modules/game/game-redux/types';
 import * as quotesTypes from '@/modules/quotes/redux/types';
@@ -10,6 +6,7 @@ import {
   deleteTurnRequest,
   getTokenRequest,
   getTurnsByIdsRequest,
+  getTurnsGeometryRequest,
   updateTurnRequest,
 } from '../requests';
 import {

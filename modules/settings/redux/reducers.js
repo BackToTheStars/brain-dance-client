@@ -18,6 +18,12 @@ export const settingsReducer = (state = initialState, { type, payload }) => {
         games: [...state.games, payload],
       };
     }
+    case types.SETTINGS_GAME_DELETE: {
+      return {
+        ...state,
+        games: state.games.filter((g) => g.hash !== payload),
+      };
+    }
     case types.SETTINGS_GAME_UPDATE: {
       return {
         ...state,

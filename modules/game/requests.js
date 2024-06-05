@@ -29,9 +29,9 @@ export const request = async (
         return data.json();
       })
       .then((res) => {
-        const { message = defaultMessage, item, items } = res;
+        const { message = defaultMessage, item, items, success } = res;
         // @todo: более гибкая обработка
-        if (item || items) {
+        if (item || items || success) {
           resolve(res);
           if (successCallback) {
             successCallback(res);
@@ -57,28 +57,46 @@ export const getGameRequest = (hash) => {
   });
 };
 
-export const getTurnsRequest = (hash) => {
-  return request(`turns?hash=${s.hash}`, {
-    tokenFlag: true,
-  });
-};
-
-export const getTurnsGeometryRequest = (hash) => {
-  return request(`new-turns/geometry?hash=${s.hash}`, {
-    tokenFlag: true,
-  });
-}
-
-export const getGamesLastTurns = () => {
-  return request(`games/last-turns`, {
-    tokenFlag: true,
-  });
-};
-
 export const saveGamePositionRequest = (gamePosition) => {
-  return request(`games/viewport?hash=${s.hash}`, {
+  return request(`codes/viewport?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'PUT',
     body: gamePosition,
   });
+};
+
+export const deleteGameRequest = () => {
+  return request(`game?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'DELETE',
+  });
+};
+
+// PUBLIC REQUESTS
+export const createGameRequest = (name, gameIsPublic) => {
+  // добавить description, players
+  return fetch(`${API_URL}/game`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      name,
+      public: gameIsPublic,
+    }),
+  }).then((res) => res.json());
+};
+
+
+export const getGameUserTokenRequest = (hash, nickname) => {
+  return fetch(`${API_URL}/codes/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      hash,
+      nickname,
+    }),
+  }).then((res) => res.json());
 };

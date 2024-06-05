@@ -6,7 +6,7 @@
   background-color: var(--bg-button);
   color: var(--text-button);
 
-  &:hover {
+  &:hover, &.active {
     background-color: var(--bg-button-hover);
     color: var(--text-button-hover);
     border-color: var(--border-button-hover);

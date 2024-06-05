@@ -1,7 +1,7 @@
 import { useAdminContext } from '@/modules/admin/contexts/AdminContext';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { loadGames, setActiveGameByHash } from '../../games-redux/actions';
+import { setActiveGameByHash } from '../../games-redux/actions';
 
 const GameListTable = () => {
   const { adminUser } = useAdminContext();
@@ -10,14 +10,14 @@ const GameListTable = () => {
 
   useEffect(() => {
     if (!adminUser.loaded) return;
-    dispatch(loadGames());
+    alert('deprecated loadGames'); // @deprecated
   }, [adminUser.loaded]);
 
   const [filter, setFilter] = useState('');
 
   const filteredGames = filter
     ? games.filter(
-        (game) => game.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+        (game) => game.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1,
       )
     : games;
 

@@ -22,7 +22,17 @@
 }
 
 .admin-layout {
+  height: 100vh;
   min-height: 100vh;
   background-color: #fff;
   color: #000;
+}
+
+// util classes
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.all-full {
+  @apply w-full h-full;
 }

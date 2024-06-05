@@ -15,7 +15,6 @@ export const addGame =
     const games = getState().settings.games;
     const currentGame = games.find((g) => g.hash === hash);
     if (currentGame) {
-      console.log({ currentGame });
       const currentCode = currentGame.codes.find((c) => c.code === code);
       let updatedGame;
       if (currentCode) {
@@ -62,3 +61,13 @@ export const addGame =
       });
     }
   };
+
+export const removeGame = (hash) => (dispatch) => {
+  const games = getStore().games;
+  const newGames = games.filter((g) => g.hash !== hash);
+  lsUpdateGames(newGames);
+  dispatch({
+    type: types.SETTINGS_GAME_DELETE,
+    payload: hash,
+  });
+};

@@ -32,6 +32,7 @@ export const RadioInput = ({ label, value, name, onChange, options }) => {
               name={name}
               value={option.value}
               checked={option.value === value}
+              onChange={() => onChange(option.value)}
             />
             <label className="cursor-pointer">{option.label}</label>
           </div>
@@ -46,6 +47,7 @@ export const LobbyForm = ({
   onCancel: parentCancel,
   inputs = [],
   error,
+  confirmText = 'Ок',
 }) => {
   const [values, setValues] = useState(
     inputs.reduce(
@@ -101,7 +103,7 @@ export const LobbyForm = ({
         <Button onClick={onCancel} className="mr-3">
           Отмена
         </Button>
-        <Button onClick={onSubmit}>Войти в игру</Button>
+        <Button onClick={onSubmit}>{confirmText}</Button>
       </div>
     </form>
   );

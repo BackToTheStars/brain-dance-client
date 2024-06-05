@@ -1,8 +1,14 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
 
+export const getTurnsGeometryRequest = (hash) => {
+  return request(`turns/geometry?hash=${s.hash}`, {
+    tokenFlag: true,
+  });
+};
+
 export const getTurnsByIdsRequest = (ids) => {
-  return request(`new-turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
+  return request(`turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
     tokenFlag: true,
   });
 }

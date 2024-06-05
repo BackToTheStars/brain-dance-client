@@ -14,7 +14,7 @@ export const setGameInfoIntoStorage = (hash, data) => {
   setRequestSettings(hash, data?.token);
   localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
 };
-const removeGameInfo = (hash) => {
+export const removeGameInfo = (hash) => {
   // @todo fixme
   // setUserToken(null);
   setRequestSettings(null, null);
