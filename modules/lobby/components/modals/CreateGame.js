@@ -39,14 +39,16 @@ const CreateGameModal = ({ params }) => {
       }
     }
     setError('');
-    const { name, gameIsPublic } = values;
+    const { name, gameIsPublic, nickname = 'Owner' } = values;
     // @todo: перенести в action
     createGameRequest(name, gameIsPublic === 'true').then((data) => {
       if (data?.item) {
         const { code } = data.item;
-        dispatch(lobbyEnterGameWithConfirm(code.hash, 'Owner')).catch((msg) => {
-          setError(msg);
-        });
+        dispatch(lobbyEnterGameWithConfirm(code.hash, nickname)).catch(
+          (msg) => {
+            setError(msg);
+          },
+        );
       } else {
         setError(data?.message || 'Что-то пошло не так');
       }

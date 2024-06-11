@@ -6,7 +6,7 @@ import {
 } from './requests';
 import * as types from './types';
 // import { loadTurnsRequest } from './requests';
-import { openModal as openUiModal } from '@/modules/ui/redux/actions';
+import { openModal } from '@/modules/ui/redux/actions';
 import { MODAL_CONFIRM } from '@/config/lobby/modal';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
 import { getGameUserTokenRequest } from '@/modules/game/requests';
@@ -22,13 +22,6 @@ export const changeLayoutSettings = (field, value) => (dispatch) => {
   dispatch({
     type: types.LOBBY_LAYOUT_SETTINGS_SET,
     payload: { field, value },
-  });
-};
-
-export const openModal = (type, params) => (dispatch) => {
-  dispatch({
-    type: types.LOBBY_MODAL_SET,
-    payload: { open: true, type, params },
   });
 };
 
@@ -133,19 +126,19 @@ export const toggleSidebar = (sidebar) => (dispatch, getState) => {
   });
 };
 
-export const lobbyEnterGameWithConfirm = (hash, nickname) => (dispatch) => {
+export const lobbyEnterGameWithConfirm = (code, nickname) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    getGameUserTokenRequest(hash, nickname).then((data) => {
+    getGameUserTokenRequest(code, nickname).then((data) => {
       if (data.success) {
         resolve();
         const { info, token } = data;
         const { hash, nickname, role, code } = info;
         dispatch(addGame({ hash, nickname, role, code }));
         dispatch(
-          openUiModal(MODAL_CONFIRM, {
+          openModal(MODAL_CONFIRM, {
             text: 'Перейти в игру?',
             callback: () => {
-              setGameInfoIntoStorage(info.hash, {
+              setGameInfoIntoStorage(hash, {
                 info,
                 token,
               });
@@ -160,12 +153,12 @@ export const lobbyEnterGameWithConfirm = (hash, nickname) => (dispatch) => {
   });
 };
 
-export const lobbyEnterGameForRequest = (hash, nickname) => (dispatch) => {
+export const lobbyEnterGameForRequest = (hash, code, nickname) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    getGameUserTokenRequest(hash, nickname).then((data) => {
+    getGameUserTokenRequest(code, nickname).then((data) => {
       if (data.success) {
         const { info, token } = data;
-        setGameInfoIntoStorage(info.hash, {
+        setGameInfoIntoStorage(hash, {
           info,
           token,
         });

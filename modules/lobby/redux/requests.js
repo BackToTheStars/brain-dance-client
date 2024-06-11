@@ -27,3 +27,17 @@ export const loadGamesRequest = () => {
     (res) => res.json()
   );
 }
+
+export const loadGamesByHashesRequest = (hashes) => {
+  return fetch(`${LOBBY_API_URL}/lobby/games-by-hashes?hashes=${hashes.join(",")}`).then(
+    (res) => res.json()
+  );
+}
+
+export const checkGameRequest = (hash, token) => {
+  return fetch(`${LOBBY_API_URL}/lobby/check-game?hash=${hash}`, {
+    headers: {
+      'game-token': token,
+    },
+  }).then((res) => res.json());
+}

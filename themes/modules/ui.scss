@@ -14,6 +14,8 @@
 .base-card_modal {
   min-width: 450px;
   min-height: 200px;
+  max-height: 90vh;
+  overflow-y: auto;
 
   .base-card__header {
     @apply p-2 flex justify-between items-center;

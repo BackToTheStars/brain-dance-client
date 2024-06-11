@@ -1,15 +1,13 @@
 'use client';
 
-import { Button, Spin } from 'antd';
+import { Button } from 'antd';
 import { useRouter } from 'next/navigation';
 import { notification } from 'antd';
 import { useAdminContext } from '@/modules/admin/contexts/AdminContext';
-import { useMemo, useState } from 'react';
-import { syncDatabaseRequest } from '@/modules/admin/requests';
+import { useEffect, useMemo } from 'react';
 
 const AdminHeader = () => {
   const router = useRouter();
-  const [syncLoading, setSyncLoading] = useState(false);
   const { adminUser, logout } = useAdminContext();
   const timeLeft = useMemo(() => {
     if (adminUser?.token) {
@@ -25,41 +23,32 @@ const AdminHeader = () => {
     }
     return null;
   }, [adminUser?.token]);
-  const syncDatabase = async () => {
-    setSyncLoading(true);
-    const { success } = await syncDatabaseRequest();
-    setSyncLoading(false);
-    if (success) {
-      notification.success({
-        message: 'Database synced',
-      });
-    } else {
+
+  useEffect(() => {
+    if (timeLeft === 'Token expired') {
       notification.error({
-        message: 'Failed to sync database',
+        message: 'Token expired',
       });
+      logout();
+      router.push('/admin/login');
     }
-  };
+  }, [timeLeft]);
 
   return (
-    <header className="p-2">
-      <div className="flex gap-2">
-        <div>
-          <Button type="link" onClick={() => router.push('/')}>
-            Lobby
-          </Button>
-        </div>
-        <div className="flex gap-2 items-center">
-          <Button htmlType="button" onClick={syncDatabase}>
-            Sync Database
-          </Button>
-          {syncLoading && <Spin />}
-        </div>
-        <div className="flex-1" />
-        <div>
-          <Button htmlType="button" onClick={logout}>
-            Logout
-          </Button>
-          <span className="ml-2">{timeLeft}</span>
+    <header className="relative z-10">
+      <div className="absolute top-0 right-0 p-2">
+        <div className="flex gap-2">
+          <div>
+            <Button type="link" onClick={() => router.push('/')}>
+              Lobby
+            </Button>
+          </div>
+          <div>
+            <Button htmlType="button" onClick={logout}>
+              Logout
+            </Button>
+            <span className="ml-2">{timeLeft}</span>
+          </div>
         </div>
       </div>
     </header>

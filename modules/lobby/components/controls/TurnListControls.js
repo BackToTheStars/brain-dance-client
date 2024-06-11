@@ -2,9 +2,15 @@ import { SIZE_SM } from '@/config/ui/size';
 import { DropdownBlock } from '../ui/DropdownList';
 import { contentTypes } from '@/config/lobby/contentType';
 import { switchMode } from '@/modules/lobby/redux/actions';
-import { ApartmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {
+  ApartmentOutlined,
+  BookOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { IntButton as Button } from '@/ui/button';
+import { MODAL_ACCESS_GAMES } from '@/config/lobby/modal';
+import { openModal } from '@/modules/ui/redux/actions';
 
 const GroupParams = ({ children }) => {
   return <div className="base-group p-2 w-1/2">{children}</div>;
@@ -59,14 +65,24 @@ const TurnListControls = () => {
           </GroupParams>
         </div>
       </div>
-      <div className="cursor-pointer py-3">
-        <DropdownBlock title="Типы ходов" size={SIZE_SM}>
-          <div className="px-1 flex flex-col gap-1">
-            {contentTypes.map((type) => (
-              <div key={type.value}>{type.label}</div>
-            ))}
-          </div>
-        </DropdownBlock>
+      <div className="flex gap-3 py-3">
+        <div>
+          <Button
+            size="sm"
+            onClick={() => dispatch(openModal(MODAL_ACCESS_GAMES))}
+          >
+            <BookOutlined /> Избранные игры
+          </Button>
+        </div>
+        <div className="cursor-pointer">
+          <DropdownBlock title="Типы ходов" size={SIZE_SM}>
+            <div className="px-1 flex flex-col gap-1">
+              {contentTypes.map((type) => (
+                <div key={type.value}>{type.label}</div>
+              ))}
+            </div>
+          </DropdownBlock>
+        </div>
       </div>
     </div>
   );

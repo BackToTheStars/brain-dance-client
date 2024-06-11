@@ -1,18 +1,127 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContentButton as Button } from '@/ui/button';
 import Search from '../ui/Search';
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalSplit } from '../elements/VerticalSplit';
 import { useRouter } from 'next/navigation';
-import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '@/config/user';
+import {
+  ROLES,
+  ROLE_GAME_VISITOR,
+  RULE_GAME_EDIT,
+  roleOptions,
+} from '@/config/user';
 import { removeGame } from '@/modules/settings/redux/actions';
 import Loading from '@/modules/ui/components/common/Loading';
 import { openModal } from '@/modules/ui/redux/actions';
 import { MODAL_CONFIRM } from '@/config/lobby/modal';
-import { removeGameInfo, setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
-import { deleteGameRequest } from '@/modules/game/requests';
+import {
+  getGameInfo,
+  removeGameInfo,
+} from '@/modules/user/contexts/UserContext';
+import { addCodeRequest, deleteGameRequest } from '@/modules/game/requests';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
+import { Select } from 'antd';
+
+const CreateCodeForm = () => {
+  const [role, setRole] = useState(String(ROLE_GAME_VISITOR));
+  return (
+    <form className="flex gap-2">
+      <Select options={roleOptions} value={role} onChange={setRole} />
+      <Button
+        onClick={(e) => {
+          e.preventDefault();
+          addCodeRequest({ role: +role }).then(() => {
+            alert('code added');
+          });
+        }}
+      >
+        Add Code
+      </Button>
+    </form>
+  );
+};
+
+const CodesBlock = ({ codes, hash, can }) => {
+  const dispatch = useDispatch();
+  const [gameInfo, setGameInfo] = useState(null);
+
+  const reloadGameInfo = () => setGameInfo(getGameInfo(hash));
+
+  useEffect(() => {
+    reloadGameInfo();
+  }, [hash]);
+
+  return (
+    <div>
+      {!!gameInfo && (
+        <div className="mb-3">
+          <h2>Game info</h2>
+          <div className="flex gap-2 items-center">
+            {gameInfo.info.nickname} {ROLES[gameInfo.info.role].name}
+            <Button
+              onClick={() => {
+                removeGameInfo(hash);
+                reloadGameInfo();
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+          {/* <pre>{JSON.stringify(gameInfo, null, 2)}</pre> */}
+        </div>
+      )}
+      {!!codes.length && (
+        <div className="flex flex-col mb-3">
+          {/* <h2>Game codes</h2> */}
+          <table>
+            <thead>
+              <tr>
+                <th>Nickname</th>
+                <th>Code</th>
+                <th>Role</th>
+                <th className="w-[100px]"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {codes.map((codeData) => (
+                <tr key={codeData.code}>
+                  <td>{codeData.nickname}</td>
+                  <td>{codeData.code}</td>
+                  <td>{ROLES[codeData.role].name}</td>
+                  <td>
+                    {codeData.role !== gameInfo?.info?.role &&
+                      codeData.nickname !== gameInfo?.info?.nickname && (
+                        <Button
+                          onClick={() => {
+                            dispatch(
+                              lobbyEnterGameForRequest(
+                                hash,
+                                codeData.code,
+                                codeData.nickname,
+                              ),
+                            ).then(() => reloadGameInfo());
+                          }}
+                        >
+                          Login
+                        </Button>
+                      )}
+                  </td>
+                  {/* <pre>{JSON.stringify(codeData, null, 2)}</pre> */}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {can(RULE_GAME_EDIT) && (
+        <div className="mb-3">
+          <CreateCodeForm />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const GameModal = ({ params, closeModal = () => {} }) => {
   const dispatch = useDispatch();
@@ -26,7 +135,13 @@ const GameModal = ({ params, closeModal = () => {} }) => {
     state.lobby.games.find((g) => g.hash === hash),
   );
   const { public: isPublic, name, image, turnsCount, description } = game || {};
-  const { can, existsInList, role, codeData } = useMemo(() => {
+  const {
+    can,
+    existsInList,
+    role,
+    codeData,
+    codes = [],
+  } = useMemo(() => {
     const info = myGames.find((g) => g.hash === hash);
     if (!info) {
       return {
@@ -44,6 +159,7 @@ const GameModal = ({ params, closeModal = () => {} }) => {
       existsInList: true,
       role: mainRole,
       codeData,
+      codes: info.codes,
       can: (rule) => ROLES[mainRole].rules.includes(rule),
     };
   }, [myGames, hash]);
@@ -115,7 +231,9 @@ const GameModal = ({ params, closeModal = () => {} }) => {
           />
         </div> */}
         <div className="mt-6">{!!description && description}</div>
-        <div className="mt-auto gap-2 flex justify-end">
+        <div className="flex-1" />
+        <CodesBlock codes={codes} hash={hash} can={can} />
+        <div className="mt-auto gap-2 flex">
           {existsInList && (
             <Button
               size="sm"
@@ -135,24 +253,31 @@ const GameModal = ({ params, closeModal = () => {} }) => {
             </Button>
           )}
           {can(RULE_GAME_EDIT) && (
-            <Button size="sm" onClick={() => {
-              dispatch(
-                openModal(MODAL_CONFIRM, {
-                  text: 'Delete the game permanently?',
-                  callback: () => {
-                    dispatch(
-                      lobbyEnterGameForRequest(codeData.code, codeData.nickname),
-                    ).then(() => {
-                      deleteGameRequest(hash).then(() => {
-                        dispatch(removeGame(hash));
-                        removeGameInfo(hash);
-                        closeModal();
+            <Button
+              size="sm"
+              onClick={() => {
+                dispatch(
+                  openModal(MODAL_CONFIRM, {
+                    text: 'Delete the game permanently?',
+                    callback: () => {
+                      dispatch(
+                        lobbyEnterGameForRequest(
+                          hash,
+                          codeData.code,
+                          codeData.nickname,
+                        ),
+                      ).then(() => {
+                        deleteGameRequest(hash).then(() => {
+                          dispatch(removeGame(hash));
+                          removeGameInfo(hash);
+                          closeModal();
+                        });
                       });
-                    });
-                  },
-                }),
-              );
-            }}>
+                    },
+                  }),
+                );
+              }}
+            >
               Delete game
             </Button>
           )}

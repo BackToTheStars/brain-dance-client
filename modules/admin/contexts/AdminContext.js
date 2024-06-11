@@ -26,6 +26,11 @@ const setTokenIntoStorage = (token) => {
   setAdminToken(token);
 };
 
+const clearTokenFromStorage = () => {
+  localStorage.removeItem(SUPER_ADMIN_TOKEN_KEY);
+  setAdminToken(null);
+};
+
 const AdminContext = createContext();
 
 // MAIN ADMIN PROVIDER CONTEXT
@@ -64,7 +69,7 @@ export const AdminProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setTokenIntoStorage(null);
+    clearTokenFromStorage();
     setAdminUser({
       ...defaultAdminUser,
       loaded: true,

@@ -17,15 +17,24 @@ export const loginRequest = ({ nickname, password }) => {
 };
 
 // ADMIN REQUESTS WITH TOKEN
-export const syncDatabaseRequest = () => {
-  return fetch(`${API_URL}/admin/backups/create-and-restore`, {
+export const getAdminScriptsRequest = () => {
+  return fetch(`${API_URL}/admin/scripts`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+}
+
+export const runAdminScriptRequest = (scriptName, commandName) => {
+  return fetch(`${API_URL}/admin/scripts`, {
     method: 'POST',
     headers: {
       authorization: `Bearer ${adminToken}`,
       'content-type': 'application/json',
     },
+    body: JSON.stringify({ scriptName, commandName }),
   }).then((res) => res.json());
-};
+}
 
 export const getAdminGamesRequest = () => {
   return fetch(`${API_URL}/admin/games`, {

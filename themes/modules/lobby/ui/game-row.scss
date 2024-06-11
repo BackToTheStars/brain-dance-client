@@ -1,12 +1,12 @@
 .game-row {
   @apply flex w-full items-center gap-6 cursor-pointer py-2;
   .game-item {
-    button {
+    button.hover-show {
       transition: opacity 0.2s ease-in-out;
       opacity: 0;
     }
     &:hover {
-      button {
+      button.hover-show {
         opacity: 1;
       }
     }

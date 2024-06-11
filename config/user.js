@@ -26,6 +26,17 @@ const ROLES = {
   },
 };
 
+const getRoleOptions = () => {
+  return Object.keys(ROLES).map((key) => {
+    return {
+      value: key,
+      label: ROLES[key].name,
+    };
+  })
+}
+
+export const roleOptions = getRoleOptions();
+
 const checkRuleByRole = (ruleId, roleId = ROLE_GAME_VISITOR) => {
   let role = ROLES[roleId];
   return role.rules.indexOf(ruleId) !== -1;

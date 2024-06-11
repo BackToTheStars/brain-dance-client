@@ -20,7 +20,7 @@ export const removeGameInfo = (hash) => {
   setRequestSettings(null, null);
   return localStorage.removeItem(`${GAME_KEY_PREFIX}${hash}`);
 };
-const getGameInfo = (hash) => {
+const loadGameInfo = (hash) => {
   if (typeof window === 'undefined') {
     return null; // get guest info
   }
@@ -31,6 +31,15 @@ const getGameInfo = (hash) => {
   setRequestSettings(hash, data?.token);
   return data;
 };
+
+export const getGameInfo = (hash) => {
+  if (typeof window === 'undefined') {
+    return null; // get guest info
+  }
+
+  const data = JSON.parse(localStorage.getItem(`${GAME_KEY_PREFIX}${hash}`));
+  return data;
+}
 
 export const logOut = () => {
   removeGameInfo(hash); // стираем token из LocalStorage
@@ -47,7 +56,7 @@ const guestUser = {
 const UserContext = createContext();
 
 export const UserProvider = ({ children, hash }) => {
-  const { info, token } = getGameInfo(hash) || guestUser;
+  const { info, token } = loadGameInfo(hash) || guestUser;
 
   const can = (rule) => checkRuleByRole(rule, info.role);
 

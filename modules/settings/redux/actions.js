@@ -51,7 +51,7 @@ export const addGame =
           codes: [{ nickname, role, code }],
         },
       ];
-      lsUpdateGames(newGames);
+      lsUpdateGames(newGames); // @todo: move to reducer
       dispatch({
         type: types.SETTINGS_GAME_ADD,
         payload: {
@@ -61,6 +61,59 @@ export const addGame =
       });
     }
   };
+
+export const updateActiveCode =
+  (hash, code, active) => (dispatch, getState) => {
+    const games = getState().settings.games;
+    const currentGame = games.find((g) => g.hash === hash);
+    const updatedCodes = currentGame.codes.map((c) =>
+      c.code === code ? { ...c, active } : { ...c, active: false },
+    );
+    dispatch({
+      type: types.SETTINGS_GAME_UPDATE,
+      payload: {
+        hash,
+        game: {
+          ...currentGame,
+          codes: updatedCodes,
+        },
+      },
+    });
+  };
+
+export const pinFirstCode = (hash) => (dispatch) => {
+  const games = getStore().games;
+  const currentGame = games.find((g) => g.hash === hash);
+  const updatedCodes = currentGame.codes.map((c, i) =>
+    i === 0 ? { ...c, active: true } : { ...c, active: false },
+  );
+  dispatch({
+    type: types.SETTINGS_GAME_UPDATE,
+    payload: {
+      hash,
+      game: {
+        ...currentGame,
+        codes: updatedCodes,
+      },
+    },
+  });
+};
+
+export const unpinAllCodes = (hash) => (dispatch) => {
+  const games = getStore().games;
+  const currentGame = games.find((g) => g.hash === hash);
+  const updatedCodes = currentGame.codes.map((c) => ({ ...c, active: false }));
+  dispatch({
+    type: types.SETTINGS_GAME_UPDATE,
+    payload: {
+      hash,
+      game: {
+        ...currentGame,
+        codes: updatedCodes,
+      },
+    },
+  });
+};
 
 export const removeGame = (hash) => (dispatch) => {
   const games = getStore().games;

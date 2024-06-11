@@ -1,3 +1,4 @@
+import { lsUpdateGames } from './requests';
 import * as types from './types';
 
 const initialState = {
@@ -25,11 +26,13 @@ export const settingsReducer = (state = initialState, { type, payload }) => {
       };
     }
     case types.SETTINGS_GAME_UPDATE: {
+      const updatedGames = state.games.map((g) =>
+        g.hash === payload.hash ? payload.game : g,
+      );
+      lsUpdateGames(updatedGames);
       return {
         ...state,
-        games: state.games.map((g) =>
-          g.hash === payload.hash ? payload.game : g
-        ),
+        games: updatedGames,
       };
     }
     default: {

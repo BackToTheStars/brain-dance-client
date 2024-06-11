@@ -68,16 +68,16 @@ const AdminTurnsTable = ({ gameId = null }) => {
   const columnsWithActions = useMemo(() => {
     return [
       ...columns,
-      {
-        title: 'Actions',
-        key: 'actions',
-        render: (text, record) => (
-          <Button htmlType="button" onClick={() => {}}>
-            In Progress
-          </Button>
-        ),
-        width: '15%',
-      },
+      // {
+      //   title: 'Actions',
+      //   key: 'actions',
+      //   render: (text, record) => (
+      //     <Button htmlType="button" onClick={() => {}}>
+      //       In Progress
+      //     </Button>
+      //   ),
+      //   width: '15%',
+      // },
     ];
   }, [columns]);
 

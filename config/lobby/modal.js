@@ -4,3 +4,4 @@ export const MODAL_DONATE = 'MODAL_DONATE';
 
 export const MODAL_CONFIRM = 'MODAL_CONFIRM';
 export const MODAL_UPLOAD = 'MODAL_UPLOAD';
+export const MODAL_ACCESS_GAMES = 'MODAL_ACCESS_GAMES';

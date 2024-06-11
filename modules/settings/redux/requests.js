@@ -64,10 +64,13 @@ export const getCodesString = () => {
   return ls.games
     .map((g) => {
       const { hash, codes } = g;
-      const code = codes.reduce((acc, c) => (acc.role > c.role ? acc : c), {
-        role: -1,
-      }).code;
+      // const code = codes.find((c) => c.active)?.code;
+      const code = codes[0]?.code;
+      if (!code) {
+        return null;
+      }
       return `${hash}:${code}`;
     })
+    .filter((a) => !!a)
     .join(',');
 };

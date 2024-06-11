@@ -1,14 +1,17 @@
 'use client';
+
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 import '@/themes/game/index.scss';
 
-import dynamic from 'next/dynamic'; // позволяет динамически подключать библиотеки в bundle
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { UserProvider } from '@/modules/user/contexts/UserContext';
 import Loading from '@/modules/ui/components/common/Loading';
-const Game = dynamic(() => import('@/modules/game/components/Game'), {
-  ssr: false,
-});
+import {
+  UserProvider,
+  useUserContext,
+} from '@/modules/user/contexts/UserContext';
 
 const GamePage = () => {
   return (
@@ -21,21 +24,38 @@ const GamePage = () => {
 const GamePageInner = () => {
   const searchParams = useSearchParams();
   const hash = searchParams.get('hash');
-  return (
-    <>
-      <div className="circle" />
 
-      <div className="game-bg">
-        {!hash ? (
-          <Loading />
-        ) : (
-          <UserProvider hash={hash}>
-            <Game hash={hash} />
-          </UserProvider>
-        )}
-      </div>
-    </>
+  return (
+    <div className="game-bg">
+      {!hash ? (
+        <Loading />
+      ) : (
+        <UserProvider hash={hash}>
+          <GameDialog hash={hash} />
+        </UserProvider>
+      )}
+    </div>
   );
+};
+
+// @todo
+const GameDialog = ({ hash }) => {
+  const { info, token, can } = useUserContext();
+  const router = useRouter();
+  useEffect(() => {
+    if (!hash) return;
+    router.push(`/game/view/${hash}`);
+    // nickname, role
+    // ? code, hash
+
+    // если роль не гостевая и nickname не установлен, то запросить его
+    // если отсутствует code, то запросить его
+
+    // если в явном виде не указано, что сохранение кода не требуется, то запросить сохранение
+    // если игра предполагает запрет сохранения, то выставить запрет и продолжить
+    // при необходимости запросить nickname пользователя
+  }, [hash, info, token]);
+  return <div className="game-dialog">Dialog</div>;
 };
 
 export default GamePage;

@@ -20,9 +20,9 @@ const ConfirmModal = ({ params }) => {
       <div className="flex-1">{text}</div>
       <div className="mt-3 text-end">
         <Button onClick={onCancel} className="mr-3">
-          Отмена
+          Cancel
         </Button>
-        <Button onClick={onOk}>ОК</Button>
+        <Button onClick={onOk}>OK</Button>
       </div>
     </div>
   );

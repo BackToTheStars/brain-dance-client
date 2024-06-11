@@ -2,6 +2,7 @@ import { Button, Form, Input, Radio } from 'antd';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
+// должна быть доступна только для ROLE_GAME_OWNER (RULE_GAME_EDIT)
 const EditGameForm = () => {
   //
   const editGame = () => {};

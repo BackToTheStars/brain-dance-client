@@ -7,7 +7,7 @@ export const setUserToken = (nextToken) => (settings.token = nextToken);
 export const request = async (
   path,
   { body = null, tokenFlag = false, method = 'GET' } = {},
-  { errorMessage, errorCallback, successCallback } = {}
+  { errorMessage, errorCallback, successCallback } = {},
 ) => {
   let defaultMessage = errorMessage || `Произошла ошибка, метод ${method}`;
   const params = {
@@ -72,6 +72,14 @@ export const deleteGameRequest = () => {
   });
 };
 
+export const addCodeRequest = (body) => {
+  return request(`codes/add?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'POST',
+    body,
+  });
+};
+
 // PUBLIC REQUESTS
 export const createGameRequest = (name, gameIsPublic) => {
   // добавить description, players
@@ -87,15 +95,14 @@ export const createGameRequest = (name, gameIsPublic) => {
   }).then((res) => res.json());
 };
 
-
-export const getGameUserTokenRequest = (hash, nickname) => {
+export const getGameUserTokenRequest = (code, nickname) => {
   return fetch(`${API_URL}/codes/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      hash,
+      code,
       nickname,
     }),
   }).then((res) => res.json());
