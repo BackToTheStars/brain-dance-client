@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 const MOVE_DELTA = 10;
-const SPLIT_WIDTH = 4 * 8 * 3; // @todo: разобраться с переменнымиКПрПП
 
 export const VerticalSplit = ({
   move = () => {},
+  setIsDragging = () => {},
   extraClasses = 'lobby-block',
 }) => {
   const resizeLineRef = useRef(null);
@@ -12,18 +12,22 @@ export const VerticalSplit = ({
 
   useEffect(() => {
     if (!resizeLineRef.current) return;
-    const { x } = resizeLineRef.current.getBoundingClientRect();
+    let startClientX = 0;
+
     const resizeDown = (e) => {
       document.addEventListener('mouseup', resizeUp);
       document.addEventListener('mousemove', resizeMove);
+      setIsDragging(true);
+      startClientX = e.clientX;
     };
     const resizeUp = (e) => {
       document.removeEventListener('mouseup', resizeUp);
       document.removeEventListener('mousemove', resizeMove);
+      setIsDragging(false);
     };
     const resizeMove = (e) => {
       const delta =
-        Math.round((e.clientX - x - SPLIT_WIDTH / 2) / MOVE_DELTA) * MOVE_DELTA;
+        Math.round((e.clientX - startClientX) / MOVE_DELTA) * MOVE_DELTA;
       setDelta(delta);
     };
     resizeLineRef.current.addEventListener('mousedown', resizeDown);

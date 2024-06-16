@@ -4,15 +4,18 @@ import 'react-image-crop/dist/ReactCrop.css';
 import ClientWrapper from './ClientWrapper';
 import '@/themes/game/index.scss';
 import '@/themes/index.scss';
+import { getLocale } from 'next-intl/server';
+import IntlProvider from './IntlProvider';
 
 export default async function RootLayout({ children }) {
   const cookieStore = cookies();
   const cookieColorSchema = cookieStore.get('colorSchema')?.value;
   const cookieSizeSchema = cookieStore.get('sizeSchema')?.value;
   const cookieMode = cookieStore.get('mode')?.value;
+  const locale = await getLocale();
 
   return (
-    <html lang="ru" className="dark">
+    <html lang={locale} className="dark">
       <head>
         <script src="/js/jquery.js"></script>
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
@@ -28,7 +31,7 @@ export default async function RootLayout({ children }) {
         cookieSizeSchema={cookieSizeSchema}
         cookieMode={cookieMode}
       >
-        {children}
+        <IntlProvider ssrLocale={locale}>{children}</IntlProvider>
       </ClientWrapper>
     </html>
   );

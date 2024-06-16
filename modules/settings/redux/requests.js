@@ -9,6 +9,8 @@ const createStore = () => {
     version: VERSION,
     games: [],
     settings: {},
+    layoutSettings: {},
+    textSettings: {},
   };
   localStorage.setItem(settingsStorageKey, JSON.stringify(store));
   return store;
@@ -48,6 +50,14 @@ export const lsUpdateGames = (games) => {
   updateStore('games', games);
 };
 
+export const lsUpdateLayoutSettings = (settings) => {
+  updateStore('layoutSettings', settings);
+};
+
+export const lsUpdateTextSettings = (settings) => {
+  updateStore('textSettings', settings);
+};
+
 // удаление данных из стора
 export const clearStore = () => {
   localStorage.removeItem(settingsStorageKey);
@@ -59,12 +69,18 @@ export const clearStore = () => {
 // экспорт / импорт
 
 /* FETCHING */
-export const getCodesString = () => {
+export const getCodesString = (pinned = false) => {
   const ls = getStore();
   return ls.games
     .map((g) => {
       const { hash, codes } = g;
       // const code = codes.find((c) => c.active)?.code;
+      if (pinned) {
+        const isActive = codes.find((c) => c.active)?.code;
+        if (!isActive) {
+          return null;
+        }
+      }
       const code = codes[0]?.code;
       if (!code) {
         return null;

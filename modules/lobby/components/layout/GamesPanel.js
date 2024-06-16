@@ -4,8 +4,10 @@ import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GameRow from '../ui/GameRow';
 import Loading from '@/modules/ui/components/common/Loading';
+import { useTranslations } from 'next-intl';
 
 const GamesPanel = () => {
+  const t = useTranslations('Lobby');
   const dispatch = useDispatch();
   const settingsGames = useSelector((s) => s.settings.games);
   const games = useSelector((s) => s.lobby.games);
@@ -15,7 +17,7 @@ const GamesPanel = () => {
       return {
         ...acc,
         [obj.hash]: {
-          isPinned: obj?.codes ? !!obj.codes.find(c => c.active) : false,
+          isPinned: obj?.codes ? !!obj.codes.find((c) => c.active) : false,
           codes: obj?.codes || [],
           // obj,
         },
@@ -43,7 +45,7 @@ const GamesPanel = () => {
   return (
     <aside className="lobby-panel lobby-panel_with-bg p-2 h-full overflow-y-auto">
       <div className="flex lobby-panel__divider-b">
-        <div className="flex-1">Search</div>
+        <div className="flex-1">{t('Games')}</div>
       </div>
       <div className="select-none">
         {sortedGames.length === 0 && <Loading />}

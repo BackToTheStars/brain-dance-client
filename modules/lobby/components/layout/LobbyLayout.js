@@ -6,25 +6,25 @@ import Header from './Header';
 import MainContent from './MainContent';
 import { useDispatch } from 'react-redux';
 import { loadSettings } from '@/modules/settings/redux/actions';
+import { MainLayoutProvider } from './MainLayoutContext';
 
 const LobbyLayout = () => {
   const dispatch = useDispatch();
-  const [leftSideWidth, setLeftSideWidth] = useState(null);
+
   useEffect(() => {
     dispatch(loadSettings());
   }, []);
   return (
-    <div className="flex flex-col h-screen px-4">
-      <Header leftSideWidth={leftSideWidth} />
-      <MainContent
-        leftSideWidth={leftSideWidth}
-        setLeftSideWidth={setLeftSideWidth}
-      />
-      {/* <div className="flex flex-1 overflow-hidden">
+    <MainLayoutProvider>
+      <div className="flex flex-col h-screen px-4">
+        <Header />
+        <MainContent />
+        {/* <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <MainContent />
       </div> */}
-    </div>
+      </div>
+    </MainLayoutProvider>
   );
 };
 

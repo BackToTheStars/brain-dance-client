@@ -1,0 +1,69 @@
+{
+  "Lobby": {
+    "Games": "Игры",
+    "Enter_game": "Войти в игру",
+    "Create_game": "Создать игру",
+    "Donate": "Поддержать",
+    "Settings": "Настройки",
+    "Parameters": "Параметры",
+    "Columns": "Столбцы",
+    "code": "код",
+    "nickname": "никнейм",
+    "Public": "Публичная",
+    "Private": "Приватная",
+    "game_name": "название игры",
+    "Cancel": "Отмена",
+    "game": {
+      "Game_info": "Об игре",
+      "Turn_info": "О ходе",
+      "Players": "Игроки",
+      "Turns": "Ходы",
+      "Views": "Просмотры",
+      "Game_data": "Данные игры",
+      "Login": "Войти",
+      "Logout": "Выйти",
+      "Nickname": "Найкнейм",
+      "Code": "Код",
+      "Role": "Роль",
+      "Add_Code": "Добавить код",
+      "Remove_from_List": "Удалить из списка",
+      "Delete_game": "Удалить игру",
+      "Open_game": "Открыть игру"
+    },
+    "parametersPanel": {
+      "Request_parameters": "Параметры запросов",
+      "By_game": "По игре",
+      "Game_limit": "Лимит игр",
+      "Turn_limit": "Лимит ходов",
+      "Chrono": "Хроно",
+      "Favorite_games": "Избранные игры",
+      "Content_types": "Типы ходов"
+    },
+    "settingsPanel": {
+      "Settings": "Настройки",
+      "Paddings": "Отступы",
+      "Header_rows_count": "Количество строк заголовка",
+      "Rows_count": "Количество строк",
+      "Font_size": "Размер шрифта",
+      "Line_spacing": "Пространство между строками",
+      "Text_align": "Выравнивание текста",
+      "Font": "Шрифт"
+    },
+    "Payment_methods": "Платёжные способы"
+  },
+  "Common": {
+    "Modal": {
+      "Donate": "Поддержать",
+      "Enter_game": "Войти в игру",
+      "Create_game": "Создать игру",
+      "Confirm": "Подтвердить",
+      "Upload": "Загрузить",
+      "Manage_access": "Управление доступом",
+      "Cancel": "Отмена",
+      "Default": "По умолчанию"
+    }
+  },
+  "UI": {
+    "Loading": "Загрузка..."
+  }
+}

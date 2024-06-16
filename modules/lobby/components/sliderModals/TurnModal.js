@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useMainLayoutContext } from '../layout/MainLayoutContext';
 
 const getVideoImg = (url) => {
   if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -22,6 +23,7 @@ const limitLine = (line) => {
 };
 
 const TurnModal = ({ params }) => {
+  const { sliderWidth } = useMainLayoutContext();
   const { id } = params;
   const turn = useSelector((s) => s.lobby.dTurns[id]);
   const { header, imageUrl, videoUrl, paragraph, date, contentType, width } =
@@ -31,7 +33,7 @@ const TurnModal = ({ params }) => {
   const videoImg = getVideoImg(videoUrl || '');
   return (
     <div
-      style={{ width: '50%' }}
+      style={{ width: `${sliderWidth}px` }}
       className="dark:bg-dark-light bg-light h-full flex flex-col rounded"
     >
       <div className="bg-main-dark rounded-t p-4">

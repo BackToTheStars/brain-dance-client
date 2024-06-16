@@ -1,5 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 const DonateModal = () => {
-  return "Платёжные способы"
-}
+  const t = useTranslations('Lobby');
+  return t('Payment_methods');
+};
 
 export default DonateModal;

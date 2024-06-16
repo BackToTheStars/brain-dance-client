@@ -4,17 +4,19 @@ import { useDispatch } from 'react-redux';
 import { closeModal } from '@/modules/ui/redux/actions';
 import { LobbyForm } from '../ui/Form';
 import { lobbyEnterGameWithConfirm } from '../../redux/actions';
+import { useTranslations } from 'next-intl';
 
 const EnterGameModal = ({ params }) => {
+  const t = useTranslations('Lobby');
   const dispatch = useDispatch();
   const [error, setError] = useState('');
   const inputs = [
     {
-      label: 'код',
+      label: t('code'),
       name: 'code',
     },
     {
-      label: 'никнейм',
+      label: t('nickname'),
       name: 'nickname',
     },
   ];
@@ -38,7 +40,7 @@ const EnterGameModal = ({ params }) => {
       onCancel={() => dispatch(closeModal())}
       inputs={inputs}
       error={error}
-      confirmText="Войти в игру"
+      confirmText={t('Enter_game')}
     />
   );
 };

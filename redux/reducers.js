@@ -9,6 +9,7 @@ import { UIReducer } from '@/modules/ui/redux/reducers';
 import { combineReducers } from 'redux';
 import { lobbyReducer } from '@/modules/lobby/redux/reducers';
 import { settingsReducer } from '@/modules/settings/redux/reducers';
+import languageReducer from '@/modules/settings/redux/lang/languageSlice';
 
 // COMBINED REDUCERS
 const reducers = {
@@ -24,6 +25,7 @@ const reducers = {
   // minimap,
   lobby: lobbyReducer,
   settings: settingsReducer,
+  lang: languageReducer,
 };
 
 export default combineReducers(reducers);

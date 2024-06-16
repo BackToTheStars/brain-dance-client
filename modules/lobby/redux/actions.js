@@ -11,12 +11,26 @@ import { MODAL_CONFIRM } from '@/config/lobby/modal';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
 import { getGameUserTokenRequest } from '@/modules/game/requests';
 
+export const loadTextSettings = (settings) => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_TEXT_SETTINGS_LOAD,
+    payload: settings,
+  });
+};
+
 export const changeTextSettings = (field, value) => (dispatch) => {
   dispatch({
     type: types.LOBBY_TEXT_SETTINGS_SET,
     payload: { field, value },
   });
 };
+
+export const changeRequestSettings = (field, value) => (dispatch) => {
+  dispatch({
+    type: types.LOBBY_REQUEST_SETTINGS_SET,
+    payload: { field, value },
+  });
+}
 
 export const changeLayoutSettings = (field, value) => (dispatch) => {
   dispatch({
@@ -101,9 +115,10 @@ export const loadGames = () => (dispatch) => {
 };
 export const loadTurns = () => (dispatch, getState) => {
   const mode = getState().lobby.mode;
+  const requestSettings = getState().lobby.requestSettings;
   const loadTurnsRequest =
     mode === 'byGame' ? loadTurnsByGameRequest : loadTurnsChronoRequest;
-  return loadTurnsRequest().then((data) => {
+  return loadTurnsRequest(requestSettings).then((data) => {
     dispatch({
       type: types.LOBBY_TURNS_LOAD,
       payload: data.items,

@@ -1,6 +1,7 @@
 .game-row {
   @apply flex w-full items-center gap-6 cursor-pointer py-2;
   .game-item {
+    max-width: calc(100% - 54px);
     button.hover-show {
       transition: opacity 0.2s ease-in-out;
       opacity: 0;
@@ -9,6 +10,9 @@
       button.hover-show {
         opacity: 1;
       }
+    }
+    &__title {
+      max-width: calc(100% - 64px);
     }
   }
 }

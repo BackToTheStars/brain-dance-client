@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Button from './Button';
+import { useTranslations } from 'next-intl';
 
 export const TextInput = ({ label, value, onChange }) => {
   return (
@@ -49,14 +50,15 @@ export const LobbyForm = ({
   error,
   confirmText = 'Ок',
 }) => {
+  const t = useTranslations('Lobby');
   const [values, setValues] = useState(
     inputs.reduce(
       (acc, input) => ({
         ...acc,
         [input.name]: input.defaultValue || '',
       }),
-      {}
-    )
+      {},
+    ),
   );
   const getOnChange = (name) => (value) =>
     setValues({ ...values, [name]: value });
@@ -101,7 +103,7 @@ export const LobbyForm = ({
       {!!error && <div className="text-red-300">{error}</div>}
       <div className="mt-3 text-end">
         <Button onClick={onCancel} className="mr-3">
-          Отмена
+          {t('Cancel')}
         </Button>
         <Button onClick={onSubmit}>{confirmText}</Button>
       </div>

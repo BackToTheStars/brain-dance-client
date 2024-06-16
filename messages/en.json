@@ -1,0 +1,74 @@
+{
+  "Lobby": {
+    "Games": "Games",
+    "Enter_game": "Enter game",
+    "Create_game": "Create game",
+    "Donate": "Donate",
+    "Settings": "Settings",
+    "Parameters": "Parameters",
+    "Columns": "Columns",
+
+    "code": "code",
+    "nickname": "nickname",
+
+    "Public": "Public",
+    "Private": "Private",
+    "game_name": "game name",
+
+    "Cancel": "Cancel",
+
+    "game": {
+      "Game_info": "Game info",
+      "Turn_info": "Turn info",
+      "Players": "Players",
+      "Turns": "Turns",
+      "Views": "Views",
+      "Game_data": "Game data",
+      "Login": "Login",
+      "Logout": "Logout",
+      "Nickname": "Nickname",
+      "Code": "Code",
+      "Role": "Role",
+      "Add_Code": "Add Code",
+      "Remove_from_List": "Remove from List",
+      "Delete_game": "Delete game",
+      "Open_game": "Open game"
+    },
+        
+    "parametersPanel": {
+      "Request_parameters": "Request parameters",
+      "By_game": "By game",
+      "Game_limit": "Game limit",
+      "Turn_limit": "Turn limit",
+      "Chrono": "Chrono",
+      "Favorite_games": "Favorite games",
+      "Content_types": "Content types"
+    },
+    "settingsPanel": {
+      "Settings": "Settings",
+      "Paddings": "Paddings",
+      "Header_rows_count": "Header rows count",
+      "Rows_count": "Rows count",
+      "Font_size": "Font size",
+      "Line_spacing": "Line spacing",
+      "Text_align": "Text align",
+      "Font": "Font"
+    },
+    "Payment_methods": "Payment methods"
+  },
+  "Common": {
+    "Modal": {
+      "Donate": "Donate",
+      "Enter_game": "Enter game",
+      "Create_game": "Create game",
+      "Confirm": "Confirm",
+      "Upload": "Upload",
+      "Manage_access": "Manage access",
+      "Cancel": "Cancel",
+      "Default": "Default"
+    }
+  },
+  "UI": {
+    "Loading": "Loading..."
+  }
+}

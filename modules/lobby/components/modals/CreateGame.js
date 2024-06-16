@@ -4,8 +4,10 @@ import { closeModal } from '@/modules/ui/redux/actions';
 import { LobbyForm } from '../ui/Form';
 import { createGameRequest } from '@/modules/game/requests';
 import { lobbyEnterGameWithConfirm } from '../../redux/actions';
+import { useTranslations } from 'next-intl';
 
 const CreateGameModal = ({ params }) => {
+  const t = useTranslations('Lobby');
   const dispatch = useDispatch();
   const [error, setError] = useState('');
   const inputs = [
@@ -17,16 +19,16 @@ const CreateGameModal = ({ params }) => {
       options: [
         {
           value: 'true',
-          label: 'public',
+          label: t('Public'),
         },
         {
           value: 'false',
-          label: 'private',
+          label: t('Private'),
         },
       ],
     },
     {
-      label: 'название игры',
+      label: t('game_name'),
       name: 'name',
     },
   ];
@@ -61,7 +63,7 @@ const CreateGameModal = ({ params }) => {
       onCancel={() => dispatch(closeModal())}
       inputs={inputs}
       error={error}
-      confirmText="Создать игру"
+      confirmText={t('Create_game')}
     />
   );
 };

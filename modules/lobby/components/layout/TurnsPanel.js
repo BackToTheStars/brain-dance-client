@@ -28,7 +28,9 @@ const TurnsPanelInner = ({ width }) => {
   const dispatch = useDispatch();
   const columnCount = useSelector((s) => s.lobby.textSettings.columnCount);
   const mode = useSelector((s) => s.lobby.mode);
+  const requestSettings = useSelector((s) => s.lobby.requestSettings);
   const turns = useSelector((s) => s.lobby.turns);
+  const settingsGames = useSelector((s) => s.settings.games);
 
   const numCols = useMemo(() => {
     if (!width) return desiredNumCols;
@@ -53,7 +55,7 @@ const TurnsPanelInner = ({ width }) => {
 
   useEffect(() => {
     dispatch(loadTurns());
-  }, [mode]);
+  }, [mode, requestSettings, settingsGames]);
 
   return (
     <div className="flex gap-4">

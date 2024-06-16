@@ -15,11 +15,11 @@ import AccessGames from '@/modules/lobby/components/modals/AccessGames';
 
 export const settings = {
   [MODAL_ENTER_GAME]: {
-    title: 'Enter Game', // 'Войти в игру',
+    title: 'Enter_game', // 'Войти в игру',
     component: EnterGameModal,
   },
   [MODAL_CREATE_GAME]: {
-    title: 'Create Game', // 'Создать игру',
+    title: 'Create_game', // 'Создать игру',
     component: CreateGameModal,
   },
   [MODAL_DONATE]: {
@@ -35,7 +35,7 @@ export const settings = {
     component: UploadModal,
   },
   [MODAL_ACCESS_GAMES]: {
-    title: 'Manage Access', // 'Закладки',
+    title: 'Manage_access', // 'Закладки',
     component: AccessGames,
   },
 };

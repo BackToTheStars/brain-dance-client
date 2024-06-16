@@ -1,6 +1,7 @@
 import { SLIDER_MODAL_GAME, SLIDER_MODAL_TURN } from '@/config/lobby/sliderModal';
 import { toggleSliderModal } from '@/modules/lobby/redux/actions';
 import { ContentButton as Button } from '@/ui/button';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,6 +17,7 @@ const getVideoImg = (url) => {
 const minHeight = 150;
 
 const TurnCard = ({ id }) => {
+  const t = useTranslations('Lobby.game');
   const dispatch = useDispatch();
   const dGames = useSelector((s) => s.lobby.dGames);
   const turn = useSelector((s) => s.lobby.dTurns[id]);
@@ -118,11 +120,11 @@ const TurnCard = ({ id }) => {
             size="sm"
             onClick={() =>
               dispatch(
-                toggleSliderModal(SLIDER_MODAL_GAME, { hash: game.hash, width: 400 }),
+                toggleSliderModal(SLIDER_MODAL_GAME, { hash: game.hash }),
               )
             }
           >
-            Game Info
+            {t('Game_info')}
           </Button>
           <Button
             size="sm"
@@ -130,7 +132,7 @@ const TurnCard = ({ id }) => {
               dispatch(toggleSliderModal(SLIDER_MODAL_TURN, { id }))
             }
           >
-            Turn Info
+            {t('Turn_info')}
           </Button>
         </div>
       </div>

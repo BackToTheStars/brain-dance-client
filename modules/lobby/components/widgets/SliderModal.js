@@ -1,4 +1,7 @@
+import { useMainLayoutContext } from "../layout/MainLayoutContext";
+
 const SliderModal = ({ open, closeModal, children }) => {
+  const { sliderWidth } = useMainLayoutContext();
   return (
     <div
       className="flex w-full h-full top-0 left-0 absolute duration-500 z-50"
@@ -13,7 +16,8 @@ const SliderModal = ({ open, closeModal, children }) => {
       />
       <div className="w-full relative flex">
         <div
-          className="absolute right-[12px] top-[8px] text-xl cursor-pointer text-white"
+          style={{ left: `${sliderWidth - 32}px` }}
+          className="absolute top-[8px] text-xl cursor-pointer text-white z-10"
           onClick={() => {
             closeModal(1000);
           }}

@@ -11,28 +11,27 @@ import { fontSettings } from '@/config/lobby/fonts';
 import { Slider } from 'antd';
 import SwitchersBlock from './SwitchersBlock';
 import ModeToggle from '@/modules/ui/components/switchers/ModeToggle';
+import { useTranslations } from 'next-intl';
+import LangSwitcher from '@/modules/ui/components/switchers/LangSwitcher';
 
 const ContentSettings = () => {
+  const t = useTranslations('Lobby.settingsPanel');
   const dispatch = useDispatch();
-  const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
-  const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
-  const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
-  const cardPadding = useSelector((s) => s.lobby.textSettings.padding);
-  const activeFontFamily = useSelector(
-    (s) => s.lobby.textSettings.activeFontFamily
-  );
-  const limitLineHeader = useSelector(
-    (s) => s.lobby.textSettings.limitLineHeader
-  );
+  const textSettings = useSelector((s) => s.lobby.textSettings);
+
+  const {
+    lineCount,
+    fontSize,
+    lineSpacing,
+    alignment,
+    padding: cardPadding,
+    activeFontFamily,
+    limitLineHeader,
+  } = textSettings;
 
   const changeLineCount = (newValue) => {
     dispatch(changeTextSettings('lineCount', newValue));
   };
-
-  // const incLineCount = () =>
-  //   lineCount < 30 && dispatch(changeTextSettings('lineCount', lineCount + 1));
-  // const decLineCount = () =>
-  //   lineCount > 5 && dispatch(changeTextSettings('lineCount', lineCount - 1));
 
   const incFontSize = () =>
     fontSize < 30 && dispatch(changeTextSettings('fontSize', fontSize + 1));
@@ -52,13 +51,13 @@ const ContentSettings = () => {
   const incLineSpacing = () =>
     lineSpacing < 3 &&
     dispatch(
-      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 + 1) / 10)
+      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 + 1) / 10),
     );
 
   const decLineSpacing = () =>
     lineSpacing > 0.5 &&
     dispatch(
-      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 - 1) / 10)
+      changeTextSettings('lineSpacing', Math.round(lineSpacing * 10 - 1) / 10),
     );
 
   const incLimitLineHeader = () =>
@@ -93,14 +92,15 @@ const ContentSettings = () => {
   return (
     <form>
       <div className="flex justify-between items-center mb-3">
-        <div className="text-lg font-semibold">
-          Настройки
-        </div>
+        <div className="text-lg font-semibold">{t('Settings')}</div>
         {/* <ThemeSwitcher /> */}
-        <ModeToggle />
+        <div className="flex gap-3">
+          <LangSwitcher />
+          <ModeToggle />
+        </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Отступы</div>
+        <div className="text-dark">{t('Paddings')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <div className={`${btnStyle}`} onClick={decCardPadding}>
             -
@@ -114,7 +114,7 @@ const ContentSettings = () => {
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Кол-во строк оглавления</div>
+        <div className="text-dark">{t('Header_rows_count')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <div className={`${btnStyle}`} onClick={decLimitLineHeader}>
             -
@@ -128,7 +128,7 @@ const ContentSettings = () => {
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Кол-во строк</div>
+        <div className="text-dark">{t('Rows_count')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <div className="w-[140px] h-full text-center font-medium">
             <Slider
@@ -141,7 +141,7 @@ const ContentSettings = () => {
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Размер шрифта</div>
+        <div className="text-dark">{t('Font_size')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <div className={`${btnStyle}`} onClick={decFontSize}>
             A-
@@ -155,7 +155,7 @@ const ContentSettings = () => {
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Междустрочный интервал</div>
+        <div className="text-dark">{t('Line_spacing')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <div className={`${btnStyle}`} onClick={decLineSpacing}>
             -
@@ -169,24 +169,30 @@ const ContentSettings = () => {
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Выравнивание текста</div>
+        <div className="text-dark">{t('Text_align')}</div>
         <div className="flex gap-x-[10px] items-center justify-between w-[120px]">
-          <div className={`${btnStyle}`} onClick={() => setAlignment('left')}>
+          <div
+            className={`${btnStyle} ${alignment === 'left' ? 'active' : ''}`}
+            onClick={() => setAlignment('left')}
+          >
             <TextLeftIcon />
           </div>
           <div
-            className={`${btnStyle}`}
+            className={`${btnStyle} ${alignment === 'justify' ? 'active' : ''}`}
             onClick={() => setAlignment('justify')}
           >
             <TextCenterIcon />
           </div>
-          <div className={`${btnStyle}`} onClick={() => setAlignment('right')}>
+          <div
+            className={`${btnStyle} ${alignment === 'right' ? 'active' : ''}`}
+            onClick={() => setAlignment('right')}
+          >
             <TextRightIcon />
           </div>
         </div>
       </div>
       <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">Шрифт</div>
+        <div className="text-dark">{t('Font')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <ul>
             {fontFamilyOptions.map((el) => {

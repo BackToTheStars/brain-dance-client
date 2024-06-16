@@ -1,9 +1,8 @@
 'use client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-// import Button from '../ui/Button';
 import { IntButton as Button } from '@/ui/button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '@/modules/ui/redux/actions';
 import {
   MODAL_CREATE_GAME,
@@ -13,18 +12,42 @@ import {
 import { TogglerPanel, TogglerWrapper } from '../ui/Toggler';
 import ContentSettings from '../elements/ContentSettings';
 import ColumnsSlider from '../controls/ColumnsSlider';
-import { switchMode } from '@/modules/lobby/redux/actions';
-import { ApartmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import TurnListControls from '../controls/TurnListControls';
-
-const Header = ({ leftSideWidth }) => {
+import { useTranslations } from 'next-intl';
+import { useMainLayoutContext } from './MainLayoutContext';
+import {
+  getStore,
+  lsUpdateTextSettings,
+} from '@/modules/settings/redux/requests';
+import { loadTextSettings } from '../../redux/actions';
+const SettingsLoader = () => {
+  const textSettings = useSelector((s) => s.lobby.textSettings);
   const dispatch = useDispatch();
+  const [isReady, setIsReady] = useState(false);
+    useEffect(() => {
+      const textSettings = getStore().textSettings;
+      if (textSettings && Object.keys(textSettings).length) {
+        dispatch(loadTextSettings(textSettings));
+      }
+      setTimeout(() => setIsReady(true), 1000);
+    }, []);
+
+    useEffect(() => {
+      if (!isReady) return;
+      lsUpdateTextSettings(textSettings);
+    }, [isReady, textSettings]);
+
+    return null;
+}
+
+const Header = () => {
+  const t = useTranslations('Lobby');
+  const dispatch = useDispatch();
+  const { leftSideWidth } = useMainLayoutContext();
 
   const leftSideStyle = useMemo(() => {
     return {
-      width: leftSideWidth ? `${leftSideWidth + 16}px` : '50%',
-      // width: leftSideWidth ? `${leftSideWidth}px` : `calc(50% - 4 * var(--block-padding-unit))`,
-      // transition: 'width 0.05s linear',
+      width: leftSideWidth ? `${leftSideWidth + 16}px` : 'calc(50% + 16px)',
     };
   }, [leftSideWidth]);
   return (
@@ -34,20 +57,21 @@ const Header = ({ leftSideWidth }) => {
         className="lobby-block flex gap-2 divider-r pb-2"
       >
         <Button size="sm" onClick={() => dispatch(openModal(MODAL_ENTER_GAME))}>
-          Войти в игру
+          {t('Enter_game')}
         </Button>
         <Button
           size="sm"
           onClick={() => dispatch(openModal(MODAL_CREATE_GAME))}
         >
-          Создать игру
+          {t('Create_game')}
         </Button>
       </div>
       <div className="lobby-block flex gap-2 flex-1 justify-between pl-4 pb-2">
+        <SettingsLoader />
         <TogglerWrapper
           Button={({ toggle, className = '' }) => (
             <Button onClick={toggle} size="sm" className={className}>
-              Настройки
+              {t('Settings')}
             </Button>
           )}
           Panel={
@@ -63,7 +87,7 @@ const Header = ({ leftSideWidth }) => {
         <TogglerWrapper
           Button={({ toggle, className = '' }) => (
             <Button onClick={toggle} size="sm" className={className}>
-              Параметры
+              {t('Parameters')}
             </Button>
           )}
           Panel={
@@ -77,20 +101,9 @@ const Header = ({ leftSideWidth }) => {
           }
         />
         <ColumnsSlider />
-        {/* <TurnListControls /> */}
-        {/* <div className="flex-1 flex gap-2">
-          <Button size="sm" onClick={() => dispatch(switchMode('byGame'))}>
-            <ApartmentOutlined />
-          </Button>
-          <Button size="sm" onClick={() => dispatch(switchMode('chrono'))}>
-            <ClockCircleOutlined />
-          </Button>
-        </div> */}
         <div className="flex-1" />
-        {/* <ContentToolbar showSettings={false} /> */}
-        {/* <Switchers /> */}
         <Button size="sm" onClick={() => dispatch(openModal(MODAL_DONATE))}>
-          Поддержать
+          {t('Donate')}
         </Button>
       </div>
     </header>

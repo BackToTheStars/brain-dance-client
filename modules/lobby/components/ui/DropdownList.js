@@ -1,6 +1,7 @@
 import { CaretDownOutlined } from '@ant-design/icons';
 import { useState, useMemo, createContext, useContext } from 'react';
 import { IntButton as Button } from '@/ui/button';
+import { SIZE_MD } from '@/config/ui/size';
 
 const DropdownWrapper = ({ title, children, show, toggleList, size }) => {
   return (
@@ -23,7 +24,7 @@ const DropdownWrapper = ({ title, children, show, toggleList, size }) => {
   );
 };
 
-export const DropdownList = ({ value, options = [], onChange }) => {
+export const DropdownList = ({ value, options = [], onChange, size=SIZE_MD }) => {
   const [show, setShow] = useState(false);
   const toggleList = () => {
     setShow((prev) => !prev);
@@ -34,7 +35,7 @@ export const DropdownList = ({ value, options = [], onChange }) => {
   }, [value, options]);
 
   return (
-    <DropdownWrapper title={label || value} toggleList={toggleList} show={show}>
+    <DropdownWrapper title={label || value} toggleList={toggleList} show={show} size={size}>
       {!!options &&
         options.map((el) => {
           return (

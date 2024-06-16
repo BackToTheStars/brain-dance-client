@@ -31,12 +31,11 @@ const GameRow = ({ game, index, settings = {} }) => {
           dispatch(
             toggleSliderModal(SLIDER_MODAL_GAME, {
               ...params,
-              width: '50%',
             }),
           );
         }}
       >
-        {name}
+        <div className="game-item__title truncate flex-1">{name}</div>
         <div className="flex gap-2">
           {settings.isPinned ? (
             <Button

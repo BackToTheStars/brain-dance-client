@@ -14,7 +14,6 @@ const initialState = {
     lineSpacing: 1.5,
     padding: 12,
     alignment: 'left',
-    theme: 'light', // @todo: remove
     activeFontFamily: FONT_INTER,
   },
   layoutSettings: {
@@ -28,15 +27,35 @@ const initialState = {
   dTurns: {},
   theme: '',
   mode: 'chrono', // 'byGame',
+  requestSettings: {
+    gameLimit: 5,
+    turnLimit: 5,
+    pinned: false,
+  }
 };
 
 export const lobbyReducer = (state = initialState, { type, payload }) => {
   switch (type) {
+    case types.LOBBY_TEXT_SETTINGS_LOAD: {
+      return {
+        ...state,
+        textSettings: payload,
+      };
+    }
     case types.LOBBY_TEXT_SETTINGS_SET: {
       return {
         ...state,
         textSettings: {
           ...state.textSettings,
+          [payload.field]: payload.value,
+        },
+      };
+    }
+    case types.LOBBY_REQUEST_SETTINGS_SET: {
+      return {
+        ...state,
+        requestSettings: {
+          ...state.requestSettings,
           [payload.field]: payload.value,
         },
       };
