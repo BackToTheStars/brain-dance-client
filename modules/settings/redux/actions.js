@@ -1,5 +1,11 @@
-import { getStore, lsUpdateGames } from './requests';
+import {
+  getStore,
+  lsUpdateGames,
+  lsUpdateLayoutSettings,
+  lsUpdateTextSettings,
+} from './requests';
 import * as types from './types';
+import * as lobbyTypes from '@/modules/lobby/redux/types';
 
 export const loadSettings = () => (dispatch) => {
   const ls = getStore();
@@ -9,7 +15,7 @@ export const loadSettings = () => (dispatch) => {
   });
 };
 
-export const addGame =
+export const addGameCode =
   ({ hash, nickname, role, code }) =>
   (dispatch, getState) => {
     const games = getState().settings.games;
@@ -61,6 +67,38 @@ export const addGame =
       });
     }
   };
+
+export const removeGameCode =
+  ({ hash, code }) =>
+  (dispatch, getState) => {
+    const games = getState().settings.games;
+    const currentGame = games.find((g) => g.hash === hash);
+    const updatedCodes = currentGame.codes.filter((c) => c.code !== code);
+    if (updatedCodes.length === 0) {
+      dispatch(removeGameFromList(hash));
+    } else {
+      dispatch({
+        type: types.SETTINGS_GAME_UPDATE,
+        payload: {
+          hash,
+          game: {
+            ...currentGame,
+            codes: updatedCodes,
+          },
+        },
+      });
+    }
+  };
+
+export const removeGameFromList = (hash) => (dispatch) => {
+  const games = getStore().games;
+  const newGames = games.filter((g) => g.hash !== hash);
+  lsUpdateGames(newGames);
+  dispatch({
+    type: types.SETTINGS_GAME_DELETE,
+    payload: hash,
+  });
+};
 
 export const updateActiveCode =
   (hash, code, active) => (dispatch, getState) => {
@@ -115,12 +153,27 @@ export const unpinAllCodes = (hash) => (dispatch) => {
   });
 };
 
-export const removeGame = (hash) => (dispatch) => {
-  const games = getStore().games;
-  const newGames = games.filter((g) => g.hash !== hash);
-  lsUpdateGames(newGames);
-  dispatch({
-    type: types.SETTINGS_GAME_DELETE,
-    payload: hash,
-  });
+export const loadStore = (store) => (dispatch) => {
+  const { games, layoutSettings, textSettings } = store;
+  if (games && games.length) {
+    lsUpdateGames(games);
+    dispatch({
+      type: types.SETTINGS_GAMES_LOAD,
+      payload: getStore().games,
+    });
+  }
+
+  if (layoutSettings && Object.keys(layoutSettings).length) {
+    // @todo: move to redux from context
+    // lsUpdateLayoutSettings(layoutSettings);
+    // ???
+  }
+
+  if (textSettings && Object.keys(textSettings).length) {
+    lsUpdateTextSettings(textSettings);
+    dispatch({
+      type: lobbyTypes.LOBBY_TEXT_SETTINGS_LOAD,
+      payload: textSettings,
+    });
+  }
 };

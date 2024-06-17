@@ -7,7 +7,11 @@ import {
 } from '../../redux/requests';
 import { useDispatch, useSelector } from 'react-redux';
 import { StarFilled, StarOutlined } from '@ant-design/icons';
-import { addGame, removeGame, updateActiveCode } from '@/modules/settings/redux/actions';
+import {
+  addGameCode,
+  removeGameFromList,
+  updateActiveCode,
+} from '@/modules/settings/redux/actions';
 import { removeGameInfo } from '@/modules/user/contexts/UserContext';
 import { getGameUserTokenRequest } from '@/modules/game/requests';
 
@@ -106,7 +110,7 @@ const AccessGames = () => {
                       <Button
                         onClick={() => {
                           dispatch(
-                            addGame({
+                            addGameCode({
                               hash,
                               nickname: ROLES[ROLE_GAME_VISITOR].name,
                               role: ROLE_GAME_VISITOR,
@@ -235,7 +239,7 @@ const AccessGames = () => {
       const hash = game.hash;
       if (!!dStorageFullGames[hash] && !game.gameCodesAccess) {
         dispatch(
-          addGame({
+          addGameCode({
             hash,
             nickname: ROLES[ROLE_GAME_VISITOR].name,
             role: ROLE_GAME_VISITOR,
@@ -249,7 +253,7 @@ const AccessGames = () => {
     if (hashesToRemove.length && confirm(`Games not found: ${hashesToRemove.join(', ')}. Remove?`)) {
       for (const hash of hashesToRemove) {
         removeGameInfo(hash);
-        dispatch(removeGame(hash));
+        dispatch(removeGameFromList(hash));
       }
     }
   }

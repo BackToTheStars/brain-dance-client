@@ -1,8 +1,10 @@
 import { closeModal } from '@/modules/ui/redux/actions';
 import { useDispatch } from 'react-redux';
 import { IntButton as Button } from '@/ui/button';
+import { useTranslations } from 'next-intl';
 
 const ConfirmModal = ({ params }) => {
+  const t = useTranslations('Lobby.confirmModal');
   const { text = '', callback = () => {} } = params;
   const dispatch = useDispatch();
   const onCancel = () => dispatch(closeModal());
@@ -17,12 +19,10 @@ const ConfirmModal = ({ params }) => {
         height: '150px',
       }}
     >
-      <div className="flex-1">{text}</div>
-      <div className="mt-3 text-end">
-        <Button onClick={onCancel} className="mr-3">
-          Cancel
-        </Button>
-        <Button onClick={onOk}>OK</Button>
+      <div className="flex-1">{t(text)}</div>
+      <div className="mt-3 flex justify-end gap-2">
+        <Button onClick={onCancel}>{t('Cancel')}</Button>
+        <Button onClick={onOk}>{t('OK')}</Button>
       </div>
     </div>
   );

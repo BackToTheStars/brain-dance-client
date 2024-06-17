@@ -1,4 +1,4 @@
-import { addGame } from '@/modules/settings/redux/actions';
+import { addGameCode } from '@/modules/settings/redux/actions';
 import {
   loadGamesRequest,
   loadTurnsByGameRequest,
@@ -148,10 +148,10 @@ export const lobbyEnterGameWithConfirm = (code, nickname) => (dispatch) => {
         resolve();
         const { info, token } = data;
         const { hash, nickname, role, code } = info;
-        dispatch(addGame({ hash, nickname, role, code }));
+        dispatch(addGameCode({ hash, nickname, role, code }));
         dispatch(
           openModal(MODAL_CONFIRM, {
-            text: 'Перейти в игру?',
+            text: 'Go_to_the_game',
             callback: () => {
               setGameInfoIntoStorage(hash, {
                 info,

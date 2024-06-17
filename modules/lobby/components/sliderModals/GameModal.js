@@ -10,9 +10,13 @@ import {
   RULE_GAME_EDIT,
   roleOptions,
 } from '@/config/user';
-import { removeGame } from '@/modules/settings/redux/actions';
+import {
+  addGameCode,
+  removeGameCode,
+  removeGameFromList,
+} from '@/modules/settings/redux/actions';
 import Loading from '@/modules/ui/components/common/Loading';
-import { openModal } from '@/modules/ui/redux/actions';
+import { closeModal, openModal } from '@/modules/ui/redux/actions';
 import { MODAL_CONFIRM } from '@/config/lobby/modal';
 import {
   getGameInfo,
@@ -26,9 +30,10 @@ import { useTranslations } from 'next-intl';
 import { SIZE_SM } from '@/config/ui/size';
 import { DropdownList } from '../ui/DropdownList';
 
-const CreateCodeForm = () => {
+const CreateCodeForm = ({ codeData, hash }) => {
   const t = useTranslations('Lobby.game');
   const [role, setRole] = useState(String(ROLE_GAME_VISITOR));
+  const dispatch = useDispatch();
   return (
     <div className="flex gap-2 pb-2">
       <DropdownList
@@ -40,8 +45,20 @@ const CreateCodeForm = () => {
         size={SIZE_SM}
         onClick={(e) => {
           e.preventDefault();
-          addCodeRequest({ role: +role }).then(() => {
-            alert('code added');
+          dispatch(
+            lobbyEnterGameForRequest(hash, codeData.code, codeData.nickname),
+          ).then(() => {
+            addCodeRequest({ role: +role }).then((data) => {
+              const { hash: code } = data.item;
+              dispatch(
+                addGameCode({
+                  hash,
+                  nickname: ROLES[role].name,
+                  role: +role,
+                  code,
+                }),
+              );
+            });
           });
         }}
       >
@@ -51,7 +68,7 @@ const CreateCodeForm = () => {
   );
 };
 
-const CodesBlock = ({ codes, hash, can }) => {
+const CodesBlock = ({ codeData, codes, hash, can }) => {
   const t = useTranslations('Lobby.game');
   const dispatch = useDispatch();
   const [gameInfo, setGameInfo] = useState(null);
@@ -85,38 +102,61 @@ const CodesBlock = ({ codes, hash, can }) => {
       {!!codes.length && (
         <div className="flex flex-col mb-3">
           {/* <h2>Game codes</h2> */}
-          <table>
+          <table className="border border-gray-700">
             <thead>
-              <tr>
+              <tr className="bg-gray-800">
                 <th>{t('Nickname')}</th>
                 <th>{t('Code')}</th>
                 <th>{t('Role')}</th>
-                <th className="w-[100px]"></th>
+                <th className="w-[150px]"></th>
               </tr>
             </thead>
             <tbody>
-              {codes.map((codeData) => (
-                <tr key={codeData.code}>
+              {codes.map((codeData, i) => (
+                <tr key={codeData.code} className={i % 2 ? 'bg-gray-700' : ''}>
                   <td>{codeData.nickname}</td>
                   <td>{codeData.code}</td>
                   <td>{ROLES[codeData.role]?.name}</td>
                   <td>
-                    {codeData.role !== gameInfo?.info?.role &&
-                      codeData.nickname !== gameInfo?.info?.nickname && (
-                        <Button
-                          onClick={() => {
-                            dispatch(
-                              lobbyEnterGameForRequest(
-                                hash,
-                                codeData.code,
-                                codeData.nickname,
-                              ),
-                            ).then(() => reloadGameInfo());
-                          }}
-                        >
-                          {t('Login')}
-                        </Button>
-                      )}
+                    <div className="flex flex-col gap-2">
+                      {codeData.role !== gameInfo?.info?.role &&
+                        codeData.nickname !== gameInfo?.info?.nickname && (
+                          <Button
+                            size={SIZE_SM}
+                            className="justify-center"
+                            onClick={() => {
+                              dispatch(
+                                lobbyEnterGameForRequest(
+                                  hash,
+                                  codeData.code,
+                                  codeData.nickname,
+                                ),
+                              ).then(() => reloadGameInfo());
+                            }}
+                          >
+                            {t('Login')}
+                          </Button>
+                        )}
+                      <Button
+                        size={SIZE_SM}
+                        className="justify-center"
+                        onClick={() => {
+                          dispatch(
+                            openModal(MODAL_CONFIRM, {
+                              text: 'Remove_game_code',
+                              callback: () => {
+                                dispatch(
+                                  removeGameCode({ hash, code: codeData.code }),
+                                );
+                                dispatch(closeModal());
+                              },
+                            }),
+                          );
+                        }}
+                      >
+                        {t('Remove_code')}
+                      </Button>
+                    </div>
                   </td>
                   {/* <pre>{JSON.stringify(codeData, null, 2)}</pre> */}
                 </tr>
@@ -127,7 +167,7 @@ const CodesBlock = ({ codes, hash, can }) => {
       )}
       {can(RULE_GAME_EDIT) && (
         <div className="mb-3">
-          <CreateCodeForm />
+          <CreateCodeForm codeData={codeData} hash={hash} />
         </div>
       )}
     </div>
@@ -214,7 +254,7 @@ const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
         </div>
         <div className="mt-6">{!!description && description}</div>
         <div className="flex-1" />
-        <CodesBlock codes={codes} hash={hash} can={can} />
+        <CodesBlock codeData={codeData} codes={codes} hash={hash} can={can} />
         <div className="mt-auto gap-2 flex">
           {existsInList && (
             <Button
@@ -222,9 +262,9 @@ const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
               onClick={() => {
                 dispatch(
                   openModal(MODAL_CONFIRM, {
-                    text: 'Remove item from my games?',
+                    text: 'Remove_item_from_my_games',
                     callback: () => {
-                      dispatch(removeGame(hash));
+                      dispatch(removeGameFromList(hash));
                       closeModal();
                     },
                   }),
@@ -240,7 +280,7 @@ const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
               onClick={() => {
                 dispatch(
                   openModal(MODAL_CONFIRM, {
-                    text: 'Delete the game permanently?',
+                    text: 'Delete_the_game_permanently',
                     callback: () => {
                       dispatch(
                         lobbyEnterGameForRequest(
@@ -250,7 +290,7 @@ const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
                         ),
                       ).then(() => {
                         deleteGameRequest(hash).then(() => {
-                          dispatch(removeGame(hash));
+                          dispatch(removeGameFromList(hash));
                           removeGameInfo(hash);
                           closeModal();
                         });

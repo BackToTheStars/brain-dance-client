@@ -17,6 +17,10 @@
 
     "Cancel": "Cancel",
 
+    "Export": "Export",
+    "Import": "Import",
+    "Upload_import_file": "Upload import file",
+
     "game": {
       "Game_info": "Game info",
       "Turn_info": "Turn info",
@@ -26,6 +30,7 @@
       "Game_data": "Game data",
       "Login": "Login",
       "Logout": "Logout",
+      "Remove_code": "Remove code",
       "Nickname": "Nickname",
       "Code": "Code",
       "Role": "Role",
@@ -53,6 +58,20 @@
       "Line_spacing": "Line spacing",
       "Text_align": "Text align",
       "Font": "Font"
+    },
+    "uploadModal": {
+      "Drag_drop": "Drag and drop a file here",
+      "Click_or_drag": "Click or drag and drop a file here"
+    },
+    "confirmModal": {
+      "Remove_game_code": "Remove game code?",
+      "Remove_item_from_my_games": "Remove item from my games?",
+      "Delete_the_game_permanently": "Delete the game permanently?",
+      "Go_to_the_game": "Go to the game?",
+      "All_game_accesses_will_be_removed": "All game accesses will be removed",
+      "All_display_settings_will_be_reset": "All display settings will be reset",
+      "OK": "OK",
+      "Cancel": "Cancel"
     },
     "Payment_methods": "Payment methods"
   },

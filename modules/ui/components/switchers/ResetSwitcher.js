@@ -13,9 +13,9 @@ const ResetSwitcher = () => {
         e.preventDefault();
         dispatch(
           openModal(MODAL_CONFIRM, {
-            text: "Будут сброшены все настройки отображения",
+            text: 'All_display_settings_will_be_reset',
             callback: () => dispatch(resetThemeSettings()),
-          })
+          }),
         );
       }}
     >

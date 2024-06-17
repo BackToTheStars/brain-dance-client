@@ -9,7 +9,7 @@ import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
 import { toggleSliderModal } from '../../redux/actions';
 import { useRouter } from 'next/navigation';
 import {
-  addGame,
+  addGameCode,
   pinFirstCode,
   unpinAllCodes,
 } from '@/modules/settings/redux/actions';
@@ -57,7 +57,7 @@ const GameRow = ({ game, index, settings = {} }) => {
                 e.stopPropagation();
                 if (!settings?.codes?.length) {
                   dispatch(
-                    addGame({
+                    addGameCode({
                       hash: game.hash,
                       nickname: ROLES[ROLE_GAME_VISITOR].name,
                       role: ROLE_GAME_VISITOR,

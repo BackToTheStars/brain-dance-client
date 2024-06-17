@@ -2,8 +2,10 @@ import { closeModal } from '@/modules/ui/redux/actions';
 import { useDispatch } from 'react-redux';
 import { IntButton as Button } from '@/ui/button';
 import { useDropzone } from 'react-dropzone';
+import { useTranslations } from 'next-intl';
 
 const UploadModal = ({ params }) => {
+  const t = useTranslations('Lobby');
   const { text = '', callback = () => {} } = params;
 
   const dispatch = useDispatch();
@@ -26,15 +28,15 @@ const UploadModal = ({ params }) => {
         <div {...getRootProps()} className="drag-n-drop-file">
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p>Drag and drop a file here</p>
+            <p>{t('uploadModal.Drag_drop')}</p>
           ) : (
-            <p>Click or drag and drop a file here</p>
+            <p>{t('uploadModal.Click_or_drag')}</p>
           )}
         </div>
       </div>
       <div className="mt-3 text-end">
         <Button onClick={onCancel} className="mr-3">
-          Cancel
+          {t('Cancel')}
         </Button>
       </div>
     </div>

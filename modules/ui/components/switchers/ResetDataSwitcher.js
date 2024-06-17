@@ -16,7 +16,7 @@ const ResetDataSwitcher = () => {
 
         dispatch(
           openModal(MODAL_CONFIRM, {
-            text: 'Будут сброшены все доступы к играм',
+            text: 'All_game_accesses_will_be_removed',
             callback: () => {
               clearStore();
               // @todo: удалить ключи всех игр по отдельности

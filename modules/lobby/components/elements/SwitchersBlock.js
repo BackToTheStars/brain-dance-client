@@ -6,9 +6,11 @@ import { useContext } from 'react';
 import { IntButton as Button } from '@/ui/button';
 import { getStore, isStoreValid } from '@/modules/settings/redux/requests';
 import ResetDataSwitcher from '@/modules/ui/components/switchers/ResetDataSwitcher';
-import { openModal } from '@/modules/ui/redux/actions';
+import { closeModal, openModal } from '@/modules/ui/redux/actions';
 import { MODAL_UPLOAD } from '@/config/lobby/modal';
 import { useDispatch } from 'react-redux';
+import { useTranslations } from 'next-intl';
+import { loadStore } from '@/modules/settings/redux/actions';
 
 const downloadFile = (data = {}) => {
   // create file in browser
@@ -30,6 +32,7 @@ const downloadFile = (data = {}) => {
 };
 
 const SwitchersBlock = () => {
+  const t = useTranslations('Lobby');
   const { cookieColorSchema, cookieSizeSchema, cookieMode } =
     useContext(CookieContext);
 
@@ -49,7 +52,7 @@ const SwitchersBlock = () => {
             downloadFile(getStore());
           }}
         >
-          Export
+          {t('Export')}
         </Button>
         <Button
           size="sm"
@@ -57,7 +60,7 @@ const SwitchersBlock = () => {
             e.preventDefault();
             dispatch(
               openModal(MODAL_UPLOAD, {
-                text: 'Загрузите файл импорта',
+                text: t('Upload_import_file'),
                 callback: (files) => {
                   const file = files[0];
                   if (file.type !== 'application/json') {
@@ -74,9 +77,10 @@ const SwitchersBlock = () => {
                         alert(error);
                         return;
                       }
-                      // dispatch(openModal(MODAL_SET_STORE, { store: jsonObj }));
+                      dispatch(loadStore(jsonObj));
+                      dispatch(closeModal());
                     } catch (error) {
-                      console.log(error)
+                      console.log(error);
                       alert('Файл импорта имеет неверный формат');
                     }
                   };
@@ -85,7 +89,7 @@ const SwitchersBlock = () => {
             );
           }}
         >
-          Import
+          {t('Import')}
         </Button>
         <ResetDataSwitcher />
       </div>
