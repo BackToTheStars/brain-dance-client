@@ -19,10 +19,11 @@
   .base-card__body {
     flex: 1;
     overflow-y: hidden;
+    @apply flex flex-col gap-3;
   }
 
   .base-card__widget {
-    @apply mb-3;
+    // @apply mb-3;
   }
 
   .base-card__roller {

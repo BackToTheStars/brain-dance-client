@@ -80,6 +80,19 @@ export const addCodeRequest = (body) => {
   });
 };
 
+export const refreshTokenRequest = (hash, token, nickname) => {
+  return fetch(`${API_URL}/codes/refresh?hash=${hash}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'game-token': token,
+    },
+    body: JSON.stringify({
+      nickname,
+    }),
+  }).then((res) => res.json());
+};
+
 // PUBLIC REQUESTS
 export const createGameRequest = (name, gameIsPublic) => {
   // добавить description, players

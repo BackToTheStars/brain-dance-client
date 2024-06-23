@@ -56,14 +56,17 @@ const guestUser = {
 const UserContext = createContext();
 
 export const UserProvider = ({ children, hash }) => {
-  const { info, token } = loadGameInfo(hash) || guestUser;
+  const [userInfo, setUserInfo] = useState(loadGameInfo(hash) || guestUser);
+  const { info, token } = userInfo;
 
   const can = (rule) => checkRuleByRole(rule, info.role);
+  const reloadUserInfo = () => setUserInfo(loadGameInfo(hash));
 
   const value = {
     info,
     token,
     can,
+    reloadUserInfo,
   };
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

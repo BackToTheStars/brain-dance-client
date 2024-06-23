@@ -34,7 +34,7 @@ const TurnModal = ({ params }) => {
   return (
     <div
       style={{ width: `${sliderWidth}px` }}
-      className="dark:bg-dark-light bg-light h-full flex flex-col rounded"
+      className="dark:bg-dark-light bg-light flex flex-col rounded self-start h-auto"
     >
       <div className="bg-main-dark rounded-t p-4">
         {!!header && <h2 style={limitLine(2)}>{header}</h2>}
@@ -58,7 +58,7 @@ const TurnModal = ({ params }) => {
           />
         )}
       </div>
-      <div className="h-full overflow-auto p-4 dark:text-main-text text-dark-light">
+      <div className="h-auto overflow-auto p-4 dark:text-main-text text-dark-light">
         {!!text && <p>{text}</p>}
       </div>
       {/* {!!contentType && <p>{contentType}</p>} */}

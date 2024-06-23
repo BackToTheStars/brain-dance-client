@@ -34,11 +34,12 @@ const TurnCard = ({ id }) => {
   );
   const { dontShowHeader, header, imageUrl, videoUrl, paragraph, contentType } =
     turn || {};
-  let text = (paragraph && paragraph[0]?.insert) || null;
+  let text = (paragraph && paragraph[0]?.insert) || '';
   if (text) {
     text =
-      text.length > 300 ? text.slice(0, text.indexOf(' ', 300)) + ' ...' : text;
+      text.length > 350 ? text.slice(0, text.indexOf(' ', 350)) + ' ...' : text;
   }
+  text = text.trim();
 
   const game = dGames[turn?.gameId];
   const imageSrc = useMemo(() => {
@@ -98,7 +99,7 @@ const TurnCard = ({ id }) => {
           <img
             src={imageSrc}
             alt="#"
-            className={`base-card__widget w-full h-auto rounded mb-3`}
+            className={`base-card__widget w-full h-auto rounded`}
           />
         )}
         {!!text && (

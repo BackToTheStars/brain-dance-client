@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import '@/themes/game/index.scss';
 
@@ -12,6 +12,9 @@ import {
   UserProvider,
   useUserContext,
 } from '@/modules/user/contexts/UserContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadSettings } from '@/modules/settings/redux/actions';
+import GameDialog from '@/modules/lobby/components/page/GameDialog';
 
 const GamePage = () => {
   return (
@@ -31,31 +34,54 @@ const GamePageInner = () => {
         <Loading />
       ) : (
         <UserProvider hash={hash}>
-          <GameDialog hash={hash} />
+          <GameDialogPage hash={hash} />
         </UserProvider>
       )}
     </div>
   );
 };
 
-// @todo
-const GameDialog = ({ hash }) => {
-  const { info, token, can } = useUserContext();
+const GameDialogPage = ({ hash }) => {
+  const dispatch = useDispatch();
+  const [myGamesLoaded, setMyGamesLoaded] = useState(false);
+  const myGames = useSelector((state) => state.settings.games);
+  const { info, token, reloadUserInfo } = useUserContext();
   const router = useRouter();
   useEffect(() => {
-    if (!hash) return;
-    router.push(`/game/view/${hash}`);
-    // nickname, role
-    // ? code, hash
+    if (!myGamesLoaded) return;
+    if (info.skipDialog) {
+      router.push(`/game/view/${hash}`);
+      return;
+    }
+  }, [hash, info, token, myGames, myGamesLoaded]);
 
-    // если роль не гостевая и nickname не установлен, то запросить его
-    // если отсутствует code, то запросить его
+  useEffect(() => {
+    if (myGamesLoaded) return;
+    if (myGames.length) {
+      setMyGamesLoaded(true);
+      return;
+    }
+    dispatch(loadSettings());
+    setTimeout(() => {
+      setMyGamesLoaded(true);
+    }, 300);
+  }, [myGames]);
 
-    // если в явном виде не указано, что сохранение кода не требуется, то запросить сохранение
-    // если игра предполагает запрет сохранения, то выставить запрет и продолжить
-    // при необходимости запросить nickname пользователя
-  }, [hash, info, token]);
-  return <div className="game-dialog">Dialog</div>;
+  if (!myGamesLoaded || info?.skipDialog) {
+    return <Loading />;
+  }
+
+  return (
+    <div className="game-dialog">
+      <GameDialog
+        hash={hash}
+        info={info}
+        token={token}
+        myGames={myGames}
+        reloadUserInfo={reloadUserInfo}
+      />
+    </div>
+  );
 };
 
 export default GamePage;

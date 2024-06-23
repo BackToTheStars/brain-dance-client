@@ -177,7 +177,7 @@ export const lobbyEnterGameForRequest = (hash, code, nickname) => (dispatch) => 
           info,
           token,
         });
-        resolve();
+        resolve(data);
       } else {
         reject(data?.message || 'Неизвестная ошибка');
       }

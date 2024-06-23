@@ -13,6 +13,7 @@ const GamesPanel = () => {
   const games = useSelector((s) => s.lobby.games);
 
   const dSettingsHashes = useMemo(() => {
+    if (!settingsGames) return {};
     return settingsGames.reduce((acc, obj) => {
       return {
         ...acc,

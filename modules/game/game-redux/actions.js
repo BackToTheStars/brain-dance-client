@@ -25,6 +25,18 @@ export const setGameStage = (stage) => (dispatch, getState) => {
   dispatch({ type: types.GAME_STAGE_SET, payload: stage });
 };
 
+export const loadShortGame = (hash) => (dispatch) => {
+  return new Promise((resolve) => {
+    getGameRequest(hash).then((data) => {
+      dispatch({
+        type: types.GAME_LOAD,
+        payload: data.item,
+      });
+      resolve(data.item);
+    });
+  });
+};
+
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
   return new Promise((resolve, reject) => {
