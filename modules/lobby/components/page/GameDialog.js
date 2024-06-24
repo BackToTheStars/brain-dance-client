@@ -8,10 +8,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
 import { refreshTokenRequest } from '@/modules/game/requests';
+import { useTranslations } from 'next-intl';
 
 const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const dispatch = useDispatch();
   const game = useSelector((state) => state.game.game);
+  const t = useTranslations('Lobby');
   const [nickname, setNickname] = useState(info?.nickname || '');
   const [skipDialog, setSkipDialog] = useState(false);
   const router = useRouter();
@@ -135,14 +137,14 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
             </h2>
             <div className="flex gap-3">
               <div className="w-1/2 flex flex-col gap-2">
-                <label>nickname</label>
+                <label>{t('nickname')}</label>
                 <Input
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                 />
               </div>
               <div className="w-1/2 flex flex-col gap-2">
-                <label>role</label>
+                <label>{t('role')}</label>
                 <Select
                   value={role}
                   onChange={(value) => setRole(value)}
@@ -158,11 +160,13 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
                 checked={skipDialog}
                 // onChange={(e) => setSkipDialog(e.target.checked)}
               />
-              <div>Skip this dialog next time</div>
+              <div>{t('gameDialog.Skip_this_dialog_next_time')}</div>
             </div>
             {/* game.description and game.image */}
             <div className="flex justify-end">
-              <Button htmlType="submit">Go to the Game</Button>
+              <Button htmlType="submit">
+                {t('gameDialog.Go_to_the_game')}
+              </Button>
             </div>
           </form>
           {/* ) : (

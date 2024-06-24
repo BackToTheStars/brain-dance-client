@@ -25,3 +25,14 @@
     @apply p-2;
   }
 }
+
+// antd overrides
+.radio-group_white-text {
+  .ant-radio-wrapper {
+    color: #fff;
+  }
+
+  .ant-radio-inner::after {
+    color: #fff;
+  }
+}

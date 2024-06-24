@@ -13,6 +13,7 @@ import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,6 +25,7 @@ const PictureQuotes = ({
   widgetSettings = {},
   pictureOnly,
 }) => {
+  const { can } = useUserContext();
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turns.d[turnId].data);
   const dLines = useSelector((store) => store.lines.d); // @fixme
@@ -77,8 +79,8 @@ const PictureQuotes = ({
             width: Math.round((width * quote.width) / 100),
             height: Math.round((height * quote.height) / 100),
           };
-        })
-      )
+        }),
+      ),
     );
   }, [quotes, widgetSettings]);
 
@@ -120,7 +122,7 @@ const PictureQuotes = ({
             onClick={() => {
               if (isQuoteActive) {
                 dispatch(setPanelMode({ mode: MODE_GAME }));
-                dispatch(processQuoteClicked(`${turnId}_${quote.id}`));
+                dispatch(processQuoteClicked(`${turnId}_${quote.id}`, can));
                 return;
               }
               dispatch(
@@ -133,9 +135,9 @@ const PictureQuotes = ({
                       [`${turnId}_${widgetId}`]: { activeQuoteId: quote.id },
                     },
                   },
-                })
+                }),
               );
-              dispatch(processQuoteClicked(`${turnId}_${quote.id}`));
+              dispatch(processQuoteClicked(`${turnId}_${quote.id}`, can));
             }}
           />
         );

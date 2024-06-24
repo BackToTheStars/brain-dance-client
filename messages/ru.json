@@ -9,6 +9,7 @@
     "Columns": "Столбцы",
     "code": "код",
     "nickname": "никнейм",
+    "role": "роль",
     "Public": "Публичная",
     "Private": "Приватная",
     "game_name": "название игры",
@@ -16,6 +17,10 @@
     "Export": "Экспорт",
     "Import": "Импорт",
     "Upload_import_file": "Загрузите файл импорта",
+    "gameDialog": {
+      "Go_to_the_game": "Перейти в игру",
+      "Skip_this_dialog_next_time": "Пропустить этот диалог в следующий раз"
+    },
     "game": {
       "Game_info": "Об игре",
       "Turn_info": "О ходе",

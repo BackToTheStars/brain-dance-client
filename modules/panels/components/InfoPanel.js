@@ -6,6 +6,7 @@ import { togglePanel } from '../redux/actions';
 import { PANEL_INFO } from '../settings';
 import EditGameForm from './info/EditGameForm';
 import { useState } from 'react';
+import { Button } from 'antd';
 
 const getUrl = ({ hash }) => {
   return typeof window === 'undefined' // SSR
@@ -78,28 +79,32 @@ const InfoPanel = () => {
               <td className="py-2 px-4">Your role:</td>
               <td className="py-2 px-4">
                 {ROLES[role].name}
-                {role === ROLE_GAME_VISITOR && <CodeEnterForm />}
+                {/* {role === ROLE_GAME_VISITOR &&  */}
+                <CodeEnterForm hash={game.hash} />
+                {/* } */}
               </td>
             </tr>
           </tbody>
         </table>
         <div className="p-3">
           {viewMode ? (
-            <button
+            <Button
+              size="small"
               onClick={() => dispatch(togglePanel({ type: PANEL_INFO }))}
               className="px-3 py-2 bg-blue-500 text-white rounded"
             >
               Close
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
+              size="small"
               className="px-3 py-2 bg-blue-500 text-white rounded"
               onClick={() => {
                 setViewMode(true);
               }}
             >
               Cancel
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@
 
     "code": "code",
     "nickname": "nickname",
+    "role": "role",
 
     "Public": "Public",
     "Private": "Private",
@@ -20,6 +21,11 @@
     "Export": "Export",
     "Import": "Import",
     "Upload_import_file": "Upload import file",
+
+    "gameDialog": {
+      "Go_to_the_game": "Go to the game",
+      "Skip_this_dialog_next_time": "Skip this dialog next time"
+    },
 
     "game": {
       "Game_info": "Game info",

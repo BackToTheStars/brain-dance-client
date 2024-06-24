@@ -65,6 +65,14 @@ export const saveGamePositionRequest = (gamePosition) => {
   });
 };
 
+export const updateGameRequest = (data) => {
+  return request(`game?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'PUT',
+    body: data,
+  });
+}
+
 export const deleteGameRequest = () => {
   return request(`game?hash=${s.hash}`, {
     tokenFlag: true,

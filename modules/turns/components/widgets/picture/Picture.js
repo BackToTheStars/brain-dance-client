@@ -8,6 +8,8 @@ import { useEffect, useState, useRef, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
 import PictureQuotes from './Quotes';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
 
 const Picture = ({
   registerHandleResize,
@@ -20,9 +22,10 @@ const Picture = ({
   widgetId,
   widgetType,
 }) => {
+  const { can } = useUserContext();
   //
   const imageUrl = useSelector(
-    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url,
   );
   const widgetSpacer = pictureOnly ? 0 : widgetSpacerOriginal;
 
@@ -38,7 +41,7 @@ const Picture = ({
   const editWidgetId = useSelector((state) => state.panels.editWidgetId);
   const mode = useSelector((state) => state.panels.mode);
   const editWidgetParams = useSelector(
-    (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`]
+    (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`],
   );
 
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
@@ -83,20 +86,18 @@ const Picture = ({
         },
         minHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight =
-            Math.floor(
-              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-                imgEl.current.naturalWidth
-            )
+          const newImgHeight = Math.floor(
+            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+              imgEl.current.naturalWidth,
+          );
           return newImgHeight;
         },
         maxHeightCallback: (newWidth) => {
           if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight =
-            Math.floor(
-              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-                imgEl.current.naturalWidth
-            )
+          const newImgHeight = Math.floor(
+            (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+              imgEl.current.naturalWidth,
+          );
           return newImgHeight;
         },
         resizeCallback: () => {},
@@ -144,21 +145,23 @@ const Picture = ({
 
         <img src={imageUrlToRender} ref={imgEl} />
 
-        <a
-          className="widget-button"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            dispatch(
-              setPanelMode({
-                mode: MODE_WIDGET_PICTURE,
-                params: { editTurnId: turnId, editWidgetId: widgetId },
-              })
-            );
-          }}
-        >
-          <i className="fas fa-highlighter"></i>
-        </a>
+        {can(RULE_TURNS_CRUD) && (
+          <a
+            className="widget-button"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              dispatch(
+                setPanelMode({
+                  mode: MODE_WIDGET_PICTURE,
+                  params: { editTurnId: turnId, editWidgetId: widgetId },
+                }),
+              );
+            }}
+          >
+            <i className="fas fa-highlighter"></i>
+          </a>
+        )}
       </div>
     </div>
   );

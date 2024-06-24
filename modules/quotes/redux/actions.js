@@ -10,6 +10,7 @@ import {
 } from '@/modules/lines/components/helpers/line';
 import { lineCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { useSelector } from 'react-redux';
+import { RULE_TURNS_CRUD } from '@/config/user';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
@@ -63,7 +64,7 @@ export const savePictureQuoteByCrop = () => (dispatch, getState) => {
 };
 
 export const processQuoteClicked =
-  (currentQuoteKey) => (dispatch, getState) => {
+  (currentQuoteKey, can) => (dispatch, getState) => {
     const state = getState();
     const cancelCallback = state.game.cancelCallback;
     // прежняя выбранная цитата
@@ -81,7 +82,8 @@ export const processQuoteClicked =
         dispatch(setActiveQuoteKey(null));
       } else {
         // если ещё нет активной цитаты, то активируем выбранную
-        if (!activeQuoteKey) {
+        // если нет прав на редактирование, то переключаемся на выбранную
+        if (!activeQuoteKey || !can(RULE_TURNS_CRUD)) {
           dispatch(setActiveQuoteKey(currentQuoteKey));
           return;
         }

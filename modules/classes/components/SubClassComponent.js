@@ -2,8 +2,11 @@ import { Input } from 'antd';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeClass, updateClass } from '../redux/actions';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
 
 const SubClassComponent = ({ subClassItemId }) => {
+  const { can } = useUserContext();
   const dispatch = useDispatch();
   const inputRef = useRef();
   const subClassItem = useSelector((state) => state.classes.d[subClassItemId]);
@@ -46,20 +49,22 @@ const SubClassComponent = ({ subClassItemId }) => {
             {'- '}
             {title}
           </div>
-          <div className="flex classes-btn-group">
-            <button
-              className="btn btn-success btn-sm"
-              onClick={(e) => setEditTitleMode(true)}
-            >
-              <img src="/icons/white/edit.svg" />
-            </button>
-            <button
-              className="btn btn-success btn-sm class-item-delete"
-              onClick={() => dispatch(removeClass(subClassItem.id))}
-            >
-              <img src="/icons/white/delete.svg" />
-            </button>
-          </div>
+          {can(RULE_TURNS_CRUD) && (
+            <div className="flex classes-btn-group">
+              <button
+                className="btn btn-success btn-sm"
+                onClick={(e) => setEditTitleMode(true)}
+              >
+                <img src="/icons/white/edit.svg" />
+              </button>
+              <button
+                className="btn btn-success btn-sm class-item-delete"
+                onClick={() => dispatch(removeClass(subClassItem.id))}
+              >
+                <img src="/icons/white/delete.svg" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

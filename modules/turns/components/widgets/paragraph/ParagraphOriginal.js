@@ -30,6 +30,8 @@ import {
   // ParagraphOriginalTextWrapper,
 } from './TextWrappers';
 import ParagraphEditButton from './EditButton';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
 // import { useTurnData } from '../contexts/TurnData';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
@@ -41,14 +43,17 @@ const ParagraphOriginal = ({
   widgetId,
   notRegisteredWidgetsCount,
 }) => {
+  const { can } = useUserContext();
   const widget = useSelector(
-    (state) => state.turns.d[turnId].data.dWidgets[widgetId]
+    (state) => state.turns.d[turnId].data.dWidgets[widgetId],
   );
   const showCompressed = useSelector(
-    (state) => state.turns.d[turnId].data.compressed
+    (state) => state.turns.d[turnId].data.compressed,
   );
   const colors = useSelector((state) => state.turns.d[turnId].data.colors);
-  const contentType = useSelector((state) => state.turns.d[turnId].data.contentType);
+  const contentType = useSelector(
+    (state) => state.turns.d[turnId].data.contentType,
+  );
   const size = useSelector((state) => state.turns.g[turnId].size);
 
   const { width, height } = size;
@@ -88,8 +93,8 @@ const ParagraphOriginal = ({
       quoteCoordsUpdate(
         turnId,
         TYPE_QUOTE_TEXT,
-        getScrolledQuotes(quotes, paragraphEl, scrollTop)
-      )
+        getScrolledQuotes(quotes, paragraphEl, scrollTop),
+      ),
     );
   }, [width]);
 
@@ -101,8 +106,8 @@ const ParagraphOriginal = ({
         quoteCoordsUpdate(
           turnId,
           TYPE_QUOTE_TEXT,
-          getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
-        )
+          getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop),
+        ),
       );
 
       dispatch(markTurnAsChanged({ _id: turnId }));
@@ -137,7 +142,7 @@ const ParagraphOriginal = ({
             updateScrollPosition({
               _id: turnId,
               scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-            })
+            }),
           );
           // @todo: сообщить сервисам минимапа и линий
         });
@@ -168,7 +173,7 @@ const ParagraphOriginal = ({
           turnType={contentType}
         />
       </p>
-      <ParagraphEditButton />
+      {can(RULE_TURNS_CRUD) && <ParagraphEditButton />}
     </div>
   );
 };

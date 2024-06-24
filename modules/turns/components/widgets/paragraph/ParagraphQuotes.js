@@ -2,10 +2,11 @@ import { quoteRectangleThickness } from '@/config/ui';
 import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-const Quote = memo(({ isActive, quote }) => {
+const Quote = memo(({ isActive, quote, can }) => {
   const dispatch = useDispatch();
   const { style, className } = useMemo(() => {
     let outline = '0px solid transparent';
@@ -29,13 +30,14 @@ const Quote = memo(({ isActive, quote }) => {
       className={className}
       style={style}
       onClick={() => {
-        dispatch(processQuoteClicked(quote.quoteKey));
+        dispatch(processQuoteClicked(quote.quoteKey, can));
       }}
     ></div>
   );
 });
 
 const ParagraphQuotes = ({ turnId }) => {
+  const { can } = useUserContext();
   const allQuotes = useSelector(
     // @fixme: update for storybook
     (state) => (state.lines ? state.lines.quotesInfo[turnId] : []),
@@ -58,6 +60,7 @@ const ParagraphQuotes = ({ turnId }) => {
       {paragraphQuotes.map((quote, i) => {
         return (
           <Quote
+            can={can}
             key={i}
             isActive={
               !!activeQuotesDictionary[quote.quoteId] ||

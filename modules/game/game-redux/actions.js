@@ -1,6 +1,7 @@
 import {
   getGameRequest,
   saveGamePositionRequest,
+  updateGameRequest,
 } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
@@ -14,9 +15,7 @@ import {
 } from '@/modules/turns/components/helpers/dataCopier';
 import { resetAndExit } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
-import {
-  snapRound,
-} from '@/modules/turns/components/helpers/grid';
+import { snapRound } from '@/modules/turns/components/helpers/grid';
 import { TurnHelper } from '@/modules/turns/redux/helpers';
 
 export const setGameStage = (stage) => (dispatch, getState) => {
@@ -104,15 +103,15 @@ export const saveField = () => (dispatch, getState) => {
       size: { width: turn.width, height: turn.height },
       wasChanged: false,
     };
-  })
+  });
 
   updateCoordinatesRequest(changedTurns).then((data) => {
     dispatch({
       type: turnsTypes.TURNS_UPDATE_GEOMETRY,
       payload: {
         turns: turnsWithUpdatedGeometry,
-      }
-    })
+      },
+    });
     dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
     dispatch(resetAndExit());
@@ -164,14 +163,14 @@ export const centerViewportAtPosition =
           moveField({
             left: -left,
             top: -top,
-          })
+          }),
         );
         gameBoxEl.css('left', 0);
         gameBoxEl.css('top', 0);
         setTimeout(() => {
           gameBoxEl.removeClass('remove-line-transition');
         }, 100);
-      }
+      },
     );
   };
 
@@ -192,4 +191,17 @@ export const updateViewportGeometry = (viewport) => (dispatch, getState) => {
     type: types.GAME_VIEWPORT_SET,
     payload: viewport,
   });
+};
+
+export const updateGame = (data) => (dispatch) => {
+  return new Promise((resolve) => {
+    updateGameRequest(data).then((data) => {
+      dispatch({
+        type: types.GAME_LOAD,
+        payload: data.item,
+      });
+
+      resolve(data.item);
+    });
+  })
 };
