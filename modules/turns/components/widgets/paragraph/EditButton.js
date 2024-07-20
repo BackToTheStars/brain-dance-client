@@ -2,7 +2,7 @@ const { MODE_WIDGET_PARAGRAPH } = require('@/config/panel');
 const { setPanelMode } = require('@/modules/panels/redux/actions');
 const { useDispatch } = require('react-redux');
 
-const ParagraphEditButton = () => {
+const ParagraphEditButton = ({ turnId, widgetId }) => {
   const dispatch = useDispatch();
   return (
     <a

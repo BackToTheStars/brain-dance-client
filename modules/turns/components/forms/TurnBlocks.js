@@ -175,10 +175,6 @@ const CreateTurnForm = () => {
       quotes: [],
       widgetShownIds: widgetBlocks.map((i) => i.id),
     };
-
-    console.log({ data });
-
-    // saveTurn()
   };
 
   const onRearrange = () => {

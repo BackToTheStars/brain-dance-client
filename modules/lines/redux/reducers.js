@@ -2,6 +2,7 @@ import * as types from './types';
 
 const initialLinesState = {
   quotesInfo: {},
+  quotesInfoByQuoteKey: {},
   error: null,
   linesToPaste: {},
   d: {},
@@ -25,8 +26,8 @@ const getDictionariesByLines = (lines) => {
       acc[line.targetTurnId][line.targetMarker].push(line);
       return acc;
     }, {}),
-  }
-}
+  };
+};
 
 export const linesReducer = (state = initialLinesState, { type, payload }) => {
   switch (type) {
@@ -43,7 +44,7 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       return {
         ...state,
         ...getDictionariesByLines(newLines),
-      }
+      };
     }
 
     case types.LINE_DELETE: {
@@ -53,7 +54,7 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       return {
         ...state,
         ...getDictionariesByLines(newLines),
-      }
+      };
     }
 
     case types.LINES_DELETE: {
@@ -67,21 +68,26 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       return {
         ...state,
         ...getDictionariesByLines(newLines),
-      }
+      };
     }
 
     case types.LINES_QUOTE_COORDS_UPDATE: {
-      const { turnId, quotesWithCoords, type } = payload;
+      const { turnId, quotesWithCoords, widgetId } = payload;
       return {
         ...state,
         quotesInfo: {
           ...state.quotesInfo,
-          [turnId]: [
-            ...(state.quotesInfo[turnId]?.filter(
-              (quote) => quote.type !== type
-            ) || []),
-            ...quotesWithCoords,
-          ],
+          [turnId]: {
+            ...(state.quotesInfo[turnId] || {}),
+            [widgetId]: quotesWithCoords,
+          },
+        },
+        quotesInfoByQuoteKey: {
+          ...state.quotesInfoByQuoteKey,
+          ...quotesWithCoords.reduce((acc, quote) => {
+            acc[quote.quoteKey] = quote;
+            return acc;
+          }, {}),
         },
       };
     }

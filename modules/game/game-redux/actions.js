@@ -94,8 +94,6 @@ export const saveField = () => (dispatch, getState) => {
       };
     }); // ход был изменён, сохранить только его
 
-  console.log({ changedTurns });
-
   const turnsWithUpdatedGeometry = changedTurns.map((turn) => {
     return {
       _id: turn._id,

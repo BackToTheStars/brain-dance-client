@@ -5,7 +5,6 @@ const ColorPicker = ({ value, changeHandler, widgetSettings, label }) => {
   // для последнего ColorPicker
   useEffect(() => {
     if (!!widgetSettings.defaultColor && !value) {
-      console.log(widgetSettings.defaultColor);
       changeHandler(widgetSettings.defaultColor);
     }
   }, [widgetSettings.defaultColor]);

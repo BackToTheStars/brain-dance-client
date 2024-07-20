@@ -3,10 +3,39 @@ import * as types from './types';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 
 export const quoteCoordsUpdate =
-  (turnId, type, quotesWithCoords) => (dispatch) => {
+  (turnId, widgetId, quotesWithCoords) => (dispatch, getState) => {
+    const state = getState();
+    const currentQuotesWithCoords = state.lines.quotesInfo[turnId]?.[widgetId];
+
+    if (
+      currentQuotesWithCoords?.length === quotesWithCoords.length &&
+      JSON.stringify(currentQuotesWithCoords) ===
+        JSON.stringify(quotesWithCoords)
+    ) {
+      return;
+    }
+    
+    const d = (currentQuotesWithCoords || []).reduce((d, quote) => {
+      d[quote.quoteId] = quote;
+
+      return d;
+    }, {});
+
     return dispatch({
       type: types.LINES_QUOTE_COORDS_UPDATE,
-      payload: { turnId, quotesWithCoords, type },
+      payload: {
+        turnId,
+        quotesWithCoords: quotesWithCoords.map((newQuote) => {
+          if (
+            JSON.stringify(newQuote) === JSON.stringify(d[newQuote.quoteId])
+          ) {
+            return d[newQuote.quoteId];
+          }
+
+          return newQuote;
+        }),
+        widgetId,
+      },
     });
   };
 

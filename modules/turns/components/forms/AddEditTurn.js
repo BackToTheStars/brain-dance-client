@@ -42,7 +42,7 @@ const getDate = (mixedDate) => {
 const AddEditTurnPopup = () => {
   const gamePosition = useSelector((state) => state.game.position);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const turnData = useSelector((state) => state.turns.d[editTurnId]?.data);
+  const turnData = useSelector((state) => state.turns.d[editTurnId]);
   const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
   // @fixme
   const turnToEdit = useMemo(

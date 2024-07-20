@@ -1,7 +1,6 @@
 import { quoteRectangleThickness } from '@/config/ui';
 import { getActiveQuotesDictionary } from '@/modules/lines/components/helpers/line';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
-import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,17 +35,18 @@ const Quote = memo(({ isActive, quote, can }) => {
   );
 });
 
-const ParagraphQuotes = ({ turnId }) => {
+
+const ParagraphQuotes = memo(({ turnId, widgetId }) => {
   const { can } = useUserContext();
-  const allQuotes = useSelector(
-    // @fixme: update for storybook
-    (state) => (state.lines ? state.lines.quotesInfo[turnId] : []),
+  const rawParagraphQuotes = useSelector(
+    (state) =>
+      state.lines.quotesInfo[turnId]?.[widgetId],
   );
+
   const paragraphQuotes = useMemo(() => {
-    // экономия вычислений на filter allQuotes
-    if (!allQuotes) return [];
-    return allQuotes.filter((quote) => quote.type === TYPE_QUOTE_TEXT);
-  }, [allQuotes]);
+    if (!rawParagraphQuotes) return [];
+    return rawParagraphQuotes;
+  }, [rawParagraphQuotes]);
 
   const dLines = useSelector((store) => (store.lines ? store.lines.d : {})); // @fixme: optimize and update for storybook
   const lines = useMemo(() => Object.values(dLines), [dLines]);
@@ -55,6 +55,7 @@ const ParagraphQuotes = ({ turnId }) => {
   const activeQuotesDictionary = useMemo(() => {
     return getActiveQuotesDictionary(paragraphQuotes, lines);
   }, [paragraphQuotes, lines]);
+
   return (
     <>
       {paragraphQuotes.map((quote, i) => {
@@ -72,6 +73,6 @@ const ParagraphQuotes = ({ turnId }) => {
       })}
     </>
   );
-};
+});
 
 export default ParagraphQuotes;

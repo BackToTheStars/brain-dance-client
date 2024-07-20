@@ -3,8 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import '@/themes/game/index.scss';
-
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Loading from '@/modules/ui/components/common/Loading';

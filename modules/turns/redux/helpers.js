@@ -1,5 +1,4 @@
 import {
-  WIDGET_COMPRESSED,
   WIDGET_HEADER,
   WIDGET_PARAGRAPH,
   WIDGET_PICTURE,
@@ -39,18 +38,11 @@ export class TurnHelper {
       [WIDGET_PARAGRAPH]: [
         {
           id: 'p_1',
-          show: !!turn.paragraph && turn.paragraph.length && !turn.compressed,
+          show: !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
           inserts: turn.paragraph,
           scrollPosition: turn.scrollPosition,
           quotes: turn.quotes.filter((quote) => quote.type === 'text'),
-        },
-      ],
-      [WIDGET_COMPRESSED]: [
-        {
-          id: 'c_1',
-          show: !!turn.compressed,
-          height: turn.compressedHeight,
-          uncompressedHeight: turn.uncompressedHeight, // ?
+          compressed: !!turn.compressed,
         },
       ],
     };
@@ -91,7 +83,6 @@ export class TurnHelper {
       // COMPRESSED PARAGRAPH
       compressed: turn.compressed,
       paragraph: turn.paragraph,
-      compressedHeight: turn.compressedHeight,
 
       colors: {
         background: turn.backgroundColor,
@@ -136,11 +127,7 @@ export class TurnHelper {
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       scrollPosition: turn.dWidgets.p_1.scrollPosition,
-      // compressed: turn.dWidgets.c_1.show,
-      compressed: turn.compressed || false,
-      compressedHeight: turn.dWidgets.c_1.compressedHeight,
-      // uncompressedHeight: turn.dWidgets.c_1.uncompressedHeight,
-      uncompressedHeight: turn.size.height,
+      compressed: turn.p_1?.compressed || false,
     };
   }
 }

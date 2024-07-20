@@ -3,7 +3,7 @@ import { memo, useMemo } from 'react';
 import { TURN_BORDER_THICKNESS } from '@/config/ui';
 import Line from './Line';
 
-const getCoordsByTurnPositionAndMarkerQuote = ( turnPosition, markerQuote ) => {
+const getCoordsByTurnPositionAndMarkerQuote = (turnPosition, markerQuote) => {
   if (!turnPosition) return null;
   if (!markerQuote)
     return {
@@ -24,36 +24,43 @@ const getCoordsByTurnPositionAndMarkerQuote = ( turnPosition, markerQuote ) => {
     width: markerQuote.width,
     height: markerQuote.height,
   };
-}
+};
 
 const LogicLine = ({ id }) => {
   const line = useSelector((state) => state.lines.d[id]);
   const { sourceTurnId, sourceMarker, targetTurnId, targetMarker } = line;
   const sourceTurnPosition = useSelector(
-    (state) => state.turns.g[sourceTurnId]?.position
+    (state) => state.turns.g[sourceTurnId]?.position,
   );
+
   const targetTurnPosition = useSelector(
-    (state) => state.turns.g[targetTurnId]?.position
+    (state) => state.turns.g[targetTurnId]?.position,
   );
   const gamePosition = useSelector((state) => state.game.position);
   const viewport = useSelector((state) => state.game.viewport);
-  const sourceMarkerQuote = useSelector((state) =>
-    state.lines.quotesInfo[sourceTurnId]?.find(
-      (q) => +q.quoteId === sourceMarker
-    )
+
+  const sourceMarkerQuote = useSelector(
+    (state) =>
+      state.lines.quotesInfoByQuoteKey[`${sourceTurnId}_${sourceMarker}`],
   );
-  const targetMarkerQuote = useSelector((state) =>
-    state.lines.quotesInfo[targetTurnId]?.find(
-      (q) => +q.quoteId === targetMarker
-    )
+
+  const targetMarkerQuote = useSelector(
+    (state) =>
+      state.lines.quotesInfoByQuoteKey[`${targetTurnId}_${targetMarker}`],
   );
 
   const sourceCoords = useMemo(() => {
-    return getCoordsByTurnPositionAndMarkerQuote(sourceTurnPosition, sourceMarkerQuote);
+    return getCoordsByTurnPositionAndMarkerQuote(
+      sourceTurnPosition,
+      sourceMarkerQuote,
+    );
   }, [sourceTurnPosition, sourceMarkerQuote]);
 
   const targetCoords = useMemo(() => {
-    return getCoordsByTurnPositionAndMarkerQuote(targetTurnPosition, targetMarkerQuote);
+    return getCoordsByTurnPositionAndMarkerQuote(
+      targetTurnPosition,
+      targetMarkerQuote,
+    );
   }, [targetTurnPosition, targetMarkerQuote]);
 
   // @todo: нужен ли viewport?
@@ -75,16 +82,18 @@ const LogicLine = ({ id }) => {
     return null;
   }
 
-  return <Line
-    prevSWidth={sourceCoords.width}
-    prevSHeight={sourceCoords.height}
-    prevSLeft={prevSleft}
-    prevSTop={prevSTop}
-    prevTWidth={targetCoords.width}
-    prevTHeight={targetCoords.height}
-    prevTLeft={prevTLeft}
-    prevTTop={prevTTop}
-  />
+  return (
+    <Line
+      prevSWidth={sourceCoords.width}
+      prevSHeight={sourceCoords.height}
+      prevSLeft={prevSleft}
+      prevSTop={prevSTop}
+      prevTWidth={targetCoords.width}
+      prevTHeight={targetCoords.height}
+      prevTLeft={prevTLeft}
+      prevTTop={prevTTop}
+    />
+  );
 };
 
 export default memo(LogicLine);

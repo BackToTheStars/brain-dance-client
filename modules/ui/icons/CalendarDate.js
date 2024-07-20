@@ -3,7 +3,7 @@ export default function CalendarDate() {
     <svg
       width="15"
       height="15"
-      style={{ transform: 'translateY(-16%)' }}
+      // style={{ transform: 'translateY(-16%)' }}
       viewBox="0 0 14 14"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

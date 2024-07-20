@@ -9,64 +9,40 @@ import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
-  changeTurnStage,
   markTurnAsChanged,
-  resetCompressedParagraphState,
-  // setParagraphIsReady,
   updateGeometry,
 } from '../redux/actions';
-import { TURN_WAS_CHANGED } from '../redux/types';
-import turnSettings, {
-  TURN_INIT,
-  TURN_LOADING,
-  TURN_LOADING_FIXED,
-  TURN_READY,
-} from '../settings';
+import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
-import { getParagraphStage, getTurnStage } from './helpers/stageHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
-import {
-  COMP_ACTIVE,
-  COMP_LOADING,
-  COMP_READY,
-  COMP_READY_TO_RECEIVE_PARAMS,
-  NOT_EXISTS,
-  ORIG_ACTIVE,
-  ORIG_LOADING,
-  ORIG_READY,
-  ORIG_READY_TO_RECEIVE_PARAMS,
-} from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
 import { snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
-import { Skeleton } from 'antd';
-import ParagraphQuotes from './widgets/paragraph/ParagraphQuotes';
+import { TurnStateProvider } from './TurnState';
+import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
 const TurnAdapter = ({ id }) => {
   const gamePosition = useSelector((state) => state.game.position);
-  const [isDragging, setIsDragging] = useState(false);
   const dispatch = useDispatch();
   const wrapper = useRef(null);
   const position = useSelector((state) => state.turns.g[id].position);
-  const size = useSelector((state) => state.turns.g[id].size);
-  const loadStatus = useSelector(
-    (state) => state.turns.d[id]?.loadStatus || 'not-loaded',
-  );
+  const width = useSelector((state) => state.turns.g[id].size?.width);
+  const height = useSelector((state) => state.turns.g[id].size?.height);
   const contentType = useSelector((state) => state.turns.g[id].contentType);
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       left: `${position.x - (gamePosition.x || 0)}px`, // @fixme: update for storybook
       top: `${position.y - (gamePosition.y || 0)}px`,
-      width: `${size.width}px`,
-      height: `${size.height}px`,
+      width: `${width}px`,
+      height: `${height}px`,
     };
 
     const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType].join(
@@ -76,7 +52,7 @@ const TurnAdapter = ({ id }) => {
       wrapperClasses,
       wrapperStyles,
     };
-  }, [gamePosition, position, size, isDragging]);
+  }, [gamePosition, position, width, height]);
 
   // DRAGGABLE
   useEffect(() => {
@@ -84,7 +60,6 @@ const TurnAdapter = ({ id }) => {
     $(wrapper.current).draggable({
       // grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
-        setIsDragging(true);
         $('#game-box')
           .addClass('remove-line-transition')
           .addClass('translucent-field');
@@ -118,7 +93,6 @@ const TurnAdapter = ({ id }) => {
             },
           }),
         );
-        setIsDragging(false);
         $('#game-box')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
@@ -131,33 +105,22 @@ const TurnAdapter = ({ id }) => {
 
   return (
     <div style={wrapperStyles} className={wrapperClasses} ref={wrapper}>
-      {loadStatus === 'loaded' ? <Turn id={id} /> : <Skeleton active />}
+      <TurnStateProvider id={id} />
     </div>
   );
 };
 
-const Turn = memo(({ id }) => {
-  const turnData = useSelector((state) => state.turns.d[id].data);
-  const size = useSelector((state) => state.turns.g[id].size);
+export const Turn = memo(({ id }) => {
+  const turnData = useSelector((state) => state.turns.d[id]);
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
-  const [widgetD, setWidgetD] = useState({});
-
   const wrapper = useRef(null);
 
-  const { width, height } = size;
   const {
-    //-- geometry
-    // position,
     _id,
-    colors: { background, font },
-    // size: { width, height },
-    //-- header
+    colors: { background },
     contentType,
-    // backgroundColor,
-    // dontShowHeader: dontShowHeaderOriginal,
-    //-- paragraph
     dWidgets: {
       p_1: { inserts: paragraph },
       i_1: { url: imageUrl },
@@ -165,21 +128,9 @@ const Turn = memo(({ id }) => {
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
-    // paragraph, // contentType, dontShowHeader
-    compressed,
-    //-- image
     pictureOnly,
-    // states
-    wasChanged,
   } = useMemo(() => {
     return turnData;
-  }, [turnData]);
-
-  const { paragraphStage, turnStage } = useMemo(() => {
-    return {
-      paragraphStage: getParagraphStage(turnData),
-      turnStage: getTurnStage(turnData),
-    };
   }, [turnData]);
 
   const dontShowHeader = useMemo(
@@ -201,10 +152,12 @@ const Turn = memo(({ id }) => {
     ); // Paragraph
   }, [dontShowHeader, imageUrl, videoUrl, doesParagraphExist]);
 
-  const notRegisteredWidgetsCount = useMemo(
-    () => widgetsCount - widgets.length,
-    [widgetsCount, widgets],
-  );
+  const { resizeDisabled, widgetsUpdatedTime } = useMemo(() => {
+    return {
+      resizeDisabled: widgets.some((widget) => widget.resizeDisabled),
+      widgetsUpdatedTime: widgetsCount === widgets.length ? Date.now() : null,
+    };
+  }, [widgets, widgetsCount]);
 
   const wrapperStyles = useMemo(() => {
     const wrapperStyles = {};
@@ -218,19 +171,12 @@ const Turn = memo(({ id }) => {
   const wrapperClasses = useMemo(() => {
     const wrapperClasses = ['stb-react-turn__inner'];
 
-    if (dontShowHeader) {
-      wrapperClasses.push('dont-show-header');
-    }
     if (pictureOnly) {
       wrapperClasses.push('picture-only');
     }
 
-    if (wasChanged) {
-      wrapperClasses.push('was-changed');
-    }
-
     return wrapperClasses.join(' ');
-  }, [dontShowHeader, pictureOnly, wasChanged]);
+  }, [pictureOnly]);
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -262,157 +208,90 @@ const Turn = memo(({ id }) => {
   );
 
   const recalculateSize = useCallback(
-    (width, height) => {
+    (width, passedHeight) => {
+      const height = passedHeight || 200;
+      const spacersCount = pictureOnly ? 0 : (widgets.length + (!dontShowHeader ? 0 : 1));
       const {
         minHeight,
         maxHeight,
         minWidth,
         maxWidth,
-        widgetD,
-        desiredHeight,
-        minHeightBasic,
-      } = getTurnMinMaxHeight(widgets, width);
-
-      let newHeight = Math.round(
-        Math.min(Math.max(height, minHeight), maxHeight) +
-          widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
+      } = getTurnMinMaxHeight(widgets, width, spacersCount * widgetSpacer);
+      const newHeight = Math.round(
+        Math.min(Math.max(height, minHeight), maxHeight),
+        // + widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
       );
-      if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
-        newHeight = widgets
-          .find((w) => w.variableHeight)
-          .getDesiredTurnHeight({
-            minHeightBasic,
-            newHeight,
-            minHeight,
-            maxHeight,
-          });
-      }
+
       const newWidth = Math.round(
         Math.min(Math.max(width, minWidth), maxWidth),
       ); //+ widgetSpacer;
 
-      const isLocked = // transition from compressed to uncompressed
-        paragraphStage === ORIG_LOADING &&
-        turnData.paragraphStages.at(-3) === COMP_READY;
+      turnGeometryQueue.add(() => {
+        dispatch(
+          updateGeometry({
+            _id,
+            size: {
+              width: newWidth,
+              height: newHeight,
+            },
+          }),
+        );
+      });
 
-      if (!isLocked) {
-        turnGeometryQueue.add(() => {
-          dispatch(
-            updateGeometry({
-              _id,
-              size: {
-                width: newWidth,
-                height: newHeight,
-              },
-              [compressed ? 'compressedHeight' : 'uncompressedHeight']:
-                newHeight,
-            }),
-          );
-        });
-
-        if (typeof $ !== 'undefined') {
-          if (newHeight !== height || newWidth !== width) {
-            $(wrapper.current).css({
-              height: `${newHeight}px`,
-              width: `${newWidth}px`,
-            });
-          }
+      if (typeof $ !== 'undefined') {
+        if (newHeight !== height || newWidth !== width) {
+          $(wrapper.current).css({
+            height: `${newHeight}px`,
+            width: `${newWidth}px`,
+          });
         }
       }
-
-      const newWidgetD = {};
-      const widgetIds = ['header1', 'video1', 'i_1', 'p_1']; // позже перенести
-
-      let minTop = 0;
-      let maxTop = 0;
-
-      for (let widgetId of widgetIds) {
-        if (!widgetD[widgetId]) continue;
-
-        newWidgetD[widgetId] = {
-          ...widgetD[widgetId],
-          minTop,
-          maxTop,
-          width: newWidth,
-        };
-
-        minTop = minTop + widgetD[widgetId].minHeight;
-        maxTop = maxTop + widgetD[widgetId].maxHeight;
-      }
-
-      setWidgetD(newWidgetD);
     },
-    [id, widgets, paragraphStage, turnData.paragraphStages, dontShowHeader],
+    [id, widgets, dontShowHeader, pictureOnly],
   );
-
-  useEffect(() => {
-    if (turnStage === TURN_LOADING_FIXED) {
-      if (paragraphStage === ORIG_READY_TO_RECEIVE_PARAMS) {
-        // @todo: проверить необходимо ли передать высоту
-        dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: ORIG_READY }),
-        );
-      }
-      if (paragraphStage === COMP_READY_TO_RECEIVE_PARAMS) {
-        dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: COMP_READY }),
-        );
-      }
-    }
-  }, [turnStage, paragraphStage]);
 
   // RESIZABLE
   useEffect(() => {
-    if (paragraphStage === COMP_READY) return;
+    if (resizeDisabled) return;
     if (typeof $ === 'undefined') return;
 
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],
+      minWidth: TURN_SIZE_MIN_WIDTH,
+      maxWidth: TURN_SIZE_MAX_WIDTH,
       resize: (event, ui) => {
-        if (notRegisteredWidgetsCount === 0) {
-          recalculateSize(
-            snapRound(ui.size.width, GRID_CELL_X),
-            snapRound(ui.size.height, GRID_CELL_Y),
-          );
-
-          dispatch(markTurnAsChanged({ _id }));
-        }
+        recalculateSize(
+          snapRound(ui.size.width, GRID_CELL_X),
+          snapRound(ui.size.height, GRID_CELL_Y),
+        );
+        dispatch(markTurnAsChanged({ _id }));
+      },
+      stop: (event, ui) => {
+        turnGeometryQueue.clear();
+        recalculateSize(
+          snapRound(ui.size.width, GRID_CELL_X),
+          snapRound(ui.size.height, GRID_CELL_Y),
+        );
+        dispatch(markTurnAsChanged({ _id }));
       },
     });
     return () => {
       $(wrapper.current).resizable('destroy');
     };
-  }, [widgets, turnStage]);
-
-  useEffect(() => {
-    dispatch(resetCompressedParagraphState(_id));
-  }, [width]); // @todo: проверить, необходимо ли перенести это в Compressor
-
-  useEffect(() => {
-    if (!wrapper.current) return;
-    if (typeof $ === 'undefined') return;
-    if (paragraphStage === COMP_READY) {
-      $(wrapper.current).resizable({ disabled: true });
-    } // @todo: else if previous paragraphStage === COMP_READY then enable
-  }, [paragraphStage]);
-
-  useEffect(() => {
-    // if (callsQueueIsBlockedFlag) return;
-
-    if (notRegisteredWidgetsCount === 0) {
-      recalculateSize(Math.round(width), Math.round(height));
-      // setStateIsReady(true);
-      dispatch(changeTurnStage(_id, TURN_LOADING_FIXED));
-    }
   }, [
+    resizeDisabled,
     widgets,
-    // callsQueueIsBlockedFlag
   ]);
 
   useEffect(() => {
-    dispatch(changeTurnStage(_id, TURN_LOADING));
-  }, []);
-
+    if (!wrapper.current) return;
+    if (!widgetsUpdatedTime) return;
+    recalculateSize(
+      snapRound(wrapper.current.clientWidth, GRID_CELL_X),
+      snapRound(wrapper.current.clientHeight, GRID_CELL_Y),
+    );
+  }, [widgetsUpdatedTime]);
+  
   return (
     <>
       <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>
@@ -420,6 +299,7 @@ const Turn = memo(({ id }) => {
           <Header
             widgetId={'h_1'}
             registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
             _id={_id}
           />
         ) : (
@@ -429,6 +309,7 @@ const Turn = memo(({ id }) => {
           <Video
             widgetId={'v_1'}
             registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
             turnId={_id}
           />
         )}
@@ -437,27 +318,25 @@ const Turn = memo(({ id }) => {
             widgetId={'i_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
-            widgetType="picture"
             turnId={_id}
-            widgetSettings={widgetD['i_1']}
             pictureOnly={pictureOnly}
           />
         )}
         {doesParagraphExist && (
           <Paragraph
+            widgetsUpdatedTime={widgetsUpdatedTime}
             turnId={_id}
             widgetId={'p_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
-            widget={widgetD['p_1']}
-            notRegisteredWidgetsCount={notRegisteredWidgetsCount}
+            // widget={widgetD['p_1']}
           />
         )}
       </div>
       <ButtonsMenu _id={_id} />
       {sourceShow && (
         <div className="stb-react-turn__bottom-subtitle">
-          <DateAndSourceUrl widgetId="s_1" date={date} sourceUrl={sourceUrl} />
+          <DateAndSourceUrl widgetId="s_1" date={date} url={sourceUrl} />
         </div>
       )}
     </>

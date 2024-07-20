@@ -11,13 +11,15 @@ import { Buttons } from '../../ButtonsPanel';
 const ParagraphMode = () => {
   //
   const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const activeTurn = useSelector((state) => state.turns.d[editTurnId]);
+  const paragraphWidget = useSelector(
+    (state) => state.turns.d[editTurnId]?.dWidgets?.p_1,
+  );
 
   const { can } = useUserContext();
   const dispatch = useDispatch();
 
   const buttons = [
-    !activeTurn?.compressed
+    !paragraphWidget?.compressed
       ? {
           text: 'Compress',
           callback: () => {

@@ -10,11 +10,6 @@ import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 
-export const TURN_INIT = 'TURN_INIT';
-export const TURN_LOADING = 'TURN_LOADING';
-export const TURN_LOADING_FIXED = 'TURN_LOADING_FIXED';
-export const TURN_READY = 'TURN_READY';
-
 const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
@@ -42,7 +37,7 @@ export const WIDGET_PARAGRAPH = 'paragraph';
 export const WIDGET_HEADER = 'header';
 export const WIDGET_VIDEO = 'video';
 export const WIDGET_SOURCE = 'source';
-export const WIDGET_COMPRESSED = 'compressed';
+
 export const widgetSettings = {
   [WIDGET_HEADER]: {
     label: 'Header',

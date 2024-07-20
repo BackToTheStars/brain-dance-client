@@ -4,7 +4,8 @@ export const getInitialPanels = (panels) => {
   // @todo:
   // обойти panels
   // замиксовать с LocalStorage
-  const fields = loadFromLocalStorage(localStorageKey);
+  // @todo: fixme
+  const fields = {}; // loadFromLocalStorage(localStorageKey);
   return panels.map((panel) => {
     if (!fields[panel.type]) {
       return panel;

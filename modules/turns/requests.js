@@ -11,7 +11,7 @@ export const getTurnsByIdsRequest = (ids) => {
   return request(`turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
     tokenFlag: true,
   });
-}
+};
 
 export const createTurnRequest = (body) => {
   return request(`turns/?hash=${s.hash}`, {
@@ -37,6 +37,7 @@ export const deleteTurnRequest = (id) => {
 };
 
 export const updateCoordinatesRequest = (changedTurns) => {
+  if (!changedTurns.length) return Promise.resolve();
   return request(`turns/coordinates?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'PUT',

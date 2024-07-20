@@ -45,6 +45,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.g[payload._id],
             ...payload,
+            wasChanged: true,
           },
         },
       };
@@ -78,27 +79,8 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
               ...prevTurn.dWidgets,
               [widgetId]: widget,
             },
-            // wasChanged: true,
+            wasChanged: true,
           },
-        },
-      };
-    }
-
-    case types.TURNS_SET_LOADING: { // @fixme
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          ...payload.reduce(
-            (a, id) => ({
-              ...a,
-              [id]: {
-                ...state.d[id],
-                loadStatus: 'loading',
-              },
-            }),
-            {}
-          ),
         },
       };
     }
@@ -109,11 +91,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         d: {
           ...state.d,
           ...payload.turns.reduce(
-            (a, { position, size, loadStatus, ...turn }) => {
+            (a, { position, size, ...turn }) => {
               a[turn._id] = {
                 ...state.d[turn._id],
-                loadStatus: 'loaded',
-                data: turn,
+                ...turn,
               };
               return a;
             },
@@ -122,44 +103,27 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
       };
     }
-    case types.TURN_SET_STAGE:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            turnStage: payload.turnStage,
-            turnStages: getStageHistory(
-              state.d[payload._id].turnStages,
-              payload.turnStage
-            ),
-            paragraphStages: getStageHistory(
-              state.d[payload._id].paragraphStages,
-              payload.paragraphStage
-            ),
-            wasReady:
-              state.d[payload._id].wasReady || payload.turnStage === TURN_READY,
-            ...payload,
-            // @todo: id параграфа
-          },
-        },
-      };
-    case types.TURN_PARAGRAPH_SET_STAGE:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            paragraphStage: payload.stage,
-            paragraphStages: getStageHistory(
-              state.d[payload._id].paragraphStages,
-              payload.stage
-            ),
-          },
-        },
-      };
+    // case types.TURN_SET_STAGE:
+    //   return {
+    //     ...state,
+    //     d: {
+    //       ...state.d,
+    //       [payload._id]: {
+    //         ...state.d[payload._id],
+    //         turnStage: payload.turnStage,
+    //         turnStages: getStageHistory(
+    //           state.d[payload._id].turnStages,
+    //           payload.turnStage
+    //         ),
+    //         paragraphStages: getStageHistory(
+    //           state.d[payload._id].paragraphStages,
+    //           payload.paragraphStage
+    //         ),
+    //         ...payload,
+    //         // @todo: id параграфа
+    //       },
+    //     },
+    //   };
 
     case types.TURN_WAS_CHANGED:
       return {

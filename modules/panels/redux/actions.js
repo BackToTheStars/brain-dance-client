@@ -51,26 +51,27 @@ export const setPanelMode = (payload) => (dispatch, getState) => {
       const state = getState();
       const { turnData, editWidgetParams, editWidgetId } =
         getWidgetDataFromState(state);
-      if (!!editWidgetParams?.activeQuoteId) {
-        const activeQuote =
-          state.lines.dByTurnIdAndMarker[turnData._id][
-            editWidgetParams.activeQuoteId
-          ];
-        params = {
-          editWidgetParams: {
-            [`${turnData._id}_${editWidgetId}`]: {
-              activeQuoteId: editWidgetParams.activeQuoteId,
-              crop: {
-                unit: '%',
-                x: activeQuote.x,
-                y: activeQuote.y,
-                width: activeQuote.width,
-                height: activeQuote.height,
-              },
-            },
-          },
-        };
-      }
+      // debugger
+      // if (!!editWidgetParams?.activeQuoteId) {
+      //   const activeQuote =
+      //     state.lines.dByTurnIdAndMarker[turnData._id][
+      //       editWidgetParams.activeQuoteId
+      //     ];
+      //   params = {
+      //     editWidgetParams: {
+      //       [`${turnData._id}_${editWidgetId}`]: {
+      //         activeQuoteId: editWidgetParams.activeQuoteId,
+      //         crop: {
+      //           unit: '%',
+      //           x: activeQuote.x,
+      //           y: activeQuote.y,
+      //           width: activeQuote.width,
+      //           height: activeQuote.height,
+      //         },
+      //       },
+      //     },
+      //   };
+      // }
     }
   }
 

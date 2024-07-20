@@ -37,6 +37,17 @@ const GameRow = ({ game, index, settings = {} }) => {
       >
         <div className="game-item__title truncate flex-1">{name}</div>
         <div className="flex gap-2">
+          <Button
+            className="hover-show"
+            size="sm"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push(`/game?hash=${hash}`);
+            }}
+          >
+            <DoubleRightOutlined />
+          </Button>
           {settings.isPinned ? (
             <Button
               size="sm"
@@ -75,17 +86,6 @@ const GameRow = ({ game, index, settings = {} }) => {
               <PushpinOutlined />
             </Button>
           )}
-          <Button
-            className="hover-show"
-            size="sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              router.push(`/game?hash=${hash}`);
-            }}
-          >
-            <DoubleRightOutlined />
-          </Button>
         </div>
       </div>
     </div>

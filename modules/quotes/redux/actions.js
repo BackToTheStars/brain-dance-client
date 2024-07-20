@@ -115,11 +115,11 @@ export const deleteQuote = () => (dispatch, getState) => {
   const state = getState();
   const { turnData, turnGeometry, editWidgetParams } =
     getWidgetDataFromState(state);
-  const { lines } = state.lines;
-
+  const turnLines = state.lines.dByTurnIdAndMarker[turnData._id];
+  
   let id = editWidgetParams.activeQuoteId;
-
-  const linesToDelete = filterLinesByQuoteKey(lines, `${turnData._id}_${id}`);
+  const linesToDelete = turnLines && turnLines[id] || []
+  // filterLinesByQuoteKey(lines, `${turnData._id}_${id}`);
 
   if (!!linesToDelete.length) {
     dispatch(linesDelete(linesToDelete.map((l) => l._id)));
@@ -130,7 +130,7 @@ export const deleteQuote = () => (dispatch, getState) => {
       resaveTurn(
         {
           _id: turnData._id,
-          quotes: turn.quotes.filter((quote) => quote.id !== id), // @todo find quote and update
+          quotes: turnData.quotes.filter((quote) => quote.id !== id), // @todo find quote and update
           x: turnGeometry.position.x,
           y: turnGeometry.position.y,
         },

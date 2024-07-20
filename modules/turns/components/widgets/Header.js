@@ -4,47 +4,53 @@ import DateAndSourceUrl from './header/DateAndSourceUrl';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
 import { useSelector } from 'react-redux';
 import { getNeedBlackText } from '../helpers/color';
+import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
+import { WIDGET_HEADER } from '../../settings';
 //const HEADER_HEIGHT = 105;
 
-const Header = ({ widgetId, registerHandleResize, _id }) => {
-  const contentType = useSelector((state) => state.turns.d[_id].data.contentType);
-  const { url, date } = useSelector((state) => state.turns.d[_id].data.dWidgets.s_1);
+const Header = ({
+  widgetId,
+  registerHandleResize,
+  unregisterHandleResize,
+  _id,
+}) => {
+  const contentType = useSelector((state) => state.turns.d[_id].contentType);
+  const { url, date } = useSelector((state) => state.turns.d[_id].dWidgets.s_1);
   const { text, show } = useSelector(
-    (state) => state.turns.d[_id].data.dWidgets[widgetId]
+    (state) => state.turns.d[_id].dWidgets[widgetId],
   );
   const { font, background } = useSelector(
-    (state) => state.turns.d[_id].data.colors
+    (state) => state.turns.d[_id].colors,
   );
 
   const headerEl = useRef(null);
 
   const headerHeight = !!url || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
 
-  const style = useMemo(() => {
-    let style = {
+  const { wrapperStyle, titleStyle } = useMemo(() => {
+    const wrapperStyle = {
       height: `${headerHeight}px`,
     };
+    const titleStyle = {};
     if (contentType === 'comment' && show) {
       const backgroundColor = getCommentHeaderColor(background);
-      style = {
-        ...style,
-        backgroundColor,
-        color: font || getNeedBlackText(backgroundColor) ? '#000' : '#fff',
-      };
+      wrapperStyle.backgroundColor = backgroundColor;
+      titleStyle.color = getNeedBlackText(background) ? '#000' : '#fff';
     }
-    return style;
+    return { wrapperStyle, titleStyle };
   }, [show, background, font, contentType]);
 
   useEffect(() => {
     registerHandleResize({
-      type: 'header',
-      id: 'header1',
-      minWidthCallback: () => 300,
+      type: WIDGET_HEADER,
+      id: widgetId,
+      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
       minHeightCallback: () => {
         return !show ? 0 : headerHeight;
       },
       maxHeightCallback: () => (!show ? 0 : headerHeight),
     });
+    return () => unregisterHandleResize({ id: widgetId });
   }, [show]);
 
   return (
@@ -52,9 +58,11 @@ const Header = ({ widgetId, registerHandleResize, _id }) => {
       <div
         className="stb-widget-header turn-widget"
         ref={headerEl}
-        style={style}
+        style={wrapperStyle}
       >
-        <div className="stb-widget-header__title">{text}</div>
+        <div className="stb-widget-header__title" style={titleStyle}>
+          {text}
+        </div>
         {!!(date || url) && <DateAndSourceUrl date={date} url={url} />}
       </div>
     </>

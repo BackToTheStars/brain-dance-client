@@ -2,8 +2,8 @@ import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
-  const spans = [...paragraphEl.current.querySelectorAll('span')];
-  const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
+  const quoteEls = [...paragraphEl.current.querySelectorAll('span[data-id]:not([data-id=""])')];
+  // const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
   const paragraphLeftPadding = 6; // @todo: get from size settings
 
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
@@ -22,7 +22,7 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
     const initialCoords = {
       left,
-      top: top, // + paragraphEl.current.scrollTop,
+      top: top + paragraphEl.current.scrollTop,
       width,
       height,
     };

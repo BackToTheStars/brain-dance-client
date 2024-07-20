@@ -40,7 +40,7 @@ export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
 export const PANEL_TURNS_PASTE = 'panel_turns_paste';
 
-export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles';
+export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';
 
 let id = 0;
@@ -58,7 +58,6 @@ export const panels = [
           panelSpacer +
           (d[PANEL_MINIMAP].isMinimized ? 40 : 33)
         : 0;
-      console.log(window.innerHeight, panelSpacer);
       return `${window.innerHeight - 2 * panelSpacer - minimapHeight}px`;
     },
     width: () => '500px',

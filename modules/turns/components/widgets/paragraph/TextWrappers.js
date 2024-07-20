@@ -3,9 +3,9 @@ import {
   TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
 } from '@/config/ui';
-import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
+import React, { useEffect, useRef, Fragment, useState, useMemo, useContext } from 'react';
 import { colorSet, getNeedBlackText } from '../../helpers/color';
-
+import { CompressorContext } from './Compressor';
 
 const modifyQuoteBackgrounds = (arrText, turnType) => {
   const colors = colorSet?.[turnType] || colorSet.turn;
@@ -123,29 +123,37 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   );
 };
 
-export const ParagraphCompressorTextWrapper = ({ arrText }) => {
-  const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
+export const ParagraphCompressorTextWrapper = ({ arrText = [] }) => {
+  // const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
+  const [processed, setProcessed] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setProcessed(true)
+    }, 1000)
+  }, [])
   return (
     <>
-      {(modifiedArrText || []).map((textItem, i) => {
-        // @todo: refactoring
-        const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
-        const newInserts = [];
-        for (let j = 0; j < arrInserts.length; j++) {
-          newInserts.push(arrInserts[j]);
-          newInserts.push(<br key={j} />);
-        }
-        newInserts.pop();
-        return (
-          <CompressorSpanTextPiece
-            key={i}
-            {...{
-              textItem,
-              newInserts,
-            }}
-          />
-        );
-      })}
+      {
+        !processed && arrText.map((textItem, i) => {
+          // @todo: refactoring
+          const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
+          const newInserts = [];
+          for (let j = 0; j < arrInserts.length; j++) {
+            newInserts.push(arrInserts[j]);
+            newInserts.push(<br key={j} />);
+          }
+          newInserts.pop();
+          return (
+            <CompressorSpanTextPiece
+              key={i}
+              {...{
+                textItem,
+                newInserts,
+              }}
+            />
+          );
+        })
+      }
     </>
   );
 };
@@ -189,78 +197,21 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
   );
 };
 
-/** @deprecated */
-export const TextAroundQuote = ({
-  // contentType,
-  // backgroundColor,
-  // fontColor,
-  // registerHandleResize,
-  // unregisterHandleResize,
-  // variableHeight,
-
-  paragraph,
-  scrollPosition,
-  height, // через этот viewport смотрим на кусок текста
-  setTextIsReady,
-}) => {
-  //
-  const paragraphEl = useRef(null);
-
-  useEffect(() => {
-    // @todo: check if no quotes
-    paragraphEl.current.scrollTop = scrollPosition;
-    setTimeout(() => {
-      // console.log(`${!paragraph?.current}, []`);
-      if (!paragraphEl?.current) return;
-      paragraphEl.current.scrollTop = scrollPosition;
-      const quotes = [
-        ...paragraphEl.current.querySelectorAll('.compressed-quote'),
-      ];
-      if (!quotes?.length) {
-        console.log('no quotes in TextAroundQuote');
-        return;
-      }
-
-      const { top } = quotes[0].getBoundingClientRect();
-      const { bottom } = quotes[quotes.length - 1].getBoundingClientRect();
-      const middleLine = (top + bottom) / 2;
-      const { top: paragraphTop, bottom: paragraphBottom } =
-        paragraphEl.current.getBoundingClientRect();
-      const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
-      const fixScroll = Math.floor(middleLineParagraph - middleLine);
-      paragraphEl.current.scrollTop -= fixScroll;
-      setTextIsReady();
-    }, 300);
-  }, []);
-
-  return (
-    <div
-      className="paragraphText"
-      ref={paragraphEl}
-      style={{ height: `${height}px` }}
-    >
-      <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
-    </div>
-  );
-};
-
 export const TextAroundQuoteOptimized = ({
   scrollPosition,
   height, // через этот viewport смотрим на кусок текста
-  setTextIsReady,
   arrText,
   turnId,
   turnType,
   index,
-  addToQuoteCollection,
   deltaTop,
   deltaScrollHeightTop,
   widgetTop,
-  widgetWidth,
+  // widgetWidth,
   quotes,
   parentClassNameId,
 }) => {
-  //
+  const { addToQuoteCollection } = useContext(CompressorContext);
   const paragraphEl = useRef(null);
 
   const [scrollTop, setScrollTop] = useState(0);
@@ -283,31 +234,31 @@ export const TextAroundQuoteOptimized = ({
       const { top, left, width, height } = quote;
       quotesInfoPart.push({
         initialCoords: {
-          left: left,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer,
-          width,
-          height,
+          // @todo: get from size settings
+          left: left + 8 - 1,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop - 1, // + widgetSpacer,
+          width: width + 1,
+          height: height + 1,
         },
         quoteId: quote.quoteId,
         quoteKey: quote.quoteKey,
         turnId,
         text: quote.text,
         type: 'text',
-        width,
-        height,
-        left: left,
-        top: top,
+        width: width + 1,
+        height: height + 1,
+        left: left + 8 - 1,
+        top: top - 1,
       });
     }
 
     setQuotesInfoPart(quotesInfoPart);
-    setTextIsReady();
-  }, [paragraphEl]);
+  }, [paragraphEl, widgetTop]);
 
   useEffect(() => {
     if (!quotesInfoPart.length) return;
-    const blockTop = widgetTop + deltaTop + widgetSpacer;
-    const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
+    const blockTop = widgetTop + deltaTop; // + widgetSpacer;
+    const blockBottom = widgetTop + deltaTop + height; // + widgetSpacer;
 
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
@@ -358,7 +309,7 @@ export const TextAroundQuoteOptimized = ({
 
   return (
     <div
-      className={`paragraphText ${classNameId}`}
+      className={`stb-widget-paragraph paragraphText ${classNameId}`}
       ref={paragraphEl}
       style={{ height: `${height}px` }}
     >

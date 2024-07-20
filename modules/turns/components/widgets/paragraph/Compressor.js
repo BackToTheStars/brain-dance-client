@@ -1,56 +1,31 @@
-import { widgetSpacer } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+
 import {
-  changeParagraphStage,
-  resetCompressedParagraphState,
-} from '@/modules/turns/redux/actions';
-// import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
-import { useRef, useState, useEffect, useMemo } from 'react';
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  memo,
+  createContext,
+  useContext,
+} from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
-import { getParagraphStage } from '../../helpers/stageHelper';
-import { paragraphStateSaveToLocalStorage } from '../../helpers/store';
-import {
-  COMP_LOADING,
-  COMP_READY,
-  COMP_READY_TO_RECEIVE_PARAMS,
-} from './settings';
 import {
   ParagraphCompressorTextWrapper,
   TextAroundQuoteOptimized,
 } from './TextWrappers';
 import { calculateTextPiecesFromQuotes } from './oldHelper';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import ParagraphEditButton from './EditButton';
+import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 
-const Compressor = ({
-  turnId,
-  widget,
-  widgetId,
-  setCompressedHeight,
-  setWrapperElCurrent,
-  registerHandleResizeWithParams,
-}) => {
-  const turn = useSelector((state) => state.turns.d[turnId].data);
-  const width = useSelector((state) => state.turns.g[turnId].size.width);
-  const dispatch = useDispatch();
-  const {
-    paragraph: originalParagraph,
-    contentType,
-    compressedParagraphState,
-  } = turn;
-  const stage = getParagraphStage(turn);
-  const [compressedTexts, setCompressedTexts] = useState([]);
-  const [textsReadyCount, setTextsReadyCount] = useState(0);
-  const [compressedTextPieces, setCompressedTextPieces] = useState([]);
+export const CompressorContext = createContext();
+
+export const CompressorProvider = ({ children }) => {
   const [quoteCollection, setQuoteCollection] = useState([]);
-
-  const paragraph = originalParagraph.map((paragraphItem) => ({
-    ...paragraphItem,
-  }));
-  const wrapperRef = useRef(null); // @learn null это мы, undefined, это система
-
-  const setTextIsReady = () => setTextsReadyCount((count) => count + 1);
-
   const addToQuoteCollection = (quotesInfoPart, index) => {
     setQuoteCollection((quoteCollection) => {
       // callback потому что идём через useMemo, чтобы отвязаться от scope
@@ -59,78 +34,37 @@ const Compressor = ({
       return quoteCollectionCopy;
     });
   };
+  return (
+    <CompressorContext.Provider value={{
+      quoteCollection,
+      addToQuoteCollection,
+    }}>
+      {children}
+    </CompressorContext.Provider>
+  );
+};
+
+const Compressor = ({
+  turnId,
+  widgetId,
+  // setWrapperElCurrent,
+  registerHandleResize,
+  unregisterHandleResize,
+  widgetsUpdatedTime,
+}) => {
+  const pRef = useRef(null);
+  const { can } = useUserContext();
+  const turn = useSelector((state) => state.turns.d[turnId]);
+  const width = useSelector((state) => state.turns.g[turnId].size.width);
+  const [widgetTop, setWidgetTop] = useState(0); // @todo: get from turn widget geometry
+  const { paragraph, contentType } = turn;
+  const [compressedTextPieces, setCompressedTextPieces] = useState([]);
+  const wrapperRef = useRef(null); // @learn null это мы, undefined, это система
 
   const classNameId = `turn_${turnId}_compressor_${widgetId}`;
 
-  useEffect(() => {
-    if (!quoteCollection.length) return;
-    const count = quoteCollection.filter((q) => !!q).length;
-    if (count !== compressedTexts.length) return;
-    const quotesInfo = quoteCollection.reduce((acc, element) => {
-      return [...acc, ...element];
-    }, []);
-    dispatch(quoteCoordsUpdate(turnId, 'text', quotesInfo));
-  }, [quoteCollection]);
-
-  // PARAGRAPH STAGE OF STATE MACHINE (same in ParagraphOriginal.js)
-
-  useEffect(() => {
-    dispatch(changeParagraphStage(turnId, COMP_LOADING));
-  }, []);
-
-  useEffect(() => {
-    if (!wrapperRef.current) return;
-    if (stage !== COMP_LOADING) return;
-    if (!!compressedParagraphState) {
-      const { height, textPieces: textPiecesFromDB } = compressedParagraphState;
-      setCompressedTextPieces(textPiecesFromDB);
-      registerHandleResizeWithParams({
-        widgetMinHeight: height,
-        widgetMaxHeight: height,
-        widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
-      });
-      setCompressedTexts(textPiecesFromDB);
-      setCompressedHeight(height);
-      return;
-    }
-    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
-    const textPieces = calculateTextPiecesFromQuotes(
-      quotes,
-      wrapperRef?.current
-    );
-    setCompressedTextPieces(textPieces);
-
-    const widgetMinHeight = textPieces.reduce(
-      (acc, textPiece) => acc + textPiece.height,
-      0
-    );
-    const widgetMaxHeight = textPieces.reduce(
-      (acc, textPiece) => acc + textPiece.scrollHeight,
-      0
-    );
-    registerHandleResizeWithParams({
-      widgetMinHeight,
-      widgetMaxHeight,
-      // widgetDesiredHeight: !!paragraphIsReady ? height : 0,
-      widgetDesiredHeight: 0, //stage === COMP_READY ? height : 0,
-    });
-  }, [wrapperRef, stage]); //, height, stateIsReady, paragraphIsReady]);
-
-  useEffect(() => {
-    if (!!compressedParagraphState) {
-      const { width: widthFromDB } = compressedParagraphState;
-      if (width === widthFromDB) return;
-    }
-    dispatch(resetCompressedParagraphState(turnId));
-  }, [width]);
-
-  useEffect(() => {
-    if (!compressedTextPieces?.length) return;
-    if (!!compressedParagraphState) {
-            const { width: widthFromDB } = compressedParagraphState;
-      if (width === widthFromDB) return;
-    }
-    
+  const { compressedTexts } = useMemo(() => {
+    if (!compressedTextPieces?.length) return { compressedTexts: [] };
     const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
 
     const spans = [...wrapperRef.current.querySelectorAll('span, br')]; // @learn возвращает коллекцию
@@ -228,7 +162,7 @@ const Compressor = ({
     // scrollHeight fixes
     const compressedScrollHeight = textPieces.reduce(
       (sum, textPiece) => sum + textPiece.scrollHeight,
-      0
+      0,
     );
     let acc = 0;
     for (let i = 1; i < textPieces.length; i += 1) {
@@ -252,84 +186,141 @@ const Compressor = ({
     const height = textPieces.reduce(
       // высота виджета параграфа в сжатом состоянии
       (sum, textPiece) => sum + textPiece.height,
-      0
+      0,
     );
-
-    paragraphStateSaveToLocalStorage({
-      textPieces,
-      turnId,
-      height,
-      width,
-      updatedAt: Date.now(),
-    });
-    setCompressedTexts(textPieces);
-
-    setCompressedHeight(height);
+    // setCompressedTexts(textPieces);
+    return {
+      compressedTexts: textPieces,
+    };
   }, [width, compressedTextPieces]); // , wrapperRef
 
-  useEffect(() => {
-    if (!textsReadyCount) return;
-        if (textsReadyCount === compressedTexts.length) {
-      setTimeout(() => {
-        dispatch(changeParagraphStage(turnId, COMP_READY_TO_RECEIVE_PARAMS));
-      }, 50);
-    }
-  }, [textsReadyCount, compressedTexts]);
-
-  useEffect(() => {
-        if (wrapperRef?.current) setWrapperElCurrent(wrapperRef.current);
-  }, [wrapperRef]);
-
-  const textsAroundQuotes = useMemo(() => {
-    if (!widget) return [];
-
+  const { desiredHeight, textsAroundQuotes } = useMemo(() => {
     let deltaTop = 0;
     let deltaScrollHeightTop = 0;
 
-    return compressedTexts.map((text, i) => {
+    const textsAroundQuotes = compressedTexts.map((text, i) => {
       deltaTop += text.height;
       deltaScrollHeightTop += text.scrollHeight;
 
       return (
         <TextAroundQuoteOptimized
           index={i}
-          addToQuoteCollection={addToQuoteCollection}
           key={i}
           arrText={text.paragraph || []}
           turnId={turnId}
           turnType={contentType}
-          setTextIsReady={setTextIsReady}
           scrollPosition={text.scrollTop} // + text.delta}
           height={text.height}
           deltaTop={deltaTop - text.height}
           deltaScrollHeightTop={deltaScrollHeightTop - text.scrollHeight}
-          widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
-          widgetWidth={widget?.width}
+          // widgetTop={widget?.minTop} // @todo: проверить widget?.minTop
+          widgetTop={widgetTop}
+          // widgetWidth={widget?.width}
+          widgetWidth={width - 12}
           quotes={text.quotes}
           parentClassNameId={classNameId}
         />
       );
     });
-  }, [compressedTexts, widget]);
 
-  const paragraphCompressorTextWrapper = useMemo(() => {
-        return <ParagraphCompressorTextWrapper arrText={paragraph} />;
+    const desiredHeight = compressedTexts.reduce(
+      (sum, text) => sum + text.height,
+      0,
+    );
+    return { textsAroundQuotes, desiredHeight };
+  }, [compressedTexts, width, widgetTop]);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+
+    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+    const textPieces = calculateTextPiecesFromQuotes(
+      quotes,
+      wrapperRef.current,
+    );
+    setCompressedTextPieces(textPieces);
   }, []);
 
+  useEffect(() => {
+    if (!desiredHeight) return;
+    if (!compressedTextPieces.length) return;
+    if (!desiredHeight) return;
+    const resizeInfo = {
+      id: widgetId,
+      type: 'paragraph',
+      resizeDisabled: true,
+      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
+      minHeightCallback: () => desiredHeight, // || height,
+      desiredHeightCallback: () => desiredHeight,
+      getDesiredHeight: ({ newHeight }) => desiredHeight, // || height,
+      maxHeightCallback: () => {
+        return desiredHeight; // || paragraphEl?.current?.scrollHeight;
+      },
+    };
+    registerHandleResize(resizeInfo);
+    return () => unregisterHandleResize(widgetId);
+  }, [desiredHeight, compressedTextPieces]);
+
+  // const paragraphCompressorTextWrapper = useMemo(() => {
+  //   return <ParagraphCompressorTextWrapper arrText={paragraph} />;
+  // }, []);
+
+  useEffect(() => {
+    if (!pRef.current) return;
+    setWidgetTop(pRef.current.offsetTop);
+  }, [pRef.current, widgetsUpdatedTime]);
+
   return (
-    <div className="wrapperParagraphText">
-      <div style={{ position: 'relative' }}>
+    <div className="wrapperParagraphText stb-widget-paragraph" ref={pRef}>
+      <div
+        style={{
+          position: 'absolute',
+          width: 'calc(100% - 18px)', // ? 8 + 8 + 6
+          opacity: 0,
+          zIndex: -1,
+          paddingLeft: '6px',
+          paddingRight: '6px',
+          height: '10px',
+          overflowY: 'hidden',
+        }}
+      >
         <div ref={wrapperRef} className="compressor paragraphText">
-          {stage !== COMP_READY &&
-            !compressedParagraphState &&
-            paragraphCompressorTextWrapper}
+          {/* {!textsAroundQuotes.length && paragraphCompressorTextWrapper} */}
+          {/* {paragraphCompressorTextWrapper} */}
+          <ParagraphCompressorTextWrapper arrText={paragraph} />
         </div>
       </div>
       <div className={`compressed-paragraph-widget ${classNameId}`}>
         {textsAroundQuotes}
       </div>
+      <QuoteCollectionController
+        compressedTextsLength={compressedTexts.length}
+        turnId={turnId}
+        widgetId={widgetId}
+      />
+      {can(RULE_TURNS_CRUD) && (
+        <ParagraphEditButton turnId={turnId} widgetId={widgetId} />
+      )}
     </div>
   );
 };
 
-export default Compressor;
+const QuoteCollectionController = memo(
+  ({ turnId, widgetId, compressedTextsLength }) => {
+    const { quoteCollection } = useContext(CompressorContext);
+    const dispatch = useDispatch();
+    useEffect(() => {
+      if (!compressedTextsLength) return;
+      if (!quoteCollection.length) return;
+      const count = quoteCollection.filter((q) => !!q).length;
+      if (count !== compressedTextsLength) return;
+      const quotesInfo = quoteCollection.reduce((acc, element) => {
+        return [...acc, ...element];
+      }, []);
+      dispatch(quoteCoordsUpdate(turnId, widgetId, quotesInfo));
+    }, [quoteCollection]);
+    return null;
+  },
+);
+
+export default memo(Compressor);

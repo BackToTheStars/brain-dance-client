@@ -7,6 +7,8 @@ import { getQueue } from '../../helpers/queueHelper';
 
 const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 
+const round100 = (num) => Math.round(num * 100) / 100;
+
 const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   const dispatch = useDispatch();
   const [crop, setCrop] = useState();
@@ -20,10 +22,10 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
           params: {
             crop: {
               ...crop,
-              width: Math.round(crop.width * 100) / 100,
-              height: Math.round(crop.height * 100) / 100,
-              x: Math.round(crop.x * 100) / 100,
-              y: Math.round(crop.y * 100) / 100,
+              width: round100(crop.width),
+              height: round100(crop.height),
+              x: round100(crop.x),
+              y: round100(crop.y),
             },
             activeQuoteId,
           },

@@ -27,14 +27,7 @@ import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 import { STATIC_API_URL } from '@/config/server';
-import {
-  COMP_ACTIVE,
-  ORIG_ACTIVE,
-} from '../components/widgets/paragraph/settings';
-import {
-  paragraphStateDeleteFromLocalStorage,
-  paragraphStateGetFromLocalStorage,
-} from '../components/helpers/store';
+
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
@@ -47,7 +40,7 @@ import { MODE_GAME } from '@/config/panel';
 
 export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   const state = getState();
-  const isSnapToGrid = true
+  const isSnapToGrid = true;
   const gameFieldMoveVector = isSnapToGrid
     ? {
         left: snapRound(turn.position.x, GRID_CELL_X),
@@ -55,18 +48,6 @@ export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
       }
     : { left: turn.position.x, top: turn.position.y };
   dispatch(moveField(gameFieldMoveVector));
-};
-
-export const resetCompressedParagraphState = (_id) => (dispatch, getState) => {
-  const state = getState();
-  const prevTurn = state.turns.d[_id];
-  if (prevTurn.compressedParagraphState || prevTurn.compressedHeight) {
-    dispatch({
-      type: types.TURN_UPDATE_GEOMETRY,
-      payload: { compressedParagraphState: null, _id, compressedHeight: 0 },
-    });
-  }
-  paragraphStateDeleteFromLocalStorage(_id);
 };
 
 export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
@@ -93,14 +74,10 @@ export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
       });
       resolve();
     });
-  })
+  });
 };
 
 export const loadTurnsData = (turnIds) => (dispatch) => {
-  dispatch({
-    type: types.TURNS_SET_LOADING,
-    payload: turnIds,
-  });
   return getTurnsByIdsRequest(turnIds).then((data) => {
     dispatch({
       type: types.TURNS_LOAD_DATA,
@@ -111,11 +88,13 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
   });
 };
 
-export const updateGeometry = (data) => (dispatch) =>
-  dispatch({
+export const updateGeometry = (data) => (dispatch) => {
+  return dispatch({
     type: types.TURN_UPDATE_GEOMETRY,
     payload: data,
   });
+}
+
 
 export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
   dispatch({
@@ -140,37 +119,46 @@ export const markTurnAsChanged =
 export const compressParagraph = () => (dispatch, getState) => {
   const state = getState();
   const editTurnId = state.panels.editTurnId;
-  const activeTurn = state.turns.d[editTurnId];
+  const activeTurnData = state.turns.d[editTurnId];
+  const currentWidget = activeTurnData.dWidgets['p_1'];
 
-  dispatch(
-    changeTurnStage(editTurnId, TURN_LOADING_FIXED, {
-      compressed: true,
-      uncompressedHeight: activeTurn.height,
-      paragraphStage: COMP_ACTIVE,
-      // paragraphIsReady: false,
-      // height: activeTurn.compressedHeight
-    })
-  );
-
-  dispatch(markTurnAsChanged({ _id: editTurnId }));
+  updateTurnRequest(editTurnId, {
+    compressed: true,
+  }).then(() => {
+    dispatch({
+      type: types.TURN_UPDATE_WIDGET,
+      payload: {
+        turnId: editTurnId,
+        widgetId: 'p_1',
+        widget: {
+          ...currentWidget,
+          compressed: true,
+        },
+      },
+    });
+  });
 };
 
 export const unCompressParagraph = () => (dispatch, getState) => {
   const state = getState();
   const editTurnId = state.panels.editTurnId;
-  const activeTurn = state.turns.d[editTurnId];
-
-  dispatch(
-    changeTurnStage(editTurnId, TURN_LOADING_FIXED, {
-      compressed: false,
-      compressedHeight: activeTurn.size.height,
-      paragraphStage: ORIG_ACTIVE,
-      height: activeTurn.size.height,
-      // height: activeTurn.uncompressedHeight,
-      // paragraphIsReady: false,
-    })
-  );
-  dispatch(markTurnAsChanged({ _id: editTurnId }));
+  const activeTurnData = state.turns.d[editTurnId];
+  const currentWidget = activeTurnData.dWidgets['p_1'];
+  updateTurnRequest(editTurnId, {
+    compressed: false,
+  }).then(() => {
+    dispatch({
+      type: types.TURN_UPDATE_WIDGET,
+      payload: {
+        turnId: editTurnId,
+        widgetId: 'p_1',
+        widget: {
+          ...currentWidget,
+          compressed: false,
+        },
+      },
+    });
+  });
 };
 
 export const updateScrollPosition = (data) => (dispatch) =>
@@ -203,7 +191,7 @@ export const moveField = (data) => (dispatch, getState) => {
     position: {
       x: viewportPrev.position.x + gameFieldMoveVector.left,
       y: viewportPrev.position.y + gameFieldMoveVector.top,
-    }
+    },
   };
   dispatch({
     type: gameTypes.GAME_FIELD_MOVE,
@@ -233,10 +221,7 @@ export const moveField = (data) => (dispatch, getState) => {
   ) {
     dispatch({
       type: gameTypes.GAME_SCREEN_RECT_SET,
-      payload: getBoundingAreaRect([
-        ...Object.values(state.turns.g),
-        viewport,
-      ]),
+      payload: getBoundingAreaRect([...Object.values(state.turns.g), viewport]),
     });
   }
 };
@@ -253,7 +238,7 @@ export const createTurn = (turn, callbacks) => (dispatch) => {
 
 export const deleteTurn = (_id) => (dispatch, getState) => {
   const state = getState();
-  const allLines = Object.values(state.lines.d)
+  const allLines = Object.values(state.lines.d);
   const lines = filterLinesByTurnId(allLines, _id);
   dispatch(linesDelete(lines.map((line) => line._id))).then(() => {
     deleteTurnRequest(_id).then((data) => {
@@ -267,11 +252,8 @@ export const deleteTurn = (_id) => (dispatch, getState) => {
 
 export const resaveTurn = (turn, callbacks) => (dispatch) => {
   updateTurnRequest(turn._id, turn).then((data) => {
-    paragraphStateDeleteFromLocalStorage(turn._id);
     const preparedTurn = {
       ...data.item,
-      compressedHeight: 0,
-      compressedParagraphState: null,
       x: turn.x,
       y: turn.y,
     };
@@ -287,14 +269,14 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
     try {
       const state = getState();
-      const turnData = state.turns.d[_id].data;
+      const turnData = state.turns.d[_id];
       const turnGeometry = state.turns.g[_id];
       // @fixme
       const newFormatTurn = {
         ...turnData,
         position: turnGeometry.position,
         size: turnGeometry.size,
-      }
+      };
       const turn = TurnHelper.toOldFields(newFormatTurn);
       const lines = Object.values(state.lines.d);
       const copiedTurn = dataCopy(turn);
@@ -328,8 +310,8 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
         lines.filter(
           (line) =>
             line.sourceTurnId === copiedTurnId ||
-            line.targetTurnId === copiedTurnId
-        )
+            line.targetTurnId === copiedTurnId,
+        ),
       );
       copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
 
@@ -341,7 +323,7 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
         addNotification({
           title: 'Info:',
           text: 'Turn was copied, ready to paste',
-        })
+        }),
       );
 
       resolve();
@@ -357,7 +339,7 @@ export const insertTurnFromBuffer =
     const state = getState();
     const timeStamps = getTimeStamps();
     const copiedTurnOldFormat = getTurnFromBufferAndRemove(
-      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
+      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1],
     );
     const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
@@ -369,11 +351,9 @@ export const insertTurnFromBuffer =
       copiedTurn.position.y = pasteNextTurnPosition.y;
     } else {
       copiedTurn.position.x =
-        position.x +
-        Math.floor((viewport.width - copiedTurn.size.width) / 2);
+        position.x + Math.floor((viewport.width - copiedTurn.size.width) / 2);
       copiedTurn.position.y =
-        position.y +
-        Math.floor((viewport.height - copiedTurn.size.height) / 2);
+        position.y + Math.floor((viewport.height - copiedTurn.size.height) / 2);
     }
 
     if (!copiedTurn) {
@@ -391,7 +371,6 @@ export const insertTurnFromBuffer =
     dispatch(
       createTurn(TurnHelper.toOldFields(copiedTurn), {
         success: (turn) => {
-          console.log({ turn });
           dispatch({
             type: types.TURN_NEXT_PASTE_POSITION,
             payload: {
@@ -403,7 +382,7 @@ export const insertTurnFromBuffer =
             centerViewportAtPosition({
               x: copiedTurn.position.x + Math.floor(copiedTurn.size.width / 2),
               y: copiedTurn.position.y + Math.floor(copiedTurn.size.height / 2),
-            })
+            }),
           );
           const turnId = copiedTurn.originalId;
           // оставить только те линии, которые связаны с turn по originalId
@@ -456,7 +435,7 @@ export const insertTurnFromBuffer =
           // преобразовать sourceTurnId и targetTurnId и вставить линии
         },
         errorCallback,
-      })
+      }),
     );
   };
 
@@ -490,23 +469,5 @@ export const uploadImage = (image) => () => {
       method: 'POST',
       body: formdata,
     }).then((res) => res.json());
-  });
-};
-
-export const changeTurnStage = (_id, turnStage, params) => (dispatch) => {
-  // @fixme
-  return;
-  dispatch({
-    type: types.TURN_SET_STAGE,
-    payload: { _id, turnStage, ...params },
-  });
-};
-
-export const changeParagraphStage = (_id, stage) => (dispatch) => {
-  // @fixme
-  return;
-  dispatch({
-    type: types.TURN_PARAGRAPH_SET_STAGE,
-    payload: { _id, stage },
   });
 };

@@ -10,7 +10,7 @@ const TurnsLoader = () => {
   useEffect(() => {
     const needToRenderTurns = [];
     for (const id of turnsToRender) {
-      if (d[id]?.loadStatus === 'not-loaded' || !d[id]?.loadStatus) {
+      if (!d[id]) {
         needToRenderTurns.push(id);
       }
     }

@@ -15,13 +15,13 @@ export const HEADER_HEIGHT = 78;
 export const HEADER_HEIGHT_2 = 58;
 export const freeSpaceRequired = 59;
 
-export const PARAGRAPH_SCROLL_TIMEOUT_DELAY = 500; // 40 - 25 изменений в секунду
+export const PARAGRAPH_SCROLL_TIMEOUT_DELAY = 100; // 40 - 25 изменений в секунду
 export const PARAGRAPH_TEXT_PADDING = 15; // дублирует $turn-text-padding-left: 15px; в SCSS
 export const TURN_SCROLLBAR_MARGIN = 8; // дублирует $turn-scrollbar-margin: 8px; в SCSS
 export const TURNS_GEOMETRY_TIMEOUT_DELAY = 40; // 25 изменений в секунду
 export const TURNS_POSITION_TIMEOUT_DELAY = 100; // 10 изменений в секунду
 export const WIDGET_PICTURE_CROP_TIMEOUT_DELAY = 500; // 2 изменения в секунду
-export const TURN_SCROLL_TIMEOUT_DELAY = 500;
+export const TURN_SCROLL_TIMEOUT_DELAY = 200;
 
 export const NOTIFICATION_SHOWTIME = 3000;
 export const NOTIFICATION_TRANSITION = 500;

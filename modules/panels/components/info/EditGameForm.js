@@ -27,14 +27,6 @@ const EditGameForm = () => {
   );
   const [description, setDescription] = useState(game.description);
 
-  console.log({
-    name,
-    gameIsPublic,
-    hash: game.hash,
-    description,
-    image,
-  });
-
   const showConfirmDialog = ({ text, okCallback }) => {
     if (confirm(text)) {
       okCallback();

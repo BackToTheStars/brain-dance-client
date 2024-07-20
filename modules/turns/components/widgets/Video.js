@@ -4,16 +4,19 @@ import YouTube from 'react-youtube';
 import { youtubeFormatter } from '../helpers/youtubeFormatter';
 import { useSelector } from 'react-redux';
 import { PlayCircleFilled } from '@ant-design/icons';
+import { WIDGET_VIDEO } from '../../settings';
 
-let timeoutId;
-
-const Video = ({ registerHandleResize, turnId, widgetId }) => {
+const Video = ({
+  registerHandleResize,
+  unregisterHandleResize,
+  turnId,
+  widgetId,
+}) => {
   const [previewMode, setPreviewMode] = useState(true);
   const videoEl = useRef(null);
-  // const [newWidth, setNewWidth] = useState(width);
   const width = useSelector((state) => state.turns.g[turnId].size.width);
   const videoUrl = useSelector(
-    (state) => state.turns.d[turnId].data.dWidgets[widgetId].url,
+    (state) => state.turns.d[turnId].dWidgets[widgetId].url,
   );
   const newVideoUrl = useMemo(() => {
     if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -24,20 +27,10 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
     }
   }, [videoUrl]);
 
-  // console.log({ width });
-  // useEffect(() => {
-  //   // clearTimeout(timeoutId);
-  //   // timeoutId = setTimeout(() => {
-  //   if (width !== newWidth) {
-  //     setNewWidth(width);
-  //   }
-  //   // }, 100);
-  // }, [width]);
-
   useEffect(() => {
     registerHandleResize({
-      type: 'video',
-      id: 'video1',
+      type: WIDGET_VIDEO,
+      id: widgetId,
       minWidthCallback: () => {
         return 20;
       },
@@ -52,6 +45,7 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
         return newImgHeight;
       },
     });
+    return () => unregisterHandleResize({ id: widgetId });
   }, []);
 
   return (
@@ -62,7 +56,7 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
           Math.floor((9 * (width - 2 * widgetSpacer)) / 16) + widgetSpacer
         }px`,
       }}
-      className="video turn-widget"
+      className="video turn-widget relative"
       ref={videoEl}
     >
       {previewMode ? (
@@ -93,16 +87,14 @@ const Video = ({ registerHandleResize, turnId, widgetId }) => {
       ) : (
         <YouTube
           videoId={newVideoUrl}
-          onReady={
-            () => {}
-            // setTimeout(() => {
-            //   // @todo: убедиться, что iframe не только "готов", но и отрисован
-            //   handleResize();
-            // }, 1000)
-          }
+          // onReady={() => {}}
           opts={{
             width: '100%',
             height: '100%',
+            playerVars: {
+              autoplay: true,
+              rel: '0',
+            },
           }}
         />
       )}
