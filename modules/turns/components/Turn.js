@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
   markTurnAsChanged,
+  recalcAreaRect,
   updateGeometry,
 } from '../redux/actions';
 import turnSettings from '../settings';
@@ -93,6 +94,7 @@ const TurnAdapter = ({ id }) => {
             },
           }),
         );
+        dispatch(recalcAreaRect());
         $('#game-box')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
@@ -121,6 +123,7 @@ export const Turn = memo(({ id }) => {
     _id,
     colors: { background },
     contentType,
+    updatedAt,
     dWidgets: {
       p_1: { inserts: paragraph },
       i_1: { url: imageUrl },
@@ -210,13 +213,14 @@ export const Turn = memo(({ id }) => {
   const recalculateSize = useCallback(
     (width, passedHeight) => {
       const height = passedHeight || 200;
-      const spacersCount = pictureOnly ? 0 : (widgets.length + (!dontShowHeader ? 0 : 1));
-      const {
-        minHeight,
-        maxHeight,
-        minWidth,
-        maxWidth,
-      } = getTurnMinMaxHeight(widgets, width, spacersCount * widgetSpacer);
+      const spacersCount = pictureOnly
+        ? 0
+        : widgets.length + (!dontShowHeader ? 0 : 1);
+      const { minHeight, maxHeight, minWidth, maxWidth } = getTurnMinMaxHeight(
+        widgets,
+        width,
+        spacersCount * widgetSpacer,
+      );
       const newHeight = Math.round(
         Math.min(Math.max(height, minHeight), maxHeight),
         // + widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
@@ -273,25 +277,24 @@ export const Turn = memo(({ id }) => {
           snapRound(ui.size.height, GRID_CELL_Y),
         );
         dispatch(markTurnAsChanged({ _id }));
+        dispatch(recalcAreaRect());
       },
     });
     return () => {
       $(wrapper.current).resizable('destroy');
     };
-  }, [
-    resizeDisabled,
-    widgets,
-  ]);
+  }, [resizeDisabled, widgets]);
 
   useEffect(() => {
     if (!wrapper.current) return;
     if (!widgetsUpdatedTime) return;
+    console.log('height', snapRound(wrapper.current.clientHeight, GRID_CELL_Y));
     recalculateSize(
       snapRound(wrapper.current.clientWidth, GRID_CELL_X),
       snapRound(wrapper.current.clientHeight, GRID_CELL_Y),
     );
-  }, [widgetsUpdatedTime]);
-  
+  }, [widgetsUpdatedTime, updatedAt]);
+
   return (
     <>
       <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>

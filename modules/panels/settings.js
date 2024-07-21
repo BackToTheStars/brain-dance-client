@@ -43,15 +43,12 @@ export const PANEL_TURNS_PASTE = 'panel_turns_paste';
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';
 
-let id = 0;
-
 export const panels = [
   {
     type: PANEL_CLASSES,
     position: POSITION_UPPER_LEFT,
     component: ClassList,
     isDisplayed: false,
-    id: (id += 1),
     height: (d) => {
       const minimapHeight = d[PANEL_MINIMAP].isDisplayed
         ? +d[PANEL_MINIMAP].calculatedHeight +
@@ -67,7 +64,6 @@ export const panels = [
     position: POSITION_UPPER_CENTER,
     component: SettingsPanel,
     isDisplayed: false,
-    id: (id += 1),
     width: () => '800px',
   },
   {
@@ -75,7 +71,6 @@ export const panels = [
     position: POSITION_UPPER_RIGHT,
     component: AddEditTurnPopup,
     isDisplayed: false,
-    id: (id += 1),
     width: () => '900px',
   },
   {
@@ -83,7 +78,6 @@ export const panels = [
     position: [POSITION_BOTTOM_RIGHT, PANEL_BUTTONS_STYLES].join(' '),
     component: ButtonsPanel,
     isDisplayed: true,
-    id: (id += 1),
     width: () => '310px',
   },
   {
@@ -91,7 +85,6 @@ export const panels = [
     position: POSITION_UPPER_CENTER,
     component: InfoPanel,
     isDisplayed: false,
-    id: (id += 1),
     width: () => '630px',
   },
   {
@@ -99,18 +92,16 @@ export const panels = [
     position: [POSITION_BOTTOM_LEFT, PANEL_MINIMAP_STYLES].join(' '),
     component: Minimap,
     isDisplayed: true,
-    id: (id += 1),
     width: 400, // () => '600px',
     isMinimized: false, // сворачивание в маленькую кнопку
     size: 100,
-    fieldsToSave: ['position', 'isDisplayed', 'isMinimized', 'size'],
+    fieldsToSave: ['isDisplayed', 'isMinimized', 'size'],
   },
   {
     type: PANEL_LINES,
     position: POSITION_BOTTOM_CENTER,
     component: LinesPanel,
-    isDisplayed: true,
-    id: (id += 1),
+    isDisplayed: false,
     width: () => `50vw`,
   },
   {
@@ -118,7 +109,6 @@ export const panels = [
     position: POSITION_NOTIFICATIONS,
     component: Notifications,
     isDisplayed: true,
-    id: (id += 1),
     // width: () => `calc(min(25vw, 360px))`,
   },
   {
@@ -126,7 +116,6 @@ export const panels = [
     position: POSITION_FLEXIBLE,
     component: TurnInfo,
     isDisplayed: false,
-    id: (id += 1),
     width: () => `640px`,
   },
   {
@@ -134,7 +123,6 @@ export const panels = [
     position: POSITION_BOTTOM_CENTER,
     component: PasteTurnPanel,
     isDisplayed: false,
-    id: (id += 1),
     width: () => `50vw`,
   },
 ];

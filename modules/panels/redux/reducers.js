@@ -1,9 +1,6 @@
 import { MODE_GAME } from '@/config/panel';
-import { panels as panelState } from '../settings';
-import { getInitialPanels } from './storage';
+import { panels } from '../settings';
 import * as types from './types';
-
-const panels = getInitialPanels(panelState);
 
 const d = {};
 for (let panel of panels) {
@@ -21,6 +18,12 @@ const initialPanelState = {
 export const panelReducer = (state = initialPanelState, { type, payload }) => {
   switch (type) {
     case types.PANEL_TOGGLE: {
+      let newValue = false;
+      if (typeof payload?.open === 'boolean') {
+        newValue = payload.open;
+      } else {
+        newValue = !state.d[payload.type].isDisplayed;
+      }
       return {
         ...state,
         ...payload.params,
@@ -28,7 +31,7 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isDisplayed: !!payload?.open || !state.d[payload.type].isDisplayed,
+            isDisplayed: newValue,
           },
         },
       };
@@ -42,7 +45,8 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isMinimized: !!payload?.minimize || !state.d[payload.type].isMinimized,
+            isMinimized:
+              !!payload?.minimize || !state.d[payload.type].isMinimized,
           },
         },
       };
@@ -85,6 +89,11 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         mode: MODE_GAME,
       };
 
+    case types.PANELS_SET:
+      return {
+        ...state,
+        d: payload.d,
+      };
     default:
       return state;
   }

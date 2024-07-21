@@ -57,14 +57,6 @@ export const getGameRequest = (hash) => {
   });
 };
 
-export const saveGamePositionRequest = (gamePosition) => {
-  return request(`codes/viewport?hash=${s.hash}`, {
-    tokenFlag: true,
-    method: 'PUT',
-    body: gamePosition,
-  });
-};
-
 export const updateGameRequest = (data) => {
   return request(`game?hash=${s.hash}`, {
     tokenFlag: true,

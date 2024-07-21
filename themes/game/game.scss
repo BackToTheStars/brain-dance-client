@@ -17,6 +17,13 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  &.init {
+    opacity: 0;
+  }
+  &.animated_loading {
+    transition: opacity 0.3s 0.5s;
+    opacity: 1;
+  }
 }
 
 .rec-rectangle {

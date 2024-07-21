@@ -93,8 +93,7 @@ export const updateGeometry = (data) => (dispatch) => {
     type: types.TURN_UPDATE_GEOMETRY,
     payload: data,
   });
-}
-
+};
 
 export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
   dispatch({
@@ -224,6 +223,22 @@ export const moveField = (data) => (dispatch, getState) => {
       payload: getBoundingAreaRect([...Object.values(state.turns.g), viewport]),
     });
   }
+};
+
+export const recalcAreaRect = () => (dispatch, getState) => {
+  const state = getState();
+  const viewport = state.game.viewport;
+  const position = state.game.position;
+  dispatch({
+    type: gameTypes.GAME_SCREEN_RECT_SET,
+    payload: getBoundingAreaRect([
+      ...Object.values(state.turns.g),
+      {
+        position,
+        size: viewport,
+      },
+    ]),
+  });
 };
 
 export const createTurn = (turn, callbacks) => (dispatch) => {

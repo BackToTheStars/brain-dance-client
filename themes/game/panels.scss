@@ -2,7 +2,7 @@
   position: fixed;
   z-index: 4;
   background-color: var(--panels-background-color);
-  border: 2px solid var(--panels-border-color);
+  outline: 2px solid var(--panels-border-color);
   border-radius: var(--turn-corner-radius);
   transition: 0.5s;
   color: var(--white-color);
@@ -55,6 +55,7 @@
 
   // Notification panel
   &.position_notifications {
+    outline: none;
     position: fixed;
     width: var(--panel-notifications-width);
     bottom: var(--panel-notifications-bottom);
@@ -325,11 +326,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  &.max-header, &.max-paragraph {
+    max-width: 20vw;
+  }
 }
 
-.max-header {
-  max-width: 20vw;
-}
 
 .quill-wrapper {
   display: flex;

@@ -227,6 +227,7 @@
 
       .paragraphText {
         overflow-y: auto;
+        line-height: var(--turn-widget-paragraph-line-height);
         // padding-top: 10px;
         // padding-bottom: 10px;
         // margin-top: 10px;
@@ -254,6 +255,7 @@
     }
 
     .wrapperParagraphText {
+      line-height: var(--turn-widget-paragraph-line-height);
       // padding: 0 $turn-scrollbar-margin 0 0;
       display: block;
       overflow-y: hidden; //scroll;

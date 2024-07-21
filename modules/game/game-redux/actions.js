@@ -1,8 +1,4 @@
-import {
-  getGameRequest,
-  saveGamePositionRequest,
-  updateGameRequest,
-} from '@/modules/game/requests';
+import { getGameRequest, updateGameRequest } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
@@ -13,10 +9,14 @@ import {
   getLinesNotExpired,
   getTurnsFromBuffer,
 } from '@/modules/turns/components/helpers/dataCopier';
-import { resetAndExit } from '@/modules/panels/redux/actions';
+import { resetAndExit, setPanels } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '@/modules/turns/components/helpers/grid';
-import { TurnHelper } from '@/modules/turns/redux/helpers';
+import { getGameSettings, updateGameSettings } from './storage';
+import {
+  getPersonalizedPanelSettings,
+  savePanelsSettings,
+} from '@/modules/panels/redux/storage';
 
 export const setGameStage = (stage) => (dispatch, getState) => {
   const state = getState();
@@ -39,10 +39,16 @@ export const loadShortGame = (hash) => (dispatch) => {
 export const loadFullGame = (hash) => (dispatch, getState) => {
   // GET GAME DATA
   return new Promise((resolve, reject) => {
+    const {
+      position: { x, y },
+    } = getGameSettings(hash);
+    const d = getState().panels.d;
+    const personalizedPanels = getPersonalizedPanelSettings(hash, d);
+    dispatch(setPanels({ d: personalizedPanels }));
     getGameRequest(hash).then((data) => {
       const position = {
-        x: snapRound(data.item.viewportPointX, GRID_CELL_X),
-        y: snapRound(data.item.viewportPointY, GRID_CELL_X),
+        x: snapRound(x, GRID_CELL_X),
+        y: snapRound(y, GRID_CELL_X),
       };
       dispatch({
         type: types.GAME_LOAD,
@@ -63,6 +69,7 @@ export const loadFullGame = (hash) => (dispatch, getState) => {
 
 export const saveField = () => (dispatch, getState) => {
   const state = getState();
+  const hash = state.game.game.hash;
   const g = state.turns.g;
   const gamePosition = state.game.position;
   const isSnapToGrid = true;
@@ -114,8 +121,8 @@ export const saveField = () => (dispatch, getState) => {
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
     dispatch(resetAndExit());
   });
-
-  saveGamePositionRequest(gamePosition);
+  updateGameSettings(hash, 'position', gamePosition);
+  savePanelsSettings(hash, state.panels.d);
 };
 
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {
@@ -134,6 +141,14 @@ export const loadTurnsAndLinesToPaste = () => (dispatch) => {
     });
   }
 };
+
+export const reloadTurnsToPaste = () => (dispatch) => {
+  const turnsToPaste = getTurnsFromBuffer();
+  dispatch({
+    type: turnsTypes.TURNS_LOAD_TO_PASTE,
+    payload: { turnsToPaste },
+  });
+}
 
 export const centerViewportAtPosition =
   ({ x, y }) =>
@@ -201,5 +216,5 @@ export const updateGame = (data) => (dispatch) => {
 
       resolve(data.item);
     });
-  })
+  });
 };

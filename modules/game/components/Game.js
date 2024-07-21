@@ -11,6 +11,7 @@ import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import {
   moveField,
+  recalcAreaRect,
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
@@ -18,7 +19,11 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
-import { GAME_STAGE_INIT, GAME_STAGE_READY } from '@/config/game';
+import {
+  GAME_STAGE_ANIMATED_LOADING,
+  GAME_STAGE_INIT,
+  GAME_STAGE_READY,
+} from '@/config/game';
 
 const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
@@ -27,6 +32,10 @@ const Game = ({ hash }) => {
   const dispatch = useDispatch();
   const [isEditMode, setIsEditMode] = useState(false);
   const stage = useSelector((state) => state.game.stage);
+  const toShowContent = useMemo(
+    () => [GAME_STAGE_ANIMATED_LOADING, GAME_STAGE_READY].includes(stage),
+    [stage],
+  );
 
   const { info } = useUserContext();
   const { nickname } = info;
@@ -36,9 +45,18 @@ const Game = ({ hash }) => {
   }, [isEditMode]);
 
   useEffect(() => {
+    if (stage === GAME_STAGE_ANIMATED_LOADING) {
+      setTimeout(() => {
+        dispatch(setGameStage(GAME_STAGE_READY));
+      }, 800);
+    }
+  }, [stage]);
+
+  useEffect(() => {
     if (!hash) return;
     dispatch(loadFullGame(hash)).then(() => {
-      dispatch(setGameStage(GAME_STAGE_READY));
+      dispatch(setGameStage(GAME_STAGE_ANIMATED_LOADING));
+      dispatch(recalcAreaRect());
     });
     dispatch(
       addNotification({
@@ -91,6 +109,7 @@ const Game = ({ hash }) => {
         );
 
         dispatch(resetTurnNextPastePosition());
+        dispatch(recalcAreaRect());
 
         $(gameBox.current).css('left', 0);
         $(gameBox.current).css('top', 0);
@@ -103,14 +122,14 @@ const Game = ({ hash }) => {
   }, [gameBox]);
 
   return (
-    <div className="game-field-wrapper">
+    <div className={`game-field-wrapper ${stage}`}>
       <div
         id="game-box"
         className={gameBoxClasses}
         ref={gameBox}
         onDoubleClick={(e) => setIsEditMode(!isEditMode)}
       >
-        {stage === GAME_STAGE_READY && (
+        {toShowContent && (
           <>
             <Turns />
             <QuotesLinesLayer />
@@ -123,7 +142,7 @@ const Game = ({ hash }) => {
           </>
         )}
       </div>
-      {stage === GAME_STAGE_READY && <Panels />}
+      {toShowContent && <Panels />}
     </div>
   );
 };

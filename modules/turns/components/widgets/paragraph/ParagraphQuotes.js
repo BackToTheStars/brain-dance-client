@@ -26,6 +26,19 @@ const Quote = memo(({ isActive, quote, can }) => {
 
   return (
     <div
+      onWheel={(e) => {
+        // добавить проверку для compressed paragraph
+        const quouteInsideParagraphEl = document.querySelector(
+          `.turn_${quote.turnId} span[data-id='${quote.quoteId}']`,
+        );
+        if (quouteInsideParagraphEl) {
+          const pEl = quouteInsideParagraphEl.closest('.paragraphText');
+          pEl.scrollTo({
+            top: pEl.scrollTop + e.deltaY,
+            behavior: 'smooth',
+          })
+        }
+      }}
       className={className}
       style={style}
       onClick={() => {

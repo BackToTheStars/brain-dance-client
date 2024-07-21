@@ -1,47 +1,41 @@
-const localStorageKey = 'panels';
+import { getGameSettings, updateGameSettings } from "@/modules/game/game-redux/storage";
 
-export const getInitialPanels = (panels) => {
-  // @todo:
-  // обойти panels
-  // замиксовать с LocalStorage
-  // @todo: fixme
-  const fields = {}; // loadFromLocalStorage(localStorageKey);
-  return panels.map((panel) => {
-    if (!fields[panel.type]) {
-      return panel;
-    }
-    return { ...panel, ...fields[panel.type] };
-  });
-};
-
-export const setInitialPanels = (d) => {
-  // получить dict
-  // получить его новые поля
-  // сохранить новый d в LocalStorage
+const getPanelSettingsPartForSave = (d) => {
   const fields = {};
-  for (let panel of Object.values(d)) {
-    if (!!panel && !!panel.fieldsToSave) {
+  for (const panel of Object.values(d)) {
+    if (panel?.fieldsToSave?.length > 0) {
       fields[panel.type] = {};
-      for (let field of panel.fieldsToSave) {
+      for (const field of panel.fieldsToSave) {
         fields[panel.type][field] = panel[field];
       }
     }
   }
-  saveIntoLocalStorage(fields, localStorageKey);
-};
+  return fields;
+}
 
-export const saveIntoLocalStorage = (value, field) => {
-  localStorage.setItem(field, JSON.stringify(value));
-};
+export const savePanelsSettings = (hash, dPanels) => {
+  updateGameSettings(hash, "panels", getPanelSettingsPartForSave(dPanels));
+}
 
-export const loadFromLocalStorage = (field) => {
-  // может быть вызвана на стороне Server Side rendering SSR
-  if (typeof window === 'undefined') return {};
-  return localStorage.getItem(field)
-    ? JSON.parse(localStorage.getItem(field))
-    : {};
-};
+export const getPersonalizedPanelSettings = (hash, dPanels) => {
+  const currentSettings = getGameSettings(hash)?.panels;
+  if (!currentSettings) {
+    return dPanels;
+  }
 
-export const removeFromLocalStorage = (field) => {
-  localStorage.removeItem(field);
-};
+  const modifiedPanels = {
+    ...dPanels
+  };
+
+  for (const [key, value] of Object.entries(currentSettings)) {
+    if (!modifiedPanels[key]) {
+      continue;
+    }
+    modifiedPanels[key] = {
+      ...dPanels[key],
+      ...value,
+    };
+  }
+
+  return modifiedPanels;
+}

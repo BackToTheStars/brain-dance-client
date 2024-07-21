@@ -99,3 +99,12 @@ export const toggleMaximizeQuill = (isMaximized) => (dispatch) => {
   );
   dispatch(togglePanel({ type: PANEL_BUTTONS, open: !isMaximized }));
 };
+
+export const setPanels =
+  ({ d }) =>
+  (dispatch) => {
+    dispatch({
+      type: types.PANELS_SET,
+      payload: { d },
+    });
+  };

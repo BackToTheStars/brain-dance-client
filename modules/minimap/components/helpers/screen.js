@@ -1,3 +1,6 @@
+export const roundUp = (x) => Math.ceil(x / 300) * 300;
+export const roundDown = (x) => Math.floor(x / 300) * 300;
+
 export const getBoundingAreaRect = (turnObjects) => {
   let left = turnObjects[0]?.position.x || 0;
   let right = turnObjects[0]?.position.x + turnObjects[0]?.size.width || 0;
@@ -22,6 +25,11 @@ export const getBoundingAreaRect = (turnObjects) => {
       bottom = y + height;
     }
   }
+
+  left = roundDown(left);
+  right = roundUp(right);
+  top = roundDown(top);
+  bottom = roundUp(bottom);
 
   return {
     left,

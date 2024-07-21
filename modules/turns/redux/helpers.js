@@ -79,6 +79,7 @@ export class TurnHelper {
       originalId: turn.originalId,
       date: turn.date,
       sourceUrl: turn.sourceUrl,
+      updatedAt: turn.updatedAt,
 
       // COMPRESSED PARAGRAPH
       compressed: turn.compressed,
@@ -128,6 +129,7 @@ export class TurnHelper {
       paragraph: turn.dWidgets.p_1.inserts,
       scrollPosition: turn.dWidgets.p_1.scrollPosition,
       compressed: turn.p_1?.compressed || false,
+      updatedAt: turn.updatedAt,
     };
   }
 }

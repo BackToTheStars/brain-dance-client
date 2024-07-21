@@ -22,8 +22,12 @@ const getQuoteLabel = (quoteInfo) => {
 };
 
 const LineRow = ({ line, can, handleDelete }) => {
-  const sourceQuoteInfo = useSelector(s => s.lines.quotesInfo[line.sourceTurnId][line.sourceMarker]);
-  const targetQuoteInfo = useSelector(s => s.lines.quotesInfo[line.targetTurnId][line.targetMarker]);
+  const sourceQuoteInfo = useSelector(
+    (s) => s.lines.quotesInfoByQuoteKey[`${line.sourceTurnId}_${line.sourceMarker}`],
+  );
+  const targetQuoteInfo = useSelector(
+    (s) => s.lines.quotesInfoByQuoteKey[`${line.targetTurnId}_${line.targetMarker}`],
+  );
   return (
     <tr>
       <td>{line.author}</td>
@@ -46,7 +50,7 @@ const LineRow = ({ line, can, handleDelete }) => {
 
 const LinesPanel = () => {
   const dByTurnIdAndMarker = useSelector(
-    (state) => state.lines.dByTurnIdAndMarker
+    (state) => state.lines.dByTurnIdAndMarker,
   );
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
   const connectedLines = useMemo(() => {

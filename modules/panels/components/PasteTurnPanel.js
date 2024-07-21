@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { RULE_TURNS_CRUD } from '@/config/user';
@@ -6,6 +5,7 @@ import {
   insertTurnFromBuffer,
   removeTurnFromBuffer,
 } from '@/modules/turns/redux/actions';
+import { reloadTurnsToPaste } from '@/modules/game/game-redux/actions';
 
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
@@ -17,18 +17,14 @@ const paragraphToString = (paragraph, length = 200) => {
 };
 
 const PasteTurnPanel = () => {
-  //
   const dispatch = useDispatch();
-  const setPanelType = () => {};
 
   const { can } = useUserContext();
   const turnsToPaste = useSelector((state) => state.turns.turnsToPaste);
 
-  useEffect(() => {
-    if (!turnsToPaste.length) {
-      setPanelType(null);
-    }
-  });
+  if (!turnsToPaste.length) {
+    return null;
+  }
 
   return (
     <table className="table m-0 table-dark table-striped">
@@ -63,11 +59,12 @@ const PasteTurnPanel = () => {
                         insertTurnFromBuffer(timeStamp, {
                           successCallback: () => {
                             dispatch(removeTurnFromBuffer(timeStamp));
+                            dispatch(reloadTurnsToPaste());
                           },
                           errorCallback: (message) => {
                             console.log(message);
                           },
-                        })
+                        }),
                       );
                     }}
                   >
@@ -79,6 +76,7 @@ const PasteTurnPanel = () => {
                     onClick={() => {
                       if (confirm('Confirm: Delete turn from buffer?')) {
                         dispatch(removeTurnFromBuffer(timeStamp));
+                        dispatch(reloadTurnsToPaste());
                       }
                     }}
                   >

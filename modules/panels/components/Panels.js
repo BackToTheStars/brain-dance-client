@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import UIPanel from './UIPanel';
 import SettingsButton from './SettingsButton';
 import { useMemo, memo } from 'react';
-// import { setInitialPanels } from '../redux/storage';
 
 const shortListIds = [
   // 'panel_buttons',
@@ -49,10 +48,6 @@ const Panels = ({ shortList = false }) => {
         return panel.type;
       });
   }, [panels, shortList]);
-
-  // useEffect(() => {
-  //   setInitialPanels(panels);
-  // }, [panels]);
 
   if (!hash) return null;
 

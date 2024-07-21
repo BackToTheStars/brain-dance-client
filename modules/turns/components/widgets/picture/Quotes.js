@@ -17,8 +17,6 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-const round100 = (num) => Math.round(num * 100) / 100;
-
 const PictureQuotes = ({
   turnId,
   widgetId,
@@ -79,8 +77,8 @@ const PictureQuotes = ({
               (pictureOnly ? 0 : widgetSpacer) +
               2 +
               widgetTop,
-            width: round100(quote.width),
-            height: round100(quote.height),
+            width: Math.round((width * quote.width) / 100),
+            height: Math.round((height * quote.height) / 100),
           };
         }),
       ),

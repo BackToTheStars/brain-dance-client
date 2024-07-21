@@ -2,7 +2,9 @@ import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 
 export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
-  const quoteEls = [...paragraphEl.current.querySelectorAll('span[data-id]:not([data-id=""])')];
+  const quoteEls = [
+    ...paragraphEl.current.querySelectorAll('span[data-id]:not([data-id=""])'),
+  ];
   // const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
   const paragraphLeftPadding = 6; // @todo: get from size settings
 
@@ -13,7 +15,8 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
 
   for (let quoteEl of quoteEls) {
     const rect = quoteEl.getBoundingClientRect();
-    let left = Math.round(rect.left - paragraphRect.left) + paragraphLeftPadding; // КРАСНАЯ РАМКА
+    let left =
+      Math.round(rect.left - paragraphRect.left) + paragraphLeftPadding; // КРАСНАЯ РАМКА
     let top = Math.round((rect.top - paragraphRect.top) * 100) / 100 + 2;
     let width = Math.round(rect.width);
     let height = Math.round(rect.height * 100) / 100;
@@ -32,16 +35,18 @@ export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
       quoteId,
       quoteKey: `${turnId}_${quoteId}`,
       turnId,
-      text: quoteEl.textContent.trim(), 
+      text: quoteEl.textContent.trim(),
     });
   }
   return quotes;
 };
 
+const QUOTE_MIN_HEIGHT_DELTA = 40;
+
 export const getScrolledQuotes = (
   quotes,
   paragraphEl,
-  passedScrollPosition
+  passedScrollPosition,
 ) => {
   const paragraphRect = paragraphEl.current.getBoundingClientRect();
   const turnRect =
@@ -56,22 +61,40 @@ export const getScrolledQuotes = (
     let scrollPosition = passedScrollPosition || 0;
 
     if (top + outlineWidth < scrollPosition) {
-      // height / 2
-      height = 0;
-      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer; // 2 ширины рамки
-      left = outlineWidth + widgetSpacer; //left + outlineWidth;
-      top = topGap - widgetSpacer - 2; //top + outlineWidth;
-      position = 'top';
+      if (top + height - outlineWidth > paragraphRect.height + scrollPosition) {
+        top = topGap;
+        height = paragraphRect.height;
+      } else if (
+        top + outlineWidth >
+        scrollPosition - height + QUOTE_MIN_HEIGHT_DELTA
+      ) {
+        height = height + (top + outlineWidth - scrollPosition) - 2;
+        top = topGap;
+      } else {
+        height = 0;
+        width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer; // 2 ширины рамки
+        left = outlineWidth + widgetSpacer; //left + outlineWidth;
+        top = topGap - widgetSpacer - 2; //top + outlineWidth;
+        position = 'top';
+      }
     } else if (
       top + height - outlineWidth >
       paragraphRect.height + scrollPosition
     ) {
-      // height / 2
-      height = 0;
-      width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer;
-      left = outlineWidth + widgetSpacer;
-      top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
-      position = 'bottom';
+      if (
+        top + height - outlineWidth <
+        paragraphRect.height + scrollPosition + height - QUOTE_MIN_HEIGHT_DELTA
+      ) {
+        top = top + topGap - scrollPosition - outlineWidth;
+        const bottom = topGap + paragraphRect.height + outlineWidth - 2;
+        height = bottom - top;
+      } else {
+        height = 0;
+        width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer;
+        left = outlineWidth + widgetSpacer;
+        top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
+        position = 'bottom';
+      }
     } else {
       top = top + topGap - scrollPosition - outlineWidth; // положение красной рамки вокруг цитаты по вертикали
     }
