@@ -27,6 +27,7 @@
 }
 
 .rec-rectangle {
+  user-select: none;
   position: fixed;
   background: rgba(255, 0, 0, .8);
   transform: translateX(-50%);

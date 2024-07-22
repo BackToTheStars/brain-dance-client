@@ -2,9 +2,9 @@ import { getGameRequest, updateGameRequest } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
-import { updateCoordinatesRequest } from '@/modules/turns/requests';
+import { updateCoordinatesRequest, updateScrollPositionsRequest } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { loadTurnsGeometry, moveField } from '@/modules/turns/redux/actions';
+import { clearScrollPositions, loadTurnsGeometry, moveField } from '@/modules/turns/redux/actions';
 import {
   getLinesNotExpired,
   getTurnsFromBuffer,
@@ -73,6 +73,7 @@ export const saveField = () => (dispatch, getState) => {
   const g = state.turns.g;
   const gamePosition = state.game.position;
   const isSnapToGrid = true;
+  const scrollPositions = Object.values(state.turns.scrollPositions);
 
   const changedTurns = Object.values(g)
     .filter((turn) => {
@@ -123,6 +124,12 @@ export const saveField = () => (dispatch, getState) => {
   });
   updateGameSettings(hash, 'position', gamePosition);
   savePanelsSettings(hash, state.panels.d);
+  if (scrollPositions.length) {
+    updateScrollPositionsRequest(scrollPositions)
+      .then(() => {
+        dispatch(clearScrollPositions());
+      })
+  }
 };
 
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {

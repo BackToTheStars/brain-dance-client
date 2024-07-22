@@ -288,7 +288,6 @@ export const Turn = memo(({ id }) => {
   useEffect(() => {
     if (!wrapper.current) return;
     if (!widgetsUpdatedTime) return;
-    console.log('height', snapRound(wrapper.current.clientHeight, GRID_CELL_Y));
     recalculateSize(
       snapRound(wrapper.current.clientWidth, GRID_CELL_X),
       snapRound(wrapper.current.clientHeight, GRID_CELL_Y),

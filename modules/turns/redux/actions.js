@@ -16,7 +16,7 @@ import {
   getTurnFromBufferAndRemove,
   saveTurnInBuffer,
 } from '../components/helpers/dataCopier';
-import turnSettings, { TURN_LOADING_FIXED } from '../settings';
+import turnSettings from '../settings';
 import { addNotification } from '@/modules/ui/redux/actions';
 import {
   centerViewportAtPosition,
@@ -119,10 +119,12 @@ export const compressParagraph = () => (dispatch, getState) => {
   const state = getState();
   const editTurnId = state.panels.editTurnId;
   const activeTurnData = state.turns.d[editTurnId];
+  const activeTurnGeometry = state.turns.g[editTurnId];
   const currentWidget = activeTurnData.dWidgets['p_1'];
 
   updateTurnRequest(editTurnId, {
     compressed: true,
+    uncompressedHeight: activeTurnGeometry.size.height,
   }).then(() => {
     dispatch({
       type: types.TURN_UPDATE_WIDGET,
@@ -145,7 +147,8 @@ export const unCompressParagraph = () => (dispatch, getState) => {
   const currentWidget = activeTurnData.dWidgets['p_1'];
   updateTurnRequest(editTurnId, {
     compressed: false,
-  }).then(() => {
+    height: activeTurnData.uncompressedHeight,
+  }).then((data) => {
     dispatch({
       type: types.TURN_UPDATE_WIDGET,
       payload: {
@@ -157,6 +160,25 @@ export const unCompressParagraph = () => (dispatch, getState) => {
         },
       },
     });
+    // setTimeout(() => {
+    dispatch({
+      type: types.TURN_UPDATE_GEOMETRY,
+      payload: {
+        _id: data.item._id,
+        size: {
+          width: data.item.width,
+          height: data.item.height,
+        },
+      },
+    });
+    // @todo: use paragraph stage
+    const turnEl = document.querySelector(
+      `.turn_${data.item._id} .stb-react-turn__inner`,
+    );
+    if (turnEl) {
+      turnEl.style.height = `${data.item.height}px`;
+    }
+    // }, 300);
   });
 };
 
@@ -164,6 +186,11 @@ export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,
     payload: data,
+  });
+
+export const clearScrollPositions = () => (dispatch) =>
+  dispatch({
+    type: types.TURNS_SCROLL_CLEAR,
   });
 
 export const moveField = (data) => (dispatch, getState) => {

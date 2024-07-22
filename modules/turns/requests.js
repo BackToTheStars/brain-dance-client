@@ -47,6 +47,16 @@ export const updateCoordinatesRequest = (changedTurns) => {
   });
 };
 
+export const updateScrollPositionsRequest = (scrollPositions) => {
+  return request(`turns/scroll-positions?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'PUT',
+    body: {
+      turns: scrollPositions,
+    },
+  });
+};
+
 export const getTokenRequest = (action) => {
   return request(`games/tokens?hash=${s.hash}`, {
     tokenFlag: true,

@@ -40,7 +40,7 @@ export class TurnHelper {
           id: 'p_1',
           show: !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
           inserts: turn.paragraph,
-          scrollPosition: turn.scrollPosition,
+          scrollPosition: turn.scrollPosition || 0,
           quotes: turn.quotes.filter((quote) => quote.type === 'text'),
           compressed: !!turn.compressed,
         },
@@ -80,10 +80,11 @@ export class TurnHelper {
       date: turn.date,
       sourceUrl: turn.sourceUrl,
       updatedAt: turn.updatedAt,
-
+      
       // COMPRESSED PARAGRAPH
       compressed: turn.compressed,
       paragraph: turn.paragraph,
+      uncompressedHeight: turn.uncompressedHeight || turn.height,
 
       colors: {
         background: turn.backgroundColor,
@@ -127,9 +128,10 @@ export class TurnHelper {
       sourceUrl: turn.sourceUrl,
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
-      scrollPosition: turn.dWidgets.p_1.scrollPosition,
+      scrollPosition: turn.dWidgets.p_1.scrollPosition || 0,
       compressed: turn.p_1?.compressed || false,
       updatedAt: turn.updatedAt,
+      uncompressedHeight: turn.uncompressedHeight || turn.height,
     };
   }
 }

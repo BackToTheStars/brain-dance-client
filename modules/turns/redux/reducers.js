@@ -9,6 +9,7 @@ const initialTurnsState = {
   error: null,
   turnsToPaste: [],
   pasteNextTurnPosition: null,
+  scrollPositions: {},
 };
 
 export const getStageHistory = (currentStages, newStage) => {
@@ -35,7 +36,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         g,
         turnsToRender,
-      }
+      };
     }
     case types.TURN_UPDATE_GEOMETRY:
       return {
@@ -62,10 +63,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
                 ...turn,
               },
             }),
-            {}
+            {},
           ),
         },
-      }
+      };
     case types.TURN_UPDATE_WIDGET: {
       const { turnId, widgetId, widget } = payload;
       const prevTurn = state.d[turnId];
@@ -90,16 +91,13 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         d: {
           ...state.d,
-          ...payload.turns.reduce(
-            (a, { position, size, ...turn }) => {
-              a[turn._id] = {
-                ...state.d[turn._id],
-                ...turn,
-              };
-              return a;
-            },
-            {}
-          ),
+          ...payload.turns.reduce((a, { position, size, ...turn }) => {
+            a[turn._id] = {
+              ...state.d[turn._id],
+              ...turn,
+            };
+            return a;
+          }, {}),
         },
       };
     }
@@ -139,13 +137,32 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
     case types.TURNS_SCROLL: {
       return {
         ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            scrollPosition: payload.scrollPosition,
-          },
+        scrollPositions: {
+          ...state.scrollPositions,
+          [`${payload.turnId}_${payload.widgetId}`]: payload,
         },
+      };
+      // return {
+      //   ...state,
+      //   d: {
+      //     ...state.d,
+      //     [payload.turnId]: {
+      //       ...state.d[payload.turnId],
+      //       dWidgets: {
+      //         ...state.d[payload.turnId].dWidgets,
+      //         [payload.widgetId]: {
+      //           ...state.d[payload.turnId].dWidgets[payload.widgetId],
+      //           scrollPosition: payload.scrollPosition,
+      //         },
+      //       }
+      //     },
+      //   },
+      // };
+    }
+    case types.TURNS_SCROLL_CLEAR: {
+      return {
+        ...state,
+        scrollPositions: {},
       };
     }
     case types.TURNS_FIELD_WAS_MOVED: {
@@ -198,7 +215,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         g: {
           ...state.g,
           [payload._id]: payload,
-        }
+        },
       };
     }
 
@@ -214,7 +231,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         d: preparedD,
         g: preparedG,
         turnsToRender: state.turnsToRender.filter(
-          (turnId) => turnId !== payload
+          (turnId) => turnId !== payload,
         ),
       };
     }

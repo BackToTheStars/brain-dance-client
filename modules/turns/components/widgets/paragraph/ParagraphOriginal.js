@@ -44,13 +44,12 @@ const ParagraphOriginal = ({
   const { width, height } = size;
 
   const paragraph = widget.inserts;
-  const scrollPosition = widget.scrollPosition;
   const fontColor = colors.font;
 
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
 
-  const [scrollTop, setScrollTop] = useState(scrollPosition); // дополнительный локальный стейт для быстрого ререндера цитат
+  const [scrollTop, setScrollTop] = useState(0); // дополнительный локальный стейт для быстрого ререндера цитат
 
   const style = {};
 
@@ -148,7 +147,8 @@ const ParagraphOriginal = ({
         paragraphScrollQueue.add(() => {
           dispatch(
             updateScrollPosition({
-              _id: turnId,
+              turnId,
+              widgetId,
               scrollPosition: Math.floor(paragraphEl.current.scrollTop),
             }),
           );
@@ -182,6 +182,13 @@ const ParagraphOriginal = ({
     registerHandleResize(resizeInfo);
     return () => unregisterHandleResize(widgetId);
   }, [paragraphEl]);
+
+  useEffect(() => {
+    if (!paragraphEl.current) return;
+    if (scrollTop !== widget.scrollPosition) {
+      paragraphEl.current.scrollTop = widget.scrollPosition;
+    }
+  }, [widget.scrollPosition]);
 
   return (
     <div
