@@ -54,16 +54,11 @@ const GameDialogPage = ({ hash }) => {
   }, [hash, info, token, myGames, myGamesLoaded]);
 
   useEffect(() => {
-    if (myGamesLoaded) return;
-    if (myGames.length) {
-      setMyGamesLoaded(true);
-      return;
-    }
     dispatch(loadSettings());
     setTimeout(() => {
       setMyGamesLoaded(true);
-    }, 300);
-  }, [myGames]);
+    }, 300)
+  }, [])
 
   if (!myGamesLoaded || info?.skipDialog) {
     return <Loading />;
