@@ -58,7 +58,7 @@ export const updateScrollPositionsRequest = (scrollPositions) => {
 };
 
 export const getTokenRequest = (action) => {
-  return request(`games/tokens?hash=${s.hash}`, {
+  return request(`codes/static-token?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'POST',
     body: {
