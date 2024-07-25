@@ -1,4 +1,7 @@
-export const LOAD_GAME = 'load_game';
-export const GAME_FIELD_MOVE = 'game_field_move';
-export const GAME_EDIT_MODE_SWITCH = 'game_edit_mode_switch';
-export const GAME_CREATE_CANCEL_CALLBACK = 'game_create_cancel_callback';
+export const GAME_LOAD = 'GAME_LOAD';
+export const GAME_FIELD_MOVE = 'GAME_FIELD_MOVE';
+export const GAME_CREATE_CANCEL_CALLBACK = 'GAME_CREATE_CANCEL_CALLBACK';
+export const GAME_SCREEN_RECT_SET = 'GAME_SCREEN_RECT_SET';
+
+export const GAME_STAGE_SET = 'GAME_STAGE_SET';
+export const GAME_VIEWPORT_SET = 'GAME_VIEWPORT_SET';

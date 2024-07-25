@@ -3,14 +3,13 @@ import turnSettings, { TURN_READY } from '../settings';
 import * as types from './types';
 
 const initialTurnsState = {
-  turns: [],
   turnsToRender: [],
   d: {},
+  g: {},
   error: null,
-  zeroPointId: null,
-  updateGeometryTime: 0,
   turnsToPaste: [],
   pasteNextTurnPosition: null,
+  scrollPositions: {},
 };
 
 export const getStageHistory = (currentStages, newStage) => {
@@ -22,95 +21,107 @@ export const getStageHistory = (currentStages, newStage) => {
 
 export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
-    case types.TURNS_UPDATE_GEOMETRY_TIME:
-      return {
-        ...state,
-        updateGeometryTime: new Date().getTime(),
-      };
-    case types.LOAD_TURNS: {
-      const d = payload.turns.reduce((a, turn) => {
+    case types.TURNS_LOAD_GEOMETRY: {
+      const g = payload.turns.reduce((a, turn) => {
         a[turn._id] = turn;
         return a;
       }, {});
       const turnsToRender = [];
-      for (let id in d) {
-        if (isTurnInsideRenderArea(d[id], payload.viewport)) {
+      for (let id in g) {
+        if (isTurnInsideRenderArea(g[id], payload.viewport)) {
           turnsToRender.push(id);
         }
       }
       return {
         ...state,
-        turns: payload.turns,
-        zeroPointId: payload.turns.find(
-          (turn) => turn.contentType === turnSettings.TEMPLATE_ZERO_POINT
-        )._id,
-        d,
-        updateGeometryTime: new Date().getTime(),
+        g,
         turnsToRender,
       };
     }
+    case types.TURN_UPDATE_GEOMETRY:
+      return {
+        ...state,
+        g: {
+          ...state.g,
+          [payload._id]: {
+            ...state.g[payload._id],
+            ...payload,
+            wasChanged: true,
+          },
+        },
+      };
     case types.TURNS_UPDATE_GEOMETRY:
+      return {
+        ...state,
+        g: {
+          ...state.g,
+          ...payload.turns.reduce(
+            (a, turn) => ({
+              ...a,
+              [turn._id]: {
+                ...state.g[turn._id],
+                ...turn,
+              },
+            }),
+            {},
+          ),
+        },
+      };
+    case types.TURN_UPDATE_WIDGET: {
+      const { turnId, widgetId, widget } = payload;
+      const prevTurn = state.d[turnId];
       return {
         ...state,
         d: {
           ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            ...payload,
-            // wasChanged: true,
+          [turnId]: {
+            ...prevTurn,
+            dWidgets: {
+              ...prevTurn.dWidgets,
+              [widgetId]: widget,
+            },
+            wasChanged: true,
           },
         },
-        updateGeometryTime: new Date().getTime(),
       };
-    // case types.TURN_PARAGRAPH_SET_IS_READY:
+    }
+
+    case types.TURNS_LOAD_DATA: {
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          ...payload.turns.reduce((a, { position, size, ...turn }) => {
+            a[turn._id] = {
+              ...state.d[turn._id],
+              ...turn,
+            };
+            return a;
+          }, {}),
+        },
+      };
+    }
+    // case types.TURN_SET_STAGE:
     //   return {
     //     ...state,
     //     d: {
     //       ...state.d,
     //       [payload._id]: {
     //         ...state.d[payload._id],
-    //         paragraphIsReady: payload.value,
+    //         turnStage: payload.turnStage,
+    //         turnStages: getStageHistory(
+    //           state.d[payload._id].turnStages,
+    //           payload.turnStage
+    //         ),
+    //         paragraphStages: getStageHistory(
+    //           state.d[payload._id].paragraphStages,
+    //           payload.paragraphStage
+    //         ),
+    //         ...payload,
+    //         // @todo: id параграфа
     //       },
     //     },
     //   };
-    case types.TURN_SET_STAGE:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            turnStage: payload.turnStage,
-            turnStages: getStageHistory(
-              state.d[payload._id].turnStages,
-              payload.turnStage
-            ),
-            paragraphStages: getStageHistory(
-              state.d[payload._id].paragraphStages,
-              payload.paragraphStage
-            ),
-            wasReady:
-              state.d[payload._id].wasReady || payload.turnStage === TURN_READY,
-            ...payload,
-            // @todo: id параграфа
-          },
-        },
-      };
-    case types.TURN_PARAGRAPH_SET_STAGE:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            paragraphStage: payload.stage,
-            paragraphStages: getStageHistory(
-              state.d[payload._id].paragraphStages,
-              payload.stage
-            ),
-          },
-        },
-      };
 
     case types.TURN_WAS_CHANGED:
       return {
@@ -126,32 +137,46 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
     case types.TURNS_SCROLL: {
       return {
         ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            scrollPosition: payload.scrollPosition,
-          },
+        scrollPositions: {
+          ...state.scrollPositions,
+          [`${payload.turnId}_${payload.widgetId}`]: payload,
         },
+      };
+      // return {
+      //   ...state,
+      //   d: {
+      //     ...state.d,
+      //     [payload.turnId]: {
+      //       ...state.d[payload.turnId],
+      //       dWidgets: {
+      //         ...state.d[payload.turnId].dWidgets,
+      //         [payload.widgetId]: {
+      //           ...state.d[payload.turnId].dWidgets[payload.widgetId],
+      //           scrollPosition: payload.scrollPosition,
+      //         },
+      //       }
+      //     },
+      //   },
+      // };
+    }
+    case types.TURNS_SCROLL_CLEAR: {
+      return {
+        ...state,
+        scrollPositions: {},
       };
     }
     case types.TURNS_FIELD_WAS_MOVED: {
-      const { left, top, viewport } = payload;
-      const newState = { ...state };
+      const g = state.g;
       const turnsToRender = [];
-      for (let id in state.d) {
-        newState.d[id] = {
-          ...newState.d[id],
-          x: newState.d[id].x - left,
-          y: newState.d[id].y - top,
-        };
-        if (isTurnInsideRenderArea(newState.d[id], viewport)) {
+      for (let id in g) {
+        if (isTurnInsideRenderArea(g[id], payload)) {
           turnsToRender.push(id);
         }
       }
-      newState.turnsToRender = turnsToRender;
-      newState.updateGeometryTime = new Date().getTime();
-      return newState;
+      return {
+        ...state,
+        turnsToRender,
+      };
     }
 
     case types.TURNS_SYNC_DONE: {
@@ -168,12 +193,14 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
     case types.TURN_CREATE: {
       return {
         ...state,
-        turns: [...state.turns, payload],
-        d: {
-          ...state.d,
-          [payload._id]: payload,
+        // d: {
+        //   ...state.d,
+        //   [payload._id]: payload, // @todo: data fields
+        // },
+        g: {
+          ...state.g,
+          [payload._id]: payload, // @todo: geometry fields
         },
-        updateGeometryTime: new Date().getTime(),
         turnsToRender: [...state.turnsToRender, payload._id],
       };
     }
@@ -185,6 +212,10 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           ...state.d,
           [payload._id]: payload,
         },
+        g: {
+          ...state.g,
+          [payload._id]: payload,
+        },
       };
     }
 
@@ -192,15 +223,16 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       // в payload прилетит _id
       const preparedD = { ...state.d };
       delete preparedD[payload];
+      const preparedG = { ...state.g };
+      delete preparedG[payload];
 
       return {
         ...state,
-        turns: state.turns.filter((turn) => turn._id !== payload),
         d: preparedD,
+        g: preparedG,
         turnsToRender: state.turnsToRender.filter(
-          (turnId) => turnId !== payload
+          (turnId) => turnId !== payload,
         ),
-        // updateGeometryTime: new Date().getTime(),
       };
     }
 

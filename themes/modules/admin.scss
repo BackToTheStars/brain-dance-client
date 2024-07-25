@@ -1,0 +1,38 @@
+// селектор модуля, перезаписывает стандартные стили
+.admin-module {
+  .settings-block {
+    @apply flex flex-col gap-4 border border-gray-50 p-3;
+
+    &__label {
+      @apply font-bold;
+    }
+  }
+
+  .settings-row {
+    @apply flex flex-wrap gap-2;
+
+    &__cell {
+      @apply flex flex-col gap-2;
+
+      &_sm-width {
+        @apply w-12;
+      }
+    }
+  }
+}
+
+.admin-layout {
+  height: 100vh;
+  min-height: 100vh;
+  background-color: #fff;
+  color: #000;
+}
+
+// util classes
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.all-full {
+  @apply w-full h-full;
+}

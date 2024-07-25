@@ -1,70 +1,94 @@
-import { GRID_CELL_X, TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
+import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
   loadTurnsAndLinesToPaste,
-  switchEditMode,
+  setGameStage,
+  updateViewportGeometry,
 } from '@/modules/game/game-redux/actions';
-import LinesCalculator from '@/modules/lines/components/LinesCalculator';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import Panels from '@/modules/panels/components/Panels';
-import { resetAndExit } from '@/modules/panels/redux/actions';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import {
   moveField,
+  recalcAreaRect,
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
-import {
-  addNotification,
-  viewportGeometryUpdate,
-} from '@/modules/ui/redux/actions';
-import { VIEWPORT_UPDATE } from '@/modules/ui/redux/types';
+import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
+import {
+  GAME_STAGE_ANIMATED_LOADING,
+  GAME_STAGE_INIT,
+  GAME_STAGE_READY,
+} from '@/config/game';
 
-const viewportGeometryUpdateQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
+const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
 const Game = ({ hash }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
-  const svgLayerZIndex = useSelector((state) => !state.game.editMode);
-  const setSvgLayerZIndex = (booleanValue) => {
-    dispatch(switchEditMode(booleanValue));
-  };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const stage = useSelector((state) => state.game.stage);
+  const toShowContent = useMemo(
+    () => [GAME_STAGE_ANIMATED_LOADING, GAME_STAGE_READY].includes(stage),
+    [stage],
+  );
 
   const { info } = useUserContext();
   const { nickname } = info;
 
+  const gameBoxClasses = useMemo(() => {
+    return isEditMode ? 'edit-mode' : '';
+  }, [isEditMode]);
+
   useEffect(() => {
-    dispatch(loadFullGame(hash));
+    if (stage === GAME_STAGE_ANIMATED_LOADING) {
+      setTimeout(() => {
+        dispatch(setGameStage(GAME_STAGE_READY));
+      }, 800);
+    }
+  }, [stage]);
+
+  useEffect(() => {
+    if (!hash) return;
+    dispatch(loadFullGame(hash)).then(() => {
+      dispatch(setGameStage(GAME_STAGE_ANIMATED_LOADING));
+      dispatch(recalcAreaRect());
+    });
     dispatch(
-      addNotification({ title: 'Info:', text: `User ${nickname} logged in.` })
+      addNotification({
+        title: 'Info:',
+        text: `User ${nickname} logged in.`,
+      }),
     );
-    // loadClasses();
-  }, []); // token
+    return () => dispatch(setGameStage(GAME_STAGE_INIT));
+  }, [hash]);
 
   useEffect(() => {
     if (!window) return;
     const update = () => {
       dispatch(
-        viewportGeometryUpdate({
-          viewport: { width: window.innerWidth, height: window.innerHeight },
-        })
+        updateViewportGeometry({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        }),
       );
     };
-    window.addEventListener('resize', () => {
-      viewportGeometryUpdateQueue.add(update);
-    });
+    const invokeUpdateWithQueue = () => {
+      updateViewportGeometryQueue.add(update);
+    };
+    window.addEventListener('resize', invokeUpdateWithQueue);
     update();
     dispatch(loadTurnsAndLinesToPaste());
-    dispatch(resetAndExit());
+
+    return window.removeEventListener('resize', invokeUpdateWithQueue);
   }, []);
 
   useEffect(() => {
     if (!window) return;
-    // if (!dispatch) return;
     if (!gameBox.current) return;
     registerMoveScene(dispatch, gameBox.current);
   }, [gameBox.current]);
@@ -72,18 +96,20 @@ const Game = ({ hash }) => {
   useEffect(() => {
     if (!gameBox.current) return;
 
+    if (typeof $ === 'undefined') return;
+
     $(gameBox.current).draggable({
-      // grid: [GRID_CELL_X, GRID_CELL_X],
       stop: (event, ui) => {
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(
           moveField({
-            left: -ui.position.left,
-            top: -ui.position.top,
-          })
+            left: -Math.round(ui.position.left),
+            top: -Math.round(ui.position.top),
+          }),
         );
 
         dispatch(resetTurnNextPastePosition());
+        dispatch(recalcAreaRect());
 
         $(gameBox.current).css('left', 0);
         $(gameBox.current).css('top', 0);
@@ -96,22 +122,27 @@ const Game = ({ hash }) => {
   }, [gameBox]);
 
   return (
-    <div className="react-wrapper">
-      <div className="gameFieldWrapper">
-        <div
-          id="gameBox"
-          className={`ui-widget-content ${
-            svgLayerZIndex ? 'hide-controls' : ''
-          }`}
-          ref={gameBox}
-          onDoubleClick={(e) => setSvgLayerZIndex(svgLayerZIndex)}
-        >
-          <Turns />
-          <LinesCalculator />
-          <QuotesLinesLayer svgLayerZIndex={svgLayerZIndex} />
-        </div>
-        <Panels />
+    <div className={`game-field-wrapper ${stage}`}>
+      <div
+        id="game-box"
+        className={gameBoxClasses}
+        ref={gameBox}
+        onDoubleClick={(e) => setIsEditMode(!isEditMode)}
+      >
+        {toShowContent && (
+          <>
+            <Turns />
+            <QuotesLinesLayer />
+            {isEditMode && (
+              <div className="rec-rectangle">
+                <div className="rec-label" />
+                <h4 className="rec-text">EDIT</h4>
+              </div>
+            )}
+          </>
+        )}
       </div>
+      {toShowContent && <Panels />}
     </div>
   );
 };

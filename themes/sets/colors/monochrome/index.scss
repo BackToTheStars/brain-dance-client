@@ -1,0 +1,78 @@
+// :root {
+.monochrome-schema {
+  --skin-color: #fff;
+  --skin-color-1: #e6e6e6;
+  --skin-color-2: #cccccc;
+  --skin-color-3: #b3b3b3;
+  --skin-color-4: #999999;
+  --skin-color-5: #808080;
+  --skin-color-6: #666666;
+  --skin-color-7: #4d4d4d;
+  --skin-color-8: #333333;
+  --skin-color-9: #1a1a1a;
+  --skin-color-10: #000;
+}
+
+// .light {
+.monochrome-schema.light {
+  --text-base: var(--skin-color-8); // цвет текста по умолчанию
+  --text-base-2: var(--skin-color-7); // цвет текста дополнительный, заголовки по умолчанию
+
+  --bg-base: var(--skin-color-1); // цвет фона body по умолчанию
+  --bg-panel: var(--skin-color-4); // цвет фона панелей
+  --bg-card: var(--bg-panel); // цвет фона карточек
+
+  --border-base: var(--skin-color-6); // цвет границы элементов по умолчанию
+  --border-body-divider: var(--skin-color-3); // цвет границы разделителя body
+  --border-panel-divider: var(--skin-color-6); // цвет границы разделителя панели
+
+  --bg-button-hover: var(--skin-color-7); // цвет фона кнопки при наведении
+  --text-button-hover: var(--skin-color); // цвет текста кнопки при наведении
+  --border-button-hover: var(--skin-color-9); // цвет границы кнопки при наведении
+
+  --backdrop-color: rgba(255, 255, 255, 0.7);
+
+  --input-text: var(--skin-color-8);
+  --input-bg-color: var(--skin-color-1); // background color for input fields
+  --input-border-color: var(--skin-color-1); // border color for input fields
+}
+
+// .dark {
+.monochrome-schema.dark {
+  --text-base: var(--skin-color-2); // Светлый текст для темной темы
+  --text-base-2: var(--skin-color-3); // Светлые заголовки для темной темы
+
+  --bg-base: var(--skin-color-9); // Темный фон body
+  --bg-panel: var(--skin-color-6); // Темный фон панелей
+  --bg-card: var(--bg-panel); // Темный фон карточек, используется та же переменная что и для фона панелей
+
+  --border-base: var(--skin-color-4); // Светлая граница элементов
+  --border-body-divider: var(--skin-color-7); // Светлая граница разделителя body
+  --border-panel-divider: var(--skin-color-4); // Светлая граница разделителя панели
+
+  --bg-button-hover: var(--skin-color-5); // Темный фон кнопки при наведении
+  --text-button-hover: var(--skin-color-10); // Светлый текст кнопки при наведении
+  --border-button-hover: var(--skin-color-3); // Светлая граница кнопки при наведении
+
+  --backdrop-color: rgba(0, 0, 0, 0.7);
+
+  --input-text: var(--skin-color-2);
+  --input-bg-color: var(--skin-color-9); // background color for input fields in dark mode
+  --input-border-color: var(--skin-color-9); // border color for input fields in dark mode
+}
+
+// Блоки и компоненты
+// :root {
+.monochrome-schema {
+  --text-card-title: var(--text-base-2);
+
+  --bg-button: var(--bg-panel);
+  --text-button: var(--text-base);
+  --border-button: var(--border-base);
+}
+
+// body {
+body.monochrome-schema {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+}

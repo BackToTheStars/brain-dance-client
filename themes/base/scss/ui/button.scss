@@ -1,0 +1,56 @@
+.base-button {
+  display: inline-flex;
+  align-items: center;
+
+  // colors
+  background-color: var(--bg-button);
+  color: var(--text-button);
+
+  &:hover, &.active {
+    background-color: var(--bg-button-hover);
+    color: var(--text-button-hover);
+    border-color: var(--border-button-hover);
+  }
+}
+
+@mixin padding-x-y($leftRightMultiplier, $topBottomMultiplier, $unit) {
+  padding-left: calc(var($leftRightMultiplier) * var($unit));
+  padding-right: calc(var($leftRightMultiplier) * var($unit));
+  padding-top: calc(var($topBottomMultiplier) * var($unit));
+  padding-bottom: calc(var($topBottomMultiplier) * var($unit));
+}
+
+.base-button, .base-element { // @todo: move to base-element styles
+  --button-padding-unit: var(--size-unit);
+  --border-radius-button: calc(
+    var(--border-radius-multiplier) * var(--border-radius-unit)
+  );
+
+  $sizes: xs, sm, md, lg, xl;
+
+  @each $size in $sizes {
+    &--#{$size} {
+      --border-radius-button: calc(
+        var(--border-radius-multiplier-#{$size}) * var(--border-radius-unit)
+      );
+      --padding-x-button: calc(
+        var(--padding-x-multiplier-#{$size}) * var(--padding-unit)
+      );
+      --padding-y-button: calc(
+        var(--padding-y-multiplier-#{$size}) * var(--padding-unit)
+      );
+      font-size: var(--fs-#{$size});
+    }
+  }
+}
+
+.base-button {
+  font-size: var(--fs-base);
+  border: var(--border-button-width) solid var(--border-button); // move to color rules
+  border-radius: var(--border-radius-button);
+  padding-left: var(--padding-x-button);
+  padding-right: var(--padding-x-button);
+  padding-top: var(--padding-y-button);
+  padding-bottom: var(--padding-y-button);
+  gap: calc(2 * var(--size-unit));
+}

@@ -1,8 +1,8 @@
-export const LOAD_GAMES = 'load_games';
-export const SET_ACTIVE_GAME_BY_HASH = 'set_active_game_by_hash';
-export const EDIT_GAME = 'edit_game';
-export const DELETE_GAME = 'delete_game';
-export const DISPLAY_ERROR = 'display_error';
-export const REMOVE_ERROR = 'remove_error';
-export const SET_CODES_INFO = 'set_codes_info';
-export const GAMES_SET_LAST_TURNS  = 'games_set_last_turns';
+export const LOAD_GAMES = 'LOAD_GAMES';
+export const SET_ACTIVE_GAME_BY_HASH = 'SET_ACTIVE_GAME_BY_HASH';
+export const EDIT_GAME = 'EDIT_GAME';
+export const DELETE_GAME = 'DELETE_GAME';
+export const DISPLAY_ERROR = 'DISPLAY_ERROR';
+export const REMOVE_ERROR = 'REMOVE_ERROR';
+export const SET_CODES_INFO = 'SET_CODES_INFO';
+export const GAMES_SET_LAST_TURNS = 'GAMES_SET_LAST_TURNS';

@@ -10,6 +10,7 @@ const TurnInfo = () => {
     if (!ref) {
       return;
     }
+    if (typeof $ === 'undefined') return;
     const el = $(ref.current.parentNode);
     el.draggable();
     return () => el.draggable('destroy');

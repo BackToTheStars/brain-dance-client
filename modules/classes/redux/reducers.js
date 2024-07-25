@@ -26,6 +26,7 @@ const getNewClassesState = (state, classes) => {
     classes,
     classesTree: newClassesTree,
     d: newClassesDictionary,
+    maxId: _getMaxId(classes),
   };
 };
 

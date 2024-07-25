@@ -5,210 +5,181 @@ import {
   TURNS_POSITION_TIMEOUT_DELAY,
   widgetSpacer,
 } from '@/config/ui';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import {
-  changeTurnStage,
   markTurnAsChanged,
-  resetCompressedParagraphState,
-  // setParagraphIsReady,
+  recalcAreaRect,
   updateGeometry,
 } from '../redux/actions';
-import { TURN_WAS_CHANGED } from '../redux/types';
-import turnSettings, {
-  TURN_INIT,
-  TURN_LOADING,
-  TURN_LOADING_FIXED,
-  TURN_READY,
-} from '../settings';
+import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
-import { getParagraphStage, getTurnStage } from './helpers/stageHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
-import {
-  COMP_ACTIVE,
-  COMP_LOADING,
-  COMP_READY,
-  COMP_READY_TO_RECEIVE_PARAMS,
-  NOT_EXISTS,
-  ORIG_ACTIVE,
-  ORIG_LOADING,
-  ORIG_READY,
-  ORIG_READY_TO_RECEIVE_PARAMS,
-} from './widgets/paragraph/settings';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/Video';
-import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
-import { isSnapToGridSelector, snapRound } from './helpers/grid';
+import { snapRound } from './helpers/grid';
+import ButtonsMenu from './widgets/header/ButtonsMenu';
+import { TurnStateProvider } from './TurnState';
+import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
 
-const getParagraphHeightOld = ({
-  widgetId,
-  widgetD,
-  compressed,
-  paragraphIsReady,
-  compressedHeight,
-}) => {
-  const widget = widgetD[widgetId];
-  if (!widget) return 0;
-  const { minHeight, maxHeight } = widget;
-  if (!compressed) return 0;
+const TurnAdapter = ({ id }) => {
+  const gamePosition = useSelector((state) => state.game.position);
+  const dispatch = useDispatch();
+  const wrapper = useRef(null);
+  const position = useSelector((state) => state.turns.g[id].position);
+  const width = useSelector((state) => state.turns.g[id].size?.width);
+  const height = useSelector((state) => state.turns.g[id].size?.height);
+  const contentType = useSelector((state) => state.turns.g[id].contentType);
+  const { wrapperClasses, wrapperStyles } = useMemo(() => {
+    const wrapperStyles = {
+      left: `${position.x - (gamePosition.x || 0)}px`, // @fixme: update for storybook
+      top: `${position.y - (gamePosition.y || 0)}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+    };
 
-  // ветка для Compressed Paragraph
-  if (paragraphIsReady) {
-    // параграф уже готов
-    // ещё выясняем первоначальную высоту параграфа
-    if (!!compressedHeight) {
-      // есть сохранённая высота
-      let paragraphHeight = compressedHeight;
-      for (const key in widgetD) {
-        if (key === widgetId) continue;
-        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
-      }
-      // compressedHeight:3000
-      // minHeight:2000
-      // maxHeight:8000
-      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
-        return paragraphHeight;
-      }
+    const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType].join(
+      ' '
+    );
+    return {
+      wrapperClasses,
+      wrapperStyles,
+    };
+  }, [gamePosition, position, width, height]);
 
-      // compressedHeight:1000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight <= minHeight)
-        return paragraphHeight - (minHeight - compressedHeight);
+  // DRAGGABLE
+  useEffect(() => {
+    if (typeof $ === 'undefined') return;
+    $(wrapper.current).draggable({
+      // grid: [GRID_CELL_X, GRID_CELL_X],
+      start: (event, ui) => {
+        $('#game-box')
+          .addClass('remove-line-transition')
+          .addClass('translucent-field');
+      },
+      drag: (event, ui) => {
+        turnPositionQueue.add(() => {
+          dispatch(
+            updateGeometry({
+              _id: id,
+              position: {
+                x: Math.round(ui.position.left + gamePosition.x),
+                y: Math.round(ui.position.top + gamePosition.y),
+              },
+              wasChanged: true,
+            })
+          );
+        });
+      },
+      stop: (event, ui) => {
+        turnPositionQueue.clear();
+        dispatch(
+          updateGeometry({
+            _id: id,
+            position: {
+              x:
+                Math.round((ui.position.left + gamePosition.x) / GRID_CELL_X) *
+                GRID_CELL_X,
+              y:
+                Math.round((ui.position.top + gamePosition.y) / GRID_CELL_X) *
+                GRID_CELL_X,
+            },
+          })
+        );
+        dispatch(recalcAreaRect());
+        $('#game-box')
+          .removeClass('remove-line-transition')
+          .removeClass('translucent-field');
+        dispatch(markTurnAsChanged({ _id: id }));
+      },
+    });
 
-      // compressedHeight:9000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight >= maxHeight)
-        return paragraphHeight - (maxHeight - compressedHeight);
-    } else {
-      // до этого момента параграф не сжимался
-      return widget.minHeight;
-    }
-  } else {
-    // ещё выясняем первоначальную высоту параграфа
-    if (!!compressedHeight) {
-      // есть сохранённая высота
-      let paragraphHeight = compressedHeight;
-      for (const key in widgetD) {
-        if (key === widgetId) continue;
-        paragraphHeight = paragraphHeight - widgetD[key].minHeight;
-      }
-      // compressedHeight:3000
-      // minHeight:2000
-      // maxHeight:8000
-      if (minHeight <= compressedHeight && compressedHeight <= maxHeight) {
-        return paragraphHeight;
-      }
+    return () => $(wrapper.current).draggable('destroy');
+  }, [gamePosition]);
 
-      // compressedHeight:1000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight <= minHeight)
-        return paragraphHeight - (minHeight - compressedHeight);
-
-      // compressedHeight:9000
-      // minHeight:2000
-      // maxHeight:8000
-      if (compressedHeight >= maxHeight)
-        return paragraphHeight - (maxHeight - compressedHeight);
-    } else {
-      // до этого момента параграф не сжимался
-      return widget.minHeight;
-    }
-  }
+  return (
+    <div style={wrapperStyles} className={wrapperClasses} ref={wrapper}>
+      <TurnStateProvider id={id} />
+    </div>
+  );
 };
 
-const Turn = ({ id }) => {
-  const turn = useSelector((state) => state.turns.d[id]);
-  const isSnapToGrid = useSelector(isSnapToGridSelector);
+export const Turn = memo(({ id }) => {
+  const turnData = useSelector((state) => state.turns.d[id]);
   const dispatch = useDispatch();
 
   const [widgets, setWidgets] = useState([]);
-  const [widgetD, setWidgetD] = useState({});
-
   const wrapper = useRef(null);
 
   const {
-    //-- geometry
     _id,
-    x,
-    y,
-    width,
-    height,
-    //-- header
-    header,
+    colors: { background },
     contentType,
-    backgroundColor,
-    fontColor,
-    dontShowHeader: dontShowHeaderOriginal,
-    sourceUrl,
-    date,
-    //-- paragraph
-    paragraph, // contentType, dontShowHeader
-    compressed,
-    //-- video
-    videoUrl,
-    //-- image
-    imageUrl,
+    updatedAt,
+    dWidgets: {
+      p_1: { inserts: paragraph },
+      i_1: { url: imageUrl },
+      v_1: { url: videoUrl },
+      h_1: { show: headerShow },
+      s_1: { url: sourceUrl, date, show: sourceShow },
+    },
     pictureOnly,
-  } = turn;
+  } = useMemo(() => {
+    return turnData;
+  }, [turnData]);
 
-  const paragraphStage = getParagraphStage(turn);
-  const turnStage = getTurnStage(turn);
+  const dontShowHeader = useMemo(
+    () => pictureOnly || !headerShow,
+    [pictureOnly, headerShow]
+  );
 
-  // const callsQueueIsBlockedFlag = useSelector(
-  //   (state) => state.ui.callsQueueIsBlocked
-  // );
+  const doesParagraphExist = useMemo(
+    () => !pictureOnly && checkIfParagraphExists(paragraph),
+    [paragraph, pictureOnly]
+  );
 
-  // const dispatchParagraphIsReady = (value) => {
-  //   dispatch(setParagraphIsReady(_id, value));
-  // };
+  const widgetsCount = useMemo(() => {
+    return (
+      !dontShowHeader + // header
+      !!imageUrl + // Picture
+      !!videoUrl + // Video
+      doesParagraphExist
+    ); // Paragraph
+  }, [dontShowHeader, imageUrl, videoUrl, doesParagraphExist]);
 
-  const dontShowHeader = pictureOnly || dontShowHeaderOriginal;
+  const { resizeDisabled, widgetsUpdatedTime } = useMemo(() => {
+    return {
+      resizeDisabled: widgets.some((widget) => widget.resizeDisabled),
+      widgetsUpdatedTime: widgetsCount === widgets.length ? Date.now() : null,
+    };
+  }, [widgets, widgetsCount]);
 
-  const doesParagraphExist = !pictureOnly && checkIfParagraphExists(paragraph);
+  const wrapperStyles = useMemo(() => {
+    const wrapperStyles = {};
 
-  const wrapperStyles = {
-    left: `${x}px`,
-    top: `${y}px`,
-    width: `${width}px`,
-    height: `${height}px`,
-  };
+    if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
+      wrapperStyles.backgroundColor = background;
+    }
+    return wrapperStyles;
+  }, [background, contentType]);
 
-  if (!!backgroundColor && contentType === turnSettings.TEMPLATE_COMMENT) {
-    wrapperStyles.backgroundColor = backgroundColor;
-  }
+  const wrapperClasses = useMemo(() => {
+    const wrapperClasses = ['stb-react-turn__inner'];
 
-  const classNameId = `turn_${_id}`;
+    if (pictureOnly) {
+      wrapperClasses.push('picture-only');
+    }
 
-  const { isDeveloperModeActive, setDevItem } = useDevPanel();
-
-  const widgetsCount =
-    1 + // header
-    !!imageUrl + // Picture
-    !!videoUrl + // Video
-    doesParagraphExist; // Paragraph
-  const notRegisteredWidgetsCount = widgetsCount - widgets.length;
-
-  if (isDeveloperModeActive) {
-    setDevItem({
-      itemType: 'turn',
-      id: _id,
-      params: { x, y, w: width, h: height, selector: `.${classNameId}` },
-      parentType: 'window',
-      parentId: '0',
-    });
-    // setDevItem = (itemType, id, params, parentType, parentId) => {
-  }
+    return wrapperClasses.join(' ');
+  }, [pictureOnly]);
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -239,336 +210,139 @@ const Turn = ({ id }) => {
     [widgets]
   );
 
-  const recalculateSize = (width, height) => {
-    const {
-      minHeight,
-      maxHeight,
-      minWidth,
-      maxWidth,
-      widgetD,
-      desiredHeight,
-      minHeightBasic,
-    } = getTurnMinMaxHeight(widgets, width);
+  const recalculateSize = useCallback(
+    (width, passedHeight) => {
+      const height = passedHeight || 200;
+      const spacersCount = pictureOnly
+        ? 0
+        : widgets.length + (!dontShowHeader ? 0 : 1);
+      const { minHeight, maxHeight, minWidth, maxWidth } = getTurnMinMaxHeight(
+        widgets,
+        width,
+        spacersCount * widgetSpacer
+      );
+      const newHeight = Math.round(
+        Math.min(Math.max(height, minHeight), maxHeight)
+        // + widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
+      );
 
-    let newHeight = Math.round(
-      Math.min(Math.max(height, minHeight), maxHeight) + widgetSpacer // @todo: для компрессора проверить
-    );
-    if (paragraphStage === ORIG_READY || paragraphStage === COMP_READY) {
-      newHeight = widgets
-        .find((w) => w.variableHeight)
-        .getDesiredTurnHeight({
-          minHeightBasic,
-          newHeight,
-          minHeight,
-          maxHeight,
-        });
-    }
+      const newWidth = Math.round(
+        Math.min(Math.max(width, minWidth), maxWidth)
+      ); //+ widgetSpacer;
 
-    // @todo: desiredHeight > minHeight
-    // if (desiredHeight >= minHeight && desiredHeight <= maxHeight) {
-    //   newHeight = desiredHeight;
-    // }
-
-    const newWidth = Math.round(Math.min(Math.max(width, minWidth), maxWidth)); //+ widgetSpacer;
-
-    // if (paragraphStage !== ORIG_LOADING) {
-    //  && paragraphStage !== COMP_LOADING) {
-
-    const isLocked = // transition from compressed to uncompressed
-      paragraphStage === ORIG_LOADING &&
-      turn.paragraphStages.at(-3) === COMP_READY;
-
-    if (!isLocked) {
       turnGeometryQueue.add(() => {
         dispatch(
           updateGeometry({
             _id,
-            width: newWidth,
-            height: newHeight,
-            [compressed ? 'compressedHeight' : 'uncompressedHeight']: newHeight,
+            size: {
+              width: newWidth,
+              height: newHeight,
+            },
           })
         );
       });
 
-      if (newHeight !== height || newWidth !== width) {
-        $(wrapper.current).css({
-          height: `${newHeight}px`,
-          width: `${newWidth}px`,
-        });
+      if (typeof $ !== 'undefined') {
+        if (newHeight !== height || newWidth !== width) {
+          $(wrapper.current).css({
+            height: `${newHeight}px`,
+            width: `${newWidth}px`,
+          });
+        }
       }
-    }
-
-    const newWidgetD = {};
-    const widgetIds = ['header1', 'video1', 'picture1', 'paragraph1'];
-
-    let minTop = 0;
-    let maxTop = 0;
-
-    for (let widgetId of widgetIds) {
-      if (!widgetD[widgetId]) continue;
-
-      newWidgetD[widgetId] = {
-        ...widgetD[widgetId],
-        minTop,
-        maxTop,
-        width: newWidth,
-      };
-
-      minTop = minTop + widgetD[widgetId].minHeight;
-      maxTop = maxTop + widgetD[widgetId].maxHeight;
-    }
-
-    setWidgetD(newWidgetD);
-  };
-
-  useEffect(() => {
-    if (turnStage === TURN_LOADING_FIXED) {
-      if (paragraphStage === ORIG_READY_TO_RECEIVE_PARAMS) {
-        // @todo: проверить необходимо ли передать высоту
-        dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: ORIG_READY })
-        );
-      }
-      if (paragraphStage === COMP_READY_TO_RECEIVE_PARAMS) {
-        dispatch(
-          changeTurnStage(_id, TURN_READY, { paragraphStage: COMP_READY })
-        );
-      }
-    }
-  }, [turnStage, paragraphStage]);
-
-  // DRAGGABLE
-  useEffect(() => {
-    $(wrapper.current).draggable({
-      grid: [GRID_CELL_X, GRID_CELL_X],
-      start: (event, ui) => {
-        $('#gameBox')
-          .addClass('remove-line-transition')
-          .addClass('translucent-field');
-      },
-      drag: (event, ui) => {
-        turnPositionQueue.add(() => {
-          dispatch(
-            updateGeometry({
-              _id,
-              x: ui.position.left, // x - left - ui.position.left,
-              y: ui.position.top, // y - top - ui.position.top,
-            })
-          );
-        });
-      },
-      stop: (event, ui) => {
-        $('#gameBox')
-          .removeClass('remove-line-transition')
-          .removeClass('translucent-field');
-        dispatch(markTurnAsChanged({ _id }));
-      },
-    });
-
-    return () => $(wrapper.current).draggable('destroy');
-  }, []);
+    },
+    [id, widgets, dontShowHeader, pictureOnly]
+  );
 
   // RESIZABLE
   useEffect(() => {
-    if (paragraphStage === COMP_READY) return;
+    if (resizeDisabled) return;
+    if (typeof $ === 'undefined') return;
 
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],
+      minWidth: TURN_SIZE_MIN_WIDTH,
+      maxWidth: TURN_SIZE_MAX_WIDTH,
       resize: (event, ui) => {
-        if (notRegisteredWidgetsCount === 0) {
-          isSnapToGrid
-            ? recalculateSize(
-                snapRound(ui.size.width, GRID_CELL_X),
-                snapRound(ui.size.height, GRID_CELL_Y)
-              )
-            : recalculateSize(
-                Math.round(ui.size.width),
-                Math.round(ui.size.height)
-              );
-          dispatch(markTurnAsChanged({ _id }));
-        }
+        recalculateSize(
+          snapRound(ui.size.width, GRID_CELL_X),
+          snapRound(ui.size.height, GRID_CELL_Y)
+        );
+        dispatch(markTurnAsChanged({ _id }));
+      },
+      stop: (event, ui) => {
+        turnGeometryQueue.clear();
+        recalculateSize(
+          snapRound(ui.size.width, GRID_CELL_X),
+          snapRound(ui.size.height, GRID_CELL_Y)
+        );
+        dispatch(markTurnAsChanged({ _id }));
+        dispatch(recalcAreaRect());
       },
     });
     return () => {
       $(wrapper.current).resizable('destroy');
     };
-  }, [widgets, turnStage]);
+  }, [resizeDisabled, widgets]);
 
   useEffect(() => {
     if (!wrapper.current) return;
-    if (paragraphStage === COMP_READY) {
-      $(wrapper.current).resizable({ disabled: true });
-    } // @todo: else if previous paragraphStage === COMP_READY then enable
-  }, [paragraphStage]);
-
-  useEffect(() => {
-    // if (callsQueueIsBlockedFlag) return;
-
-    if (notRegisteredWidgetsCount === 0) {
-      recalculateSize(Math.round(width), Math.round(height));
-      // setStateIsReady(true);
-      dispatch(changeTurnStage(_id, TURN_LOADING_FIXED));
-    }
-  }, [
-    widgets,
-    // callsQueueIsBlockedFlag
-  ]);
-
-  useEffect(() => {
-    dispatch(changeTurnStage(_id, TURN_LOADING));
-  }, []);
-
-  // console.log({ widgets });
-
-  const wrapperClasses = [
-    contentType,
-    'react-turn-new',
-    'noselect',
-    classNameId,
-  ];
-
-  if (dontShowHeader) {
-    wrapperClasses.push('dont-show-header');
-  }
-  if (pictureOnly) {
-    wrapperClasses.push('picture-only');
-  }
+    if (!widgetsUpdatedTime) return;
+    recalculateSize(
+      snapRound(wrapper.current.clientWidth, GRID_CELL_X),
+      snapRound(wrapper.current.clientHeight, GRID_CELL_Y)
+    );
+  }, [widgetsUpdatedTime, updatedAt]);
 
   return (
-    <div
-      ref={wrapper}
-      className={wrapperClasses.join(' ')}
-      style={wrapperStyles}
-    >
-      <Header
-        registerHandleResize={registerHandleResize}
-        // copyPasteActions={copyPasteActions}
-        {...{
-          header,
-          contentType,
-          backgroundColor,
-          fontColor,
-          dontShowHeader,
-          _id,
-          sourceUrl,
-          date,
-        }}
-      />
-      {!!videoUrl && (
-        <Video
-          videoUrl={videoUrl}
-          registerHandleResize={registerHandleResize}
-          width={width}
-        />
-      )}
-      {!!imageUrl && (
-        <Picture
-          imageUrl={imageUrl}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          widgetId="picture1"
-          widgetType="picture"
-          turnId={_id}
-          widgetSettings={widgetD['picture1']}
-          pictureOnly={pictureOnly}
-        />
-      )}
-      {doesParagraphExist && (
-        <Paragraph
-          turnId={_id}
-          registerHandleResize={registerHandleResize}
-          unregisterHandleResize={unregisterHandleResize}
-          // stateIsReady={stateIsReady}
-          widgetId="paragraph1"
-          widget={widgetD['paragraph1']}
-          notRegisteredWidgetsCount={notRegisteredWidgetsCount}
-          // paragraphIsReady={paragraphIsReady}
-          // setParagraphIsReady={dispatchParagraphIsReady}
-          // height={getParagraphHeight({
-          //   widgetId: 'paragraph1',
-          //   widgetD,
-          //   compressed,
-          //   paragraphIsReady: paragraphStage === COMP_READY,
-          //   compressedHeight,
-          // })}
-        />
-      )}
-      {dontShowHeader && !!date && !!sourceUrl && (
-        <div className="bottom-date-and-sourceurl">
-          <DateAndSourceUrl {...{ date, sourceUrl }} />
+    <>
+      <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>
+        {!dontShowHeader ? (
+          <Header
+            widgetId={'h_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            _id={_id}
+          />
+        ) : (
+          <div style={{ height: '0px' }} />
+        )}
+        {!!videoUrl && (
+          <Video
+            widgetId={'v_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            turnId={_id}
+          />
+        )}
+        {!!imageUrl && (
+          <Picture
+            widgetId={'i_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            turnId={_id}
+            pictureOnly={pictureOnly}
+          />
+        )}
+        {doesParagraphExist && (
+          <Paragraph
+            widgetsUpdatedTime={widgetsUpdatedTime}
+            turnId={_id}
+            widgetId={'p_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            // widget={widgetD['p_1']}
+          />
+        )}
+      </div>
+      <ButtonsMenu _id={_id} />
+      {sourceShow && (
+        <div className="stb-react-turn__bottom-subtitle">
+          <DateAndSourceUrl widgetId="s_1" date={date} url={sourceUrl} />
         </div>
       )}
-    </div>
+    </>
   );
+});
 
-  // return (
-  //   <div
-  //     ref={wrapper}
-  //     className={wrapperClasses.join(' ')}
-  //     style={wrapperStyles}
-  //   >
-  //     <Header
-  //       registerHandleResize={registerHandleResize}
-  //       // copyPasteActions={copyPasteActions}
-  //       {...{
-  //         header,
-  //         contentType,
-  //         backgroundColor,
-  //         fontColor,
-  //         dontShowHeader,
-  //         _id,
-  //         sourceUrl,
-  //         date,
-  //       }}
-  //     />
-
-  //     {/* <div className="top-spaceholder" /> */}
-  //     {!!videoUrl && (
-  //       <Video
-  //         videoUrl={videoUrl}
-  //         registerHandleResize={registerHandleResize}
-  //         width={width}
-  //       />
-  //     )}
-  //     {!!imageUrl && (
-  //       <Picture
-  //         imageUrl={imageUrl}
-  //         registerHandleResize={registerHandleResize}
-  //         unregisterHandleResize={unregisterHandleResize}
-  //         widgetId="picture1"
-  //         widgetType="picture"
-  //         turnId={_id}
-  //         widgetSettings={widgetD['picture1']}
-  //         pictureOnly={pictureOnly}
-  //       />
-  //     )}
-  //     {doesParagraphExist && (
-  //       <Paragraph
-  //         turn={turn}
-  //         registerHandleResize={registerHandleResize}
-  //         unregisterHandleResize={unregisterHandleResize}
-  //         // stateIsReady={stateIsReady}
-  //         widgetId="paragraph1"
-  //         // paragraphIsReady={paragraphIsReady}
-  //         // setParagraphIsReady={dispatchParagraphIsReady}
-  //         height={getParagraphHeight({
-  //           widgetId: 'paragraph1',
-  //           widgetD,
-  //           height,
-  //           compressed,
-  //           paragraphIsReady: paragraphStage === COMP_READY,
-  //           compressedHeight,
-  //           uncompressedHeight,
-  //         })}
-  //       />
-  //     )}
-  //     {dontShowHeader && !!date && !!sourceUrl && (
-  //       <div className="bottom-date-and-sourceurl">
-  //         <DateAndSourceUrl {...{ date, sourceUrl }} />
-  //       </div>
-  //     )}
-  //   </div>
-  // );
-};
-
-export default Turn;
+export default memo(TurnAdapter);

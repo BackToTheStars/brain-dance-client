@@ -2,11 +2,13 @@
 
 import { Input, Switch } from 'antd';
 import ImageUploading from './components/forms/ImageUploading';
-
-export const TURN_INIT = 'TURN_INIT';
-export const TURN_LOADING = 'TURN_LOADING';
-export const TURN_LOADING_FIXED = 'TURN_LOADING_FIXED';
-export const TURN_READY = 'TURN_READY';
+import CarouselTemplate from './components/templates/Carousel';
+import PictureOnlyTemplate from './components/templates/PictureOnly';
+import { HeaderAddForm } from './components/widgets/header/EditForm';
+import PictureAddForm from './components/widgets/picture/EditForm';
+import { SourceAddForm } from './components/widgets/source/EditForm';
+import { VideoAddForm } from './components/widgets/video/EditForm';
+import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 
 const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
@@ -17,6 +19,7 @@ const TEMPLATE_PDF = 'pdf';
 const TEMPLATE_AUDIO = 'audio';
 const TEMPLATE_CAROUSEL = 'carousel';
 const TEMPLATE_NEWS = 'news';
+const TEMPLATE_PICTURE_ONLY = 'picture-only';
 
 const FIELD_HEADER = 'header';
 const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
@@ -31,35 +34,195 @@ const FIELD_PICTURE_ONLY = 'pictureOnly';
 export const WIDGET_PICTURE = 'picture';
 export const WIDGET_PARAGRAPH = 'paragraph';
 
-// по умолчанию виджет текста присутствует
-const settings = {
-  // [TEMPLATE_PICTURE_ONLY]: {
-  //   availableFields: [FIELD_PICTURE],
-  //   disabledFields: [FIELD_TEXT],
-  //   value: 'picture-only',
-  //   label: 'Picture',
-  // },
-  [TEMPLATE_PICTURE]: {
-    availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
-    value: 'picture',
-    label: 'Text / picture',
-    requiredFields: [],
+export const WIDGET_HEADER = 'header';
+export const WIDGET_VIDEO = 'video';
+export const WIDGET_SOURCE = 'source';
+
+export const widgetSettings = {
+  [WIDGET_HEADER]: {
+    label: 'Header',
+    prefix: 'h',
+    componentToAdd: HeaderAddForm,
+    defaultParams: { show: true, text: '' },
+    validation: (widgetFields) => {
+      const { text, show } = widgetFields;
+      if (!show) return [true];
+      if (!text) {
+        return [false, 'text required'];
+      }
+      return [true];
+    },
+    subWidgets: [
+      {
+        field: 'sources',
+        label: 'Sources',
+        component: SourceAddForm,
+        defaultParams: { url: '', date: null, show: true },
+      },
+    ],
   },
-  [TEMPLATE_VIDEO]: {
-    availableFields: [FIELD_VIDEO],
-    value: 'video',
-    label: 'Text / video',
-    requiredFields: [FIELD_VIDEO],
+  [WIDGET_PICTURE]: {
+    label: 'Picture',
+    prefix: 'i',
+    componentToAdd: PictureAddForm,
+    defaultParams: { url: '', show: true },
+    validation: (widgetFields) => {
+      const { url, show } = widgetFields;
+      if (!show) return [true];
+      if (!url) {
+        return [false, 'no picture added'];
+      }
+      return [true];
+    },
+    subWidgets: [
+      {
+        field: 'sources',
+        label: 'Sources',
+        component: SourceAddForm,
+        defaultParams: { url: '', date: null, show: true },
+      },
+    ],
   },
-  [TEMPLATE_COMMENT]: {
-    availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
-    value: 'comment',
-    label: 'Comment',
-    requiredParagraph: true,
+  [WIDGET_PARAGRAPH]: {
+    label: 'Paragraph',
+    prefix: 'p',
+    componentToAdd: ParagraphAddForm,
+    defaultParams: { inserts: [{ insert: '' }], show: true },
+    validation: (widgetFields) => {
+      const { inserts } = widgetFields;
+      if (inserts.length > 1) return [true];
+      if (inserts.length === 0 || inserts[0].insert.trim() === '') {
+        return [false, 'text area is empty'];
+      }
+      return [true];
+    },
+  },
+  [WIDGET_VIDEO]: {
+    label: 'Video',
+    prefix: 'v',
+    componentToAdd: VideoAddForm,
+    defaultParams: { provider: 'youtube', url: '' },
+    validation: (widgetFields) => {
+      const { url, provider, show } = widgetFields;
+      if (!show) return [true];
+      if (provider === 'youtube') {
+        if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+          return [true];
+        } else return [false, 'provider is not youtube'];
+      }
+      return [false, 'provider unknown'];
+    },
+  },
+  [WIDGET_SOURCE]: {
+    label: 'Source',
+    prefix: 's',
+    componentToAdd: SourceAddForm,
   },
 };
 
-const templatesToShow = [TEMPLATE_PICTURE, TEMPLATE_VIDEO, TEMPLATE_COMMENT];
+// по умолчанию виджет текста присутствует
+const settings = {
+  [TEMPLATE_MIXED]: {
+    // это именно тип хода, а не виджета
+    component: () => {}, // MixedTemplate,
+    value: TEMPLATE_MIXED,
+    label: 'Mixed',
+    availableWidgets: {},
+    optionalWidgets: [],
+    description:
+      'Экспериментальный шаблон, содержит любые виджеты в любых количествах',
+  },
+
+  [TEMPLATE_CAROUSEL]: {
+    // это именно тип хода, а не виджета
+    component: CarouselTemplate,
+    value: TEMPLATE_CAROUSEL,
+    label: 'Carousel',
+    // availableWidgets: [WIDGET_PICTURE, WIDGET_VIDEO],
+    optionalWidgets: [WIDGET_HEADER, WIDGET_SOURCE],
+    availableWidgets: {
+      [WIDGET_HEADER]: { max: 2, min: 1 },
+      [WIDGET_SOURCE]: { max: 1 },
+      [WIDGET_PICTURE]: { max: 15 },
+      [WIDGET_VIDEO]: { max: 3 },
+    },
+    description:
+      'Ход, в котором есть карусели, одна или несколько, и каждая содержит фото или видео',
+    validation: (widgetBlocks) => {
+      // const count = widgetBlocks.filter((widgetBlock) => [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type)).length
+      // @learn reduce & accumulator
+      const count = widgetBlocks.reduce(
+        (acc, widgetBlock) =>
+          [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type),
+        0
+      );
+      if (count < 2) return [false, 'need more media for carousel'];
+      return [true];
+    },
+  },
+  [TEMPLATE_PICTURE_ONLY]: {
+    component: PictureOnlyTemplate,
+    value: TEMPLATE_PICTURE_ONLY,
+    label: 'Picture only',
+    availableWidgets: { [WIDGET_PICTURE]: { max: 1, min: 1 } },
+    // availableWidgets: [WIDGET_PICTURE],
+    optionalWidgets: [],
+    description: 'Только картинка, без ничего',
+  },
+  [TEMPLATE_PICTURE]: {
+    value: 'picture',
+    label: 'Text / picture',
+    availableWidgets: {
+      [WIDGET_HEADER]: { max: 1, min: 1 },
+      [WIDGET_SOURCE]: { max: 1, min: 0 },
+      [WIDGET_PICTURE]: { max: 1, min: 0 },
+      [WIDGET_PARAGRAPH]: { max: 1, min: 0 },
+    },
+    widgetOrder: [
+      WIDGET_HEADER,
+      WIDGET_PICTURE,
+      WIDGET_PARAGRAPH,
+      WIDGET_SOURCE,
+    ],
+    validation: (widgetBlocks) => {
+      // const count = widgetBlocks.filter((widgetBlock) => [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type)).length
+      // @learn reduce & accumulator
+      const count = widgetBlocks.reduce(
+        (acc, widgetBlock) =>
+          [WIDGET_PICTURE, WIDGET_PARAGRAPH].includes(widgetBlock.type),
+        0
+      );
+      if (count < 1) return [false, 'need either picture or paragraph'];
+      return [true];
+    },
+    //
+    requiredFields: [],
+    availableFields: [FIELD_PICTURE, FIELD_PICTURE_ONLY],
+  },
+  [TEMPLATE_VIDEO]: {
+    value: 'video',
+    label: 'Text / video',
+
+    requiredFields: [FIELD_VIDEO],
+    availableFields: [FIELD_VIDEO],
+  },
+  [TEMPLATE_COMMENT]: {
+    value: 'comment',
+    label: 'Comment',
+    requiredParagraph: true,
+
+    availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
+  },
+};
+
+const templatesToShow = [
+  // TEMPLATE_MIXED,
+  TEMPLATE_PICTURE,
+  TEMPLATE_VIDEO,
+  TEMPLATE_COMMENT,
+  // TEMPLATE_CAROUSEL,
+  // TEMPLATE_PICTURE_ONLY,
+];
 
 const fieldSettings = {
   [FIELD_HEADER]: {
@@ -133,14 +296,6 @@ const fieldSettings = {
               }}
             />{' '}
             <span style={{ fontSize: '1rem' }}>Picture only</span>
-            {/* <Input
-              placeholder={`${label}:`}
-              value={value}
-              onChange={(e) => {
-                changeHandler(e.target.value);
-              }}
-            />
-            <ImageUploading setImageUrl={changeHandler} /> */}
           </>
         );
       },
@@ -156,11 +311,6 @@ const fieldSettings = {
     prefixClass: 'date',
     inputType: 'date',
     valueCallback: (value) => value.date.slice(0, 10),
-    // valueCallback: (value) => {
-    //   // console.log({ value });
-    //   console.log(value.date);
-    //   return value.date;
-    // },
     separate: true,
   },
   [FIELD_SOURCE]: {
@@ -172,6 +322,7 @@ const fieldSettings = {
 
 const fieldsToShow = Object.keys(fieldSettings); // возвращает массив строк-ключей объекта
 
+// @todo: choose only one format
 const fieldsToClone = [
   'originalId',
   'header',
@@ -189,6 +340,7 @@ const fieldsToClone = [
   'scrollPosition',
   'height',
   'width',
+  'size',
 ];
 
 const turnSettings = {

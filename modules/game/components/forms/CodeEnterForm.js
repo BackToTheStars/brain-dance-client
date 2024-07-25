@@ -1,20 +1,34 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import CreateGameModal from '../modals/CreateGameModal';
+import { Button, Input } from 'antd';
+import { getGameUserTokenRequest } from '../../requests';
+import { setGameInfoIntoStorage, useUserContext } from '@/modules/user/contexts/UserContext';
 
 const CodeEnterForm = ({ hash }) => {
+  const { reloadUserInfo } = useUserContext();
   const [accessCode, setAccessCode] = useState('');
   const [userNickname, setUserNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const router = useRouter();
-  const enterGame = (hash, nickname) => {
-    router.push(`/code?hash=${hash}&nickname=${nickname}`);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    getGameUserTokenRequest(accessCode, userNickname).then((data) => {
+      if (data.success) {
+        const { info, token } = data;
+        setGameInfoIntoStorage(hash, {
+          info,
+          token,
+        });
+        setTimeout(() => {
+          reloadUserInfo();
+        }, 300)
+      } else {
+        setErrorMessage(data?.message || 'Неизвестная ошибка');
+      }
+    });
     //setShowCreateModal(true)
 
     /*if (!accessCode) {
@@ -30,7 +44,8 @@ const CodeEnterForm = ({ hash }) => {
   return (
     <form className="row" onSubmit={handleSubmit}>
       <div className="col-auto mb-2">
-        <input
+        <Input
+          size="small"
           name="code"
           type="text"
           className="form-control"
@@ -41,7 +56,8 @@ const CodeEnterForm = ({ hash }) => {
         />
       </div>
       <div className="col-auto mb-2">
-        <input
+        <Input
+          size="small"
           name="nickname"
           type="text"
           className="form-control"
@@ -52,10 +68,9 @@ const CodeEnterForm = ({ hash }) => {
         />
       </div>
       <div className="col-auto mb-2">
-        <button type="submit" className="enter-game"   
-        >
+        <Button size="small" htmlType="submit" className="enter-game">
           Enter Game
-        </button>
+        </Button>
       </div>
       {!!errorMessage && <div className="text-danger mb-2">{errorMessage}</div>}
     </form>

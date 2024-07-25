@@ -3,23 +3,28 @@ import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
-} from '@/modules/panels/settings';
-import { useEffect, useState, useRef } from 'react';
+} from '@/config/panel';
+import { useEffect, useState, useRef, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PictureCrop from './Crop';
 import PictureQuotes from './Quotes';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
+import { WIDGET_PICTURE } from '@/modules/turns/settings';
 
 const Picture = ({
-  imageUrl,
   registerHandleResize,
   unregisterHandleResize,
-  widgetId,
-  widgetType,
   turnId,
-  widgetSettings,
-  pictureOnly,
+  pictureOnly = false, // @todo: сделать универсальную настройку
+  widgetId,
 }) => {
+  const { can } = useUserContext();
   //
+  const imageUrl = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId].url,
+  );
   const widgetSpacer = pictureOnly ? 0 : widgetSpacerOriginal;
 
   const imgEl = useRef(null);
@@ -28,22 +33,17 @@ const Picture = ({
   const dispatch = useDispatch();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
-  // const [displayCrop, setDisplayCrop] = useState(false);
-
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const editWidgetId = useSelector((state) => state.panels.editWidgetId);
   const mode = useSelector((state) => state.panels.mode);
   const editWidgetParams = useSelector(
-    (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`]
+    (state) => state.panels.editWidgetParams[`${editTurnId}_${editWidgetId}`],
   );
+
   const isActive = editTurnId === turnId && editWidgetId === widgetId;
 
   useEffect(() => {
-    setImageUrlToRender(imageUrl);
-  }, [imageUrl]);
-
-  useEffect(() => {
-    if (!imgEl || !imgEl.current) return; // была ошибка React state update on an unmounted component
+    if (!imgEl.current) return;
     const loadImage = () => {
       if (imgEl && imgEl.current) {
         setImageLoaded(Date.now());
@@ -51,14 +51,12 @@ const Picture = ({
     };
 
     const errorPicture = () => {
-      console.log('on image error');
       setImageUrlToRender('/img/404.jpg');
     };
 
     imgEl.current.addEventListener('load', loadImage);
     imgEl.current.addEventListener('error', errorPicture);
 
-    // @todo: проверить
     return () => {
       // в момент когда мы удаляем компонент, unMount
       if (imgEl.current) {
@@ -70,30 +68,30 @@ const Picture = ({
 
   useEffect(() => {
     if (imageLoaded) {
+      const heightCallback = (newWidth) => {
+        if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
+
+        if (pictureOnly) {
+          return Math.round(
+            (imgEl.current.naturalHeight * newWidth) /
+              imgEl.current.naturalWidth,
+          );
+        }
+
+        const newImgHeight = Math.round(
+          (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
+            imgEl.current.naturalWidth,
+        );
+        return newImgHeight;
+      };
       registerHandleResize({
-        type: widgetType,
+        type: WIDGET_PICTURE,
         id: widgetId,
         minWidthCallback: () => {
-          return 0;
+          return TURN_SIZE_MIN_WIDTH;
         },
-        minHeightCallback: (newWidth) => {
-          if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight =
-            Math.floor(
-              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-                imgEl.current.naturalWidth
-            ) + widgetSpacer;
-          return newImgHeight;
-        },
-        maxHeightCallback: (newWidth) => {
-          if (!imgEl.current || !imgEl.current.naturalHeight) return 0;
-          const newImgHeight =
-            Math.floor(
-              (imgEl.current.naturalHeight * (newWidth - 2 * widgetSpacer)) /
-                imgEl.current.naturalWidth
-            ) + widgetSpacer;
-          return newImgHeight;
-        },
+        minHeightCallback: heightCallback,
+        maxHeightCallback: heightCallback,
         resizeCallback: () => {},
       });
     } else {
@@ -104,21 +102,11 @@ const Picture = ({
     return () => {
       unregisterHandleResize({ id: 'picture' });
     };
-  }, [imageLoaded]);
+  }, [imageLoaded, pictureOnly]);
 
   return (
-    <div
-      className={`picture-content ${isActive ? 'active' : ''}`}
-      style={{
-        minHeight: `${widgetSettings?.minHeight}px`,
-        maxHeight: `${widgetSettings?.maxHeight}px`,
-      }}
-    >
-      <div
-        style={{ width: '100%', height: '100%', position: 'relative' }}
-        ref={imgWrapperEl}
-      >
-        {/* {displayCrop &&  */}
+    <div className={`picture-content ${isActive ? 'active' : ''} turn-widget`}>
+      <div className="w-full h-full relative" ref={imgWrapperEl}>
         {isActive && mode === MODE_WIDGET_PICTURE_QUOTE_ADD && (
           <PictureCrop
             imageUrl={imageUrlToRender}
@@ -132,37 +120,32 @@ const Picture = ({
           widgetId={widgetId}
           activeQuoteId={editWidgetParams?.activeQuoteId}
           mode={mode}
-          widgetSettings={widgetSettings}
-          wrapperEl={imgWrapperEl?.current}
+          wrapperEl={imageLoaded && imgWrapperEl?.current}
           pictureOnly={pictureOnly}
-          // quotes={
-          //   interactionType === INTERACTION_ADD_OR_EDIT_QUOTE && !!activeQuote
-          //     ? quotes.filter((quote) => quote.id !== activeQuote.quoteId)
-          //     : quotes
-          // }
         />
 
-        <img className="turn-img" src={imageUrlToRender} ref={imgEl} />
+        <img src={imageUrlToRender} ref={imgEl} />
 
-        <a
-          className="widget-button"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            // setDisplayCrop(true);
-            dispatch(
-              setPanelMode({
-                mode: MODE_WIDGET_PICTURE,
-                params: { editTurnId: turnId, editWidgetId: widgetId },
-              })
-            );
-          }}
-        >
-          <i className="fas fa-highlighter"></i>
-        </a>
+        {can(RULE_TURNS_CRUD) && (
+          <a
+            className="widget-button"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              dispatch(
+                setPanelMode({
+                  mode: MODE_WIDGET_PICTURE,
+                  params: { editTurnId: turnId, editWidgetId: widgetId },
+                }),
+              );
+            }}
+          >
+            <i className="fas fa-highlighter"></i>
+          </a>
+        )}
       </div>
     </div>
   );
 };
 
-export default Picture;
+export default memo(Picture);

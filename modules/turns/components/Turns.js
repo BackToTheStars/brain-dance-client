@@ -1,18 +1,35 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Turn from './Turn';
+import { useEffect } from 'react';
+import { loadTurnsData } from '../redux/actions';
+
+const TurnsLoader = () => {
+  const dispatch = useDispatch();
+  const turnsToRender = useSelector((store) => store.turns.turnsToRender);
+  const d = useSelector((store) => store.turns.d);
+  useEffect(() => {
+    const needToRenderTurns = [];
+    for (const id of turnsToRender) {
+      if (!d[id]) {
+        needToRenderTurns.push(id);
+      }
+    }
+    if (needToRenderTurns.length) {
+      dispatch(loadTurnsData(needToRenderTurns));
+    }
+  }, [turnsToRender, d])
+  return null;
+}
 
 const Turns = () => {
-  //  const turns = useSelector(store => store.turns.turns)
   const turns = useSelector((store) => store.turns.turnsToRender);
 
   return (
     <>
-      {/* {turns.map((turn) => (
-        <Turn key={turn._id} id={turn._id} />
-      ))} */}
       {turns.map((id) => (
         <Turn key={id} id={id} />
       ))}
+      <TurnsLoader />
     </>
   );
 };

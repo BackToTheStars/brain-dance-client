@@ -1,5 +1,3 @@
-// import { lineThickness, lineOffset, kBezier } from '../const';
-
 import { kBezier, lineOffset, lineThickness } from '@/config/ui';
 
 import {
@@ -91,7 +89,6 @@ const Line = ({
   stroke = 'red',
   strokeWidth = lineThickness,
 }) => {
-  // console.log({ prevSourceCoords });
   const sourceCoords = {
     ...prevSourceCoords,
     right: prevSourceCoords.left + prevSourceCoords.width,
@@ -134,18 +131,6 @@ const Line = ({
         strokeWidth={strokeWidth}
         fill="transparent"
       />
-
-      {/* <text
-        x={Math.floor((x2 + x1) / 2)}
-        y={Math.floor((y2 + y1) / 2)}
-        fill="black"
-      >
-        {curveType}
-      </text>
-      <circle cx={x1b} cy={y1b} fill="red" r="5" />
-      <circle cx={x2b} cy={y2b} fill="blue" r="5" />
-      <circle cx={x1} cy={y1} fill="red" r="5" />
-      <circle cx={x2} cy={y2} fill="blue" r="5" /> */}
     </>
   );
 };

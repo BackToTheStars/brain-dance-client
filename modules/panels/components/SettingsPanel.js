@@ -4,8 +4,6 @@ import { togglePanel } from '../redux/actions';
 const SettingsPanel = () => {
   const panelsDict = useSelector((state) => state.panels.d);
   const panels = Object.values(panelsDict);
-  // const panels = useSelector((state) => state.panels.panels);
-  // console.log({ panels });
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const dispatch = useDispatch();
   const getTogglePanel = (type) => () => dispatch(togglePanel({ type }));

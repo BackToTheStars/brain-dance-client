@@ -1,13 +1,13 @@
 import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
-import { useEffect, useState } from 'react';
-import turnSettings from '@/modules/turns/settings';
+import { useEffect, useState, useMemo } from 'react';
+import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
@@ -17,6 +17,7 @@ import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Switch } from 'antd';
 import moment from 'moment';
 import { cleanText } from '../helpers/textHelper';
+import { TurnHelper } from '../../redux/helpers';
 
 const {
   settings,
@@ -34,23 +35,35 @@ const getDate = (mixedDate) => {
   const d = new Date(mixedDate);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
     2,
-    '0'
+    '0',
   )}-${String(d.getDay()).padStart(2, '0')}`;
 };
 
 const AddEditTurnPopup = () => {
-  // https://transform.tools/html-to-jsx   - преобразователь HTML в JSX
+  const gamePosition = useSelector((state) => state.game.position);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
-  const turnToEdit = useSelector((state) => state.turns.d[editTurnId]);
-  const zeroPointId = useSelector((state) => state.turns.zeroPointId);
-  const zeroPoint = useSelector((state) => state.turns.d[zeroPointId]);
-
+  const turnData = useSelector((state) => state.turns.d[editTurnId]);
+  const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
+  // @fixme
+  const turnToEdit = useMemo(
+    () =>
+      turnData && turnGeometry
+        ? TurnHelper.toOldFields({
+            ...turnData,
+            ...turnGeometry,
+          })
+        : null,
+    [turnData, turnGeometry],
+  );
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const [error, setError] = useState(null);
-  const availableFields = settings[activeTemplate].availableFields;
-  const requiredFields = settings[activeTemplate].requiredFields || [];
-  const requiredParagraph = settings[activeTemplate].requiredParagraph || false;
+  const templateSettings = settings[activeTemplate];
+
+  const availableFields = templateSettings.availableFields || [];
+  const requiredFields = templateSettings.requiredFields || [];
+  const requiredParagraph = templateSettings.requiredParagraph || false;
+  const Component = templateSettings.component || null;
   const [form, setForm] = useState({
     check: true,
   });
@@ -62,7 +75,8 @@ const AddEditTurnPopup = () => {
     dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
     dispatch(toggleMaximizeQuill(false));
   };
-  const lines = useSelector((state) => state.lines.lines);
+  const dLines = useSelector((state) => state.lines.d);
+  const lines = useMemo(() => Object.values(dLines), [dLines]);
 
   const toggleMaximize = (value) => {
     setIsMaximized(value);
@@ -87,9 +101,7 @@ const AddEditTurnPopup = () => {
       setForm(newForm);
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
-        // quill.setContents(turnToEdit.paragraph);
         quill.setContents(turnToEdit.paragraph);
-        // console.log(' quill.getLine(0).value()', quill.getLine(0).value());
         setTimeout(() => {
           const paragraphQuotes = turnToEdit.quotes
             ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
@@ -117,7 +129,7 @@ const AddEditTurnPopup = () => {
 
   useEffect(() => {
     setQuillConstants(
-      getQuill('#editor-container-new', '#toolbar-container-new')
+      getQuill('#editor-container-new', '#toolbar-container-new'),
     );
   }, []);
 
@@ -129,10 +141,6 @@ const AddEditTurnPopup = () => {
 
     const resTextArr = [];
     let i = 0;
-    // const paragraphQuotes =
-    //   turnToEdit && turnToEdit.quotes
-    //     ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-    //     : [];
     const spans = document.querySelectorAll('.ql-editor span');
 
     let j = 0;
@@ -220,7 +228,7 @@ const AddEditTurnPopup = () => {
 
     const linesToDelete = filterLinesByQuoteKeys(
       lines,
-      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`)
+      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`),
     );
 
     if (!!quotesDeleted.length) {
@@ -231,10 +239,7 @@ const AddEditTurnPopup = () => {
       ...preparedForm,
       paragraph: resTextArr,
       contentType: activeTemplate,
-      quotes: [
-        ...quotes,
-        // ...prevQuotes.filter((quote) => quote.type === 'picture'), // добавляем отдельно цитаты картинки
-      ],
+      quotes: [...quotes],
     };
 
     const saveCallbacks = {
@@ -247,42 +252,120 @@ const AddEditTurnPopup = () => {
 
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
-      turnObj.x = -zeroPoint.x + turnToEdit.x;
-      turnObj.y = -zeroPoint.y + turnToEdit.y;
+      turnObj.x = turnToEdit.x;
+      turnObj.y = turnToEdit.y;
 
-      dispatch(resaveTurn(turnObj, zeroPoint, saveCallbacks));
+      // @fixme
+      dispatch(resaveTurn(turnObj, saveCallbacks));
     } else {
       turnObj.height = 600;
       turnObj.width = 800;
       turnObj.x =
-        -zeroPoint.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
+        gamePosition.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
       turnObj.y =
-        -zeroPoint.y + Math.round(window.innerHeight / 2 - turnObj.height / 2);
+        gamePosition.y +
+        Math.round(window.innerHeight / 2 - turnObj.height / 2);
 
-      dispatch(createTurn(turnObj, zeroPoint, saveCallbacks));
+      // @fixme
+      dispatch(createTurn(turnObj, saveCallbacks));
     }
   };
 
   const formChangeHandler = (field, value) => {
-    console.log('formChangeHandler');
-    console.log({ form });
     if (!!error) setError(null);
 
     setForm({ ...form, [field]: value });
   };
 
+  if (Component) {
+    return (
+      <div
+        className={`panel-inner flex flex-col h-full flex-1`}
+      >
+        <div className="panel-cell">
+          <div className="panel-flex mb-2">
+            <div className="w-1/6">
+              <DropdownTemplate
+                {...{
+                  templatesToShow,
+                  settings,
+                  activeTemplate,
+                  setError,
+                  setActiveTemplate,
+                }}
+              />
+            </div>
+            {templateSettings.optionalWidgets.includes(WIDGET_HEADER) && (
+              <>
+                <div className="w-2/3">
+                  <Input
+                    placeholder="Header:"
+                    value={form[FIELD_HEADER]}
+                    onChange={(e) =>
+                      formChangeHandler(FIELD_HEADER, e.target.value)
+                    }
+                  />
+                </div>
+                <div className="w-1/6">
+                  <Switch
+                    defaultChecked={true}
+                    checked={!form[FIELD_DONT_SHOW_HEADER]}
+                    onChange={(checked) => {
+                      if (!!error) setError(null);
+                      setForm({
+                        ...form,
+                        [FIELD_DONT_SHOW_HEADER]: !checked,
+                      });
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="panel-flex mb-2">
+            <div className="w-7/12">
+              <Input
+                placeholder="Source URL:"
+                value={form[FIELD_SOURCE]}
+                onChange={(e) => {
+                  if (!!error) setError(null);
+                  setForm({ ...form, [FIELD_SOURCE]: e.target.value });
+                }}
+              />
+            </div>
+            <div className="w-1/4">
+              <DatePicker
+                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
+                style={{ width: '100%' }}
+                onChange={(moment) => {
+                  if (!!error) setError(null);
+
+                  setForm({
+                    ...form,
+                    [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
+                  });
+                }}
+              />
+            </div>
+          </div>
+
+          {!!error && <div className="alert alert-danger">{error.message}</div>}
+        </div>
+        <Component />
+      </div>
+    );
+  }
+
   return (
     <>
       <div
-        className={`panel-inner d-flex flex-column h-100 flex-1 add-edit-form ${
-          isMaximized ? 'maximized' : ''
-        }`}
+        className={`panel-inner flex flex-col h-full flex-1`}
       >
         {!isMaximized && (
           <>
             <div className="panel-cell">
-              <div className="form-group panel-flex mb-2">
-                <div className="col-sm-2">
+              <div className="panel-flex mb-2">
+                <div className="w-1/6">
                   <DropdownTemplate
                     {...{
                       templatesToShow,
@@ -293,20 +376,16 @@ const AddEditTurnPopup = () => {
                     }}
                   />
                 </div>
-                <div className="col-sm-8">
+                <div className="w-2/3">
                   <Input
                     placeholder="Header:"
                     value={form[FIELD_HEADER]}
-                    // onChange={(e) => {
-                    //   if (!!error) setError(null);
-                    //   setForm({ ...form, [FIELD_HEADER]: e.target.value });
-                    // }}
                     onChange={(e) =>
                       formChangeHandler(FIELD_HEADER, e.target.value)
                     }
                   />
                 </div>
-                <div className="col-sm-2">
+                <div>
                   <Switch
                     defaultChecked={true}
                     checked={!form[FIELD_DONT_SHOW_HEADER]}
@@ -320,9 +399,8 @@ const AddEditTurnPopup = () => {
                   />
                 </div>
               </div>
-              {/* <input type="hidden" id="idInput" /> */}
-              <div className="form-group panel-flex mb-2">
-                <div className="col-sm-7">
+              <div className="panel-flex mb-2">
+                <div className="w-7/12">
                   <Input
                     placeholder="Source URL:"
                     value={form[FIELD_SOURCE]}
@@ -332,13 +410,12 @@ const AddEditTurnPopup = () => {
                     }}
                   />
                 </div>
-                <div className="col-sm-3">
+                <div className="w-1/4">
                   <DatePicker
                     value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
                     style={{ width: '100%' }}
                     onChange={(moment) => {
                       if (!!error) setError(null);
-                      // console.log(moment.format('YYYY-MM-DD'));
                       setForm({
                         ...form,
                         [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
@@ -396,7 +473,6 @@ const AddEditTurnPopup = () => {
             </span>
           </div>
           <div id="editor-container-new" />
-          {/* class="h-85"> */}
         </div>
         <div className="panel-cell">
           <div className="panel-flex panel-buttons">
@@ -418,11 +494,9 @@ const AddEditTurnPopup = () => {
               className="btn btn-primary"
               onClick={() => {
                 const cleanedText = cleanText(
-                  quillConstants.quill.editor.getText(0, Infinity)
+                  quillConstants.quill.editor.getText(0, Infinity),
                 );
                 quillConstants.quill.setText(cleanedText);
-                console.log({ cleanedText });
-                console.log(quillConstants.quill.editor);
               }}
             >
               Format

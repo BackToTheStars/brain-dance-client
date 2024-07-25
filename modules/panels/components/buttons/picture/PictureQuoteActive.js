@@ -3,8 +3,8 @@ import { deleteQuote } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '../../../settings';
 import { Buttons } from '../../ButtonsPanel';
+import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '@/config/panel';
 
 const PictureQuoteActive = () => {
   //
@@ -23,7 +23,6 @@ const PictureQuoteActive = () => {
       text: 'Delete',
       callback: () => {
         dispatch(deleteQuote()).then(() => {
-          // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
           dispatch(resetAndExit());
         });
       },

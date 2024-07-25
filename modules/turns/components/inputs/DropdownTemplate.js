@@ -1,4 +1,4 @@
-import { Button, Dropdown, Menu, Space } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import React from 'react';
 
@@ -6,40 +6,39 @@ const DropdownTemplate = ({
   templatesToShow,
   settings,
   activeTemplate,
-  setError,
+  setError = () => {},
   setActiveTemplate,
 }) => {
-  const menu = (
-    <Menu
-      onClick={({ key }) => {
-        setActiveTemplate(templatesToShow[key]);
-        setError(null);
-      }}
-      items={templatesToShow.map((el, i) => {
-        const templateSettings = settings[el];
-        return {
-          key: i,
-          label: (
-            <a href="#" style={{ paddingLeft: '10px' }}>
-              {templateSettings.label}
-            </a>
-          ),
-        };
-      })}
-    />
-  );
+  const items = templatesToShow.map((el, i) => {
+    const templateSettings = settings[el];
+    return {
+      key: i,
+      label: (
+        <a
+          href="#"
+          style={{ paddingLeft: '10px' }}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTemplate(templatesToShow[i]);
+            setError(null);
+          }}
+        >
+          {templateSettings.label}
+        </a>
+      ),
+    };
+  });
 
   return (
-    <Dropdown overlay={menu} placement="bottomLeft">
+    <Dropdown menu={{ items }} trigger="click" placement="bottomLeft">
       <Button
-        className="w-100"
+        className="w-full"
         style={{
           color: 'rgb(255, 255, 255)',
           backgroundColor: '#1b4d76',
           borderColor: '#667480',
           opacity: 0.65,
         }}
-        // style={{ color: '#1b4d76' }}
       >
         {settings[activeTemplate].label}
         <DownOutlined style={{ fontSize: '15px' }} />

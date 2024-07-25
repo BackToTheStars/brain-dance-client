@@ -3,36 +3,18 @@ import {
   TURN_SCROLLBAR_MARGIN,
   widgetSpacer,
 } from '@/config/ui';
-import { increment } from '@/modules/telemetry/utils/logger';
-import React, { useEffect, useRef, Fragment, useState, useMemo } from 'react';
-import { useDevPanel } from '@/modules/panels/components/hooks/useDevPanel';
-
-const ORANGE = '#ffd596';
-const GRAY = '#d2d3d4';
-const PINK = '#fdc9ff';
-const LIGHT_BLUE = '#9cf5ff';
-const GREEN = '#8aff24';
-const YELLOW = '#ffff00';
+import React, {
+  useEffect,
+  useRef,
+  Fragment,
+  useState,
+  useMemo,
+  useContext,
+} from 'react';
+import { colorSet, getNeedBlackText } from '../../helpers/color';
+import { CompressorContext } from './Compressor';
 
 const modifyQuoteBackgrounds = (arrText, turnType) => {
-  const colorSet = {};
-  colorSet.turn = {
-    [ORANGE]: '#8f480d',
-    [GRAY]: '#525354',
-    [PINK]: '#85176d',
-    [LIGHT_BLUE]: '#1f717a',
-    [GREEN]: '#3f6e17',
-    [YELLOW]: '#87862b',
-  };
-  colorSet.comment = {
-    [ORANGE]: '#edb193',
-    [GRAY]: '#d2d3d4',
-    [PINK]: '#fdc9ff',
-    [LIGHT_BLUE]: '#9cf5ff',
-    [GREEN]: '#8aff24',
-    [YELLOW]: '#ffff00',
-  };
-
   const colors = colorSet?.[turnType] || colorSet.turn;
 
   return arrText.map((textItem) => {
@@ -40,14 +22,18 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
     // console.log(textItem?.attributes?.background);
     const rectColor =
       colors[textItem.attributes.background] || textItem.attributes.background;
+    const attributes = {
+      ...textItem.attributes,
+      background: rectColor,
+      borderRadius: TURN_QUOTE_BORDER_RADIUS,
+      outline: `solid 2px ${rectColor}`,
+    };
+
+    attributes.color = getNeedBlackText(rectColor) ? '#000' : '#fff';
+
     return {
       ...textItem,
-      attributes: {
-        ...textItem.attributes,
-        background: rectColor,
-        borderRadius: TURN_QUOTE_BORDER_RADIUS,
-        outline: `solid 2px ${rectColor}`,
-      },
+      attributes,
     };
   });
 };
@@ -57,12 +43,8 @@ export const ParagraphOriginalTexts = ({
   turnId,
   turnType,
   compressed = false,
-  // setTextIsReady = () => {},
-  // scrollPosition = -1, // специально ненастоящее значение, чтобы проверять
 }) => {
-  //
   const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
-
   return (
     <>
       {modifiedArrText.map((textItem, i) => {
@@ -88,8 +70,6 @@ export const ParagraphOriginalTexts = ({
     </>
   );
 };
-
-// export const ParagraphOriginalTextWrapper = React.memo(ParagraphOriginalTexts);
 
 export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   // const spanFragment = useRef(null);
@@ -128,14 +108,6 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
         if (startPosition < element.length) {
           items.push({ value: element.slice(startPosition), type: 'text' });
         }
-        // console.log(items);
-        // [{
-        //   value: 'Я пишу про ',
-        //   type: 'text',
-        // }, {
-        //   value: 'https://google.com',
-        //   type: 'link',
-        // }]
         return items.map((item, index2) => {
           if (item.type === 'text') return item.value;
           return (
@@ -158,33 +130,36 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   );
 };
 
-export const ParagraphCompressorTextWrapper = ({ arrText }) => {
-  // if (!arrText) return;
-  // console.log({ arrText });
-  const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
-  // console.log('ParagraphCompressorTextWrapper', arrText.length);
-  // return 'check';
+export const ParagraphCompressorTextWrapper = ({ arrText = [] }) => {
+  // const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
+  const [processed, setProcessed] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setProcessed(true);
+    }, 1000);
+  }, []);
   return (
     <>
-      {(modifiedArrText || []).map((textItem, i) => {
-        // @todo: refactoring
-        const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
-        const newInserts = [];
-        for (let j = 0; j < arrInserts.length; j++) {
-          newInserts.push(arrInserts[j]);
-          newInserts.push(<br key={j} />);
-        }
-        newInserts.pop();
-        return (
-          <CompressorSpanTextPiece
-            key={i}
-            {...{
-              textItem,
-              newInserts,
-            }}
-          />
-        );
-      })}
+      {!processed &&
+        arrText.map((textItem, i) => {
+          // @todo: refactoring
+          const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
+          const newInserts = [];
+          for (let j = 0; j < arrInserts.length; j++) {
+            newInserts.push(arrInserts[j]);
+            newInserts.push(<br key={j} />);
+          }
+          newInserts.pop();
+          return (
+            <CompressorSpanTextPiece
+              key={i}
+              {...{
+                textItem,
+                newInserts,
+              }}
+            />
+          );
+        })}
     </>
   );
 };
@@ -209,7 +184,6 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
             return (
               <Fragment key={'item' + index}>
                 {words.map((word, index2) => {
-                  // increment('WordMap');
                   return (
                     <span key={`item-${index}-${index2}`}>
                       {word}
@@ -229,107 +203,27 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
   );
 };
 
-/** @deprecated */
-export const TextAroundQuote = ({
-  // contentType,
-  // backgroundColor,
-  // fontColor,
-  // registerHandleResize,
-  // unregisterHandleResize,
-  // variableHeight,
-
-  paragraph,
-  scrollPosition,
-  height, // через этот viewport смотрим на кусок текста
-  setTextIsReady,
-}) => {
-  //
-  const paragraphEl = useRef(null);
-
-  useEffect(() => {
-    // @todo: check if no quotes
-    paragraphEl.current.scrollTop = scrollPosition;
-    setTimeout(() => {
-      // console.log(`${!paragraph?.current}, []`);
-      increment('txt_textAroundQuote');
-      if (!paragraphEl?.current) return;
-      paragraphEl.current.scrollTop = scrollPosition;
-      const quotes = [
-        ...paragraphEl.current.querySelectorAll('.compressed-quote'),
-      ];
-      if (!quotes?.length) {
-        console.log('no quotes in TextAroundQuote');
-        return;
-      }
-
-      const { top } = quotes[0].getBoundingClientRect();
-      const { bottom } = quotes[quotes.length - 1].getBoundingClientRect();
-      const middleLine = (top + bottom) / 2;
-      const { top: paragraphTop, bottom: paragraphBottom } =
-        paragraphEl.current.getBoundingClientRect();
-      const middleLineParagraph = (paragraphTop + paragraphBottom) / 2;
-      const fixScroll = Math.floor(middleLineParagraph - middleLine);
-      paragraphEl.current.scrollTop -= fixScroll;
-      setTextIsReady();
-      // for (let quote of quotes) {
-      // const { top, bottom } = quote.getBoundingClientRect();
-      // }
-      // console.log(middleLine, ' ', middleLineParagraph);
-    }, 300);
-  }, []);
-
-  return (
-    <div
-      className="paragraphText"
-      ref={paragraphEl}
-      style={{ height: `${height}px` }}
-    >
-      <ParagraphCompressorTextWrapper {...{ arrText: paragraph }} />
-    </div>
-  );
-};
-
 export const TextAroundQuoteOptimized = ({
   scrollPosition,
   height, // через этот viewport смотрим на кусок текста
-  setTextIsReady,
   arrText,
   turnId,
   turnType,
   index,
-  addToQuoteCollection,
   deltaTop,
   deltaScrollHeightTop,
   widgetTop,
-  widgetWidth,
+  // widgetWidth,
   quotes,
   parentClassNameId,
 }) => {
-  //
+  const { addToQuoteCollection } = useContext(CompressorContext);
   const paragraphEl = useRef(null);
 
   const [scrollTop, setScrollTop] = useState(0);
   const [quotesInfoPart, setQuotesInfoPart] = useState([]);
 
   const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
-
-  const { isDeveloperModeActive, setDevItem } = useDevPanel();
-
-  if (isDeveloperModeActive) {
-    setDevItem({
-      itemType: 'textaroundquotes',
-      id: classNameId,
-      params: {
-        x: 0,
-        y: deltaTop,
-        w: widgetWidth - TURN_SCROLLBAR_MARGIN,
-        h: height,
-        selector: `.${classNameId}`,
-      },
-      parentType: 'compressor',
-      parentId: parentClassNameId,
-    });
-  }
 
   useEffect(() => {
     // @todo: check if no quotes
@@ -346,50 +240,31 @@ export const TextAroundQuoteOptimized = ({
       const { top, left, width, height } = quote;
       quotesInfoPart.push({
         initialCoords: {
-          left: left,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop + widgetSpacer,
-          width,
-          height,
+          // @todo: get from size settings
+          left: left + 8 - 1,
+          top: top + widgetTop + deltaTop - deltaScrollHeightTop - 1, // + widgetSpacer,
+          width: width + 1,
+          height: height + 1,
         },
         quoteId: quote.quoteId,
         quoteKey: quote.quoteKey,
         turnId,
         text: quote.text,
         type: 'text',
-        width,
-        height,
-        left: left,
-        top: top,
+        width: width + 1,
+        height: height + 1,
+        left: left + 8 - 1,
+        top: top - 1,
       });
     }
 
     setQuotesInfoPart(quotesInfoPart);
-    setTextIsReady();
-  }, [paragraphEl]);
+  }, [paragraphEl, widgetTop]);
 
   useEffect(() => {
     if (!quotesInfoPart.length) return;
-    const blockTop = widgetTop + deltaTop + widgetSpacer;
-    const blockBottom = widgetTop + deltaTop + height + widgetSpacer;
-
-    if (isDeveloperModeActive) {
-      const quote = quotesInfoPart[0];
-      const top = quotes[0].top - deltaScrollHeightTop - scrollTop;
-      // quote.top - текущее значение от верха turn
-      setDevItem({
-        itemType: 'quoteincompressedpart',
-        id: `q_${quote.quoteKey}`,
-        params: {
-          x: quote.left,
-          y: top,
-          w: quote.width,
-          h: quote.height,
-          selector: `.q_${quote.quoteKey}`,
-        },
-        parentType: 'textaroundquotes',
-        parentId: classNameId, // id сжатого мини-параграфа, text around quote
-      });
-    }
+    const blockTop = widgetTop + deltaTop; // + widgetSpacer;
+    const blockBottom = widgetTop + deltaTop + height; // + widgetSpacer;
 
     addToQuoteCollection(
       quotesInfoPart.map((quoteInfo) => {
@@ -440,7 +315,7 @@ export const TextAroundQuoteOptimized = ({
 
   return (
     <div
-      className={`paragraphText ${classNameId}`}
+      className={`stb-widget-paragraph paragraphText ${classNameId}`}
       ref={paragraphEl}
       style={{ height: `${height}px` }}
     >

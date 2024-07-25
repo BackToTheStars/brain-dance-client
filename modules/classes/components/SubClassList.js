@@ -38,7 +38,7 @@ const SubClassList = ({
       ))}
       {editSubclassMode && (
         <div className="p-2">
-          <form className="form-inline d-flex" onSubmit={addSubClass}>
+          <form className="form-inline flex" onSubmit={addSubClass}>
             <Input
               ref={inputRef}
               className="me-2 flex-grow-1"

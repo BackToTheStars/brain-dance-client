@@ -6,23 +6,32 @@ const Delta = Quill.import('delta');
 Quill.register(colorModule, true);
 Quill.register(Delta, true);
 
+const lastRegisteredQuill = {};
+
 const getQuill = (containerSelector, toolbarSelector) => {
-  const quill = new Quill(containerSelector, {
-    // '#editor-container', {
-    modules: {
-      toolbar: {
-        container: toolbarSelector, // '#toolbar-container',
-        /*
+  const domEl = document.querySelector(containerSelector);
+  const containerExists =
+    lastRegisteredQuill[containerSelector]?.domEl === domEl;
+  const quill = containerExists
+    ? lastRegisteredQuill[containerSelector].quill
+    : new Quill(containerSelector, {
+        // '#editor-container', {
+        modules: {
+          toolbar: {
+            container: toolbarSelector, // '#toolbar-container',
+            /*
            'align': [],
            'size': ['10px', '20px', '80px'],
            'color': ['#FFF', '#000', 'yellow'],
            */
-        //[{background: ['#FFF', 'yellow']}]
-      },
-    },
-    placeholder: 'Compose an epic...',
-    theme: 'snow',
-  });
+            //[{background: ['#FFF', 'yellow']}]
+          },
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow',
+      });
+
+  lastRegisteredQuill[containerSelector] = { domEl, quill };
 
   quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
     const ops = delta.ops.map((op) => ({ insert: op.insert }));
@@ -41,8 +50,8 @@ const getQuill = (containerSelector, toolbarSelector) => {
   };
 };
 
-const checkIfParagraphExists = (paragraph) => {
-  return !!paragraph
+const checkIfParagraphExists = (inserts) => {
+  return !!inserts
     .map((item) => item.insert)
     .join('')
     .trim(); // @todo: remove after quill fix

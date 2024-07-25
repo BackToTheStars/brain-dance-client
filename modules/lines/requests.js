@@ -16,13 +16,6 @@ export const deleteLinesRequest = (ids) => {
   });
 };
 
-// export const updateLineRequest = (params) =>
-//   request(`lines/${params.id}?hash=${s.hash}`, {
-//     method: 'PUT',
-//     tokenFlag: true,
-//     body: params,
-//   });
-
 export const getLinesRequest = () => {
   return request(`lines?hash=${s.hash}`);
 };

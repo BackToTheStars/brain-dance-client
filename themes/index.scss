@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// === SETS ===
+@import "./sets/index.scss";
+
+// === BASE ===
+// mixins, buttons, etc.
+@import "./base/scss/index.scss";
+
+// === MODULES ===
+// @import "@/modules/ui/scss/index.scss";
+@import "./modules/ui.scss";
+// @import "@/modules/admin/scss/index.scss";
+@import "./modules/admin.scss";
+// @import "@/modules/lobby-refactoring/scss/index.scss";
+@import "./modules/lobby/index.scss";

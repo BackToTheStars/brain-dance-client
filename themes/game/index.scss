@@ -1,0 +1,17 @@
+@import './common/reset.scss';
+
+@import './vars/common-vars.scss';
+@import './vars/color-vars.scss';
+@import './vars/size-vars.scss';
+
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
+// @import './common/tailwind-tmp.scss';
+@import './common/bootstrap-tmp.scss';
+
+@import './base.scss';
+
+@import './turn.scss';
+@import './game.scss';
+@import './panels.scss';

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { RULE_TURNS_CRUD } from '@/config/user';
@@ -6,16 +5,8 @@ import {
   insertTurnFromBuffer,
   removeTurnFromBuffer,
 } from '@/modules/turns/redux/actions';
-// import dynamic from 'next/dynamic';
+import { reloadTurnsToPaste } from '@/modules/game/game-redux/actions';
 
-// const quillHelper = dynamic(
-//   () => import('@/modules/turns/components/helpers/quillHelper'),
-//   {
-//     ssr: false,
-//   }
-// );
-// const { paragraphToString } = quillHelper;
-// import { paragraphToString } from '@/modules/turns/components/helpers/quillHelper';
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
     .map((item) => item.insert)
@@ -26,25 +17,14 @@ const paragraphToString = (paragraph, length = 200) => {
 };
 
 const PasteTurnPanel = () => {
-  //
   const dispatch = useDispatch();
-  const getTurnFromBufferAndRemove = () => {};
-  const setPanelType = () => {};
 
   const { can } = useUserContext();
-  // const { insertTurnFromBuffer } = useTurnsCollectionContext();
   const turnsToPaste = useSelector((state) => state.turns.turnsToPaste);
 
-  // const {
-  //   bottomPanelSettings: { setPanelType }, // @learn {} второго уровня в деструктуризаторе (можно любую вложенность)
-  // } = useInteractionContext();
-
-  useEffect(() => {
-    if (!turnsToPaste.length) {
-      setPanelType(null);
-    }
-  }); // @learn усли второго аргумента нет, то компонент реагирует на любые изменения,
-  // через props, contexts, на все хуки и пропсы
+  if (!turnsToPaste.length) {
+    return null;
+  }
 
   return (
     <table className="table m-0 table-dark table-striped">
@@ -57,7 +37,8 @@ const PasteTurnPanel = () => {
       </thead>
       <tbody>
         {turnsToPaste.map((turn, index) => {
-          const { header, timeStamp, paragraph } = turn;
+          const { header, timeStamp, dWidgets, paragraph = [] } = turn;
+          // const paragraph = dWidgets.p_1.inserts; // @todo
           return (
             <tr key={index}>
               <td>
@@ -77,12 +58,13 @@ const PasteTurnPanel = () => {
                       dispatch(
                         insertTurnFromBuffer(timeStamp, {
                           successCallback: () => {
-                            console.log('success inserted turn from buffer');
+                            dispatch(removeTurnFromBuffer(timeStamp));
+                            dispatch(reloadTurnsToPaste());
                           },
                           errorCallback: (message) => {
                             console.log(message);
                           },
-                        })
+                        }),
                       );
                     }}
                   >
@@ -94,6 +76,7 @@ const PasteTurnPanel = () => {
                     onClick={() => {
                       if (confirm('Confirm: Delete turn from buffer?')) {
                         dispatch(removeTurnFromBuffer(timeStamp));
+                        dispatch(reloadTurnsToPaste());
                       }
                     }}
                   >

@@ -3,13 +3,11 @@ import {
   TURN_SCROLL_TIMEOUT_DELAY,
 } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
-import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import {
-  changeParagraphStage,
   markTurnAsChanged,
   updateScrollPosition,
 } from '@/modules/turns/redux/actions';
-// import { setCallsQueueIsBlocked } from '@/modules/ui/redux/actions';
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
@@ -17,129 +15,127 @@ import {
   getParagraphQuotesWithoutScroll,
   getScrolledQuotes,
 } from '../../helpers/quotesHelper';
-import { getParagraphStage } from '../../helpers/stageHelper';
-import {
-  ORIG_LOADING,
-  ORIG_READY,
-  ORIG_READY_TO_RECEIVE_PARAMS,
-} from './settings';
 
-// import { ACTION_TURN_WAS_CHANGED } from '@/components/contexts/TurnsCollectionContext';
-import {
-  ParagraphOriginalTexts,
-  // ParagraphOriginalTextWrapper,
-} from './TextWrappers';
-// import { useTurnData } from '../contexts/TurnData';
+import { ParagraphOriginalTexts } from './TextWrappers';
+import ParagraphEditButton from './EditButton';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
 const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 
 const ParagraphOriginal = ({
-  setParagraphElCurrent,
-  // stateIsReady,
   turnId,
-  notRegisteredWidgetsCount,
-  // setParagraphIsReady,
+  widgetId,
+  registerHandleResize,
+  unregisterHandleResize,
+  widgetsUpdatedTime,
 }) => {
-  const turn = useSelector((state) => state.turns.d[turnId]);
-  const {
-    compressed,
-    paragraph,
-    _id: turnId,
-    backgroundColor,
-    fontColor,
-    contentType,
-    scrollPosition,
-    width,
-    height,
-    wasReady,
-  } = turn;
+  const quotesDataRef = useRef(null);
+  const { can } = useUserContext();
+  const widget = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId],
+  );
+  const colors = useSelector((state) => state.turns.d[turnId].colors);
+  const contentType = useSelector((state) => state.turns.d[turnId].contentType);
+  const size = useSelector((state) => state.turns.g[turnId].size);
 
-  const stage = getParagraphStage(turn);
+  const { width, height } = size;
+
+  const paragraph = widget.inserts;
+  const fontColor = colors.font;
 
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
 
-  const [scrollTop, setScrollTop] = useState(scrollPosition); // дополнительный локальный стейт для быстрого ререндера цитат
-  const [quotesWithoutScroll, setQuotesWithoutScroll] = useState([]);
+  const [scrollTop, setScrollTop] = useState(0); // дополнительный локальный стейт для быстрого ререндера цитат
 
   const style = {};
 
-  if (contentType === 'comment') {
-    style.backgroundColor = backgroundColor;
-    style.color = fontColor || 'black';
+  if (contentType === 'comment' && fontColor) {
+    style.color = fontColor;
   }
-  if (compressed) {
-    style.visibility = 'hidden';
-    style.position = 'absolute';
-  }
-  // if (!!variableHeight) {
-  //   style.height = `${variableHeight}px`;
-  // }
-
-  // const topQuotesCount = quotesWithCoords.filter((quote) => {
-  //   return !!lineEnds[quote.quoteKey] && quote.position === 'top';
-  // }).length;
-
-  // const bottomQuotesCount = quotesWithCoords.filter((quote) => {
-  //   return !!lineEnds[quote.quoteKey] && quote.position === 'bottom';
-  // }).length;
-
-  // PARAGRAPH STAGE OF STATE MACHINE (same in Compressor.js)
-  useEffect(() => {
-    dispatch(changeParagraphStage(turnId, ORIG_LOADING));
-  }, []);
 
   useEffect(() => {
-    // полностью пересчитываем расположение цитат
-    const quotes = getParagraphQuotesWithoutScroll(turnId, paragraphEl);
-    setQuotesWithoutScroll(quotes);
-    dispatch(
-      quoteCoordsUpdate(
+    if (!paragraphEl.current) return;
+    let needToUpdate = false;
+    let widthChanged = false;
+    let firstRender = false;
+    if (!quotesDataRef.current || widgetsUpdatedTime) {
+      firstRender = true;
+      needToUpdate = true;
+      const quotesWithoutScroll = getParagraphQuotesWithoutScroll(
         turnId,
-        TYPE_QUOTE_TEXT,
-        getScrolledQuotes(quotes, paragraphEl, scrollTop)
-      )
-    );
-
-    // dispatch(markTurnAsChanged({ _id: turnId }));
-  }, [width]);
-
-  // useEffect(() => {
-
-  // }, [width, wasReady]);
-
-  useEffect(() => {
-    if (!quotesWithoutScroll.length) return;
-    // обновляем только вертикальное расположение цитат
-    turnScrollQueue.add(() => {
-      dispatch(
-        quoteCoordsUpdate(
-          turnId,
-          TYPE_QUOTE_TEXT,
-          getScrolledQuotes(quotesWithoutScroll, paragraphEl, scrollTop)
-        )
+        paragraphEl,
       );
+      quotesDataRef.current = {
+        turnEl: paragraphEl.current.closest('.stb-react-turn'),
+        width,
+        height,
+        scrollTop,
+        quotesWithoutScroll,
+        scrolledQuotes: getScrolledQuotes(
+          quotesWithoutScroll,
+          paragraphEl,
+          scrollTop,
+        ),
+      };
+    }
+    if (!quotesDataRef.current.turnEl) {
+      quotesDataRef.current.turnEl =
+        paragraphEl.current.closest('.stb-react-turn');
+    }
 
-      dispatch(markTurnAsChanged({ _id: turnId }));
-    });
-  }, [height, scrollTop, wasReady]); // stage, stateIsReady
-  // @todo: нужно учитывать stage
+    if (width !== quotesDataRef.current.width) {
+      needToUpdate = true;
+      widthChanged = true;
+      quotesDataRef.current.width = width;
+      quotesDataRef.current.quotesWithoutScroll =
+        getParagraphQuotesWithoutScroll(turnId, paragraphEl);
+    }
 
-  useEffect(() => {
-    if (paragraphEl?.current) setParagraphElCurrent(paragraphEl.current);
-  }, [paragraphEl]);
-
-  useEffect(() => {
-    paragraphEl.current.scrollTop = scrollPosition;
-    if (!!notRegisteredWidgetsCount) return;
-    // @todo: дождаться сигналы завершения от всех внутренних компонентов
-    // проверить что очередь заблокирована
-    setTimeout(() => {
-      // dispatch(setCallsQueueIsBlocked(false));
-      dispatch(changeParagraphStage(turnId, ORIG_READY_TO_RECEIVE_PARAMS));
-    }, 300);
-  }, [notRegisteredWidgetsCount]);
+    if (
+      widthChanged ||
+      height !== quotesDataRef.current.height ||
+      scrollTop !== quotesDataRef.current.scrollTop
+    ) {
+      needToUpdate = true;
+      quotesDataRef.current.height = height;
+      quotesDataRef.current.scrollTop = scrollTop;
+      quotesDataRef.current.scrolledQuotes = getScrolledQuotes(
+        quotesDataRef.current.quotesWithoutScroll,
+        paragraphEl,
+        scrollTop,
+      );
+    }
+    if (needToUpdate) {
+      if (!quotesDataRef.current.scrolledQuotes?.length) {
+        return;
+      }
+      if (firstRender) {
+        dispatch(
+          quoteCoordsUpdate(
+            turnId,
+            widgetId,
+            quotesDataRef.current.scrolledQuotes,
+          ),
+        );
+      } else {
+        quotesDataRef.current.turnEl.classList.add('quotes-queued');
+        turnScrollQueue.add(() => {
+          dispatch(
+            quoteCoordsUpdate(
+              turnId,
+              widgetId,
+              quotesDataRef.current.scrolledQuotes,
+            ),
+          );
+          quotesDataRef.current.turnEl.classList.remove('quotes-queued');
+        });
+      }
+    }
+  }, [width, height, scrollTop, paragraphEl.current, widgetsUpdatedTime]);
 
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
@@ -151,22 +147,12 @@ const ParagraphOriginal = ({
         paragraphScrollQueue.add(() => {
           dispatch(
             updateScrollPosition({
-              _id: turnId,
+              turnId,
+              widgetId,
               scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-            })
+            }),
           );
-          // @todo: сообщить сервисам минимапа и линий
         });
-
-        // dispatch({
-        //   type: ACTION_TURN_WAS_CHANGED,
-        //   payload: {
-        //     _id: turnId,
-        //     wasChanged: true,
-        //     scrollPosition: Math.floor(paragraphEl.current.scrollTop),
-        //   },
-        // });
-      } else {
       }
     };
 
@@ -178,30 +164,53 @@ const ParagraphOriginal = ({
     };
   }, [paragraphEl]);
 
+  useEffect(() => {
+    if (!paragraphEl || !paragraphEl.current) return;
+    const scrollHeight = paragraphEl?.current?.scrollHeight;
+    const resizeInfo = {
+      id: widgetId,
+      type: 'paragraph',
+      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
+      minHeightCallback: () => 40,
+      getDesiredHeight: ({ newHeight }) => {
+        return newHeight;
+      },
+      maxHeightCallback: () => {
+        return paragraphEl?.current?.scrollHeight || scrollHeight;
+      },
+    };
+    registerHandleResize(resizeInfo);
+    return () => unregisterHandleResize(widgetId);
+  }, [paragraphEl]);
+
+  useEffect(() => {
+    if (!paragraphEl.current) return;
+    if (scrollTop !== widget.scrollPosition) {
+      paragraphEl.current.scrollTop = widget.scrollPosition;
+    }
+  }, [widget.scrollPosition]);
+
   return (
-    <div className="wrapperParagraphText" style={style}>
+    <div
+      className="wrapperParagraphText turn-widget stb-widget-paragraph"
+      style={style}
+    >
       <p
-        className="paragraphText original-text noselect"
+        className="paragraphText original-text"
         ref={paragraphEl}
         style={style}
       >
-        {/* {!!topQuotesCount && (
-            <span className="top-quotes-counter">{topQuotesCount}</span>
-          )} */}
-        {/* <ParagraphOriginalTextWrapper */}
         <ParagraphOriginalTexts
           arrText={paragraph || []}
           turnId={turnId}
           turnType={contentType}
         />
-        {/* {!!bottomQuotesCount && (
-            <span className="bottom-quotes-counter">{bottomQuotesCount}</span>
-          )} */}
       </p>
+      {can(RULE_TURNS_CRUD) && (
+        <ParagraphEditButton turnId={turnId} widgetId={widgetId} />
+      )}
     </div>
   );
 };
-
-// export default React.memo(ParagraphOriginal);
 
 export default ParagraphOriginal;

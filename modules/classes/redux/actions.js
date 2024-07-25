@@ -5,7 +5,6 @@ import {
   getClassesRequest,
   updateClassRequest,
 } from '../requests';
-import { ACTION_CLASS_ADD } from 'old/components/contexts/ClassContext';
 
 export const loadClasses = () => {
   return (dispatch) => {
@@ -17,9 +16,7 @@ export const loadClasses = () => {
 
 const _getAlias = (title, nextId) => {
   let name = _getNameAlias(title);
-  // if (classes.find((classItem) => classItem.name === name)) {
   name = name + `_${nextId}`;
-  // }
   return name;
 };
 
@@ -56,10 +53,3 @@ export const removeClass = (id) => {
     });
   };
 };
-
-// loadClasses(hash)(dispatch); вот так это работает
-
-// const dispatch = () => {}
-// applyDispatch = (callback) => {
-//   return callback()(dispatch)
-// }

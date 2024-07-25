@@ -1,0 +1,42 @@
+/** bootstrap overwrite */
+// @todo: switch to own and remove
+.btn {
+  cursor: pointer;
+  border-radius: 0.375rem;
+  border: 1px solid var(--panel-buttons-border-color);
+  background-color: var(--panel-buttons-bg-color);
+  &:hover {
+    background-color: var(panel-buttons-hover-bg-color);
+  }
+}
+
+.btn-success,
+.btn-primary,
+.btn-danger {
+  color: var(--panel-buttons-font-color);
+  opacity: 0.65;
+}
+
+.btn-success:hover,
+.btn-primary:hover,
+.btn-danger:hover {
+  opacity: 0.9;
+}
+
+.btn-accent {
+  color: var(--white-color);
+  background-color: #ff8503;
+  opacity: 1;
+
+  &:hover {
+    background-color: #d27512;
+    color: var(--white-color);
+  }
+}
+
+.btn-group-sm>.btn,
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+}

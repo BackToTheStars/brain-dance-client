@@ -1,0 +1,9 @@
+.drag-n-drop-file {
+  border: 1px solid #fff;
+  padding: 10px;
+  cursor: pointer;
+  margin: 10px 0;
+  &:hover {
+    border: 1px solid #ccc;
+  }
+}

@@ -1,6 +1,18 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
 
+export const getTurnsGeometryRequest = (hash) => {
+  return request(`turns/geometry?hash=${s.hash}`, {
+    tokenFlag: true,
+  });
+};
+
+export const getTurnsByIdsRequest = (ids) => {
+  return request(`turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
+    tokenFlag: true,
+  });
+};
+
 export const createTurnRequest = (body) => {
   return request(`turns/?hash=${s.hash}`, {
     method: 'POST',
@@ -25,6 +37,7 @@ export const deleteTurnRequest = (id) => {
 };
 
 export const updateCoordinatesRequest = (changedTurns) => {
+  if (!changedTurns.length) return Promise.resolve();
   return request(`turns/coordinates?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'PUT',
@@ -34,8 +47,18 @@ export const updateCoordinatesRequest = (changedTurns) => {
   });
 };
 
+export const updateScrollPositionsRequest = (scrollPositions) => {
+  return request(`turns/scroll-positions?hash=${s.hash}`, {
+    tokenFlag: true,
+    method: 'PUT',
+    body: {
+      turns: scrollPositions,
+    },
+  });
+};
+
 export const getTokenRequest = (action) => {
-  return request(`games/tokens?hash=${s.hash}`, {
+  return request(`codes/static-token?hash=${s.hash}`, {
     tokenFlag: true,
     method: 'POST',
     body: {

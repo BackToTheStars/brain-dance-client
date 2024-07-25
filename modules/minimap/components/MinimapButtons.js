@@ -7,7 +7,6 @@ const MinimapButtons = ({
   setMinimapSizePercents,
   isMinimized,
 }) => {
-  //
   const handleMapMinus = () => {
     if (minimapSizePercents <= 60) return false;
     setMinimapSizePercents(minimapSizePercents - 10);
@@ -21,8 +20,28 @@ const MinimapButtons = ({
   const dispatch = useDispatch();
 
   return (
-    <>
+    <div className="percent-map-wrap-holder">
       <div className="percent-map-wrap">
+        <div className="map-icon">
+          <svg
+            width={24}
+            height={24}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            onClick={() =>
+              dispatch(toggleMinimizePanel({ type: PANEL_MINIMAP }))
+            }
+          >
+            <path
+              d="M15 4L9 7M9 20L3.55279 17.2764C3.214 17.107 3 16.7607 3 16.382V5.61803C3 4.87465 3.78231 4.39116 4.44721 4.72361L9 7V20ZM9 20L15 17L9 20ZM9 20V7V20ZM15 17L19.5528 19.2764C20.2177 19.6088 21 19.1253 21 18.382V7.61803C21 7.23926 20.786 6.893 20.4472 6.72361L15 4V17ZM15 17V4V17Z"
+              stroke="white"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
         {!isMinimized && (
           <>
             <svg
@@ -59,26 +78,8 @@ const MinimapButtons = ({
           </>
         )}
       </div>
-
-      <div className="map-icon">
-        <svg
-          width={24}
-          height={24}
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          onClick={() => dispatch(toggleMinimizePanel({ type: PANEL_MINIMAP }))}
-        >
-          <path
-            d="M15 4L9 7M9 20L3.55279 17.2764C3.214 17.107 3 16.7607 3 16.382V5.61803C3 4.87465 3.78231 4.39116 4.44721 4.72361L9 7V20ZM9 20L15 17L9 20ZM9 20V7V20ZM15 17L19.5528 19.2764C20.2177 19.6088 21 19.1253 21 18.382V7.61803C21 7.23926 20.786 6.893 20.4472 6.72361L15 4V17ZM15 17V4V17Z"
-            stroke="white"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </>
+   
+    </div>
   );
 };
 

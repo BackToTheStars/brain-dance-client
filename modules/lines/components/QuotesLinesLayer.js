@@ -1,26 +1,13 @@
-// import {
-//   useInteractionContext,
-//   MODE_GAME,
-// } from '../contexts/InteractionContext';
-// import { useTurnsCollectionContext } from '../contexts/TurnsCollectionContext';
 import { utils } from '@/modules/game/components/helpers/game';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import Line from './Line';
-// import { useUiContext } from '../contexts/UI_Context';
+import LogicLine from './LogicLine';
 
-const QuotesLinesLayer = ({ svgLayerZIndex }) => {
+const QuotesLinesLayer = () => {
+  const d = useSelector((state) => state.lines.d);
   const svgLayer = useRef();
-
-  const viewportHeight = window ? window.innerHeight : 1600;
-  const viewportWidth = window ? window.innerWidth : 1200; // @todo сделать импорт из UI Context
-  // const { linesWithEndCoords } = useTurnsCollectionContext();
-  const linesWithEndCoords = useSelector(
-    (state) => state.lines.linesWithEndCoords
-  );
-
-  // turns {_id, x, y, width, height}
-  // lines {sourceTurnId, sourceMarker, targetTurnId, targetMarker}
+  const viewport = useSelector((state) => state.game.viewport);
+  const lines = useMemo(() => Object.values(d), [d]);
 
   useEffect(() => {
     if (!svgLayer?.current) return;
@@ -30,40 +17,37 @@ const QuotesLinesLayer = ({ svgLayerZIndex }) => {
       e.shiftKey ? utils.moveScene(2 * delta, 0) : utils.moveScene(0, delta);
     };
 
-    svgLayer.current.addEventListener('wheel', scrollMove);
+    svgLayer.current.addEventListener('wheel', scrollMove, { passive: false });
     return () => {
       svgLayer?.current?.removeEventListener('wheel', scrollMove);
     };
   }, [svgLayer?.current]);
 
+  const { viewBox, styles } = useMemo(() => {
+    return {
+      viewBox: `0 0 ${viewport.width * 3} ${viewport.height * 3}`,
+      styles: {
+        width: `${viewport.width * 3}px`,
+        height: `${viewport.height * 3}px`,
+        left: `${-viewport.width}px`,
+        top: `${-viewport.height}px`,
+      },
+    };
+  }, [viewport]);
+
   return (
     <>
       <svg
-        viewBox={`0 0 ${viewportWidth} ${viewportHeight}`}
+        viewBox={viewBox}
+        style={styles}
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
-        className={svgLayerZIndex ? 'front-elements' : ''}
         ref={svgLayer}
       >
-        {linesWithEndCoords.map((lineWithEndCoords) => {
-          // console.log(lineWithEndCoords.line._id);
-          return (
-            <Line
-              key={lineWithEndCoords.line._id}
-              sourceCoords={lineWithEndCoords.sourceCoords}
-              targetCoords={lineWithEndCoords.targetCoords}
-            />
-          );
+        {lines.map((line) => {
+          return <LogicLine key={line._id} id={line._id} />;
         })}
       </svg>
-      {!svgLayerZIndex && (
-        <div className="rec-rectangle">
-          <div className="rec-label"></div>
-          <div className="rec-text">
-            <h4>EDIT</h4>
-          </div>
-        </div>
-      )}
     </>
   );
 };

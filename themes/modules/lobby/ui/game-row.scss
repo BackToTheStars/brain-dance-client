@@ -1,0 +1,29 @@
+.game-row {
+  @apply flex w-full items-center gap-6 cursor-pointer py-2;
+  .game-item {
+    max-width: calc(100% - 54px);
+    button.hover-show {
+      transition: opacity 0.2s ease-in-out;
+      opacity: 0;
+    }
+    &:hover {
+      button.hover-show {
+        opacity: 1;
+      }
+    }
+    &__title {
+      max-width: calc(100% - 64px);
+    }
+  }
+}
+.circle-cell {
+  @apply w-[30px] h-[30px] flex-[0_0_30px] flex justify-center items-center
+    rounded-full;
+  border: 1px solid var(--border-button);
+  &__text {
+    @apply text-[12px] font-bold;
+  }
+}
+.game-cell {
+  @apply flex-[0_1_100%] flex justify-between text-xl cursor-pointer;
+}

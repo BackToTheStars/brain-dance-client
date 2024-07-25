@@ -5,13 +5,12 @@ const ColorPicker = ({ value, changeHandler, widgetSettings, label }) => {
   // для последнего ColorPicker
   useEffect(() => {
     if (!!widgetSettings.defaultColor && !value) {
-      console.log(widgetSettings.defaultColor);
       changeHandler(widgetSettings.defaultColor);
     }
   }, [widgetSettings.defaultColor]);
 
   return (
-    <div className="d-flex align-items-center">
+    <div className="flex align-items-center">
       <label className="me-2" style={{ fontSize: '16px', width: '95px' }}>
         {label}:
       </label>

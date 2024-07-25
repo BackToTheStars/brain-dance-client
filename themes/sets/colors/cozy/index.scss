@@ -1,0 +1,75 @@
+// cozy colors
+// :root {
+.cozy-schema {
+  --skin-cozy-1: #f8f0e3; // светло-бежевый
+  --skin-cozy-2: #eed6c4; // песочный
+  --skin-cozy-3: #d3b8a6; // бледно-коричневый
+  --skin-cozy-4: #b89c8e; // теплый серо-коричневый
+  --skin-cozy-5: #9d8177; // глубокий бежево-коричневый
+
+  --skin-cozy-text: #5a4639; // темно-коричневый
+  --skin-cozy-accent: #c2502d; // терракотовый
+
+  --skin-cozy-border: #a4978e; // светло-серый с коричневатым оттенком
+  --skin-cozy-shadow: rgba(90, 70, 57, 0.2); // тень (с прозрачностью)
+}
+
+// .light {
+.cozy-schema.light {
+  --text-base: var(--skin-cozy-text);
+  --bg-base: var(--skin-cozy-1);
+  --bg-panel: var(--skin-cozy-3);
+  --bg-card: var(--skin-cozy-2);
+
+  --border-base: var(--skin-cozy-border);
+  --border-body-divider: var(--skin-cozy-4);
+  --border-panel-divider: var(--skin-cozy-5);
+
+  --bg-button-hover: var(--skin-cozy-accent);
+  --text-button-hover: var(--skin-cozy-1);
+  --border-button-hover: var(--skin-cozy-5);
+
+  --backdrop-color: rgba(255, 255, 255, 0.7);
+
+  --input-text-color: var(--skin-cozy-text);
+  --input-bg-color: var(--skin-cozy-1);
+  --input-border-color: var(--skin-cozy-4);
+}
+
+// .dark {
+.cozy-schema.dark {
+  --text-base: var(--skin-cozy-1);
+  --bg-base: var(--skin-cozy-5);
+  --bg-panel: var(--skin-cozy-4);
+  --bg-card: var(--skin-cozy-3);
+
+  --border-base: var(--skin-cozy-border);
+  --border-body-divider: var(--skin-cozy-2);
+  --border-panel-divider: var(--skin-cozy-1);
+
+  --bg-button-hover: var(--skin-cozy-accent);
+  --text-button-hover: var(--skin-cozy-5);
+  --border-button-hover: var(--skin-cozy-1);
+
+  --backdrop-color: rgba(0, 0, 0, 0.7);
+
+  --input-text-color: var(--skin-cozy-1);
+  --input-bg-color: var(--skin-cozy-5);
+  --input-border-color: var(--skin-cozy-2);
+}
+
+// Блоки и компоненты
+// :root {
+.cozy-schema {
+  --text-card-title: var(--text-base-2);
+
+  --bg-button: var(--bg-panel);
+  --text-button: var(--text-base);
+  --border-button: var(--border-base);
+}
+
+// body {
+body.cozy-schema {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+}

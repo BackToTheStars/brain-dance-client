@@ -7,26 +7,14 @@ import { getQueue } from '../../helpers/queueHelper';
 
 const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 
+const round100 = (num) => Math.round(num * 100) / 100;
+
 const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
   const dispatch = useDispatch();
-
-  const [crop, setCrop] = useState(
-    stateCrop || {
-      unit: '%',
-      // x: 10,
-      // y: 10,
-      // width: 20,
-      // height: 20,
-    }
-  );
-
-  // useEffect(() => {
-  //     const quote = quotes.find((quote) => quote.id === activeQuote.quoteId);
-  //     const { x, y, height, width } = quote;
-  //     setCrop({ unit: '%', x, y, width, height });
-  // }, []);
+  const [crop, setCrop] = useState();
 
   useEffect(() => {
+    if (!crop) return;
     cropQueue.add(() => {
       dispatch(
         changeWidgetParams({
@@ -34,10 +22,10 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
           params: {
             crop: {
               ...crop,
-              width: Math.round(crop.width * 100) / 100,
-              height: Math.round(crop.height * 100) / 100,
-              x: Math.round(crop.x * 100) / 100,
-              y: Math.round(crop.y * 100) / 100,
+              width: round100(crop.width),
+              height: round100(crop.height),
+              x: round100(crop.x),
+              y: round100(crop.y),
             },
             activeQuoteId,
           },
@@ -54,7 +42,9 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
       onChange={(newCrop, newPercentCrop) => {
         setCrop(newPercentCrop);
       }}
-    />
+    >
+      <img src={imageUrl} alt="crop" />
+    </ReactCrop>
   );
 };
 

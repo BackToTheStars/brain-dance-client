@@ -1,14 +1,10 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  filterLinesByQuoteKey,
-  filterLinesByQuoteKeys,
-  filterLinesByTurnId,
-} from '@/modules/lines/components/helpers/line';
+import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
 import * as panelTypes from '@/modules/panels/redux/types';
 import { lineDelete } from '@/modules/lines/redux/actions';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { PANEL_LINES } from '../settings';
 
 const cutTextToSize = (text, size) => {
@@ -16,28 +12,31 @@ const cutTextToSize = (text, size) => {
   return text.slice(0, size) + '...';
 };
 
+const getQuoteLabel = (quoteInfo) => {
+  if (!quoteInfo) return '';
+  if (quoteInfo.type === 'picture') return 'picture';
+  {
+    /* сделать резиновую обрезку текста */
+  }
+  return cutTextToSize(quoteInfo.text || '', 22);
+};
+
 const LineRow = ({ line, can, handleDelete }) => {
   const sourceQuoteInfo = useSelector(
-    (state) => state.quotes.d[`${line.sourceTurnId}_${line.sourceMarker}`]
+    (s) => s.lines.quotesInfoByQuoteKey[`${line.sourceTurnId}_${line.sourceMarker}`],
   );
   const targetQuoteInfo = useSelector(
-    (state) => state.quotes.d[`${line.targetTurnId}_${line.targetMarker}`]
+    (s) => s.lines.quotesInfoByQuoteKey[`${line.targetTurnId}_${line.targetMarker}`],
   );
   return (
     <tr>
       <td>{line.author}</td>
       <td>{line.type}</td>
-      <td>
-        {!!sourceQuoteInfo && cutTextToSize(sourceQuoteInfo.text || '', 22)}
-      </td>
-      <td>
-        {!!targetQuoteInfo && cutTextToSize(targetQuoteInfo.text || '', 22)}
-        {/* сделать резиновую обрезку текста */}
-      </td>
+      <td>{getQuoteLabel(sourceQuoteInfo)}</td>
+      <td>{getQuoteLabel(targetQuoteInfo)}</td>
       {can(RULE_TURNS_CRUD) && (
         <td className="text-end">
           <button
-            // className="del-btn"
             className="btn btn-danger"
             onClick={(e) => handleDelete(e, line._id)}
           >
@@ -50,13 +49,17 @@ const LineRow = ({ line, can, handleDelete }) => {
 };
 
 const LinesPanel = () => {
-  // const editTurnId = useSelector((state) => state.panels.editTurnId);
-  // const turn = useSelector((state) => state.turns.d[editTurnId])
-
-  const lines = useSelector((state) => state.lines.lines);
+  const dByTurnIdAndMarker = useSelector(
+    (state) => state.lines.dByTurnIdAndMarker,
+  );
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
-  // const preparedLines = turn ? filterLinesByTurnId(lines, turn._id) : filterLinesByQuoteKey(lines, activeQuoteKey);
-  const preparedLines = filterLinesByQuoteKey(lines, activeQuoteKey);
+  const connectedLines = useMemo(() => {
+    if (!activeQuoteKey) return {};
+    const [turnId, marker] = activeQuoteKey.split('_');
+    return (
+      (dByTurnIdAndMarker[turnId] && dByTurnIdAndMarker[turnId][marker]) || []
+    );
+  }, [dByTurnIdAndMarker, activeQuoteKey]);
 
   const dispatch = useDispatch();
   const { can } = useUserContext();
@@ -68,17 +71,16 @@ const LinesPanel = () => {
     }
   };
 
-  useEffect(() => {
-    if (!preparedLines.length) {
-      dispatch({
-        type: panelTypes.PANEL_TOGGLE,
-        payload: { open: false, type: PANEL_LINES },
-      });
-    }
-  }, [preparedLines]);
+  // useEffect(() => {
+  //   if (!connectedLines.length) {
+  //     dispatch({
+  //       type: panelTypes.PANEL_TOGGLE,
+  //       payload: { open: false, type: PANEL_LINES },
+  //     });
+  //   }
+  // }, [connectedLines]);
 
-  if (!preparedLines.length) {
-    // return 'no preparedLines';
+  if (!connectedLines.length) {
     return null;
   }
 
@@ -94,9 +96,7 @@ const LinesPanel = () => {
         </tr>
       </thead>
       <tbody>
-        {preparedLines.map((line, index) => {
-          const { sourceQuoteInfo, targetQuoteInfo } = line;
-
+        {connectedLines.map((line, index) => {
           return (
             <LineRow
               key={index}

@@ -2,19 +2,24 @@ import { getShortLink } from '../../helpers/formatters/urlFormatter';
 import { dateFormatter } from '../../helpers/formatters/dateFormatter';
 import EarthLink from '@/modules/ui/icons/EarthLink';
 import CalendarDate from '@/modules/ui/icons/CalendarDate';
+import { memo } from 'react';
 
-const DateAndSourceUrl = ({ sourceUrl, date }) => {
+const DateAndSourceUrl = ({ url, date }) => {
   return (
-    <div className="flex_mod">
-      {!!sourceUrl && (
-        <a href={sourceUrl} className="flex_mod_site" target="_blank">
+    <div className="flex items-center gap-3 stb-react-turn__subtitle">
+      {!!url && (
+        <a
+          href={url}
+          className="stb-react-turn__link flex items-center gap-1"
+          target="_blank"
+        >
           <EarthLink />
-          <span>{getShortLink(sourceUrl)}</span>
+          <span>{getShortLink(url)}</span>
         </a>
       )}
 
       {!!date && (
-        <div className="mod_date">
+        <div className="flex items-center gap-1">
           <CalendarDate />
           <span>{dateFormatter(date)}</span>
         </div>
@@ -23,4 +28,4 @@ const DateAndSourceUrl = ({ sourceUrl, date }) => {
   );
 };
 
-export default DateAndSourceUrl;
+export default memo(DateAndSourceUrl);

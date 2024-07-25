@@ -1,24 +1,43 @@
-import { increment } from '@/modules/telemetry/utils/logger';
 import { createLinesRequest, deleteLinesRequest } from '../requests';
 import * as types from './types';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 
 export const quoteCoordsUpdate =
-  (turnId, type, quotesWithCoords) => (dispatch) => {
-    increment('quoteCoordsUpdate');
+  (turnId, widgetId, quotesWithCoords) => (dispatch, getState) => {
+    const state = getState();
+    const currentQuotesWithCoords = state.lines.quotesInfo[turnId]?.[widgetId];
+
+    if (
+      currentQuotesWithCoords?.length === quotesWithCoords.length &&
+      JSON.stringify(currentQuotesWithCoords) ===
+        JSON.stringify(quotesWithCoords)
+    ) {
+      return;
+    }
+    
+    const d = (currentQuotesWithCoords || []).reduce((d, quote) => {
+      d[quote.quoteId] = quote;
+
+      return d;
+    }, {});
+
     return dispatch({
       type: types.LINES_QUOTE_COORDS_UPDATE,
-      payload: { turnId, quotesWithCoords, type },
+      payload: {
+        turnId,
+        quotesWithCoords: quotesWithCoords.map((newQuote) => {
+          if (
+            JSON.stringify(newQuote) === JSON.stringify(d[newQuote.quoteId])
+          ) {
+            return d[newQuote.quoteId];
+          }
+
+          return newQuote;
+        }),
+        widgetId,
+      },
     });
   };
-
-export const linesWithEndCoordsUpdate = (linesWithEndCoords) => (dispatch) => {
-  increment('LINES_WITH_END_COORDS_UPDATE');
-  return dispatch({
-    type: types.LINES_WITH_END_COORDS_UPDATE,
-    payload: linesWithEndCoords,
-  });
-};
 
 export const lineDelete = (id) => (dispatch) => {
   deleteLinesRequest([id]).then((data) => {

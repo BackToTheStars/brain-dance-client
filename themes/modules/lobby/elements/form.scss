@@ -1,0 +1,20 @@
+.lobby-form {
+  @apply w-full h-full py-3 flex flex-col;
+}
+
+.base-card_modal {
+  .lobby-form {
+    .lobby-form__input-label {
+      // @apply absolute left-[32px] text-sm top-[-12px] dark:bg-black bg-light
+      //   px-3 dark:text-main-text text-dark-light;
+      @apply absolute left-[32px] text-sm top-[-12px] px-3;
+      background-color: var(--bg-panel);
+    }
+
+    .lobby-form__input {
+      // @apply border-2 border-main px-4 py-2 rounded-full outline-none
+      //   bg-transparent w-full dark:text-main-text text-dark-light;
+      @apply border-2 px-4 py-2 rounded-full outline-none bg-transparent w-full;
+    }
+  }
+}

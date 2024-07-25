@@ -1,0 +1,82 @@
+.base-input {
+    color: var(--input-text-color);
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+  //   --input-padding-unit: var(--size-unit);
+  //   --border-radius-input: calc(2 * var(--input-padding-unit));
+  //   border-radius: var(--border-radius-input);
+  
+  //   font-size: var(--fs-base);
+  // }
+  
+  // .base-input {
+  //   --input-padding-unit: var(--size-unit);
+  //   font-size: var(--fs-base);
+  
+  //   --border-radius-input: calc(var(--border-radius-multiplier) * var(--border-radius-unit));
+  //   border-radius: var(--border-radius-input);
+  
+  //   $sizes: xs, sm, md, lg, xl;
+  
+  //   @each $size in $sizes {
+  //     &.base-input--#{$size} {
+  //       --border-radius-input: calc(var(--border-radius-multiplier-#{$size}) * var(--border-radius-unit));
+  //     }
+  //   }
+  // }
+  
+  // @mixin padding-and-spacing-styles($unit, $leftRightMultiplier, $topBottomMultiplier, $fontSize) {
+  //   @include custom-spacing-first-level($unit);
+    
+  //   font-size: var($fontSize);
+  // }
+  
+  // .base-button, .base-input {
+  //   &--xs {
+  //     @include padding-and-spacing-styles(2px, 2, 1, --fs-xs);
+  //   }
+  
+  //   &--sm {
+  //     @include padding-and-spacing-styles(2px, 3, 1, --fs-sm);
+  //   }
+    
+  //   &--md {
+  //     @include padding-and-spacing-styles(3px, 4, 2, --fs-md);
+  //   }
+  
+  //   &--lg {
+  //     @include padding-and-spacing-styles(4px, 5, 3, --fs-lg);
+  //   }
+  
+  //   &--xl {
+  //     @include padding-and-spacing-styles(5px, 6, 4, --fs-xl);
+  //   }
+  }
+  
+
+.base-input {
+  --input-padding-unit: var(--size-unit);
+
+  $sizes: xs, sm, md, lg, xl;
+
+  @each $size in $sizes {
+    &.base-input--#{$size} {
+      --padding-x-input: calc(
+        var(--padding-x-multiplier-#{$size}) * var(--padding-unit)
+      );
+      --padding-y-input: calc(
+        var(--padding-y-multiplier-#{$size}) * var(--padding-unit)
+      );
+      font-size: var(--fs-#{$size});
+    }
+  }
+}
+
+.base-input {
+  font-size: var(--fs-base);
+  padding-left: var(--padding-x-input);
+  padding-right: var(--padding-x-input);
+  padding-top: var(--padding-y-input);
+  padding-bottom: var(--padding-y-input);
+  gap: calc(2 * var(--size-unit));
+}

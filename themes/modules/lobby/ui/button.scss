@@ -1,0 +1,17 @@
+// @deprecated
+// .lobby-button {
+//   background-color: var(--bg-button);
+//   color: var(--text-button);
+//   border: 2px solid var(--border-button);
+//   --button-padding-unit: 3px; // Установка CSS переменной
+//   --border-radius-button: calc(2 * var(--button-padding-unit));
+//   border-radius: var(--border-radius-button);
+//   @include custom-spacing-first-level(
+//     var(--button-padding-unit)
+//   ); // Применение миксина
+//   &:hover {
+//     background-color: var(--bg-button-hover);
+//     color: var(--text-button-hover);
+//     border-color: var(--border-button-hover);
+//   }
+// }

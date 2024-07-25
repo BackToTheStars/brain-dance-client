@@ -10,8 +10,8 @@ const FormInput = ({
   form,
 }) => {
   return (
-    <div className={`form-group row ${prefixClass}-row mb-2`}>
-      <div className="col-sm-10" style={{ width: '770px', maxWidth: '100%' }}>
+    <div className={`row ${prefixClass}-row mb-2`}>
+      <div className="w-5/6" style={{ width: '745px', maxWidth: '100%' }}>
         {inputType === 'component' &&
           widgetSettings.render({
             form,
@@ -47,7 +47,7 @@ const FormInput = ({
               value={value}
               onChange={(e) =>
                 changeHandler(
-                  inputType === 'checkbox' ? e.target.checked : e.target.value
+                  inputType === 'checkbox' ? e.target.checked : e.target.value,
                 )
               }
               checked={inputType === 'checkbox' && value}

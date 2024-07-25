@@ -89,10 +89,6 @@ export const getTimestampsNotExpired = () => {
   return timeStampsNotExpired;
 };
 
-// const [savedLinesToPaste, setSavedLinesToPaste] = useState(
-//   typeof window !== 'undefined' ? getLinesNotExpired() || {} : {}
-// );
-
 let savedLinesToPaste = [];
 const setSavedLinesToPaste = (newLines) => {
   savedLinesToPaste = newLines;
@@ -103,8 +99,6 @@ const setTimeStamps = (newTimeStamps) => {
   timeStamps = newTimeStamps;
 };
 export const getTimeStamps = () => timeStamps; // @todo: проверить, нужна ли функция
-
-// const [timeStamps, setTimeStamps] = useState([]);
 
 const addTimeStamp = () => {
   const timeStamp = new Date().getTime(); // значение в мс после 1 января 1970 года
@@ -132,7 +126,3 @@ const addLinesToStorage = (octopusLines) => {
   saveIntoLocalStorage(lines, 'savedLinesToPaste');
   setSavedLinesToPaste(lines);
 };
-
-// useEffect(() => {
-//   setTimeStamps(getTimestampsNotExpired());
-// }, []); // выполнится после первого рендера

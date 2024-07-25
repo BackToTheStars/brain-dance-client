@@ -1,62 +1,72 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, memo } from 'react';
 import { HEADER_HEIGHT, HEADER_HEIGHT_2 } from '@/config/ui';
 import DateAndSourceUrl from './header/DateAndSourceUrl';
-import ButtonsMenu from './header/ButtonsMenu';
 import { getCommentHeaderColor } from '../helpers/colorHelper';
+import { useSelector } from 'react-redux';
+import { getNeedBlackText } from '../helpers/color';
+import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
+import { WIDGET_HEADER } from '../../settings';
 //const HEADER_HEIGHT = 105;
 
 const Header = ({
+  widgetId,
   registerHandleResize,
+  unregisterHandleResize,
   _id,
-  header,
-  contentType,
-  backgroundColor,
-  fontColor,
-  dontShowHeader,
-  sourceUrl,
-  date,
 }) => {
+  const contentType = useSelector((state) => state.turns.d[_id].contentType);
+  const { url, date } = useSelector((state) => state.turns.d[_id].dWidgets.s_1);
+  const { text, show } = useSelector(
+    (state) => state.turns.d[_id].dWidgets[widgetId],
+  );
+  const { font, background } = useSelector(
+    (state) => state.turns.d[_id].colors,
+  );
+
   const headerEl = useRef(null);
 
-  const headerHeight = !!sourceUrl || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
+  const headerHeight = !!url || !!date ? HEADER_HEIGHT : HEADER_HEIGHT_2;
 
-  const style = useMemo(() => {
-    let style = {
+  const { wrapperStyle, titleStyle } = useMemo(() => {
+    const wrapperStyle = {
       height: `${headerHeight}px`,
     };
-    if (contentType === 'comment' && !dontShowHeader) {
-      style = {
-        ...style,
-        backgroundColor: getCommentHeaderColor(backgroundColor),
-        color: fontColor || 'black',
-      };
+    const titleStyle = {};
+    if (contentType === 'comment' && show) {
+      const backgroundColor = getCommentHeaderColor(background);
+      wrapperStyle.backgroundColor = backgroundColor;
+      titleStyle.color = getNeedBlackText(background) ? '#000' : '#fff';
     }
-    return style;
-  }, [dontShowHeader, backgroundColor, fontColor, contentType]);
+    return { wrapperStyle, titleStyle };
+  }, [show, background, font, contentType]);
 
   useEffect(() => {
     registerHandleResize({
-      type: 'header',
-      id: 'header1',
-      minWidthCallback: () => 300,
+      type: WIDGET_HEADER,
+      id: widgetId,
+      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
       minHeightCallback: () => {
-        return dontShowHeader ? 0 : headerHeight;
+        return !show ? 0 : headerHeight;
       },
-      maxHeightCallback: () => (dontShowHeader ? 0 : headerHeight),
+      maxHeightCallback: () => (!show ? 0 : headerHeight),
     });
-  }, [dontShowHeader]);
+    return () => unregisterHandleResize({ id: widgetId });
+  }, [show]);
 
   return (
     <>
-      <div className="headerText" ref={headerEl} style={style}>
-        <div className="headerTextTitle">{header}</div>
-        {!!(date || sourceUrl) && <DateAndSourceUrl {...{ date, sourceUrl }} />}
+      <div
+        className="stb-widget-header turn-widget"
+        ref={headerEl}
+        style={wrapperStyle}
+      >
+        <div className="stb-widget-header__title" style={titleStyle}>
+          {text}
+        </div>
+        {!!(date || url) && <DateAndSourceUrl date={date} url={url} />}
       </div>
-      <ButtonsMenu {...{ _id }} />
     </>
   );
 };
 
-const MemorizedHeader = React.memo(Header);
-
-export default MemorizedHeader;
+export default memo(Header);

@@ -1,0 +1,98 @@
+// Базовая цветовая гамма и размеры
+// Блок 1. Общие названия scss и css переменных, которые могут быть использованы
+// только на уровне скина
+// :root {
+.business-schema {
+  --skin-text-color: #fff;
+  --skin-text-color-2: #b2b2b2;
+
+  --skin-text-color-5: #333;
+  --skin-text-color-6: #d6d6d6;
+
+  --skin-bg-color: #070d11;
+  --skin-bg-color-2: #0c1e35;
+  --skin-bg-color-3: #294377;
+
+  --skin-bg-color-5: #fff;
+  --skin-bg-color-6: #f3f4f6;
+
+  --skin-border-color: #426498;
+  --skin-border-color-2: #293449;
+  --skin-border-color-3: #15191d;
+
+  --skin-border-color-5: #dddee0;
+  --skin-border-color-6: #f4f4f4;
+}
+
+// Блок 2. Названия css переменных с учётом dark и light режимов, которые могут
+// быть использованы темой и любыми компонентами
+// .light {
+.business-schema.light {
+  --text-base: var(--skin-text-color-5); // цвет текста по умолчанию
+  --text-base-2: var(--skin-text-color-6); // цвет текста дополнительный, заголовки по умолчанию
+
+  --bg-base: var(--skin-bg-color-5); // цвет фона body по умолчанию
+  --bg-panel: var(--skin-bg-color-6); // цвет фона панелей
+  --bg-card: var(--bg-panel); // цвет фона карточек
+
+  --border-base: var(--skin-border-color); // цвет границы элементов по умолчанию
+  --border-body-divider: var(--skin-border-color-6); // цвет границы разделителя body
+  --border-panel-divider: var(--skin-border-color-5); // цвет границы разделителя панели
+
+  --bg-button-hover: var(--skin-bg-color-3);
+  --text-button-hover: var(--skin-text-color);
+  --border-button-hover: var(--skin-border-color-3);
+
+  --backdrop-color: rgba(255, 255, 255, 0.7);
+
+  --input-text-color: var(--skin-text-color-5);
+  --input-bg-color: var(--skin-bg-color-5);
+  --input-border-color: var(--skin-border-color-5);
+}
+
+// .dark {
+.business-schema.dark {
+  --text-base: var(--skin-text-color); // цвет текста по умолчанию
+  --text-base-2: var(--skin-text-color-2); // цвет текста дополнительный, заголовки по умолчанию
+
+  --bg-base: var(--skin-bg-color); // цвет фона body по умолчанию
+  --bg-panel: var(--skin-bg-color-2); // цвет фона панелей
+  --bg-card: var(--bg-panel); // цвет фона карточек
+
+  --border-base: var(--skin-border-color); // цвет границы элементов по умолчанию
+  --border-body-divider: var(--skin-border-color-3); // цвет границы разделителя body
+  --border-panel-divider: var(--skin-border-color-2); // цвет границы разделителя панели
+
+  --bg-button-hover: var(--skin-bg-color-3);
+  --text-button-hover: var(--skin-text-color);
+  --border-button-hover: var(--skin-border-color-3);
+
+  --backdrop-color: rgba(0, 0, 0, 0.7);
+
+  --input-text-color: var(--skin-text-color-5);
+  --input-bg-color: var(--skin-bg-color-5);
+  --input-border-color: var(--skin-border-color-5);
+}
+
+// @new
+.business-schema {
+  --scrollbar-thumb-color: var(--bg-button-hover);
+  --scrollbar-track-color: var(--bg-panel);
+}
+
+// Блоки и компоненты
+// :root {
+.business-schema {
+  --text-card-title: var(--text-base-2);
+
+  --bg-button: var(--bg-panel);
+  --text-button: var(--text-base);
+  --border-button: var(--border-base);
+}
+
+// @todo: перенести в тему
+// body {
+body.business-schema {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+}

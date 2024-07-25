@@ -1,8 +1,6 @@
-import { MODE_GAME, panels as panelState } from '../settings';
-import { getInitialPanels } from './storage';
+import { MODE_GAME } from '@/config/panel';
+import { panels } from '../settings';
 import * as types from './types';
-
-const panels = getInitialPanels(panelState);
 
 const d = {};
 for (let panel of panels) {
@@ -10,35 +8,21 @@ for (let panel of panels) {
 }
 
 const initialPanelState = {
-  panels: panels,
   d: d,
   editTurnId: null,
   editWidgetId: null,
   editWidgetParams: {},
   mode: MODE_GAME,
-
-  //   [{
-  //     type: PANEL_CLASSES,
-  //     position: POSITION_UPPER_LEFT,
-  //     component: ClassList,
-  //     isDisplayed: true,
-  //     id: 1,
-  //     height: () => {
-  //       console.log(window.innerHeight, panelSpacer);
-  //       return `${window.innerHeight - 2 * panelSpacer}px`;
-  //     },
-  //     width: () => '500px',
-  //   }]
 };
 
 export const panelReducer = (state = initialPanelState, { type, payload }) => {
   switch (type) {
     case types.PANEL_TOGGLE: {
-      let open = null;
-      if (typeof payload.open === 'undefined') {
-        open = !state.d[payload.type].isDisplayed;
+      let newValue = false;
+      if (typeof payload?.open === 'boolean') {
+        newValue = payload.open;
       } else {
-        open = payload.open;
+        newValue = !state.d[payload.type].isDisplayed;
       }
       return {
         ...state,
@@ -47,19 +31,13 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isDisplayed: open,
+            isDisplayed: newValue,
           },
         },
       };
     }
 
     case types.PANEL_TOGGLE_MINIMIZE: {
-      let minimize = null;
-      if (typeof payload.minimize === 'undefined') {
-        minimize = !state.d[payload.type].isMinimized;
-      } else {
-        minimize = payload.minimize;
-      }
       return {
         ...state,
         ...payload.params,
@@ -67,7 +45,8 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
           ...state.d,
           [payload.type]: {
             ...state.d[payload.type],
-            isMinimized: minimize,
+            isMinimized:
+              !!payload?.minimize || !state.d[payload.type].isMinimized,
           },
         },
       };
@@ -110,6 +89,11 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         mode: MODE_GAME,
       };
 
+    case types.PANELS_SET:
+      return {
+        ...state,
+        d: payload.d,
+      };
     default:
       return state;
   }

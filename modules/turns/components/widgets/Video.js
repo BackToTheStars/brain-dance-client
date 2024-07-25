@@ -1,36 +1,36 @@
-import { isDevMode } from '@/config/mode';
 import { widgetSpacer } from '@/config/ui';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import YouTube from 'react-youtube';
 import { youtubeFormatter } from '../helpers/youtubeFormatter';
+import { useSelector } from 'react-redux';
+import { PlayCircleFilled } from '@ant-design/icons';
+import { WIDGET_VIDEO } from '../../settings';
 
-let timeoutId;
-const Video = ({ videoUrl, registerHandleResize, width }) => {
+const Video = ({
+  registerHandleResize,
+  unregisterHandleResize,
+  turnId,
+  widgetId,
+}) => {
+  const [previewMode, setPreviewMode] = useState(true);
   const videoEl = useRef(null);
-  let newVideoUrl = '';
-  const [newWidth, setNewWidth] = useState(width);
-
-  // console.log({ width });
-  useEffect(() => {
-    // clearTimeout(timeoutId);
-    // timeoutId = setTimeout(() => {
-    if (width !== newWidth) {
-      setNewWidth(width);
+  const width = useSelector((state) => state.turns.g[turnId].size.width);
+  const videoUrl = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId].url,
+  );
+  const newVideoUrl = useMemo(() => {
+    if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+      // @todo videoFormatter()
+      return youtubeFormatter(videoUrl);
+    } else {
+      console.log(`Unknown video source: "${videoUrl}_${turnId}"`);
     }
-    // }, 100);
-  }, [width]);
-
-  if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-    // @todo videoFormatter()
-    newVideoUrl = youtubeFormatter(videoUrl);
-  } else {
-    console.log(`Unknown video source: "${videoUrl}"`);
-  }
+  }, [videoUrl]);
 
   useEffect(() => {
     registerHandleResize({
-      type: 'video',
-      id: 'video1',
+      type: WIDGET_VIDEO,
+      id: widgetId,
       minWidthCallback: () => {
         return 20;
       },
@@ -45,41 +45,56 @@ const Video = ({ videoUrl, registerHandleResize, width }) => {
         return newImgHeight;
       },
     });
+    return () => unregisterHandleResize({ id: widgetId });
   }, []);
 
   return (
     <div
       style={{
-        width: newWidth,
-        height:
-          Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer,
+        width: `${width}px`,
+        height: `${
+          Math.floor((9 * (width - 2 * widgetSpacer)) / 16) + widgetSpacer
+        }px`,
       }}
-      className="video"
+      className="video turn-widget relative"
       ref={videoEl}
     >
-      {isDevMode ? (
-        <img
-          src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
+      {previewMode ? (
+        <div
           style={{
-            display: 'block',
-            margin: '0 auto',
-            maxWidth: '100%',
-            maxHeight: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
+        >
+          <img
+            src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
+            style={{
+              display: 'block',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              width: '100%',
+              height: '100%',
+            }}
+          />
+          <PlayCircleFilled
+            className="video__play"
+            onClick={() => {
+              setPreviewMode(false);
+            }}
+          />
+        </div>
       ) : (
         <YouTube
           videoId={newVideoUrl}
-          onReady={
-            () => {}
-            // setTimeout(() => {
-            //   // @todo: убедиться, что iframe не только "готов", но и отрисован
-            //   handleResize();
-            // }, 1000)
-          }
+          // onReady={() => {}}
           opts={{
             width: '100%',
             height: '100%',
+            playerVars: {
+              autoplay: true,
+              rel: '0',
+            },
           }}
         />
       )}

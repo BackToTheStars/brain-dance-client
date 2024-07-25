@@ -2,20 +2,8 @@ import {
   addCodeRequest,
   deleteGameRequest,
   editGameRequest,
-  getGamesRequest,
-  getTokenRequest,
 } from '@/modules/admin/requests';
-import { getGamesLastTurns } from '../requests';
 import * as types from './types';
-
-export const loadGames = (activeIndex) => (dispatch) => {
-  getGamesRequest().then((data) => {
-    dispatch({
-      type: types.LOAD_GAMES,
-      payload: { games: data.items, activeIndex },
-    });
-  });
-};
 
 export const setActiveGameByHash = (hash) => (dispatch) => {
   dispatch({
@@ -79,15 +67,3 @@ export const closeError = () => (dispatch) =>
   dispatch({
     type: types.REMOVE_ERROR,
   });
-
-export const loadLastGamesTurns = () => (dispatch) => {
-  return getGamesLastTurns().then((data) => {
-    dispatch({
-      type: types.GAMES_SET_LAST_TURNS,
-      payload: {
-        turns: data.items,
-        lastTurnsGamesDictionary: data.lastTurnsGamesDictionary,
-      },
-    });
-  });
-};

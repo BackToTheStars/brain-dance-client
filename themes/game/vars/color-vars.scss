@@ -1,0 +1,36 @@
+:root {
+  --base-body-bg-color: #3c3c3c;
+  --base-text-color: #dbdbdb;
+  --base-link-color: #0a58ca;
+  --base-link-hover-color: #1890ff;
+  --white-color: rgba(255, 255, 255, 0.842);
+  --dark-grey-color: rgba(53, 58, 64, 1);
+
+  // PANEL
+  // @todo: switch to own and remove (bootstrap overwrite)
+  --panel-buttons-font-color: rgb(255, 255, 255);
+  --panel-buttons-bg-color: #1b4d76;
+  --panel-buttons-hover-bg-color: #0d6efd;
+  // --panel-buttons-border-base-color: #0d6efd;
+  --panel-buttons-border-color: #667480;
+  // other panel colors
+  --panels-background-color: #040911;
+  --panels-border-color: rgba(47, 69, 101, 0.623);
+
+  // GAME
+  --game-bg-color: #070d11;
+  --circle-color-light: #184269;
+  --circle-color-dark: #143656;
+
+  // TURN
+  // --turn-border-color: rgba(47, 69, 101, 0.623);
+  --turn-border-color: rgba(98, 143, 211, .623); // @todo: изменить на цвет без прозрачности
+  // @todo: добавить зависимость от цвета параграфа
+  --turn-scrollbar-color: #183968; // rgba(24, 57, 104, 0.5);
+  --turn-widget-notes-color: #c3c3c3;
+  --turn-widget-header-color: #294377;
+  --turn-widget-header-title-color: rgb(10, 10, 10);
+  --turn-widget-header-subtitle-color: #c3c2c2;
+  --turn-header-link-color: #78adff;
+  --turn-header-link-hover-color: #add8e6;
+}

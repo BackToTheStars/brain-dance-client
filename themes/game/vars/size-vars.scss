@@ -1,0 +1,34 @@
+:root {
+  // PANEL
+  --panels-spacer-size: 10px;
+  // @todo: move to settings
+  --panel-notifications-width: 308px;
+  --panel-notifications-bottom: 146px;
+  --panel-notifications-right: 11px;
+
+  // GAME
+  --circle-size: 300px;
+  --circle-blur: 130px;
+
+  // TURN
+  --turn-widgets-gap: 14px;
+  --turn-widget-inner-gap: 6px;
+  --turn-widget-header-height_sm: 58px;
+  --turn-widget-header-height_lg: 78px;
+  --turn-corner-radius: 14px;
+  --turn-quote-radius: 5px;
+  --turn-border-size: 2px;
+  --turn-widget-paragraph-font-size: 18px;
+  --turn-widget-paragraph-line-height: 24px;
+
+  // @todo: добавить зависимость от --turn-widgets-gap
+  --turn-widget-paragraph-scrollbar-size: 6px;
+  --turn-widget-paragraph-scrollbar-padding: 8px;
+  --turn-widget-paragraph-padding: 6px;
+  // @todo: добавить возможность управления через классы размеров
+  --turn-widget-header-title-font-size: 24px;
+  --turn-widget-header-subtitle-font-size: 16px;
+  --turn-widget-header-title-font-weight: 500;
+
+  --turn-action-icons-base-size: 12px;
+}

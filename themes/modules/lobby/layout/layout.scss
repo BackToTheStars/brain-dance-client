@@ -1,0 +1,92 @@
+.divider-b {
+  border-bottom: 2px solid var(--border-body-divider);
+}
+
+.divider-r {
+  border-right: 2px solid var(--border-body-divider);
+}
+
+// @todo: перенести миксин в common theme
+// @mixin custom-spacing-first-level($unit: 4px) {
+//   --standard-unit: #{$unit};
+
+//   // &.p-1 { padding: calc(1 * var(--standard-unit)); }
+//   // &.p-2 { padding: calc(2 * var(--standard-unit)); }
+
+//   @for $i from 1 through 10 {
+//     &.p-#{$i} {
+//       padding: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.pt-#{$i} {
+//       padding-top: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.pr-#{$i} {
+//       padding-right: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.pb-#{$i} {
+//       padding-bottom: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.pl-#{$i} {
+//       padding-left: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.px-#{$i} {
+//       padding-left: calc(#{$i} * var(--standard-unit));
+//       padding-right: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.py-#{$i} {
+//       padding-top: calc(#{$i} * var(--standard-unit));
+//       padding-bottom: calc(#{$i} * var(--standard-unit));
+//     }
+//     // margins
+//     &.m-#{$i} {
+//       margin: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.mt-#{$i} {
+//       margin-top: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.mr-#{$i} {
+//       margin-right: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.mb-#{$i} {
+//       margin-bottom: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.ml-#{$i} {
+//       margin-left: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.mx-#{$i} {
+//       margin-left: calc(#{$i} * var(--standard-unit));
+//       margin-right: calc(#{$i} * var(--standard-unit));
+//     }
+//     &.my-#{$i} {
+//       margin-top: calc(#{$i} * var(--standard-unit));
+//       margin-bottom: calc(#{$i} * var(--standard-unit));
+//     }
+//     // gaps
+//     &.gap-#{$i} {
+//       gap: calc(#{$i} * var(--standard-unit));
+//     }
+//   }
+
+//   &.m-1 {
+//     margin: calc(1 * var(--standard-unit));
+//   }
+//   &.m-2 {
+//     margin: calc(2 * var(--standard-unit));
+//   }
+//   // И так далее для всех вариантов margin и padding
+
+//   &.gap-1 {
+//     gap: calc(1 * var(--standard-unit));
+//   }
+//   &.gap-2 {
+//     gap: calc(2 * var(--standard-unit));
+//   }
+// }
+
+.lobby-block {
+  --block-padding-unit: 4px; // Установка CSS переменной
+  @include custom-spacing-first-level(var(--block-padding-unit)); // Применение миксина
+  &.w-8 {
+    width: calc(8 * var(--block-padding-unit));
+  }
+}

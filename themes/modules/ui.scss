@@ -1,0 +1,38 @@
+.ui-modal {
+  @apply fixed left-0 top-0 w-screen h-screen flex items-center justify-center z-[100] invisible opacity-0;
+  background-color: var(--backdrop-color);
+
+  &_visible {
+    @apply visible opacity-100;
+  }
+
+  &__close {
+    @apply cursor-pointer;
+  }
+}
+
+.base-card_modal {
+  min-width: 450px;
+  min-height: 200px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .base-card__header {
+    @apply p-2 flex justify-between items-center;
+  }
+
+  .base-card__body {
+    @apply p-2;
+  }
+}
+
+// antd overrides
+.radio-group_white-text {
+  .ant-radio-wrapper {
+    color: #fff;
+  }
+
+  .ant-radio-inner::after {
+    color: #fff;
+  }
+}

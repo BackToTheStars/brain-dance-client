@@ -1,3 +1,4 @@
+import { Button, Form, Input } from 'antd';
 import { useAdminContext } from '../../contexts/AdminContext';
 
 const AdminSigninForm = ({ onSuccessSubmit }) => {
@@ -10,31 +11,21 @@ const AdminSigninForm = ({ onSuccessSubmit }) => {
         nickname: e.target.nickname.value,
         password: e.target.password.value,
       },
-      onSuccessSubmit
+      onSuccessSubmit,
     );
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3">
-      <div className="mb-3">
-        <input
-          name="nickname"
-          type="text"
-          className="form-control"
-          placeholder="Login"
-        />
+    <form onSubmit={handleSubmit} className="border border-gray-300 p-4 flex flex-col gap-3">
+      <div>
+        <Input name="nickname" type="text" placeholder="Login" />
       </div>
-      <div className="mb-3">
-        <input
-          name="password"
-          type="password"
-          className="form-control"
-          placeholder="Password"
-        />
+      <div>
+        <Input name="password" type="password" placeholder="Password" />
       </div>
-      <button type="submit" className="btn btn-primary">
-        Login
-      </button>
+      <div className="text-end">
+        <Button htmlType="submit">Login</Button>
+      </div>
     </form>
   );
 };

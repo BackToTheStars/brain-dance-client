@@ -2,9 +2,14 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@/game/*": ["modules/game-new/*"],
       "@/modules/*": ["modules/*"],
       "@/components/*": ["components/*"],
-      "@/config/*": ["config/*"]
+      "@/config/*": ["config/*"],
+      "@/colors/*": ["themes/sets/colors/*"],
+      "@/sizes/*": ["themes/sets/sizes/*"],
+      "@/themes/*": ["themes/*"],
+      "@/ui/*": ["themes/template/components/*"]
     }
   }
 }

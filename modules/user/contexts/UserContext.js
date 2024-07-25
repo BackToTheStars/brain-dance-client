@@ -14,13 +14,13 @@ export const setGameInfoIntoStorage = (hash, data) => {
   setRequestSettings(hash, data?.token);
   localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
 };
-const removeGameInfo = (hash) => {
+export const removeGameInfo = (hash) => {
   // @todo fixme
   // setUserToken(null);
   setRequestSettings(null, null);
   return localStorage.removeItem(`${GAME_KEY_PREFIX}${hash}`);
 };
-const getGameInfo = (hash) => {
+const loadGameInfo = (hash) => {
   if (typeof window === 'undefined') {
     return null; // get guest info
   }
@@ -31,6 +31,15 @@ const getGameInfo = (hash) => {
   setRequestSettings(hash, data?.token);
   return data;
 };
+
+export const getGameInfo = (hash) => {
+  if (typeof window === 'undefined') {
+    return null; // get guest info
+  }
+
+  const data = JSON.parse(localStorage.getItem(`${GAME_KEY_PREFIX}${hash}`));
+  return data;
+}
 
 export const logOut = () => {
   removeGameInfo(hash); // стираем token из LocalStorage
@@ -47,14 +56,17 @@ const guestUser = {
 const UserContext = createContext();
 
 export const UserProvider = ({ children, hash }) => {
-  const { info, token } = getGameInfo(hash) || guestUser;
+  const [userInfo, setUserInfo] = useState(loadGameInfo(hash) || guestUser);
+  const { info, token } = userInfo;
 
   const can = (rule) => checkRuleByRole(rule, info.role);
+  const reloadUserInfo = () => setUserInfo(loadGameInfo(hash));
 
   const value = {
     info,
     token,
     can,
+    reloadUserInfo,
   };
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

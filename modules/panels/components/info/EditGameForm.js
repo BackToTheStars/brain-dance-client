@@ -1,15 +1,30 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { updateGame } from '@/modules/game/game-redux/actions';
+import { addNotification } from '@/modules/ui/redux/actions';
+import { Button, Form, Input, Radio } from 'antd';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+// должна быть доступна только для ROLE_GAME_OWNER (RULE_GAME_EDIT)
 const EditGameForm = () => {
+  const dispatch = useDispatch();
   //
-  const editGame = () => {};
+  const editGame = (data) => {
+    dispatch(updateGame(data))
+      .then(() => {
+        dispatch(addNotification({ title: 'Info:', text: 'Game updated.' }));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const game = useSelector((state) => state.game.game);
 
   const [name, setName] = useState(game.name);
   const [image, setImage] = useState(game.image);
-  const [gameIsPublic, setGameIsPublic] = useState(game.public);
+  const [gameIsPublic, setGameIsPublic] = useState(
+    game.public ? 'true' : 'false',
+  );
   const [description, setDescription] = useState(game.description);
 
   const showConfirmDialog = ({ text, okCallback }) => {
@@ -19,10 +34,10 @@ const EditGameForm = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const data = {
       name,
-      gameIsPublic,
+      public: gameIsPublic === 'true',
       hash: game.hash,
       description,
       image,
@@ -39,71 +54,70 @@ const EditGameForm = () => {
     }
   };
 
+  // useEffect(() => {
+  //   setName(game.name);
+  //   setImage(game.image);
+  //   setGameIsPublic(game.public);
+  //   setDescription(game.description);
+  // }, [game]);
+
   return (
-    <form className="card" onSubmit={(e) => handleSubmit(e)}>
-      <div className="card-body ">
-        <div className="form-group">
-          <div className="form-check form-check-inline">
-            <input
-              onChange={(e) => setGameIsPublic(true)}
-              name="gameIsPublic"
-              value="true"
-              type="radio"
-              className="form-check-input"
-              checked={gameIsPublic}
-            />
-            <label className="form-check-label">Public</label>
-          </div>
-          <div className="form-check form-check-inline ml-3s">
-            <input
-              onChange={(e) => setGameIsPublic(false)}
-              name="gameIsPublic"
-              value="false"
-              type="radio"
-              className="form-check-input"
-              checked={!gameIsPublic}
-            />
-            <label className="form-check-label ">Private</label>
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Name</label>
-          <input
-            className="form-control"
-            name="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Screenshot</label>
-          <input
-            className="form-control"
-            name="image"
-            type="text"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Description</label>
-          <textarea
-            className="form-control"
-            rows="3"
-            onChange={(e) => setDescription(e.target.value)}
-            defaultValue={description}
-          ></textarea>
-        </div>
-        <button
-          style={{ minWidth: '75px' }}
-          type="submit"
-          className="btn btn-primary mt-3"
+    <div className="p-3">
+      <Form
+        className="ant-card"
+        onFinish={(e) => handleSubmit(e)}
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+      >
+        <Form.Item
+          name="gameIsPublic"
+          valuePropName="checked"
+          initialValue={gameIsPublic}
         >
-          Save
-        </button>
-      </div>
-    </form>
+          <Radio.Group
+            className="radio-group_white-text"
+            value={gameIsPublic}
+            onChange={(e) => setGameIsPublic(e.target.value)}
+          >
+            <Radio value="true">Public</Radio>
+            <Radio value="false">Private</Radio>
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item
+          initialValue={name}
+          name="name"
+          value={name}
+          label={<span className="text-white">Name</span>}
+          rules={[{ required: true, message: 'Please input name!' }]}
+        >
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Form.Item>
+        <Form.Item
+          initialValue={image}
+          name="image"
+          label={<span className="text-white">Screenshot</span>}
+          rules={[{ required: true, message: 'Please input image!' }]}
+        >
+          <Input value={image} onChange={(e) => setImage(e.target.value)} />
+        </Form.Item>
+        <Form.Item
+          initialValue={description}
+          name="description"
+          label={<span className="text-white">Description</span>}
+        >
+          <Input.TextArea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button size="small" type="primary" htmlType="submit">
+            Save
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 

@@ -52,25 +52,6 @@ function youtubeFormatterOld(videoAddress) {
     console.log(`Incorrect youtube url: ${videoAddress}`);
     return '';
   }
-
-  //   if (!dataMatched) {
-
-  // console.log(`Incorrect youtube url: ${videoAddress}`);
-  // return '';
-
-  //   } else {
-  //       let startSeconds = '';
-  // if (dataMatched.groups.startTime !== dataMatched.groups.startSeconds) {
-  //     startSeconds = dataMatched.groups.startSeconds.slice(0, -1); // 's' postfix
-  // }
-  //     return `https://www.youtube.com/embed/${dataMatched.groups.videoHash}?${dataMatched.groups.startTime ? dataMatched.groups.startTime}`;
-  //   }
-
-  // https://www.youtube.com/embed/fxc3Tv3tV7M
-
-  // const address = videoAddress.slice(videoAddress.lastIndexOf('?v=') + 3);
-
-  // return address;
 }
 
 /*
