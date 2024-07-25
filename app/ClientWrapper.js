@@ -42,6 +42,15 @@ const ClientInner = ({
     dispatch(setMode(cookieMode || defaultMode));
   }, [cookieColorSchema, cookieSizeSchema, cookieMode]);
 
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_REDIRECT_DOMAIN) {
+      if (typeof window !== 'undefined') {
+        const { pathname, search } = window.location;
+        window.location.href = `${process.env.NEXT_PUBLIC_REDIRECT_DOMAIN}${pathname}${search}`;
+      }
+    }
+  }, []);
+
   return <>{children}</>;
 };
 
