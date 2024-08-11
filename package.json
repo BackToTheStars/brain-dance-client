@@ -11,7 +11,7 @@
     "redux-devtools": "redux-devtools --hostname=localhost --port=8000",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "start:test": "next start -p 5017"
+    "start:test": "next start -p 5018"
   },
   "keywords": [],
   "author": "",
