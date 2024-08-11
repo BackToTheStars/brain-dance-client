@@ -13,6 +13,7 @@ export const lineOffset = 50;
 export const kBezier = 0.3; // - константа внешнего вида кривых
 export const HEADER_HEIGHT = 78;
 export const HEADER_HEIGHT_2 = 58;
+export const AUDIO_HEIGHT = 50;
 export const freeSpaceRequired = 59;
 
 export const PARAGRAPH_SCROLL_TIMEOUT_DELAY = 100; // 40 - 25 изменений в секунду

@@ -9,6 +9,8 @@ import PictureAddForm from './components/widgets/picture/EditForm';
 import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
+import FileUploading from './components/forms/FileUploading';
+import { uploadAudio } from './redux/actions';
 
 const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
@@ -25,6 +27,7 @@ const FIELD_HEADER = 'header';
 const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
 const FIELD_PICTURE = 'imageUrl';
 const FIELD_VIDEO = 'videoUrl';
+const FIELD_AUDIO = 'audioUrl';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
@@ -36,6 +39,7 @@ export const WIDGET_PARAGRAPH = 'paragraph';
 
 export const WIDGET_HEADER = 'header';
 export const WIDGET_VIDEO = 'video';
+export const WIDGET_AUDIO = 'audio';
 export const WIDGET_SOURCE = 'source';
 
 export const widgetSettings = {
@@ -154,7 +158,7 @@ const settings = {
       const count = widgetBlocks.reduce(
         (acc, widgetBlock) =>
           [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type),
-        0
+        0,
       );
       if (count < 2) return [false, 'need more media for carousel'];
       return [true];
@@ -190,7 +194,7 @@ const settings = {
       const count = widgetBlocks.reduce(
         (acc, widgetBlock) =>
           [WIDGET_PICTURE, WIDGET_PARAGRAPH].includes(widgetBlock.type),
-        0
+        0,
       );
       if (count < 1) return [false, 'need either picture or paragraph'];
       return [true];
@@ -206,6 +210,12 @@ const settings = {
     requiredFields: [FIELD_VIDEO],
     availableFields: [FIELD_VIDEO],
   },
+  [TEMPLATE_AUDIO]: {
+    value: 'audio',
+    label: 'Text / audio',
+    requiredFields: [FIELD_AUDIO],
+    availableFields: [FIELD_AUDIO],
+  },
   [TEMPLATE_COMMENT]: {
     value: 'comment',
     label: 'Comment',
@@ -219,6 +229,7 @@ const templatesToShow = [
   // TEMPLATE_MIXED,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
+  TEMPLATE_AUDIO,
   TEMPLATE_COMMENT,
   // TEMPLATE_CAROUSEL,
   // TEMPLATE_PICTURE_ONLY,
@@ -306,6 +317,32 @@ const fieldSettings = {
     prefixClass: 'video-url',
     special: true,
   },
+  [FIELD_AUDIO]: {
+    label: 'Audio URL',
+    prefixClass: 'audio-url',
+    special: true,
+    inputType: 'component',
+    widgetSettings: {
+      render: ({ changeHandler, label, prefixClass, value, form }) => {
+        return (
+          <>
+            <Input
+              placeholder={`${label}:`}
+              value={value}
+              onChange={(e) => {
+                changeHandler(e.target.value);
+              }}
+            />
+            <FileUploading
+              changeHandler={changeHandler}
+              fileTypeLabel="an audio"
+              uploadFunc={uploadAudio}
+            />
+          </>
+        );
+      },
+    },
+  },
   [FIELD_DATE]: {
     label: 'Date',
     prefixClass: 'date',
@@ -329,6 +366,7 @@ const fieldsToClone = [
   'dontShowHeader',
   'imageUrl',
   'videoUrl',
+  'audioUrl',
   'date',
   'sourceUrl',
   'backgroundColor',
@@ -347,6 +385,7 @@ const turnSettings = {
   TEMPLATE_ZERO_POINT,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
+  TEMPLATE_AUDIO,
   TEMPLATE_COMMENT,
   TEMPLATE_MIXED,
   TEMPLATE_PDF,

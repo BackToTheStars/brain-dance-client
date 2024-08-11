@@ -1,4 +1,5 @@
 import {
+  WIDGET_AUDIO,
   WIDGET_HEADER,
   WIDGET_PARAGRAPH,
   WIDGET_PICTURE,
@@ -26,6 +27,9 @@ export class TurnHelper {
       ],
       [WIDGET_VIDEO]: [
         { id: 'v_1', show: !!turn.videoUrl, url: turn.videoUrl },
+      ],
+      [WIDGET_AUDIO]: [
+        { id: 'a_1', show: !!turn.audioUrl, url: turn.audioUrl },
       ],
       [WIDGET_SOURCE]: [
         {
@@ -125,6 +129,7 @@ export class TurnHelper {
       header: turn.dWidgets.h_1.text,
       imageUrl: turn.dWidgets.i_1.url,
       videoUrl: turn.dWidgets.v_1.url,
+      audioUrl: turn.dWidgets.a_1.url,
       sourceUrl: turn.sourceUrl,
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,

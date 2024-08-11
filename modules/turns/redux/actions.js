@@ -26,7 +26,7 @@ import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
-import { STATIC_API_URL } from '@/config/server';
+import { STATIC_API_URL, STATIC_AUDIO_URL } from '@/config/server';
 
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
@@ -173,7 +173,7 @@ export const unCompressParagraph = () => (dispatch, getState) => {
     });
     // @todo: use paragraph stage
     const turnEl = document.querySelector(
-      `.turn_${data.item._id} .stb-react-turn__inner`
+      `.turn_${data.item._id} .stb-react-turn__inner`,
     );
     if (turnEl) {
       turnEl.style.height = `${data.item.height}px`;
@@ -352,8 +352,8 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
         lines.filter(
           (line) =>
             line.sourceTurnId === copiedTurnId ||
-            line.targetTurnId === copiedTurnId
-        )
+            line.targetTurnId === copiedTurnId,
+        ),
       );
       copiedLines.forEach((line) => fieldRemover(line, linesFieldsToKeep));
 
@@ -365,7 +365,7 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
         addNotification({
           title: 'Info:',
           text: 'Turn was copied, ready to paste',
-        })
+        }),
       );
 
       resolve();
@@ -381,7 +381,7 @@ export const insertTurnFromBuffer =
     const state = getState();
     const timeStamps = getTimeStamps();
     const copiedTurnOldFormat = getTurnFromBufferAndRemove(
-      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1]
+      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1],
     );
     const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
@@ -424,7 +424,7 @@ export const insertTurnFromBuffer =
             centerViewportAtPosition({
               x: copiedTurn.position.x + Math.floor(copiedTurn.size.width / 2),
               y: copiedTurn.position.y + Math.floor(copiedTurn.size.height / 2),
-            })
+            }),
           );
           const turnId = copiedTurn.originalId;
           // оставить только те линии, которые связаны с turn по originalId
@@ -477,7 +477,7 @@ export const insertTurnFromBuffer =
           // преобразовать sourceTurnId и targetTurnId и вставить линии
         },
         errorCallback,
-      })
+      }),
     );
   };
 
@@ -505,6 +505,22 @@ export const uploadImage = (image) => () => {
     const formdata = new FormData();
     formdata.append('file', image);
     return fetch(`${STATIC_API_URL}/images/upload`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: 'POST',
+      body: formdata,
+    }).then((res) => res.json());
+  });
+};
+
+export const uploadAudio = (audio) => () => {
+  return getTokenRequest('upload').then((data) => {
+    const token = data.item;
+
+    const formdata = new FormData();
+    formdata.append('file', audio);
+    return fetch(`${STATIC_AUDIO_URL}/audios/upload`, {
       headers: {
         authorization: `Bearer ${token}`,
       },

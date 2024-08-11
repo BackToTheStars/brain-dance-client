@@ -2,7 +2,7 @@ import { togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
 import { useDispatch, useSelector } from 'react-redux';
 import { HeaderEditForm } from '../widgets/header/EditForm';
-import { Button, Carousel, Dropdown } from 'antd';
+import { Button, Dropdown } from 'antd';
 import { CheckOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
 import turnSettings, {
   WIDGET_HEADER,
@@ -10,14 +10,12 @@ import turnSettings, {
   WIDGET_PICTURE,
   WIDGET_SOURCE,
   WIDGET_VIDEO,
+  WIDGET_AUDIO,
   widgetSettings,
 } from '../../settings';
 import React, { useState } from 'react';
 import { WidgetBlockComponent } from './turnBlocks/WidgetBlock';
 import DropdownTemplate from '../inputs/DropdownTemplate';
-import Picture from '../widgets/picture/Picture';
-import Video from '../widgets/Video';
-import Paragraph from 'antd/es/skeleton/Paragraph';
 import { TURN_SIZE_HEIGHT, TURN_SIZE_WIDTH } from '@/config/turn';
 
 const { templatesToShow, settings } = turnSettings;
@@ -105,6 +103,7 @@ const CreateTurnForm = () => {
     WIDGET_PICTURE,
     WIDGET_PARAGRAPH,
     WIDGET_VIDEO,
+    WIDGET_AUDIO,
     WIDGET_SOURCE,
   ].map((item) => ({
     key: item,
@@ -144,7 +143,7 @@ const CreateTurnForm = () => {
     if (!!Object.values(templateSettings.availableWidgets || {}).length) {
       const [success, message] = validateAvailableWidgets(
         widgetBlocks.filter((w) => w.show),
-        templateSettings.availableWidgets
+        templateSettings.availableWidgets,
       );
       if (!success) {
         errors.extra = message;
@@ -156,7 +155,7 @@ const CreateTurnForm = () => {
     // проверка шаблона по их правилам валидации, напр. есть ли картинка
     if (templateSettings.validation) {
       const [success, message] = templateSettings.validation(
-        widgetBlocks.filter((w) => w.show)
+        widgetBlocks.filter((w) => w.show),
       );
       if (!success) {
         errors.extra = message;
@@ -185,7 +184,7 @@ const CreateTurnForm = () => {
         if (pos1 > pos2) return 1;
         if (pos1 < pos2) return -1;
         if (pos1 === pos2) return 0;
-      })
+      }),
     );
   };
 
@@ -236,7 +235,7 @@ const CreateTurnForm = () => {
       widgetBlocks.map((block) => {
         if (block.id !== widgetBlock.id) return block;
         return widgetBlock;
-      })
+      }),
     );
   };
 
@@ -352,7 +351,7 @@ const UpdateTurnForm = () => {
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   // const turn = useSelector((state) => state.turns.d[editTurnId]);
   const items = ['header', 'picture', 'video', 'source', 'paragraph'].map(
-    (item) => ({ key: item, label: item })
+    (item) => ({ key: item, label: item }),
   );
   return (
     <>

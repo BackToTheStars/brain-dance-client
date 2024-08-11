@@ -26,6 +26,7 @@ import { snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { TurnStateProvider } from './TurnState';
 import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
+import Audio from './widgets/audio/Audio';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -100,6 +101,7 @@ const TurnAdapter = ({ id }) => {
           .removeClass('translucent-field');
         dispatch(markTurnAsChanged({ _id: id }));
       },
+      cancel: ".not-draggable",
     });
 
     return () => $(wrapper.current).draggable('destroy');
@@ -128,6 +130,7 @@ export const Turn = memo(({ id }) => {
       p_1: { inserts: paragraph },
       i_1: { url: imageUrl },
       v_1: { url: videoUrl },
+      a_1: { url: audioUrl },
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
@@ -151,9 +154,10 @@ export const Turn = memo(({ id }) => {
       !dontShowHeader + // header
       !!imageUrl + // Picture
       !!videoUrl + // Video
+      !!audioUrl + // Audio
       doesParagraphExist
     ); // Paragraph
-  }, [dontShowHeader, imageUrl, videoUrl, doesParagraphExist]);
+  }, [dontShowHeader, imageUrl, videoUrl, audioUrl, doesParagraphExist]);
 
   const { resizeDisabled, widgetsUpdatedTime } = useMemo(() => {
     return {
@@ -310,6 +314,14 @@ export const Turn = memo(({ id }) => {
         {!!videoUrl && (
           <Video
             widgetId={'v_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            turnId={_id}
+          />
+        )}
+        {!!audioUrl && (
+          <Audio
+            widgetId={'a_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}

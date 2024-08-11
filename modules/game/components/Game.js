@@ -117,6 +117,7 @@ const Game = ({ hash }) => {
           $(gameBox.current).removeClass('remove-line-transition');
         }, 100);
       },
+      cancel: '.not-draggable',
     });
     return () => $(gameBox.current).draggable('destroy');
   }, [gameBox]);

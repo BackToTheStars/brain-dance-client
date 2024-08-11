@@ -108,6 +108,7 @@
     transition: 0.2s;
     border-radius: var(--turn-quote-radius); // дублируется кроме переменных SCSS в общих переменных config/ui.js
   }
+
   &.quotes-queued {
     .quote-rectangle {
       opacity: 0.1;
@@ -128,11 +129,12 @@
 
     outline: var(--turn-border-size) solid var(--turn-border-color);
 
-    background-color: #0c1e35;
+    background-color: var(--turn-bg-color);
 
     &.picture-only {
       gap: 0;
       padding-bottom: 0;
+
       .turn-widget {
         padding-left: 0;
         padding-right: 0;
@@ -328,6 +330,85 @@
       }
     }
 
+    .audio-player-wrapper {
+      height: 50px; // AUDIO_HEIGHT
+      color: var(--turn-widget-header-subtitle-color);
+      font-weight: 500;
+
+      .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      .audio-title-wrapper {
+        max-width: calc(100% - 100px);
+      }
+
+      .audio-time {
+        font-size: 14px;
+        color: #999;
+      }
+
+      // volume control
+      .volume-control,
+      .speed-control {
+        position: relative;
+        display: inline-flex;
+      }
+
+      .volume-button {
+        font-size: 18px;
+      }
+
+      .speed-control {
+        font-size: 14px;
+        width: 24px;
+        text-align: right;
+
+        button {
+          width: 100%;
+        }
+      }
+
+      // slider
+      .timeline-slider.ant-slider {
+        margin-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+
+        .ant-slider-track {
+          background-color: var(--turn-header-link-color);
+          transition: height 0.1s, transform 0.1s;
+          height: 2px;
+        }
+
+        .ant-slider-rail {
+          background-color: var(--bg-button-hover);
+          transition: height 0.1s, transform 0.1s;
+          height: 2px;
+        }
+
+        .ant-slider-handle {
+          opacity: 0;
+        }
+
+        &:hover {
+          .ant-slider-track {
+            transform: translateY(-3px);
+            height: 6px;
+          }
+
+          .ant-slider-rail {
+
+            transform: translateY(-3px);
+            height: 6px;
+          }
+        }
+      }
+    }
+
     .stb-gap-spacer {
       height: var(--turn-widgets-gap);
     }
@@ -357,5 +438,65 @@
     left: var(--turn-widgets-gap);
     transform: translateY(100%);
     bottom: -2px;
+  }
+}
+
+// @todo: change vars and move to ui
+.vertical-mini-slider {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 70px;
+  background: transparent;
+  padding: 3px 5px;
+  border: none;
+  z-index: 100;
+  padding-top: 5px;
+  padding-bottom: 10px;
+
+  .slider-container {
+    border: 1px solid var(--turn-border-color);
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--turn-widget-header-color);
+  }
+
+  .ant-slider {
+    margin: 5px;
+
+    .ant-slider-handle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:after {
+        box-shadow: 0 0 0 4px transparent;
+        transform: scale(0.5) translateX(-3px);
+      }
+    }
+
+    .ant-slider-track {
+      background-color: var(--turn-header-link-color);
+      width: 3px;
+      transform: translateX(-1px);
+    }
+
+    &:hover .ant-slider-rail {
+      background-color: var(--turn-bg-color);
+    }
+
+    .ant-slider-rail {
+      background-color: var(--turn-bg-color);
+      width: 3px;
+      transform: translateX(-1px);
+    }
   }
 }
