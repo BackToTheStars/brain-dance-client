@@ -44,6 +44,11 @@ const AdminHeader = () => {
             </Button>
           </div>
           <div>
+            <Button type="link" onClick={() => router.push('/admin')}>
+              Admin
+            </Button>
+          </div>
+          <div>
             <Button htmlType="button" onClick={logout}>
               Logout
             </Button>

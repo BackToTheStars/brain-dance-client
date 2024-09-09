@@ -12,7 +12,6 @@ import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 import FileUploading from './components/forms/FileUploading';
 import { uploadAudio } from './redux/actions';
 
-const TEMPLATE_ZERO_POINT = 'zero-point';
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
 const TEMPLATE_COMMENT = 'comment';
@@ -382,7 +381,6 @@ const fieldsToClone = [
 ];
 
 const turnSettings = {
-  TEMPLATE_ZERO_POINT,
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
   TEMPLATE_AUDIO,

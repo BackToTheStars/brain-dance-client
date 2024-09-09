@@ -1,3 +1,5 @@
+export const TOKEN_REFETCH_DELAY = 3 * 24 * 60 * 60 * 1000;
+
 export const USER_MODE_VISITOR = 'visitor';
 export const USER_MODE_ADMIN = 'admin';
 

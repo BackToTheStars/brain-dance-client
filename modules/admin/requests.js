@@ -54,6 +54,14 @@ export const deleteAdminGameRequest = (id) => {
   }).then((res) => res.json()); // вернёт Promise
 };
 
+export const getAdminLogsRequest = () => {
+  return fetch(`${API_URL}/admin/logs`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+};
+
 export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
   let url = `${API_URL}/admin/turns`;
   const params = {};
@@ -69,6 +77,25 @@ export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
     headers: {
       authorization: `Bearer ${adminToken}`,
     },
+  }).then((res) => res.json());
+};
+
+export const getAdminTurnRequest = (id) => {
+  return fetch(`${API_URL}/admin/turns/${id}`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+};
+
+export const moveAudioRequest = (data) => {
+  return fetch(`${API_URL}/admin/turns/move-audio`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(data),
   }).then((res) => res.json());
 };
 

@@ -1,7 +1,17 @@
-import { Button, Checkbox, Input, Space, Table } from 'antd';
+import { Checkbox, Input, Space, Table } from 'antd';
 import { getAdminTurnsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment';
+import Link from 'next/link';
+
+const HeaderCell = ({ record }) => {
+    return (
+      <div className="flex flex-col gap-2">
+        <Link href={`/admin/turns/${record._id}`}>{record.header || 'No header'}</Link>
+        {!!record.audioUrl && <div>audio: {record.audioUrl}</div>}
+      </div>
+    );
+};
 
 const columns = [
   {
@@ -9,7 +19,8 @@ const columns = [
     dataIndex: 'header',
     key: 'header',
     width: '40%',
-    sorter: (a, b) => a.header ? a.header.localeCompare(b.header) : 0,
+    render: (text, record) => <HeaderCell record={record} />,
+    sorter: (a, b) => (a.header ? a.header.localeCompare(b.header) : 0),
   },
   {
     title: 'Type',
@@ -36,13 +47,7 @@ const columns = [
   },
 ];
 
-const allContentTypes = [
-  'zero-point',
-  'picture',
-  'video',
-  'comment',
-  'picture-only',
-];
+const allContentTypes = ['picture', 'audio', 'video', 'comment', 'picture-only'];
 
 const AdminTurnsTable = ({ gameId = null }) => {
   const [turns, setTurns] = useState([]);
@@ -92,7 +97,7 @@ const AdminTurnsTable = ({ gameId = null }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search"
-          size='small'
+          size="small"
         />
         <Checkbox.Group
           value={contentTypes}

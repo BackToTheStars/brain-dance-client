@@ -27,7 +27,7 @@ const PictureQuotes = ({
 }) => {
   const dispatch = useDispatch();
   const turnQuotes = useSelector((state) => state.turns.d[turnId]?.quotes);
-  const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]);
+  const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]) || {};
 
   const { width, height } = useSelector((state) => state.turns.g[turnId].size);
 

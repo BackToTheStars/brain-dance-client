@@ -2,17 +2,23 @@ import { useMemo, useState } from 'react';
 import { Tabs } from 'antd';
 import GamesTab from './Games';
 import ScriptsTab from './Scripts';
+import LogsTab from './Logs';
 
 const tabs = [
+  {
+    key: 'scripts',
+    label: 'Scripts',
+    component: ScriptsTab,
+  },
   {
     key: 'games',
     label: 'Games',
     component: GamesTab,
   },
   {
-    key: 'scripts',
-    label: 'Scripts',
-    component: ScriptsTab
+    key: 'logs',
+    label: 'Logs',
+    component: LogsTab,
   },
 ];
 
