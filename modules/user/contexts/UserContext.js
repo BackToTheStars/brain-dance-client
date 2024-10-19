@@ -1,6 +1,7 @@
+'use client'
 import { setRequestSettings } from '@/config/request';
 import { checkRuleByRole, ROLE_GAME_VISITOR } from '@/config/user';
-import { setUserToken } from '@/modules/game/requests';
+// import { setUserToken } from '@/modules/game/requests';
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const GAME_KEY_PREFIX = 'game_';

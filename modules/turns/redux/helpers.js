@@ -26,7 +26,12 @@ export class TurnHelper {
         },
       ],
       [WIDGET_VIDEO]: [
-        { id: 'v_1', show: !!turn.videoUrl, url: turn.videoUrl },
+        {
+          id: 'v_1',
+          show: !!turn.videoUrl,
+          url: turn.videoUrl,
+          preview: turn.videoPreview,
+        },
       ],
       [WIDGET_AUDIO]: [
         { id: 'a_1', show: !!turn.audioUrl, url: turn.audioUrl },
@@ -84,7 +89,7 @@ export class TurnHelper {
       date: turn.date,
       sourceUrl: turn.sourceUrl,
       updatedAt: turn.updatedAt,
-      
+
       // COMPRESSED PARAGRAPH
       compressed: turn.compressed,
       paragraph: turn.paragraph,

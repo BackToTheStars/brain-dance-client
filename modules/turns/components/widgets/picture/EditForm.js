@@ -1,6 +1,6 @@
 import { Button, Input } from 'antd';
 import FormInput from '../../forms/FormInput';
-import ImageUploading from '../../forms/ImageUploading';
+// import ImageUploading from '../../forms/ImageUploading';
 import { WIDGET_PICTURE, widgetSettings } from '@/modules/turns/settings';
 // import { SourceAddForm } from '../source/EditForm';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -38,7 +38,7 @@ const PictureAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
                     changeHandler(e.target.value);
                   }}
                 />
-                <ImageUploading setImageUrl={changeHandler} />
+                {/* <ImageUploading setImageUrl={changeHandler} /> */}
               </>
             );
           },

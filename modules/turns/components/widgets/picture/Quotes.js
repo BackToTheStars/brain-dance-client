@@ -27,7 +27,7 @@ const PictureQuotes = ({
 }) => {
   const dispatch = useDispatch();
   const turnQuotes = useSelector((state) => state.turns.d[turnId]?.quotes);
-  const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]) || {};
+  const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]);
 
   const { width, height } = useSelector((state) => state.turns.g[turnId].size);
 
@@ -42,7 +42,7 @@ const PictureQuotes = ({
   const activeQuotesDictionary = useMemo(() => {
     const d = {};
     for (const quote of quotes) {
-      if (quote.turnId === turnId && dLines[quote.quoteId]) {
+      if (quote.turnId === turnId && dLines && dLines[quote.quoteId]) {
         d[quote.quoteId] = true;
       }
     }

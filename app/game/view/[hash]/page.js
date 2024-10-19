@@ -33,10 +33,12 @@ const GamePageInner = () => {
     if (!hash) return;
     const {
       token,
-      info: { skipDialog },
+      info,
     } = getGameInfo(hash) || {};
+    const { skipDialog } = info || {};
     if (!token) {
       router.push(`/`);
+      return;
     }
     const [_, payload] = token.split('.');
 

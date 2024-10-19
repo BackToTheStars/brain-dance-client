@@ -1,6 +1,6 @@
 import { Input } from 'antd';
 import FormInput from '../forms/FormInput';
-import ImageUploading from '../forms/ImageUploading';
+// import ImageUploading from '../forms/ImageUploading';
 
 const PictureOnlyTemplate = () => {
   const field = 'imageUrl';
@@ -27,7 +27,7 @@ const PictureOnlyTemplate = () => {
                     changeHandler(e.target.value);
                   }}
                 />
-                <ImageUploading setImageUrl={changeHandler} />
+                {/* <ImageUploading setImageUrl={changeHandler} /> */}
               </>
             );
           },

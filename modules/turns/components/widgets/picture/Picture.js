@@ -51,7 +51,7 @@ const Picture = ({
     };
 
     const errorPicture = () => {
-      setImageUrlToRender('/img/404.jpg');
+      setImageUrlToRender('/img/404.png');
     };
 
     imgEl.current.addEventListener('load', loadImage);

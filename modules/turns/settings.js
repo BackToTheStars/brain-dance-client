@@ -1,7 +1,6 @@
 // все переменные для работы Turn
 
 import { Input, Switch } from 'antd';
-import ImageUploading from './components/forms/ImageUploading';
 import CarouselTemplate from './components/templates/Carousel';
 import PictureOnlyTemplate from './components/templates/PictureOnly';
 import { HeaderAddForm } from './components/widgets/header/EditForm';
@@ -10,7 +9,7 @@ import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 import FileUploading from './components/forms/FileUploading';
-import { uploadAudio } from './redux/actions';
+import { uploadMedia } from './redux/actions';
 
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
@@ -282,7 +281,11 @@ const fieldSettings = {
                 changeHandler(e.target.value);
               }}
             />
-            <ImageUploading setImageUrl={changeHandler} />
+            <FileUploading
+              changeHandler={changeHandler}
+              fileTypeLabel="an image"
+              uploadFunc={(file) => uploadMedia('images', file)}
+            />
           </>
         );
       },
@@ -314,7 +317,28 @@ const fieldSettings = {
   [FIELD_VIDEO]: {
     label: 'Video URL',
     prefixClass: 'video-url',
+    inputType: 'component',
     special: true,
+    widgetSettings: {
+      render: ({ changeHandler, label, prefixClass, value, form }) => {
+        return (
+          <>
+            <Input
+              placeholder={`${label}:`}
+              value={value}
+              onChange={(e) => {
+                changeHandler(e.target.value);
+              }}
+            />
+            <FileUploading
+              changeHandler={changeHandler}
+              fileTypeLabel="a video"
+              uploadFunc={(file) => uploadMedia('videos', file)}
+            />
+          </>
+        );
+      },
+    },
   },
   [FIELD_AUDIO]: {
     label: 'Audio URL',
@@ -335,7 +359,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="an audio"
-              uploadFunc={uploadAudio}
+              uploadFunc={(file) => uploadMedia('audios', file)}
             />
           </>
         );

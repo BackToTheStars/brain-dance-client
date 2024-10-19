@@ -21,7 +21,7 @@ import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import Picture from './widgets/picture/Picture';
-import Video from './widgets/Video';
+import Video from './widgets/video/Video';
 import { snapRound } from './helpers/grid';
 import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { TurnStateProvider } from './TurnState';

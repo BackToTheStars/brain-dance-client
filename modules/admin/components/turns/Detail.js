@@ -2,7 +2,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button, Collapse, Divider } from 'antd';
 import { getAdminTurnRequest, moveAudioRequest } from '../../requests';
-import { STATIC_AUDIO_URL } from '@/config/server';
+import { STATIC_MEDIA_URL } from '@/config/server';
 
 const AudioBlock = ({ turn, reloadTurn }) => {
   const [inProgress, setInProgress] = useState(false);
@@ -22,7 +22,7 @@ const AudioBlock = ({ turn, reloadTurn }) => {
         setInProgress(false);
       });
   };
-  if (!audioUrl || audioUrl.startsWith(STATIC_AUDIO_URL)) {
+  if (!audioUrl || audioUrl.startsWith(STATIC_MEDIA_URL)) {
     return null;
   }
   return (

@@ -26,7 +26,7 @@ import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
-import { STATIC_API_URL, STATIC_AUDIO_URL } from '@/config/server';
+import { STATIC_MEDIA_URL } from '@/config/server';
 
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
@@ -498,13 +498,12 @@ export const resetTurnNextPastePosition = () => (dispatch, getState) => {
   }
 };
 
-export const uploadImage = (image) => () => {
+export const uploadMedia = (type, file) => () => {
   return getTokenRequest('upload').then((data) => {
     const token = data.item;
-
     const formdata = new FormData();
-    formdata.append('file', image);
-    return fetch(`${STATIC_API_URL}/images/upload`, {
+    formdata.append('file', file);
+    return fetch(`${STATIC_MEDIA_URL}/${type}/upload`, {
       headers: {
         authorization: `Bearer ${token}`,
       },
@@ -512,20 +511,4 @@ export const uploadImage = (image) => () => {
       body: formdata,
     }).then((res) => res.json());
   });
-};
-
-export const uploadAudio = (audio) => () => {
-  return getTokenRequest('upload').then((data) => {
-    const token = data.item;
-
-    const formdata = new FormData();
-    formdata.append('file', audio);
-    return fetch(`${STATIC_AUDIO_URL}/audios/upload`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      method: 'POST',
-      body: formdata,
-    }).then((res) => res.json());
-  });
-};
+}
