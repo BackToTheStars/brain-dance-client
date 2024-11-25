@@ -1,17 +1,17 @@
 import { widgetSpacer as widgetSpacerOriginal } from '@/config/ui';
-import { setPanelMode } from '@/modules/panels/redux/actions';
 import {
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/config/panel';
 import { useEffect, useState, useRef, memo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import PictureCrop from './Crop';
 import PictureQuotes from './Quotes';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import { WIDGET_PICTURE } from '@/modules/turns/settings';
+import WidgetEditButton from '../buttons/Edit';
 
 const Picture = ({
   registerHandleResize,
@@ -30,7 +30,6 @@ const Picture = ({
   const imgEl = useRef(null);
   const imgWrapperEl = useRef(null);
 
-  const dispatch = useDispatch();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
@@ -127,21 +126,11 @@ const Picture = ({
         <img src={imageUrlToRender} ref={imgEl} />
 
         {can(RULE_TURNS_CRUD) && (
-          <a
-            className="widget-button"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              dispatch(
-                setPanelMode({
-                  mode: MODE_WIDGET_PICTURE,
-                  params: { editTurnId: turnId, editWidgetId: widgetId },
-                }),
-              );
-            }}
-          >
-            <i className="fas fa-highlighter"></i>
-          </a>
+          <WidgetEditButton
+            turnId={turnId}
+            widgetId={widgetId}
+            mode={MODE_WIDGET_PICTURE}
+          />
         )}
       </div>
     </div>

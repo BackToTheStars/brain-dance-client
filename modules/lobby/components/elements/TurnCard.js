@@ -1,27 +1,21 @@
-import { SLIDER_MODAL_GAME, SLIDER_MODAL_TURN } from '@/config/lobby/sliderModal';
-import { toggleSliderModal } from '@/modules/lobby/redux/actions';
-import { ContentButton as Button } from '@/ui/button';
-import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import TurnPreviewHeader from './turnPreview/Header';
+import TurnPreviewWrapper from './turnPreview/Wrapper';
+import TurnPreviewRoller from './turnPreview/Roller';
+import TurnPreviewAudio from './turnPreview/Audio';
 
-const getVideoImg = (url) => {
-  if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-    const newVideoUrl = url.split('=')[1];
-    return `https://img.youtube.com/vi/${newVideoUrl}/0.jpg`;
+const getVideoImg = (videoUrl) => {
+  if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
+    const videoId = videoUrl.split('v=')[1] || videoUrl.split('/').at(-1);
+    return `https://img.youtube.com/vi/${videoId}/0.jpg`;
   } else {
-    return '';
+    return '/img/video-default.png';
   }
 };
 
-const minHeight = 150;
-
 const TurnCard = ({ id }) => {
-  const t = useTranslations('Lobby.game');
-  const dispatch = useDispatch();
-  const dGames = useSelector((s) => s.lobby.dGames);
   const turn = useSelector((s) => s.lobby.dTurns[id]);
-  const lineCount = useSelector((s) => s.lobby.textSettings.lineCount);
   const fontSize = useSelector((s) => s.lobby.textSettings.fontSize);
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
   const alignment = useSelector((s) => s.lobby.textSettings.alignment);
@@ -29,11 +23,16 @@ const TurnCard = ({ id }) => {
   const activeFontFamily = useSelector(
     (s) => s.lobby.textSettings.activeFontFamily,
   );
-  const limitLineHeader = useSelector(
-    (s) => s.lobby.textSettings.limitLineHeader,
-  );
-  const { dontShowHeader, header, imageUrl, videoUrl, paragraph, contentType } =
-    turn || {};
+
+  const {
+    dontShowHeader,
+    header,
+    imageUrl,
+    videoUrl,
+    audioUrl,
+    paragraph,
+    contentType,
+  } = turn || {};
   let text = (paragraph && paragraph[0]?.insert) || '';
   if (text) {
     text =
@@ -41,60 +40,31 @@ const TurnCard = ({ id }) => {
   }
   text = text.trim();
 
-  const game = dGames[turn?.gameId];
   const imageSrc = useMemo(() => {
     if (imageUrl) return imageUrl;
     if (videoUrl) return getVideoImg(videoUrl);
     return null;
   }, [imageUrl, videoUrl]);
 
-  const headerLimiterStyle = useMemo(
-    () => ({
-      WebkitLineClamp: limitLineHeader,
-    }),
-    [limitLineHeader],
-  );
-
-  const maxHeight = useMemo(() => {
-    const maxHeightLimit = 1600;
-    const newHeight = lineSpacing * fontSize * lineCount + 16;
-    if (newHeight > maxHeightLimit) {
-      return maxHeightLimit;
-    }
-    return newHeight;
-  }, [lineCount, fontSize, lineSpacing]);
-
-  const wrapperStyle = useMemo(() => {
-    return {
-      minHeight: `${minHeight}px`,
-      maxHeight: `${maxHeight}px`,
-    }
-  }, [minHeight, maxHeight]);
-
   const textStyle = useMemo(() => {
     return {
       fontSize: `${fontSize}px`,
       lineHeight: `${lineSpacing * fontSize}px`,
       textAlign: alignment,
-    }
+    };
   }, [fontSize, lineSpacing, alignment, activeFontFamily]);
 
   const paddingStyle = useMemo(() => {
     return {
       padding: `${cardPadding}px`,
-    }
+    };
   }, [cardPadding]);
 
   return (
-    <div className="base-card base-card_turn" style={wrapperStyle}>
-      {!dontShowHeader && (
-        <div className="base-card__header" style={paddingStyle}>
-          <div className="lines-limiter" style={headerLimiterStyle}>
-            {header}
-          </div>
-        </div>
-      )}
+    <TurnPreviewWrapper>
+      {!dontShowHeader && !!header && <TurnPreviewHeader header={header} />}
       <div className="base-card__body" style={paddingStyle}>
+        {!!audioUrl && <TurnPreviewAudio audioUrl={audioUrl} header={header} />}
         {!!imageSrc && (
           <img
             src={imageSrc}
@@ -107,37 +77,9 @@ const TurnCard = ({ id }) => {
             {text}
           </div>
         )}
-        {/* <Button
-          size="sm"
-          onClick={() => dispatch(toggleSliderModal(SLIDER_MODAL_TURN, { id }))}
-        >
-          Open
-        </Button> */}
       </div>
-      <div className="base-card__roller" style={paddingStyle}>
-        {game?.name && <div className="mb-2">{game.name}</div>}
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            onClick={() =>
-              dispatch(
-                toggleSliderModal(SLIDER_MODAL_GAME, { hash: game.hash }),
-              )
-            }
-          >
-            {t('Game_info')}
-          </Button>
-          <Button
-            size="sm"
-            onClick={() =>
-              dispatch(toggleSliderModal(SLIDER_MODAL_TURN, { id }))
-            }
-          >
-            {t('Turn_info')}
-          </Button>
-        </div>
-      </div>
-    </div>
+      <TurnPreviewRoller turn={turn} />
+    </TurnPreviewWrapper>
   );
 };
 

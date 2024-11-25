@@ -1,13 +1,17 @@
 import { Slider } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { useSelector } from 'react-redux';
-import { FiPlay, FiPause } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { FiPlay, FiPause, FiEdit } from 'react-icons/fi';
 import { WIDGET_AUDIO } from '@/modules/turns/settings';
 import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import { getFormattedDuration } from '../../helpers/formatters/player';
 import { SpeedControl, VolumeControl } from './Control';
 import { AUDIO_HEIGHT } from '@/config/ui';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { MODE_WIDGET_AUDIO } from '@/config/panel';
+import { setPanelMode } from '@/modules/panels/redux/actions';
 
 const Audio = ({
   registerHandleResize,
@@ -15,6 +19,8 @@ const Audio = ({
   turnId,
   widgetId,
 }) => {
+  const dispatch = useDispatch();
+  const { can } = useUserContext();
   const title = useSelector((s) => s.turns.d[turnId].dWidgets.h_1?.text || '');
   const playerRef = useRef(null);
   const audioUrl = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].url);
@@ -71,7 +77,29 @@ const Audio = ({
           <span className="truncate">{title}</span>
         </div>
         <div className="audio-info flex gap-2 items-center">
-          <span className="audio-time">{getFormattedDuration(progress * duration)}</span>
+          {can(RULE_TURNS_CRUD) && duration && (
+            <button
+              className="icon-button"
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(
+                  setPanelMode({
+                    mode: MODE_WIDGET_AUDIO,
+                    params: {
+                      editTurnId: turnId,
+                      editWidgetId: widgetId,
+                      duration,
+                    },
+                  }),
+                );
+              }}
+            >
+              <FiEdit />
+            </button>
+          )}
+          <span className="audio-time">
+            {getFormattedDuration(progress * duration)}
+          </span>
           <SpeedControl speed={speed} setSpeed={setSpeed} />
           <VolumeControl
             volume={volume * 100}

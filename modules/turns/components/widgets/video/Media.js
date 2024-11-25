@@ -8,9 +8,15 @@ import {
   FiVolumeX,
   FiMaximize,
   FiMinimize,
+  FiEdit,
 } from 'react-icons/fi';
 // import { SpeedControl, VolumeControl } from './Control';
 import { getFormattedDuration } from '../../helpers/formatters/player';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { useDispatch } from 'react-redux';
+import { MODE_WIDGET_VIDEO } from '@/config/panel';
+import { setPanelMode } from '@/modules/panels/redux/actions';
 
 const VolumeControl = ({ volume, setVolume, muted, setMuted }) => {
   const toggleMute = () => {
@@ -58,7 +64,9 @@ const SpeedControl = ({ speed, setSpeed }) => {
   );
 };
 
-const MediaVideo = ({ videoUrl }) => {
+const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
+  const { can } = useUserContext();
+  const dispatch = useDispatch();
   const fsRef = useRef(null);
   const playerRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -97,9 +105,9 @@ const MediaVideo = ({ videoUrl }) => {
 
   const toggleFullscreen = () => {
     const playerDiv = fsRef.current;
-      // playerRef.current
-      // .getInternalPlayer()
-      // .closest('.video-player-wrapper');
+    // playerRef.current
+    // .getInternalPlayer()
+    // .closest('.video-player-wrapper');
     if (!document.fullscreenElement) {
       playerDiv.requestFullscreen().catch((err) => {
         console.error(err);
@@ -122,61 +130,87 @@ const MediaVideo = ({ videoUrl }) => {
   }, []);
 
   return (
-    <div className="video-player-wrapper not-draggable cursor-auto" ref={fsRef}>
-      <ReactPlayer
-        ref={playerRef}
-        url={videoUrl}
-        playing={playing}
-        muted={muted}
-        volume={volume}
-        onProgress={onProgress}
-        onDuration={onDuration}
-        width="100%"
-        height="100%"
-        playbackRate={speed}
-        controls={false}
-        config={{
-          youtube: { playerVars: { controls: 0 } },
-          file: { forceVideo: true },
-        }}
-      />
-      <div className="video-controls">
-        {/* Таймлайн */}
-        <Slider
-          className="timeline-slider"
-          min={0}
-          max={duration}
-          value={progress}
-          onChange={handleSeek}
-          tooltip={{
-            formatter: (value) => getFormattedDuration(value),
+    <>
+      <div
+        className="video-player-wrapper not-draggable cursor-auto"
+        ref={fsRef}
+      >
+        <ReactPlayer
+          ref={playerRef}
+          url={videoUrl}
+          playing={playing}
+          muted={muted}
+          volume={volume}
+          onProgress={onProgress}
+          onDuration={onDuration}
+          width="100%"
+          height="100%"
+          playbackRate={speed}
+          controls={false}
+          config={{
+            youtube: { playerVars: { controls: 0 } },
+            file: { forceVideo: true },
           }}
         />
-        {/* Элементы управления */}
-        <div className="controls-row">
-          <button className="icon-button play-button" onClick={togglePlay}>
-            {playing ? <FiPause /> : <FiPlay />}
-          </button>
-          <VolumeControl
-            volume={volume * 100}
-            setVolume={handleVolumeChange}
-            muted={muted}
-            setMuted={toggleMute}
+        <div className="video-controls">
+          {/* Таймлайн */}
+          <Slider
+            className="timeline-slider"
+            min={0}
+            max={duration}
+            value={progress}
+            onChange={handleSeek}
+            tooltip={{
+              formatter: (value) => getFormattedDuration(value),
+            }}
           />
-          <span className="video-time">
-            {getFormattedDuration(progress)} / {getFormattedDuration(duration)}
-          </span>
-          <div className="flex-1" />
-          <SpeedControl speed={speed} setSpeed={setSpeed} />
-          <button
-            className="icon-button fullscreen-button"
-            onClick={toggleFullscreen}
-          >
-            {fullscreen ? <FiMinimize /> : <FiMaximize />}
-          </button>
+          {/* Элементы управления */}
+          <div className="controls-row">
+            <button className="icon-button play-button" onClick={togglePlay}>
+              {playing ? <FiPause /> : <FiPlay />}
+            </button>
+            <VolumeControl
+              volume={volume * 100}
+              setVolume={handleVolumeChange}
+              muted={muted}
+              setMuted={toggleMute}
+            />
+            <span className="video-time">
+              {getFormattedDuration(progress)} /{' '}
+              {getFormattedDuration(duration)}
+            </span>
+            <div className="flex-1" />
+            {can(RULE_TURNS_CRUD) && duration && (
+              <button
+                className="icon-button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(
+                    setPanelMode({
+                      mode: MODE_WIDGET_VIDEO,
+                      params: {
+                        editTurnId: turnId,
+                        editWidgetId: widgetId,
+                        duration,
+                      },
+                    }),
+                  );
+                }}
+              >
+                <FiEdit />
+              </button>
+            )}
+            <SpeedControl speed={speed} setSpeed={setSpeed} />
+            <button
+              className="icon-button fullscreen-button"
+              onClick={toggleFullscreen}
+            >
+              {fullscreen ? <FiMinimize /> : <FiMaximize />}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

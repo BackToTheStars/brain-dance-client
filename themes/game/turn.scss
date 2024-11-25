@@ -1,3 +1,7 @@
+:root {
+  --fragment-editable-color: #1677ff;
+}
+
 .translucent-field {
   .stb-react-turn {
     opacity: 0.4;
@@ -71,6 +75,21 @@
           fill: #d72929;
         }
       }
+    }
+  }
+
+  .icon-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    &.disabled {
+      opacity: 0.3;
+      pointer-events: none;
     }
   }
 
@@ -328,6 +347,159 @@
         opacity: 0.7;
         cursor: pointer;
       }
+
+
+    }
+
+    .timeline-quotes {
+      .bg-fragment {
+        border: none;
+        background-color: transparent;
+        z-index: 0;
+
+        &.active {
+          // border: 2px solid red;
+          background-color: red;
+          // transform: translateY(-2px);
+          // height: 7px;
+          z-index: 1;
+          cursor: pointer;
+
+          &:hover {
+            transform: translateY(-1px);
+            height: 7px;
+          }
+        }
+      }
+
+      .fragments-container {
+        &.mode-view {
+          .selected {
+            .fragment-rect {
+              outline: 2px solid red;
+              max-width: calc(100% - 10px);
+              // margin-right: 5px;
+            }
+          }
+        }
+        .fragment-with-line {
+          outline: 2px solid red;
+          max-width: calc(100% - 10px);
+        }
+
+        .timeline {
+          padding-left: 7px;
+          padding-right: 7px;
+
+          .ant-slider-handle {
+            z-index: 3;
+          }
+
+          .ant-slider-rail {
+            background-color: rgba(255, 255, 255, 0.3);
+          }
+        }
+
+        .ant-timeline {
+          .ant-timeline-item-tail {
+            background-color: var(--turn-border-color);
+          }
+
+          .ant-timeline-item-head {
+            cursor: pointer;
+            transition: transform 0.2s;
+
+            &:hover {
+              transform: scale(1.5);
+            }
+          }
+        }
+
+        .fragment-rect {
+          // max-width: calc(100% - 20px);
+        }
+
+        .fragment-rect .text-with-buttons span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .text-with-buttons {
+          // width: calc(100% - 5px);
+
+          .icon-button {
+            visibility: hidden;
+          }
+
+          &:hover {
+            .icon-button {
+              visibility: visible;
+            }
+          }
+        }
+
+        .editable-fragment,
+        .inactive-fragment {
+          color: #fff;
+
+          .range-text {
+            color: rgba(255, 255, 255, 0.5);
+          }
+
+          .icon-button {
+            font-size: 16px;
+          }
+        }
+
+        .ant-timeline-item {
+          padding-bottom: 0px;
+        }
+
+        .ant-timeline-item .ant-timeline-item-head {
+          border-color: gray;
+        }
+
+        .ant-timeline-item .ant-timeline-item-tail {
+          background-color: gray;
+        }
+
+        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-tail {
+          background-color: var(--fragment-editable-color);
+        }
+
+        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-head {
+          border-color: var(--fragment-editable-color);
+        }
+
+        .ant-timeline-item:has(.editable-fragment)+.ant-timeline-item .ant-timeline-item-head {
+          border-color: var(--fragment-editable-color);
+        }
+
+        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-tail {
+          background-color: red;
+        }
+
+        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-head {
+          border-color: red;
+        }
+
+        .ant-timeline-item:has(.editable-fragment.selected)+.ant-timeline-item .ant-timeline-item-head {
+          border-color: red;
+        }
+
+        .ant-timeline-item:has(.inactive-fragment) {
+          padding-bottom: 0px;
+        }
+
+        .ant-timeline-item-content {
+          margin-inline-start: 16px;
+        }
+
+        .ant-timeline-item-last>.ant-timeline-item-content {
+          min-height: auto;
+        }
+      }
     }
 
     .video-player-wrapper {
@@ -342,7 +514,8 @@
       bottom: 0;
       width: 100%;
       display: flex;
-      flex-direction: column;background: rgba(0, 0, 0, 0.6);
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.6);
 
       .timeline-slider {
         width: calc(100% - 26px);
@@ -367,14 +540,14 @@
         padding: 5px 10px;
 
         .icon-button {
-          background: none;
-          border: none;
-          color: white;
+          // background: none;
+          // border: none;
+          // color: white;
           font-size: 20px;
-          cursor: pointer;
+          // cursor: pointer;
           margin-right: 10px;
-          display: flex;
-          align-items: center;
+          // display: flex;
+          // align-items: center;
         }
 
         .volume-control {
@@ -445,9 +618,9 @@
       font-weight: 500;
 
       .icon-button {
-        background: none;
-        border: none;
-        cursor: pointer;
+        // background: none;
+        // border: none;
+        // cursor: pointer;
         font-size: 18px;
       }
 

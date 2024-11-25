@@ -37,7 +37,9 @@ export const WIDGET_PARAGRAPH = 'paragraph';
 
 export const WIDGET_HEADER = 'header';
 export const WIDGET_VIDEO = 'video';
+export const WIDGET_VIDEO_QUOTES = 'video-quotes';
 export const WIDGET_AUDIO = 'audio';
+export const WIDGET_AUDIO_QUOTES = 'audio-quotes';
 export const WIDGET_SOURCE = 'source';
 
 export const widgetSettings = {

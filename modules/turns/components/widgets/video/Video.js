@@ -7,7 +7,10 @@ import { STATIC_MEDIA_URL } from '@/config/server';
 // import YoutubeVideo from './Youtube';
 import MediaVideo from './Media';
 
-const mediaServerUrls = [STATIC_MEDIA_URL];
+const mediaServerUrls = [
+  STATIC_MEDIA_URL,
+  'https://test-media.braindance.space',
+];
 
 const Video = ({
   registerHandleResize,
@@ -111,8 +114,21 @@ const Video = ({
       ) : (
         <>
           {/* {platform === 'youtube' && <YoutubeVideo videoId={videoId} />} */}
-          {platform === 'youtube' && <MediaVideo videoUrl={video.url} />}
-          {platform === 'media-server' && <MediaVideo videoUrl={videoId} />}
+          {platform === 'youtube' && (
+            <MediaVideo
+              videoUrl={video.url}
+              turnId={turnId}
+              widgetId={widgetId}
+            />
+          )}
+          {platform === 'media-server' && (
+            <MediaVideo
+              videoUrl={videoId}
+              turnId={turnId}
+              widgetId={widgetId}
+            />
+          )}
+          {/* {platform === 'local' && <div>Local Video {videoId}</div>} */}
           {platform === 'local' && <div>Local Video {videoId}</div>}
           {platform === 'unknown' && <div>Unknown Video {videoId}</div>}
         </>

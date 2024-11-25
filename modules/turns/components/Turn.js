@@ -27,6 +27,8 @@ import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { TurnStateProvider } from './TurnState';
 import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import Audio from './widgets/audio/Audio';
+import VideoQuotes from './widgets/video/VideoQuotes';
+import AudioQuotes from './widgets/audio/AudioQuotes';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -130,6 +132,8 @@ export const Turn = memo(({ id }) => {
       p_1: { inserts: paragraph },
       i_1: { url: imageUrl },
       v_1: { url: videoUrl },
+      vq_1: { duration: videoQuotesDuration },
+      aq_1: { duration: audioQuotesDuration },
       a_1: { url: audioUrl },
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
@@ -154,6 +158,8 @@ export const Turn = memo(({ id }) => {
       !dontShowHeader + // header
       !!imageUrl + // Picture
       !!videoUrl + // Video
+      !!videoQuotesDuration + // Video quotes
+      !!audioQuotesDuration + // Audio quotes
       !!audioUrl + // Audio
       doesParagraphExist
     ); // Paragraph
@@ -319,9 +325,25 @@ export const Turn = memo(({ id }) => {
             turnId={_id}
           />
         )}
+        {!!videoQuotesDuration && (
+          <VideoQuotes
+            widgetId={'vq_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            turnId={_id}
+          />
+        )}
         {!!audioUrl && (
           <Audio
-            widgetId={'a_1'}
+          widgetId={'a_1'}
+          registerHandleResize={registerHandleResize}
+          unregisterHandleResize={unregisterHandleResize}
+          turnId={_id}
+          />
+        )}
+        {!!audioQuotesDuration && (
+          <AudioQuotes
+            widgetId={'aq_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}

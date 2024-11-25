@@ -1,10 +1,12 @@
 import {
   WIDGET_AUDIO,
+  WIDGET_AUDIO_QUOTES,
   WIDGET_HEADER,
   WIDGET_PARAGRAPH,
   WIDGET_PICTURE,
   WIDGET_SOURCE,
   WIDGET_VIDEO,
+  WIDGET_VIDEO_QUOTES,
 } from '../settings';
 
 export class TurnHelper {
@@ -52,6 +54,24 @@ export class TurnHelper {
           scrollPosition: turn.scrollPosition || 0,
           quotes: turn.quotes.filter((quote) => quote.type === 'text'),
           compressed: !!turn.compressed,
+        },
+      ],
+      [WIDGET_VIDEO_QUOTES]: [
+        {
+          id: 'vq_1',
+          show: !!turn.videoQuotes,
+          duration: turn.videoQuotes?.duration || 0,
+          // quotes: turn.quotes.filter((quote) => quote.type === 'video'),
+          quotes: turn.videoQuotes?.quotes || [],
+        },
+      ],
+      [WIDGET_AUDIO_QUOTES]: [
+        {
+          id: 'aq_1',
+          show: !!turn.audioQuotes,
+          duration: turn.audioQuotes?.duration || 0,
+          // quotes: turn.quotes.filter((quote) => quote.type === 'video'),
+          quotes: turn.audioQuotes?.quotes || [],
         },
       ],
     };
@@ -121,7 +141,12 @@ export class TurnHelper {
       _id: turn._id,
       backgroundColor: turn.colors.background,
       fontColor: turn.colors.font,
-      quotes: [...turn.dWidgets.p_1.quotes, ...turn.dWidgets.i_1.quotes],
+      quotes: [
+        ...turn.dWidgets.p_1.quotes,
+        ...turn.dWidgets.i_1.quotes,
+        ...turn.dWidgets.vq_1.quotes,
+        ...turn.dWidgets.aq_1.quotes,
+      ],
       contentType: turn.contentType, // turn.pictureOnly
       pictureOnly: turn.pictureOnly || false, // @todo: remove
       gameId: turn.gameId,
@@ -134,6 +159,18 @@ export class TurnHelper {
       header: turn.dWidgets.h_1.text,
       imageUrl: turn.dWidgets.i_1.url,
       videoUrl: turn.dWidgets.v_1.url,
+      videoQuotes: turn.dWidgets.vq_1
+        ? {
+            duration: turn.dWidgets.vq_1.duration,
+            connectedTo: turn.dWidgets.vq_1.connectedTo,
+          }
+        : null,
+      audioQuotes: turn.dWidgets.aq_1
+        ? {
+            duration: turn.dWidgets.aq_1.duration,
+            connectedTo: turn.dWidgets.aq_1.connectedTo,
+          }
+        : null,
       audioUrl: turn.dWidgets.a_1.url,
       sourceUrl: turn.sourceUrl,
       date: turn.date,

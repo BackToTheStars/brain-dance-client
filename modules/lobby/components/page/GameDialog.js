@@ -41,13 +41,24 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     return roleOptions.filter((option) => roles[option.value]);
   }, [info, myCodes]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const choosedRole = +role;
     // случаи, когда нужно просто открыть игру без применения кода
     if (choosedRole === info.role) {
       if (nickname === info.nickname) {
         // + установить skipDialog при необходимости
+        let code = myCodes.find((c) => c.role === choosedRole)?.code;
+        if (!code && choosedRole === ROLE_GAME_VISITOR) {
+          code = hash;
+          const prm = new Promise((resolve) => {
+            dispatch(lobbyEnterGameForRequest(hash, hash, 'Guest')).then(() => {
+              // reloadGameInfo();
+              resolve();
+            });
+          });
+          await prm;
+        }
         if (skipDialog) {
           setGameInfoIntoStorage(info.hash, {
             info: {
@@ -79,9 +90,25 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       }
       return;
     }
-
     // случаи, когда требуется применение кода
-    const code = myCodes.find((c) => c.role === choosedRole)?.code || hash;
+    let code = myCodes.find((c) => c.role === choosedRole)?.code;
+    if (!code && choosedRole === ROLE_GAME_VISITOR) {
+      code = hash;
+      const prm = new Promise((resolve) => {
+        dispatch(
+          lobbyEnterGameForRequest(
+            hash,
+            hash,
+            'Guest',
+          ),
+        ).then(() => {
+          // reloadGameInfo();
+          resolve();
+        })
+      });
+      await prm;
+    }
+    
     const applyCodeAndGoToGame = () => {
       dispatch(lobbyEnterGameForRequest(hash, code, nickname)).then((data) => {
         const { info, token } = data;
@@ -122,9 +149,10 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   };
 
   useEffect(() => {
-    if (!token) return;
+    // if (!token) return;
     dispatch(loadShortGame(hash));
-  }, [token]);
+  // }, [token]);
+  }, []);
 
   return (
     <div className="flex-center h-screen">

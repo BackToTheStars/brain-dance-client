@@ -511,4 +511,164 @@ export const uploadMedia = (type, file) => () => {
       body: formdata,
     }).then((res) => res.json());
   });
-}
+};
+
+export const addVideoQuotesWidget =
+  (turnId, editWidgetId, duration) => (dispatch, getState) => {
+    const videoQuotes = {
+      connectedTo: editWidgetId, // v_1
+      duration,
+      quotes: [
+        {
+          id: Math.floor(Date.now() / 1000),
+          text: '',
+          start: 0,
+          active: false,
+        },
+      ],
+    };
+    return updateTurnRequest(turnId, { videoQuotes }).then((data) => {
+      dispatch({
+        type: types.TURN_UPDATE_WIDGET,
+        payload: {
+          turnId: turnId,
+          widgetId: 'vq_1',
+          widget: data.item.videoQuotes,
+        },
+      });
+    });
+  };
+
+export const deleteVideoQuotesWidget =
+  (turnId, widgetId) => (dispatch, getState) => {
+    const state = getState();
+    const quotes = state.turns.d[turnId].dWidgets['vq_1'].quotes;
+    const dLines = state.lines.dByTurnIdAndMarker[turnId];
+    const dLineIdsToRemove = {};
+    for (const quote of quotes) {
+      if (dLines[quote.id]) {
+        for (const line of dLines[quote.id]) {
+          dLineIdsToRemove[line._id] = true;
+        }
+      }
+    }
+    const ids = Object.keys(dLineIdsToRemove);
+
+    const callback = () => {
+      return updateTurnRequest(turnId, { videoQuotes: null }).then((data) => {
+        dispatch({
+          type: types.TURN_UPDATE_WIDGET,
+          payload: {
+            turnId: turnId,
+            widgetId: widgetId,
+            widget: {
+              id: 'vq_1',
+              show: false,
+              duration: 0,
+              quotes: [],
+            },
+          },
+        });
+      });
+    };
+
+    if (ids.length) {
+      return dispatch(linesDelete(ids)).then(() => callback());
+    }
+
+    return callback();
+  };
+
+export const updateVideoQuotesWidget =
+  (turnId, widgetId, widget) => (dispatch) => {
+    return updateTurnRequest(turnId, { videoQuotes: widget }).then((data) => {
+      dispatch({
+        type: types.TURN_UPDATE_WIDGET,
+        payload: {
+          turnId: turnId,
+          widgetId: widgetId,
+          widget: data.item.videoQuotes,
+        },
+      });
+    });
+  };
+
+export const addAudioQuotesWidget =
+  (turnId, editWidgetId, duration) => (dispatch, getState) => {
+    const audioQuotes = {
+      connectedTo: editWidgetId, // a_1
+      duration,
+      quotes: [
+        {
+          id: Math.floor(Date.now() / 1000),
+          text: '',
+          start: 0,
+          active: false,
+        },
+      ],
+    };
+    return updateTurnRequest(turnId, { audioQuotes }).then((data) => {
+      dispatch({
+        type: types.TURN_UPDATE_WIDGET,
+        payload: {
+          turnId: turnId,
+          widgetId: 'aq_1',
+          widget: data.item.audioQuotes,
+        },
+      });
+    });
+  };
+
+export const deleteAudioQuotesWidget =
+  (turnId, widgetId) => (dispatch, getState) => {
+    const state = getState();
+    const quotes = state.turns.d[turnId].dWidgets['aq_1'].quotes;
+    const dLines = state.lines.dByTurnIdAndMarker[turnId];
+    const dLineIdsToRemove = {};
+    for (const quote of quotes) {
+      if (dLines[quote.id]) {
+        for (const line of dLines[quote.id]) {
+          dLineIdsToRemove[line._id] = true;
+        }
+      }
+    }
+    const ids = Object.keys(dLineIdsToRemove);
+
+    const callback = () => {
+      return updateTurnRequest(turnId, { audioQuotes: null }).then((data) => {
+        dispatch({
+          type: types.TURN_UPDATE_WIDGET,
+          payload: {
+            turnId: turnId,
+            widgetId: widgetId,
+            widget: {
+              id: 'aq_1',
+              show: false,
+              duration: 0,
+              quotes: [],
+            },
+          },
+        });
+      });
+    };
+
+    if (ids.length) {
+      return dispatch(linesDelete(ids)).then(() => callback());
+    }
+
+    return callback();
+  };
+
+export const updateAudioQuotesWidget =
+  (turnId, widgetId, widget) => (dispatch) => {
+    return updateTurnRequest(turnId, { audioQuotes: widget }).then((data) => {
+      dispatch({
+        type: types.TURN_UPDATE_WIDGET,
+        payload: {
+          turnId: turnId,
+          widgetId: widgetId,
+          widget: data.item.audioQuotes,
+        },
+      });
+    });
+  };
