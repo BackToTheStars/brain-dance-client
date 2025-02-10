@@ -14,9 +14,10 @@ const Paragraph = ({
   const paragraphWidget = useSelector(
     (state) => state.turns.d[turnId]?.dWidgets?.[widgetId],
   );
+  const canBeCompressed = paragraphWidget?.quotes?.length > 1;
   return (
     <>
-      {paragraphWidget?.compressed ? (
+      {paragraphWidget?.compressed && canBeCompressed ? (
         <CompressorProvider>
           <Compressor
             turnId={turnId}

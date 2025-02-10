@@ -9,29 +9,31 @@ import { resetAndExit } from '../../../redux/actions';
 import { Buttons } from '../../ButtonsPanel';
 
 const ParagraphMode = () => {
-  //
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const paragraphWidget = useSelector(
     (state) => state.turns.d[editTurnId]?.dWidgets?.p_1,
   );
 
+  const canBeCompressed = paragraphWidget?.quotes?.length > 1;
   const { can } = useUserContext();
   const dispatch = useDispatch();
 
   const buttons = [
-    !paragraphWidget?.compressed
+    canBeCompressed && !paragraphWidget?.compressed
       ? {
           text: 'Compress',
           callback: () => {
             dispatch(compressParagraph());
           },
         }
-      : {
-          text: 'Uncompress',
-          callback: () => {
-            dispatch(unCompressParagraph());
-          },
-        },
+      : paragraphWidget?.compressed
+        ? {
+            text: 'Uncompress',
+            callback: () => {
+              dispatch(unCompressParagraph());
+            },
+          }
+        : null,
     null,
     null,
     null,
