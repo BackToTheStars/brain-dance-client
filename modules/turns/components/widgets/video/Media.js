@@ -180,7 +180,9 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
               {getFormattedDuration(duration)}
             </span>
             <div className="flex-1" />
-            {can(RULE_TURNS_CRUD) && duration && (
+            {can(RULE_TURNS_CRUD) && duration
+              && false // TODO: пока нет возможности редактировать цитаты медиа
+              && (
               <button
                 className="icon-button"
                 onClick={(e) => {

@@ -14,12 +14,52 @@ import React, {
 import { colorSet, getNeedBlackText } from '../../helpers/color';
 import { CompressorContext } from './Compressor';
 
+/** Утилита для разбиения строки по переводу строки с добавлением <br /> */
+const getInserts = (text) => {
+  if (!text) return [];
+  const parts = text.split('\n');
+  return parts.flatMap((line, idx) =>
+    idx === parts.length - 1 ? [line] : [line, <br key={idx} />],
+  );
+};
+
+/** Преобразует строку, содержащую URL, в массив React-элементов с ссылками
+ * Использует keyPrefix для уникальности ключей
+ */
+const processTextForLinks = (text, keyPrefix) => {
+  const urlRegex =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/g;
+  const parts = [];
+  let lastIndex = 0;
+  const matches = [...text.matchAll(urlRegex)];
+  if (matches.length === 0) return text;
+  matches.forEach((match, idx) => {
+    const { index } = match;
+    if (index > lastIndex) {
+      parts.push(text.slice(lastIndex, index));
+    }
+    let url = match[0];
+    if (url.endsWith('.')) {
+      url = url.slice(0, -1);
+    }
+    parts.push(
+      <a key={`${keyPrefix}-${idx}`} href={url} target="_blank">
+        {url}
+      </a>,
+    );
+    lastIndex = index + match[0].length;
+  });
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts;
+};
+
+/** Модифицирует атрибуты элементов для цитат */
 const modifyQuoteBackgrounds = (arrText, turnType) => {
   const colors = colorSet?.[turnType] || colorSet.turn;
-
   return arrText.map((textItem) => {
     if (!textItem?.attributes?.background) return textItem;
-    // console.log(textItem?.attributes?.background);
     const rectColor =
       colors[textItem.attributes.background] || textItem.attributes.background;
     const attributes = {
@@ -28,16 +68,21 @@ const modifyQuoteBackgrounds = (arrText, turnType) => {
       borderRadius: TURN_QUOTE_BORDER_RADIUS,
       outline: `solid 2px ${rectColor}`,
     };
-
     attributes.color = getNeedBlackText(rectColor) ? '#000' : '#fff';
-
-    return {
-      ...textItem,
-      attributes,
-    };
+    return { ...textItem, attributes };
   });
 };
 
+/** Рендерит слова с уникальными ключами, используя префикс */
+const renderText = (text, prefix = '') =>
+  text.split(' ').map((word, idx, arr) => (
+    <span key={`${prefix}-${idx}`}>
+      {word}
+      {idx < arr.length - 1 ? ' ' : ''}
+    </span>
+  ));
+
+/** Компонент для полного отображения текста с разметкой */
 export const ParagraphOriginalTexts = ({
   arrText,
   turnId,
@@ -48,22 +93,14 @@ export const ParagraphOriginalTexts = ({
   return (
     <>
       {modifiedArrText.map((textItem, i) => {
-        const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
-        const newInserts = [];
-        for (let j = 0; j < arrInserts.length; j++) {
-          newInserts.push(arrInserts[j]);
-          newInserts.push(<br key={j} />);
-        }
-        newInserts.pop();
+        const newInserts = getInserts(textItem.insert);
         return (
           <OriginalSpanTextPiece
             key={i}
-            {...{
-              textItem,
-              newInserts,
-              turnId,
-              compressed,
-            }}
+            textItem={textItem}
+            newInserts={newInserts}
+            turnId={turnId}
+            compressed={compressed}
           />
         );
       })}
@@ -71,92 +108,54 @@ export const ParagraphOriginalTexts = ({
   );
 };
 
+/** Рендерит отдельный фрагмент текста с обработкой ссылок */
 export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
-  // const spanFragment = useRef(null);
-  const isItQuote = textItem.attributes
-    ? !!textItem.attributes.background
-    : false;
-
-  // console.log(newInserts);
-
-  const links = isItQuote
-    ? newInserts
-    : newInserts.map((element, index) => {
-        if (typeof element !== 'string') return element;
-        const iterator = element.matchAll(
-          /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/gm,
-          '<a href="$&" target="_blank">$&</a>'
-        );
-        const matches = [];
-        for (const item of iterator) {
-          matches.push(item);
-        }
-        if (matches.length === 0) return element;
-        const items = [];
-        let startPosition = 0;
-        for (const match of matches) {
-          if (match.index > startPosition)
-            items.push({
-              value: element.slice(startPosition, match.index),
-              type: 'text',
-            });
-          const value =
-            match[0].at(-1) === '.' ? match[0].slice(0, -1) : match[0];
-          items.push({ value, type: 'link' });
-          startPosition = match.index + value.length;
-        }
-        if (startPosition < element.length) {
-          items.push({ value: element.slice(startPosition), type: 'text' });
-        }
-        return items.map((item, index2) => {
-          if (item.type === 'text') return item.value;
-          return (
-            <a key={`${index}_${index2}`} href={item.value} target="_blank">
-              {item.value}
-            </a>
-          );
-        });
-      });
-
+  const isItQuote = !!(textItem.attributes && textItem.attributes.background);
+  let content;
+  if (!isItQuote && textItem?.attributes?.link) {
+    content = (
+      <a href={textItem.attributes.link} target="_blank">
+        {textItem.insert}
+      </a>
+    );
+  } else {
+    content = newInserts.map((element, outerIndex) => {
+      if (typeof element !== 'string') return element;
+      return (
+        <Fragment key={'fragment_' + outerIndex}>
+          {processTextForLinks(element, outerIndex)}
+        </Fragment>
+      );
+    });
+  }
   return (
     <span
       style={textItem.attributes}
       data-id={isItQuote ? textItem.attributes.id : ''}
       className={isItQuote && compressed ? 'compressed-quote' : ''}
-      // ref={spanFragment}
     >
-      {links}
+      {content}
     </span>
   );
 };
 
+/** Компонент для первичного отображения текста в режиме Compressor */
 export const ParagraphCompressorTextWrapper = ({ arrText = [] }) => {
-  // const modifiedArrText = arrText && modifyQuoteBackgrounds(arrText, 'turn');
   const [processed, setProcessed] = useState(false);
   useEffect(() => {
-    setTimeout(() => {
-      setProcessed(true);
-    }, 1000);
+    const timer = setTimeout(() => setProcessed(true), 1000);
+    return () => clearTimeout(timer);
   }, []);
   return (
     <>
       {!processed &&
         arrText.map((textItem, i) => {
-          // @todo: refactoring
-          const arrInserts = textItem.insert ? textItem.insert.split('\n') : [];
-          const newInserts = [];
-          for (let j = 0; j < arrInserts.length; j++) {
-            newInserts.push(arrInserts[j]);
-            newInserts.push(<br key={j} />);
-          }
-          newInserts.pop();
+          const newInserts = getInserts(textItem.insert);
           return (
             <CompressorSpanTextPiece
               key={i}
-              {...{
-                textItem,
-                newInserts,
-              }}
+              textItem={textItem}
+              newInserts={newInserts}
             />
           );
         })}
@@ -164,48 +163,38 @@ export const ParagraphCompressorTextWrapper = ({ arrText = [] }) => {
   );
 };
 
+/** Рендерит отдельный фрагмент сжатого текста, разбивая строки на слова */
 export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
-  const isTextQuote =
-    !!textItem && textItem.attributes && textItem.attributes.background;
-  const additionalAttributes = {};
-  if (isTextQuote && textItem.attributes?.id) {
-    additionalAttributes['data-id'] = textItem.attributes.id;
-  }
+  const isTextQuote = !!(
+    textItem?.attributes && textItem.attributes.background
+  );
+  const additionalAttributes =
+    isTextQuote && textItem.attributes?.id
+      ? { 'data-id': textItem.attributes.id }
+      : {};
   return (
     <span
       style={textItem.attributes}
       className={isTextQuote ? 'compressed-quote' : ''}
       {...additionalAttributes}
     >
-      {newInserts.map((item, index) => {
-        if (typeof item === 'string') {
-          if (item.includes(' ')) {
-            const words = item.split(' ');
-            return (
-              <Fragment key={'item' + index}>
-                {words.map((word, index2) => {
-                  return (
-                    <span key={`item-${index}-${index2}`}>
-                      {word}
-                      {index2 < words.length - 1 ? ' ' : ''}
-                    </span>
-                  );
-                })}
-              </Fragment>
-            );
-          } else {
-            return <span key={'item' + index}>{item}</span>;
-          }
-        }
-        return item;
-      })}
+      {newInserts.map((item, outerIndex) =>
+        typeof item === 'string' ? (
+          <Fragment key={'fragment_' + outerIndex}>
+            {renderText(item, outerIndex)}
+          </Fragment>
+        ) : (
+          item
+        ),
+      )}
     </span>
   );
 };
 
+/** Компонент для отображения текста вокруг цитат в режиме Compressor */
 export const TextAroundQuoteOptimized = ({
   scrollPosition,
-  height, // через этот viewport смотрим на кусок текста
+  height, // высота viewport-а
   arrText,
   turnId,
   turnType,
@@ -213,105 +202,88 @@ export const TextAroundQuoteOptimized = ({
   deltaTop,
   deltaScrollHeightTop,
   widgetTop,
-  // widgetWidth,
   quotes,
   parentClassNameId,
 }) => {
   const { addToQuoteCollection } = useContext(CompressorContext);
   const paragraphEl = useRef(null);
-
   const [scrollTop, setScrollTop] = useState(0);
   const [quotesInfoPart, setQuotesInfoPart] = useState([]);
 
   const classNameId = `${parentClassNameId}_textaroundquotes_${index}`;
 
   useEffect(() => {
-    // @todo: check if no quotes
-    if (!paragraphEl?.current) return;
+    if (!paragraphEl.current) return;
     paragraphEl.current.scrollTop = scrollPosition;
-    if (!quotes?.length) {
+    if (!quotes || !quotes.length) {
       console.log('no quotes in TextAroundQuote');
       return;
     }
-
-    const quotesInfoPart = [];
-
-    for (let quote of quotes) {
-      const { top, left, width, height } = quote;
-      quotesInfoPart.push({
+    const computedQuotes = quotes.map((quote) => {
+      const computedLeft = quote.left + 7; // эквивалентно (left + 8 - 1)
+      const computedWidth = quote.width + 1;
+      const computedHeight = quote.height + 1;
+      return {
         initialCoords: {
-          // @todo: get from size settings
-          left: left + 8 - 1,
-          top: top + widgetTop + deltaTop - deltaScrollHeightTop - 1, // + widgetSpacer,
-          width: width + 1,
-          height: height + 1,
+          left: computedLeft,
+          top: quote.top + widgetTop + deltaTop - deltaScrollHeightTop - 1,
+          width: computedWidth,
+          height: computedHeight,
         },
         quoteId: quote.quoteId,
         quoteKey: quote.quoteKey,
         turnId,
         text: quote.text,
         type: 'text',
-        width: width + 1,
-        height: height + 1,
-        left: left + 8 - 1,
-        top: top - 1,
-      });
-    }
-
-    setQuotesInfoPart(quotesInfoPart);
-  }, [paragraphEl, widgetTop]);
+        width: computedWidth,
+        height: computedHeight,
+        left: computedLeft,
+        top: quote.top - 1,
+      };
+    });
+    setQuotesInfoPart(computedQuotes);
+  }, [scrollPosition, quotes, widgetTop, deltaTop, deltaScrollHeightTop]);
 
   useEffect(() => {
     if (!quotesInfoPart.length) return;
-    const blockTop = widgetTop + deltaTop; // + widgetSpacer;
-    const blockBottom = widgetTop + deltaTop + height; // + widgetSpacer;
-
-    addToQuoteCollection(
-      quotesInfoPart.map((quoteInfo) => {
-        const quoteTop = quoteInfo.initialCoords.top - scrollTop;
-        const quoteBottom =
-          quoteInfo.initialCoords.top +
-          quoteInfo.initialCoords.height -
-          scrollTop;
-
-        const params = {};
-
-        if (quoteBottom < blockTop) {
-          params.height = 0;
-          params.top = blockTop + 1;
-        } else if (quoteTop < blockTop) {
-          params.top = blockTop + 1;
-          params.height = quoteBottom - blockTop;
-        } else if (quoteTop > blockBottom) {
-          params.top = blockBottom - 1;
-          params.height = 0;
-        } else if (quoteBottom > blockBottom) {
-          params.top = quoteTop;
-          params.height = blockBottom - quoteTop;
-        } else {
-          params.top = quoteTop;
-        }
-
-        return {
-          ...quoteInfo,
-          ...params,
-        };
-      }),
-      index
-    );
-  }, [scrollTop, quotesInfoPart]);
+    const blockTop = widgetTop + deltaTop;
+    const blockBottom = blockTop + height;
+    const updatedQuotes = quotesInfoPart.map((quoteInfo) => {
+      const { initialCoords } = quoteInfo;
+      const quoteTop = initialCoords.top - scrollTop;
+      const quoteBottom = initialCoords.top + initialCoords.height - scrollTop;
+      let params = {};
+      if (quoteBottom < blockTop) {
+        params = { height: 0, top: blockTop + 1 };
+      } else if (quoteTop < blockTop) {
+        params = { top: blockTop + 1, height: quoteBottom - blockTop };
+      } else if (quoteTop > blockBottom) {
+        params = { top: blockBottom - 1, height: 0 };
+      } else if (quoteBottom > blockBottom) {
+        params = { top: quoteTop, height: blockBottom - quoteTop };
+      } else {
+        params = { top: quoteTop };
+      }
+      return { ...quoteInfo, ...params };
+    });
+    addToQuoteCollection(updatedQuotes, index);
+  }, [
+    scrollTop,
+    quotesInfoPart,
+    widgetTop,
+    deltaTop,
+    height,
+    addToQuoteCollection,
+    index,
+  ]);
 
   useEffect(() => {
-    if (!paragraphEl || !paragraphEl.current) return;
-    const scrollHandler = () => {
-      if (!!paragraphEl.current) {
-        setScrollTop(paragraphEl.current.scrollTop);
-      }
-    };
-    paragraphEl.current.addEventListener('scroll', scrollHandler);
-    return () =>
-      paragraphEl.current?.removeEventListener('scroll', scrollHandler);
-  }, [paragraphEl]);
+    if (!paragraphEl.current) return;
+    const scrollHandler = () => setScrollTop(paragraphEl.current.scrollTop);
+    const el = paragraphEl.current;
+    el.addEventListener('scroll', scrollHandler);
+    return () => el.removeEventListener('scroll', scrollHandler);
+  }, []);
 
   return (
     <div

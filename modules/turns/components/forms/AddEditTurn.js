@@ -470,6 +470,7 @@ const AddEditTurnPopup = () => {
                   <option value={val} key={i} />
                 ))}
               </select>
+              <button className="ql-link" />
             </span>
           </div>
           <div id="editor-container-new" />

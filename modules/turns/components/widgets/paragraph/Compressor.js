@@ -8,6 +8,7 @@ import {
   memo,
   createContext,
   useContext,
+  useCallback,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -26,14 +27,14 @@ export const CompressorContext = createContext();
 
 export const CompressorProvider = ({ children }) => {
   const [quoteCollection, setQuoteCollection] = useState([]);
-  const addToQuoteCollection = (quotesInfoPart, index) => {
+  const addToQuoteCollection = useCallback((quotesInfoPart, index) => {
     setQuoteCollection((quoteCollection) => {
       // callback потому что идём через useMemo, чтобы отвязаться от scope
       const quoteCollectionCopy = [...quoteCollection];
       quoteCollectionCopy[index] = quotesInfoPart;
       return quoteCollectionCopy;
     });
-  };
+  }, []);
   return (
     <CompressorContext.Provider
       value={{

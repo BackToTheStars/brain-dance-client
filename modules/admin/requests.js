@@ -130,3 +130,29 @@ export const addCodeRequest = (hash) => {
     },
   }).then((res) => res.json()); // вернёт Promise
 };
+
+export const getTgChatIdsRequest = () => {
+  return fetch(`${API_URL}/admin/tg-logs/chat-ids`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      'content-type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
+
+export const getTgLogsRequest = (chatId, filter = {}) => {
+  let url = `${API_URL}/admin/tg-logs`;
+
+  if (chatId) {
+    url += `?chatId=${chatId}`;
+  }
+  if (Object.keys(filter).length) {
+    url += `&${new URLSearchParams(filter).toString()}`;
+  }
+  return fetch(url, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      'content-type': 'application/json',
+    },
+  }).then((res) => res.json());
+};
