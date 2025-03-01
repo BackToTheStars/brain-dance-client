@@ -13,6 +13,9 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { loadSettings } from '@/modules/settings/redux/actions';
 import GameDialog from '@/modules/lobby/components/page/GameDialog';
+import { lobbyEnterGameWithConfirm } from '@/modules/lobby/redux/actions';
+
+const GAME_ID_HASH_LENGTH = 3;
 
 const GamePage = () => {
   return (
@@ -41,17 +44,41 @@ const GamePageInner = () => {
 
 const GameDialogPage = ({ hash }) => {
   const dispatch = useDispatch();
-  const [myGamesLoaded, setMyGamesLoaded] = useState(false);
+  const [myGamesLoaded, setMyGamesLoaded] = useState(false); // @todo: перенести в store
   const myGames = useSelector((state) => state.settings.games);
   const { info, token, reloadUserInfo } = useUserContext();
+  
   const router = useRouter();
+  
   useEffect(() => {
+    if (!hash || hash.length === GAME_ID_HASH_LENGTH) return;
     if (!myGamesLoaded) return;
-    if (info.skipDialog) {
-      router.push(`/game/view/${hash}`);
+    // обработка случая, когда hash является кодом с ролью
+    // @todo: изменить при переходе к произвольной длине hash
+    const existedGame = myGames.find((g) => {
+      for (const codeObj of g.codes) {
+        if (codeObj.code === hash) {
+          return true;
+        }
+      }
+      return false;
+    });
+    if (existedGame) {
+      router.push(`/game?hash=${existedGame.hash}`);
       return;
     }
-  }, [hash, info, token, myGames, myGamesLoaded]);
+    dispatch(lobbyEnterGameWithConfirm(hash, 'user')).catch((msg) => {
+      alert(msg);
+    });
+  }, [hash, myGames, myGamesLoaded]);
+
+  // useEffect(() => {
+  //   if (!myGamesLoaded) return;
+  //   if (info.skipDialog) {
+  //     router.push(`/game/view/${hash}`);
+  //     return;
+  //   }
+  // }, [hash, info, token, myGames, myGamesLoaded]);
 
   useEffect(() => {
     dispatch(loadSettings());
@@ -60,7 +87,8 @@ const GameDialogPage = ({ hash }) => {
     }, 300)
   }, [])
 
-  if (!myGamesLoaded || info?.skipDialog) {
+  // if (!myGamesLoaded || info?.skipDialog) {
+  if (!myGamesLoaded) {
     return <Loading />;
   }
 

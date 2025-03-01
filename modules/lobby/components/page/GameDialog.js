@@ -15,7 +15,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const game = useSelector((state) => state.game.game);
   const t = useTranslations('Lobby');
   const [nickname, setNickname] = useState(info?.nickname || '');
-  const [skipDialog, setSkipDialog] = useState(false);
+  // const [skipDialog, setSkipDialog] = useState(false);
   const router = useRouter();
 
   const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
@@ -59,29 +59,30 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
           });
           await prm;
         }
-        if (skipDialog) {
-          setGameInfoIntoStorage(info.hash, {
-            info: {
-              ...info,
-              skipDialog,
-            },
-            token,
-          });
-          reloadUserInfo();
-          router.push(`/game/view/${hash}`);
-        } else {
-          // ничего не требуется
-          router.push(`/game/view/${hash}`);
-        }
+        // if (skipDialog) {
+        //   setGameInfoIntoStorage(info.hash, {
+        //     info: {
+        //       ...info,
+        //       skipDialog,
+        //     },
+        //     token,
+        //   });
+        //   reloadUserInfo();
+        //   router.push(`/game/view/${hash}`);
+        // } else {
+        // ничего не требуется
+        router.push(`/game/view/${hash}`);
+        // }
       } else {
         // случаи, когда требуется только изменить никнейм
         refreshTokenRequest(hash, token, nickname).then((data) => {
           const { info, token } = data;
           setGameInfoIntoStorage(info.hash, {
-            info: {
-              ...info,
-              skipDialog,
-            },
+            info,
+            // info: {
+            //   ...info,
+            //   skipDialog,
+            // },
             token,
           });
           reloadUserInfo();
@@ -113,10 +114,11 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       dispatch(lobbyEnterGameForRequest(hash, code, nickname)).then((data) => {
         const { info, token } = data;
         setGameInfoIntoStorage(info.hash, {
-          info: {
-            ...info,
-            skipDialog,
-          },
+          info,
+          // info: {
+          //   ...info,
+          //   skipDialog,
+          // },
           token,
         });
         reloadUserInfo();
@@ -128,8 +130,6 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       (acc, { role }) => Math.max(acc, role),
       ROLE_GAME_VISITOR,
     );
-    // случаи, когда требуется дополнительный вопрос
-    // в info содержится роль, которая больше, чем выбранная и в myCodes отсутствует роль owner
     if (
       choosedRole > maxRole &&
       !myCodes.find((c) => c.role === ROLE_GAME_OWNER)
@@ -137,12 +137,6 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       if (confirm(`Owner access will be lost. Do you want to continue?`)) {
         applyCodeAndGoToGame();
       }
-      // dispatch(
-      //   openModal(MODAL_CONFIRM, {
-      //     text: 'Do_you_want_to_apply_the_code?',
-      //     callback: applyCodeAndGoToGame,
-      //   }),
-      // );
     } else {
       applyCodeAndGoToGame();
     }
@@ -158,7 +152,6 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     <div className="flex-center h-screen">
       <div className="flex gap-2">
         <div className="w-[400px] border border-solid border-gray-300 rounded-md p-4">
-          {/* {game ? ( */}
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <h2 className="text-2xl text-center">
               {game?.name || <Loading />}
@@ -180,7 +173,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
                 />
               </div>
             </div>
-            <div
+            {/* <div
               className="flex gap-2 cursor-pointer"
               onClick={() => setSkipDialog(!skipDialog)}
             >
@@ -189,7 +182,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
                 // onChange={(e) => setSkipDialog(e.target.checked)}
               />
               <div>{t('gameDialog.Skip_this_dialog_next_time')}</div>
-            </div>
+            </div> */}
             {/* game.description and game.image */}
             <div className="flex justify-end">
               <Button htmlType="submit">
@@ -197,13 +190,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
               </Button>
             </div>
           </form>
-          {/* ) : (
-            <Loading />
-          )} */}
         </div>
-        {/* <pre className="w-[400px]  max-h-[500px] overflow-y-auto">
-          {JSON.stringify({ hash, info, token, myGames }, null, 2)}
-        </pre> */}
       </div>
     </div>
   );

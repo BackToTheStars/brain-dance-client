@@ -35,7 +35,7 @@ const GamePageInner = () => {
       token,
       info,
     } = getGameInfo(hash) || {};
-    const { skipDialog } = info || {};
+    // const { skipDialog } = info || {};
     if (!token) {
       router.push(`/`);
       return;
@@ -51,10 +51,11 @@ const GamePageInner = () => {
         .then((data) => {
           const { info, token } = data;
           setGameInfoIntoStorage(hash, {
-            info: {
-              ...info,
-              skipDialog,
-            },
+            // info: {
+            //   ...info,
+            //   skipDialog,
+            // },
+            info,
             token,
           });
           setHashChecked(true);
