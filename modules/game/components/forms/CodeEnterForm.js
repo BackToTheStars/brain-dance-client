@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Button, Input } from 'antd';
 import { getGameUserTokenRequest } from '../../requests';
 import { setGameInfoIntoStorage, useUserContext } from '@/modules/user/contexts/UserContext';
+import { TID } from '@/config/testIds';
 
 const CodeEnterForm = ({ hash }) => {
   const { reloadUserInfo } = useUserContext();
@@ -50,6 +51,7 @@ const CodeEnterForm = ({ hash }) => {
           type="text"
           className="form-control"
           placeholder="Enter code..."
+          data-test-id={TID.codeEnter.code}
           onChange={(e) => setAccessCode(e.target.value)}
           value={accessCode}
           onKeyDown={() => setErrorMessage('')}
@@ -62,13 +64,19 @@ const CodeEnterForm = ({ hash }) => {
           type="text"
           className="form-control"
           placeholder="Enter nickname..."
+          data-test-id={TID.codeEnter.nickname}
           onChange={(e) => setUserNickname(e.target.value)}
           value={userNickname}
           onKeyDown={() => setErrorMessage('')}
         />
       </div>
       <div className="col-auto mb-2">
-        <Button size="small" htmlType="submit" className="enter-game">
+        <Button
+          size="small"
+          htmlType="submit"
+          className="enter-game"
+          data-test-id={TID.codeEnter.submit}
+        >
           Enter Game
         </Button>
       </div>

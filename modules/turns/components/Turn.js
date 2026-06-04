@@ -29,6 +29,7 @@ import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import Audio from './widgets/audio/Audio';
 import VideoQuotes from './widgets/video/VideoQuotes';
 import AudioQuotes from './widgets/audio/AudioQuotes';
+import { TID } from '@/config/testIds';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
@@ -110,7 +111,13 @@ const TurnAdapter = ({ id }) => {
   }, [gamePosition]);
 
   return (
-    <div style={wrapperStyles} className={wrapperClasses} ref={wrapper}>
+    <div
+      style={wrapperStyles}
+      className={wrapperClasses}
+      data-test-id={TID.turnCard}
+      data-turn-id={id}
+      ref={wrapper}
+    >
       <TurnStateProvider id={id} />
     </div>
   );

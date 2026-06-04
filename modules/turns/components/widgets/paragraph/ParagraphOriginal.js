@@ -46,6 +46,16 @@ const ParagraphOriginal = ({
   const paragraph = widget.inserts;
   const fontColor = colors.font;
 
+  // Сигнатура набора цитат: id всех инсертов-цитат (attributes.background + id), из
+  // которых рендерятся span[data-id]. Меняется при добавлении/удалении цитаты —
+  // используется как зависимость замера координат (баг #5: координаты цитат не
+  // попадали в стор для свежесозданных тёрнов/цитат, линии были видны только после
+  // повторного входа).
+  const quotesSignature = (paragraph || [])
+    .filter((ins) => ins?.attributes?.background && ins.attributes.id)
+    .map((ins) => ins.attributes.id)
+    .join(',');
+
   const paragraphEl = useRef(null);
   const dispatch = useDispatch();
 
@@ -109,8 +119,48 @@ const ParagraphOriginal = ({
         scrollTop,
       );
     }
+
+    // Набор цитат изменился (добавлена/удалена цитата), но размеры — нет: размерный
+    // эффект сам по себе это не ловил. Пере-замеряем спаны.
+    if (
+      !firstRender &&
+      quotesDataRef.current.quotesSignature !== quotesSignature
+    ) {
+      needToUpdate = true;
+      quotesDataRef.current.quotesWithoutScroll =
+        getParagraphQuotesWithoutScroll(turnId, paragraphEl);
+      quotesDataRef.current.scrolledQuotes = getScrolledQuotes(
+        quotesDataRef.current.quotesWithoutScroll,
+        paragraphEl,
+        scrollTop,
+      );
+    }
+    quotesDataRef.current.quotesSignature = quotesSignature;
+
     if (needToUpdate) {
       if (!quotesDataRef.current.scrolledQuotes?.length) {
+        // Цитаты ожидаются (есть в контенте), но их спаны ещё не разложены в DOM —
+        // повторяем замер на следующем кадре. Один rAF; гард от повторного планирования.
+        if (quotesSignature && !quotesDataRef.current.remeasureRaf) {
+          quotesDataRef.current.remeasureRaf = requestAnimationFrame(() => {
+            quotesDataRef.current.remeasureRaf = null;
+            if (!paragraphEl.current) return;
+            const quotesWithoutScroll = getParagraphQuotesWithoutScroll(
+              turnId,
+              paragraphEl,
+            );
+            const scrolledQuotes = getScrolledQuotes(
+              quotesWithoutScroll,
+              paragraphEl,
+              scrollTop,
+            );
+            quotesDataRef.current.quotesWithoutScroll = quotesWithoutScroll;
+            quotesDataRef.current.scrolledQuotes = scrolledQuotes;
+            if (scrolledQuotes?.length) {
+              dispatch(quoteCoordsUpdate(turnId, widgetId, scrolledQuotes));
+            }
+          });
+        }
         return;
       }
       if (firstRender) {

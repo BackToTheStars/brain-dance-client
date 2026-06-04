@@ -1,9 +1,10 @@
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-const DefaultModal = ({ title, children, isOpen = false, onCancel }) => {
+const DefaultModal = ({ title, children, isOpen = false, onCancel, testId }) => {
   return (
     <div
       className={`ui-modal ${isOpen ? 'ui-modal_visible' : ''}`}
+      data-test-id={isOpen ? testId : undefined}
       onClick={(e) => e.currentTarget === e.target && onCancel()}
     >
       <div className="base-card base-card_modal">

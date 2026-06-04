@@ -2,6 +2,7 @@ import { utils } from '@/modules/game/components/helpers/game';
 import { useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import LogicLine from './LogicLine';
+import { TID } from '@/config/testIds';
 
 const QuotesLinesLayer = () => {
   const d = useSelector((state) => state.lines.d);
@@ -42,6 +43,7 @@ const QuotesLinesLayer = () => {
         style={styles}
         xmlns="http://www.w3.org/2000/svg"
         id="lines"
+        data-test-id={TID.canvasLines}
         ref={svgLayer}
       >
         {lines.map((line) => {

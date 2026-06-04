@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { IntButton as Button } from '@/ui/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '@/modules/ui/redux/actions';
+import { TID } from '@/config/testIds';
 import {
   MODAL_CREATE_GAME,
   MODAL_DONATE,
@@ -56,11 +57,16 @@ const Header = () => {
         style={leftSideStyle}
         className="lobby-block flex gap-2 divider-r pb-2"
       >
-        <Button size="sm" onClick={() => dispatch(openModal(MODAL_ENTER_GAME))}>
+        <Button
+          size="sm"
+          data-test-id={TID.lobby.enterGameBtn}
+          onClick={() => dispatch(openModal(MODAL_ENTER_GAME))}
+        >
           {t('Enter_game')}
         </Button>
         <Button
           size="sm"
+          data-test-id={TID.lobby.createGameBtn}
           onClick={() => dispatch(openModal(MODAL_CREATE_GAME))}
         >
           {t('Create_game')}

@@ -2,6 +2,7 @@ import { closeModal } from '@/modules/ui/redux/actions';
 import { useDispatch } from 'react-redux';
 import { IntButton as Button } from '@/ui/button';
 import { useTranslations } from 'next-intl';
+import { TID } from '@/config/testIds';
 
 const ConfirmModal = ({ params }) => {
   const t = useTranslations('Lobby.confirmModal');
@@ -21,8 +22,12 @@ const ConfirmModal = ({ params }) => {
     >
       <div className="flex-1">{t(text)}</div>
       <div className="mt-3 flex justify-end gap-2">
-        <Button onClick={onCancel}>{t('Cancel')}</Button>
-        <Button onClick={onOk}>{t('OK')}</Button>
+        <Button onClick={onCancel} data-test-id={TID.confirm.cancel}>
+          {t('Cancel')}
+        </Button>
+        <Button onClick={onOk} data-test-id={TID.confirm.ok}>
+          {t('OK')}
+        </Button>
       </div>
     </div>
   );

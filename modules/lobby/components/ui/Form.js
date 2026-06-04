@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import Button from './Button';
 import { useTranslations } from 'next-intl';
+import { TID } from '@/config/testIds';
 
-export const TextInput = ({ label, value, onChange }) => {
+export const TextInput = ({ label, value, name, onChange }) => {
   return (
     <div className="w-100 my-3 relative">
       <label className="lobby-form__input-label">{label}</label>
@@ -10,6 +11,7 @@ export const TextInput = ({ label, value, onChange }) => {
         className="lobby-form__input"
         type="text"
         value={value}
+        data-test-id={name ? TID.lobby.field(name) : undefined}
         onChange={(e) => onChange(e.target.value)}
       />
     </div>
@@ -32,6 +34,7 @@ export const RadioInput = ({ label, value, name, onChange, options }) => {
               type="radio"
               name={name}
               value={option.value}
+              data-test-id={TID.lobby.radio(name, option.value)}
               checked={option.value === value}
               onChange={() => onChange(option.value)}
             />
@@ -81,6 +84,7 @@ export const LobbyForm = ({
           return (
             <TextInput
               key={name}
+              name={name}
               label={label}
               value={values[name]}
               onChange={getOnChange(name)}
@@ -102,10 +106,16 @@ export const LobbyForm = ({
       })}
       {!!error && <div className="text-red-300">{error}</div>}
       <div className="mt-3 text-end">
-        <Button onClick={onCancel} className="mr-3">
+        <Button
+          onClick={onCancel}
+          className="mr-3"
+          data-test-id={TID.lobby.cancel}
+        >
           {t('Cancel')}
         </Button>
-        <Button onClick={onSubmit}>{confirmText}</Button>
+        <Button onClick={onSubmit} data-test-id={TID.lobby.submit}>
+          {confirmText}
+        </Button>
       </div>
     </form>
   );

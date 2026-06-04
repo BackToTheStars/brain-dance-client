@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
 import { refreshTokenRequest } from '@/modules/game/requests';
 import { useTranslations } from 'next-intl';
+import { TID } from '@/config/testIds';
 
 const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const dispatch = useDispatch();
@@ -160,6 +161,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
               <div className="w-1/2 flex flex-col gap-2">
                 <label>{t('nickname')}</label>
                 <Input
+                  data-test-id={TID.gameDialog.nickname}
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                 />
@@ -167,6 +169,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
               <div className="w-1/2 flex flex-col gap-2">
                 <label>{t('role')}</label>
                 <Select
+                  data-test-id={TID.gameDialog.role}
                   value={role}
                   onChange={(value) => setRole(value)}
                   options={availableRoleOptions}
@@ -185,7 +188,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
             </div> */}
             {/* game.description and game.image */}
             <div className="flex justify-end">
-              <Button htmlType="submit">
+              <Button htmlType="submit" data-test-id={TID.gameDialog.submit}>
                 {t('gameDialog.Go_to_the_game')}
               </Button>
             </div>

@@ -1,7 +1,7 @@
 import { Button, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminLogsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const columns = [
   {
@@ -25,8 +25,8 @@ const columns = [
     title: 'Created At',
     dataIndex: 'createdAt',
     key: 'createdAt',
-    sorter: (a, b) => moment(a.createdAt).diff(moment(b.createdAt)),
-    render: (text) => moment(text).format('YYYY-MM-DD'),
+    sorter: (a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt)),
+    render: (text) => dayjs(text).format('YYYY-MM-DD'),
     width: '15%',
   },
 ];

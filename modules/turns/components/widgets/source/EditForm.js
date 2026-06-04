@@ -1,6 +1,6 @@
 import { DatePicker, Input, Switch } from 'antd';
 import { WIDGET_SOURCE, widgetSettings } from '@/modules/turns/settings';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 export const SourceAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
   const settings = widgetSettings[WIDGET_SOURCE];
@@ -24,10 +24,10 @@ export const SourceAddForm = ({ widgetBlock: widget, updateWidgetBlock }) => {
         </div>
         <div className="w-1/4">
           <DatePicker
-            value={widget.date ? moment(widget.date) : null}
+            value={widget.date ? dayjs(widget.date) : null}
             style={{ width: '100%' }}
-            onChange={(moment) => {
-              updateField('date', moment?.format('YYYY-MM-DD'));
+            onChange={(d) => {
+              updateField('date', d?.format('YYYY-MM-DD'));
             }}
           />
         </div>

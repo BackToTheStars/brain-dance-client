@@ -18,6 +18,7 @@ import {
 } from './settings';
 
 import { memo } from 'react';
+import { TID } from '@/config/testIds';
 
 const getFromToQuoteSettingsX = (source, target) => {
   if (source.left > target.right + lineOffset) {
@@ -90,6 +91,7 @@ const findBezierXYPairs = ({ x1, y1, x2, y2 }, curveType, k = 0.5) => {
 };
 
 const Line = ({
+  lineId,
   prevSWidth,
   prevSHeight,
   prevSLeft,
@@ -157,6 +159,8 @@ const Line = ({
 
   return (
     <path
+      data-test-id={TID.redLine}
+      data-line-id={lineId}
       d={`M${x1} ${y1} C ${x1b} ${y1b}, ${x2b} ${y2b}, ${x2} ${y2}`}
       stroke={stroke}
       strokeWidth={strokeWidth}

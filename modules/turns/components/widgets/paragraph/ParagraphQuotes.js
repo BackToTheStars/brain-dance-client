@@ -4,6 +4,7 @@ import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { TID } from '@/config/testIds';
 
 const Quote = memo(({ isActive, quote, can }) => {
   const dispatch = useDispatch();
@@ -41,6 +42,9 @@ const Quote = memo(({ isActive, quote, can }) => {
       }}
       className={className}
       style={style}
+      data-test-id={TID.quoteRect}
+      data-turn-id={quote.turnId}
+      data-quote-key={quote.quoteKey}
       onClick={() => {
         dispatch(processQuoteClicked(quote.quoteKey, can));
       }}

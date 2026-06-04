@@ -6,6 +6,7 @@ import {
   updateViewportGeometry,
 } from '@/modules/game/game-redux/actions';
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
+import { TID } from '@/config/testIds';
 import Panels from '@/modules/panels/components/Panels';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
@@ -126,6 +127,7 @@ const Game = ({ hash }) => {
     <div className={`game-field-wrapper ${stage}`}>
       <div
         id="game-box"
+        data-test-id={TID.canvas}
         className={gameBoxClasses}
         ref={gameBox}
         onDoubleClick={(e) => setIsEditMode(!isEditMode)}

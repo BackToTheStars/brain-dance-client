@@ -84,6 +84,7 @@ const LogicLine = ({ id }) => {
 
   return (
     <Line
+      lineId={id}
       prevSWidth={sourceCoords.width}
       prevSHeight={sourceCoords.height}
       prevSLeft={prevSleft}

@@ -1,7 +1,7 @@
 import { Checkbox, Input, Space, Table } from 'antd';
 import { getAdminTurnsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 
 const HeaderCell = ({ record }) => {
@@ -33,17 +33,17 @@ const columns = [
     title: 'Created',
     dataIndex: 'createdAt',
     key: 'createdAt',
-    render: (text) => moment(text).format('YYYY-MM-DD'),
+    render: (text) => dayjs(text).format('YYYY-MM-DD'),
     width: '15%',
-    sorter: (a, b) => moment(a.createdAt).diff(moment(b.createdAt)),
+    sorter: (a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt)),
   },
   {
     title: 'Updated',
     dataIndex: 'updatedAt',
     key: 'updatedAt',
-    render: (text) => moment(text).format('YYYY-MM-DD'),
+    render: (text) => dayjs(text).format('YYYY-MM-DD'),
     width: '15%',
-    sorter: (a, b) => moment(a.updatedAt).diff(moment(b.updatedAt)),
+    sorter: (a, b) => dayjs(a.updatedAt).diff(dayjs(b.updatedAt)),
   },
 ];
 

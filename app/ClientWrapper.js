@@ -61,6 +61,26 @@ const ClientWrapper = ({
   cookieMode,
 }) => {
   const store = useStore();
+
+  // E2E-хуки (только при NEXT_PUBLIC_E2E=1, no-op в обычной сборке):
+  // 1) доступ к каноническому состоянию Redux для ассертов; 2) ускорение
+  // анимаций/переходов почти до нуля, чтобы стабилизировать drag/скриншоты.
+  // ВАЖНО: не `animation:none` — antd (rc-motion) дожидается animationend/transitionend,
+  // чтобы раскрыть overlay (dropdown/modal/tooltip); полное отключение оставляет их
+  // скрытыми. Делаем длительности ~0, события при этом срабатывают.
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_E2E !== '1') return;
+    if (typeof window === 'undefined') return;
+    window.__APP_STATE__ = () => store.getState();
+    window.__STORE__ = store;
+    const style = document.createElement('style');
+    style.setAttribute('data-e2e', '');
+    style.textContent =
+      '*,*::before,*::after{transition-duration:0.001ms!important;transition-delay:0ms!important;animation-duration:0.001ms!important;animation-delay:0ms!important;scroll-behavior:auto!important}';
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, [store]);
+
   const bodyClassNames = getBodyClasses(
     cookieColorSchema,
     cookieSizeSchema,

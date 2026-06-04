@@ -10,6 +10,7 @@ import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 import FileUploading from './components/forms/FileUploading';
 import { uploadMedia } from './redux/actions';
+import { TID } from '@/config/testIds';
 
 const TEMPLATE_PICTURE = 'picture';
 const TEMPLATE_VIDEO = 'video';
@@ -277,6 +278,7 @@ const fieldSettings = {
         return (
           <>
             <Input
+              data-test-id={TID.addTurn.field(prefixClass)}
               placeholder={`${label}:`}
               value={value}
               onChange={(e) => {
@@ -326,6 +328,7 @@ const fieldSettings = {
         return (
           <>
             <Input
+              data-test-id={TID.addTurn.field(prefixClass)}
               placeholder={`${label}:`}
               value={value}
               onChange={(e) => {
@@ -352,6 +355,7 @@ const fieldSettings = {
         return (
           <>
             <Input
+              data-test-id={TID.addTurn.field(prefixClass)}
               placeholder={`${label}:`}
               value={value}
               onChange={(e) => {

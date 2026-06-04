@@ -13,6 +13,7 @@ import {
 } from '../../settings';
 import { Buttons } from '../ButtonsPanel';
 import { MODE_OPERATION_PASTE } from '@/config/panel';
+import { TID } from '@/config/testIds';
 
 const GameMode = () => {
   //
@@ -27,6 +28,7 @@ const GameMode = () => {
   const buttons = [
     {
       text: 'Add Turn',
+      testId: TID.gameAction('add-turn'),
       callback: () => {
         dispatch(
           togglePanel({
@@ -40,30 +42,39 @@ const GameMode = () => {
     },
     {
       text: 'Save Field',
+      testId: TID.gameAction('save-field'),
       callback: () => dispatch(saveField()),
       show: () => can(RULE_TURNS_CRUD),
     },
     {
       text: 'Classes',
+      testId: TID.gameAction('classes'),
       callback: () => {
         dispatch(togglePanel({ type: PANEL_CLASSES }));
       },
     },
     {
       text: 'Info',
+      testId: TID.gameAction('info'),
       callback: () => {
         dispatch(togglePanel({ type: PANEL_INFO }));
       },
     },
     {
       text: 'Minimap',
+      testId: TID.gameAction('minimap'),
       callback: () => {
         dispatch(togglePanel({ type: PANEL_MINIMAP }));
       },
     },
-    { text: 'Lobby', callback: () => router.push('/') },
+    {
+      text: 'Lobby',
+      testId: TID.gameAction('lobby'),
+      callback: () => router.push('/'),
+    },
     {
       text: 'Paste\u00A0Turn',
+      testId: TID.gameAction('paste-turn'),
       callback: () => {
         dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: true }));
         dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));

@@ -15,9 +15,10 @@ import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Switch } from 'antd';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { cleanText } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
+import { TID } from '@/config/testIds';
 
 const {
   settings,
@@ -300,6 +301,7 @@ const AddEditTurnPopup = () => {
                 <div className="w-2/3">
                   <Input
                     placeholder="Header:"
+                    data-test-id={TID.addTurn.field('header')}
                     value={form[FIELD_HEADER]}
                     onChange={(e) =>
                       formChangeHandler(FIELD_HEADER, e.target.value)
@@ -326,6 +328,7 @@ const AddEditTurnPopup = () => {
             <div className="w-7/12">
               <Input
                 placeholder="Source URL:"
+                data-test-id={TID.addTurn.field('source')}
                 value={form[FIELD_SOURCE]}
                 onChange={(e) => {
                   if (!!error) setError(null);
@@ -335,14 +338,15 @@ const AddEditTurnPopup = () => {
             </div>
             <div className="w-1/4">
               <DatePicker
-                value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
+                value={form[FIELD_DATE] ? dayjs(form[FIELD_DATE]) : null}
+                data-test-id={TID.addTurn.field('date')}
                 style={{ width: '100%' }}
-                onChange={(moment) => {
+                onChange={(d) => {
                   if (!!error) setError(null);
 
                   setForm({
                     ...form,
-                    [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
+                    [FIELD_DATE]: d?.format('YYYY-MM-DD'),
                   });
                 }}
               />
@@ -379,6 +383,7 @@ const AddEditTurnPopup = () => {
                 <div className="w-2/3">
                   <Input
                     placeholder="Header:"
+                    data-test-id={TID.addTurn.field('header')}
                     value={form[FIELD_HEADER]}
                     onChange={(e) =>
                       formChangeHandler(FIELD_HEADER, e.target.value)
@@ -403,6 +408,7 @@ const AddEditTurnPopup = () => {
                 <div className="w-7/12">
                   <Input
                     placeholder="Source URL:"
+                    data-test-id={TID.addTurn.field('source')}
                     value={form[FIELD_SOURCE]}
                     onChange={(e) => {
                       if (!!error) setError(null);
@@ -412,13 +418,14 @@ const AddEditTurnPopup = () => {
                 </div>
                 <div className="w-1/4">
                   <DatePicker
-                    value={form[FIELD_DATE] ? moment(form[FIELD_DATE]) : null}
+                    value={form[FIELD_DATE] ? dayjs(form[FIELD_DATE]) : null}
+                    data-test-id={TID.addTurn.field('date')}
                     style={{ width: '100%' }}
-                    onChange={(moment) => {
+                    onChange={(d) => {
                       if (!!error) setError(null);
                       setForm({
                         ...form,
-                        [FIELD_DATE]: moment?.format('YYYY-MM-DD'),
+                        [FIELD_DATE]: d?.format('YYYY-MM-DD'),
                       });
                     }}
                   />
@@ -479,6 +486,7 @@ const AddEditTurnPopup = () => {
           <div className="panel-flex panel-buttons">
             <button
               className="btn btn-primary btn-accent"
+              data-test-id={TID.addTurn.save}
               onClick={(e) => saveHandler(e)}
             >
               Save

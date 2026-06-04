@@ -4,6 +4,7 @@ import Modal from '../ui/Modal';
 import { closeModal } from '../../redux/actions';
 import { settings } from '../../config/settings';
 import { useTranslations } from 'next-intl';
+import { TID } from '@/config/testIds';
 // import { closeModal } from '../../redux/actions';
 
 // временные заглушки
@@ -23,7 +24,12 @@ const CommonModal = ({ ModalComponent = Modal }) => {
     dispatch(closeModal());
   };
   return (
-    <ModalComponent title={title} isOpen={open} onCancel={handleCancel}>
+    <ModalComponent
+      title={title}
+      isOpen={open}
+      onCancel={handleCancel}
+      testId={type ? TID.modal(type) : undefined}
+    >
       {open && <Component params={params} />}
     </ModalComponent>
   );

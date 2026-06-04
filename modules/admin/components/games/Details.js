@@ -1,5 +1,7 @@
 import { ROLES } from '@/config/user';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 import AdminTurnsTable from '../turns/Table';
 import { deleteAdminGameRequest } from '../../requests';
 import { Button } from 'antd';
@@ -22,7 +24,7 @@ const AdminGameDetails = ({ game }) => {
               </ul>
             </div>
             <p>{game.turnsCount} turns</p>
-            <p>Published {moment(game.createdAt).fromNow()}</p>
+            <p>Published {dayjs(game.createdAt).fromNow()}</p>
             <Button
               className="px-2 py-1"
               type="primary"

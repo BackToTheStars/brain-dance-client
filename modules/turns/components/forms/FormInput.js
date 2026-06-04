@@ -1,5 +1,6 @@
 import { Input, Tooltip } from 'antd';
 import ColorPicker from './ColorPicker';
+import { TID } from '@/config/testIds';
 const FormInput = ({
   label,
   prefixClass,
@@ -9,6 +10,7 @@ const FormInput = ({
   widgetSettings = {},
   form,
 }) => {
+  const testId = prefixClass ? TID.addTurn.field(prefixClass) : undefined;
   return (
     <div className={`row ${prefixClass}-row mb-2`}>
       <div className="w-5/6" style={{ width: '745px', maxWidth: '100%' }}>
@@ -33,6 +35,7 @@ const FormInput = ({
         {inputType === 'text' && (
           <Input
             value={value}
+            data-test-id={testId}
             onChange={(e) => changeHandler(e.target.value)}
             placeholder={`${label}:`}
           />
@@ -45,6 +48,7 @@ const FormInput = ({
                 inputType === 'checkbox' ? 'form-check-input' : 'form-control'
               }
               value={value}
+              data-test-id={testId}
               onChange={(e) =>
                 changeHandler(
                   inputType === 'checkbox' ? e.target.checked : e.target.value,

@@ -31,6 +31,7 @@ export const Buttons = ({ buttons }) => {
           <button
             key={index}
             className="btn btn-primary"
+            data-test-id={button.testId}
             onClick={() => button.callback()}
           >
             {button.text}
