@@ -1,0 +1,3 @@
+/* Tailwind 4 entry (CSS-first). Legacy JS config kept via @config. */
+@import "tailwindcss";
+@config "../tailwind.config.js";

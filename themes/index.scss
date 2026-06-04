@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Tailwind перенесён в themes/tailwind.css (v4, CSS-first) и подключается в app/layout.js.
+// @reference даёт @apply-директивам ниже доступ к утилитам Tailwind, ничего не выводя.
+@reference "tailwindcss";
 
 // === SETS ===
 @import "./sets/index.scss";

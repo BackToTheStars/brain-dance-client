@@ -1,8 +1,8 @@
 'use  client'
 import { useMemo } from 'react'
 import { createStore, applyMiddleware } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
-import thunkMiddleware from 'redux-thunk'
+import { composeWithDevTools } from '@redux-devtools/extension'
+import { thunk as thunkMiddleware } from 'redux-thunk'
 import reducers from './reducers.js'
 
 let store

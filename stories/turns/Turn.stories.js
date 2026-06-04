@@ -1,4 +1,4 @@
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import Turn from '@/modules/turns/components/Turn';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';

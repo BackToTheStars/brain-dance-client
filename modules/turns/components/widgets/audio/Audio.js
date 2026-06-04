@@ -43,17 +43,18 @@ const Audio = ({
     setVolume(value / 100);
   };
 
-  const onProgress = (state) => {
-    setProgress(state.played);
+  const onTimeUpdate = (e) => {
+    const d = e.currentTarget.duration || 0;
+    setProgress(d ? e.currentTarget.currentTime / d : 0);
   };
 
-  const onDuration = (duration) => {
-    setDuration(duration);
+  const onDurationChange = (e) => {
+    setDuration(e.currentTarget.duration || 0);
   };
 
   const handleSeek = (value) => {
-    playerRef.current.seekTo(value);
-    setProgress(value / duration);
+    if (playerRef.current) playerRef.current.currentTime = value;
+    setProgress(duration ? value / duration : 0);
   };
 
   useEffect(() => {
@@ -123,16 +124,15 @@ const Audio = ({
       />
       <ReactPlayer
         ref={playerRef}
-        url={audioUrl}
+        src={audioUrl}
         playing={playing}
         muted={muted}
         volume={volume}
-        onProgress={onProgress}
-        onDuration={onDuration}
+        onTimeUpdate={onTimeUpdate}
+        onDurationChange={onDurationChange}
         height="0"
         width="0"
         playbackRate={speed}
-        config={{ file: { forceAudio: true } }}
       />
     </div>
   );

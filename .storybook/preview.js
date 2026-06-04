@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { initializeStore } from '../redux/storybook/store';
 import '@/themes/game/index.scss';
 
-/** @type { import('@storybook/react').Preview } */
+/** @type { import('@storybook/nextjs').Preview } */
 const preview = {
   parameters: {
     controls: {

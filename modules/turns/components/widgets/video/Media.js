@@ -90,16 +90,16 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
     setMuted(value === 0);
   };
 
-  const onProgress = (state) => {
-    setProgress(state.playedSeconds);
+  const onTimeUpdate = (e) => {
+    setProgress(e.currentTarget.currentTime);
   };
 
-  const onDuration = (duration) => {
-    setDuration(duration);
+  const onDurationChange = (e) => {
+    setDuration(e.currentTarget.duration || 0);
   };
 
   const handleSeek = (value) => {
-    playerRef.current.seekTo(value, 'seconds');
+    if (playerRef.current) playerRef.current.currentTime = value;
     setProgress(value);
   };
 
@@ -137,20 +137,16 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
       >
         <ReactPlayer
           ref={playerRef}
-          url={videoUrl}
+          src={videoUrl}
           playing={playing}
           muted={muted}
           volume={volume}
-          onProgress={onProgress}
-          onDuration={onDuration}
+          onTimeUpdate={onTimeUpdate}
+          onDurationChange={onDurationChange}
           width="100%"
           height="100%"
           playbackRate={speed}
           controls={false}
-          config={{
-            youtube: { playerVars: { controls: 0 } },
-            file: { forceVideo: true },
-          }}
         />
         <div className="video-controls">
           {/* Таймлайн */}

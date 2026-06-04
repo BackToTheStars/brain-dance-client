@@ -39,7 +39,7 @@ const getQuill = (containerSelector, toolbarSelector) => {
   });
 
   const getQuillTextArr = () => {
-    const ops = quill.editor.delta.ops;
+    const ops = quill.getContents().ops;
     //console.log(`getQuillTextArr: ${JSON.stringify(ops)}`);
     return ops;
   };

@@ -503,7 +503,7 @@ const AddEditTurnPopup = () => {
               className="btn btn-primary"
               onClick={() => {
                 const cleanedText = cleanText(
-                  quillConstants.quill.editor.getText(0, Infinity),
+                  quillConstants.quill.getText(),
                 );
                 quillConstants.quill.setText(cleanedText);
               }}

@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { defaultLanguage, defaultTimeZone } from './config/settings/language';
 
 export default getRequestConfig(async () => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const locale = cookieStore.get('language')?.value || defaultLanguage;
   return {
     locale,

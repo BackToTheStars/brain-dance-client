@@ -6,7 +6,7 @@
   border: 1px solid var(--panel-buttons-border-color);
   background-color: var(--panel-buttons-bg-color);
   &:hover {
-    background-color: var(panel-buttons-hover-bg-color);
+    background-color: var(--panel-buttons-hover-bg-color);
   }
 }
 
