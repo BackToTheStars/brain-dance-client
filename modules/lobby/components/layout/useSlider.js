@@ -29,11 +29,21 @@ export const useSlider = (
 
   useEffect(() => {
     if (!wrapper) return;
-    setMinMaxWidth([minWidthCallbac(wrapper), maxWidthCallback(wrapper)]);
 
-    const resizeObserver = new ResizeObserver((entries) => {
+    const applyBounds = () => {
+      const max = maxWidthCallback(wrapper);
+      setMinMaxWidth([minWidthCallbac(wrapper), max]);
+      // Сохранённая ширина может превышать текущий вьюпорт (напр. 1400px на экране
+      // 1000px) — ужимаем до максимума. Иначе левая панель шире контейнера, и
+      // ResizeObserver зацикливает пересчёт → лобби виснет.
+      setLeftSideWidth((prev) => (prev != null && prev > max ? max : prev));
+    };
+
+    applyBounds();
+
+    const resizeObserver = new ResizeObserver(() => {
       if (!wrapper) return;
-      setMinMaxWidth([minWidthCallbac(wrapper), maxWidthCallback(wrapper)]);
+      applyBounds();
     });
     resizeObserver.observe(wrapper);
 

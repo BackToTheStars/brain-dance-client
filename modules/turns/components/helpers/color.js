@@ -27,7 +27,7 @@ const contrastSettings = {};
 export const getNeedBlackText = (backgroundColor) => {
   if (contrastSettings[backgroundColor])
     return contrastSettings[backgroundColor];
-  const color = backgroundColor.replace('#', '');
+  const color = backgroundColor?.replace('#', '') || '';
   const rgb = parseInt(color, 16);
   const r = (rgb >> 16) & 0xff;
   const g = (rgb >> 8) & 0xff;
