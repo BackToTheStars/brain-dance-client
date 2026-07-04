@@ -29,6 +29,7 @@ import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import Audio from './widgets/audio/Audio';
 import VideoQuotes from './widgets/video/VideoQuotes';
 import AudioQuotes from './widgets/audio/AudioQuotes';
+import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
 
 const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
@@ -312,7 +313,7 @@ export const Turn = memo(({ id }) => {
   }, [widgetsUpdatedTime, updatedAt]);
 
   return (
-    <>
+    <MediaPlaybackProvider>
       <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>
         {!dontShowHeader ? (
           <Header
@@ -335,6 +336,7 @@ export const Turn = memo(({ id }) => {
         {!!videoQuotesDuration && (
           <VideoQuotes
             widgetId={'vq_1'}
+            mediaWidgetId={'v_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}
@@ -351,6 +353,7 @@ export const Turn = memo(({ id }) => {
         {!!audioQuotesDuration && (
           <AudioQuotes
             widgetId={'aq_1'}
+            mediaWidgetId={'a_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}
@@ -382,7 +385,7 @@ export const Turn = memo(({ id }) => {
           <DateAndSourceUrl widgetId="s_1" date={date} url={sourceUrl} />
         </div>
       )}
-    </>
+    </MediaPlaybackProvider>
   );
 });
 

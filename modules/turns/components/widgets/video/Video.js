@@ -3,14 +3,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { PlayCircleFilled } from '@ant-design/icons';
 import { WIDGET_VIDEO } from '../../../settings';
-import { STATIC_MEDIA_URL } from '@/config/server';
-// import YoutubeVideo from './Youtube';
+import {
+  getYoutubeVideoId,
+  getYoutubePreviewUrl,
+} from '../../helpers/videoUrl';
 import MediaVideo from './Media';
 
-const mediaServerUrls = [
-  STATIC_MEDIA_URL,
-  'https://test-media.braindance.space',
-];
+const DEFAULT_PREVIEW = '/img/video-default.png';
 
 const Video = ({
   registerHandleResize,
@@ -24,34 +23,14 @@ const Video = ({
   );
   const [previewMode, setPreviewMode] = useState(true);
 
-  const { previewImg, platform, videoId } = useMemo(() => {
+  // YouTube — превью с img.youtube.com; всё остальное (медиа-сервер, прямые
+  // ссылки) react-player играет по URL как есть, превью — из виджета или дефолт
+  const previewImg = useMemo(() => {
     const videoUrl = video?.url;
-    if (!videoUrl) return {};
-    if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-      const videoId = videoUrl.split('v=')[1] || videoUrl.split('/').at(-1);
-      return {
-        previewImg: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-        platform: 'youtube',
-        videoId,
-      };
-    }
-    for (const mediaServerUrl of mediaServerUrls) {
-      if (videoUrl.startsWith(mediaServerUrl)) {
-        // const innerPath = videoUrl.replace(mediaServerUrl, '');
-        // const videoId = innerPath.split('/').at(-1);
-        return {
-          // previewImg: `${mediaServerUrl}/preview/${videoId}`,
-          previewImg: video?.preview || '/img/video-default.png',
-          platform: 'media-server',
-          videoId: videoUrl,
-        };
-      }
-    }
-    return {
-      previewImg: null,
-      platform: 'local',
-      videoId: videoUrl,
-    };
+    if (!videoUrl) return DEFAULT_PREVIEW;
+    const youtubeId = getYoutubeVideoId(videoUrl);
+    if (youtubeId) return getYoutubePreviewUrl(youtubeId);
+    return video?.preview || DEFAULT_PREVIEW;
   }, [video]);
 
   useEffect(() => {
@@ -94,8 +73,13 @@ const Video = ({
           }}
         >
           <img
-            // src={`https://img.youtube.com/vi/${newVideoUrl}/0.jpg`}
             src={previewImg}
+            alt=""
+            onError={(e) => {
+              if (!e.currentTarget.src.endsWith(DEFAULT_PREVIEW)) {
+                e.currentTarget.src = DEFAULT_PREVIEW;
+              }
+            }}
             style={{
               display: 'block',
               objectFit: 'cover',
@@ -112,26 +96,7 @@ const Video = ({
           />
         </div>
       ) : (
-        <>
-          {/* {platform === 'youtube' && <YoutubeVideo videoId={videoId} />} */}
-          {platform === 'youtube' && (
-            <MediaVideo
-              videoUrl={video.url}
-              turnId={turnId}
-              widgetId={widgetId}
-            />
-          )}
-          {platform === 'media-server' && (
-            <MediaVideo
-              videoUrl={videoId}
-              turnId={turnId}
-              widgetId={widgetId}
-            />
-          )}
-          {/* {platform === 'local' && <div>Local Video {videoId}</div>} */}
-          {platform === 'local' && <div>Local Video {videoId}</div>}
-          {platform === 'unknown' && <div>Unknown Video {videoId}</div>}
-        </>
+        <MediaVideo videoUrl={video.url} turnId={turnId} widgetId={widgetId} />
       )}
     </div>
   );

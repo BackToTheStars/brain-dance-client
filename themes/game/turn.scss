@@ -398,6 +398,25 @@
           .ant-slider-rail {
             background-color: rgba(255, 255, 255, 0.3);
           }
+
+          // позиция воспроизведения парного плеера (v_1 / a_1)
+          .timeline-playhead {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 16px;
+            background-color: var(--fragment-editable-color, red);
+            pointer-events: none;
+            z-index: 2;
+          }
+        }
+
+        // фрагмент, внутри которого сейчас позиция воспроизведения
+        .editable-fragment.now-playing {
+          .fragment-rect {
+            outline: 1px dashed var(--fragment-editable-color, red);
+            max-width: calc(100% - 10px);
+          }
         }
 
         .ant-timeline {

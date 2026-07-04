@@ -19,6 +19,9 @@ const initialUIState = {
   notifications: [],
   modal: { open: false, type: null, params: {} },
   viewport: { width: 1600, height: 1200 },
+  // арбитр потоковых медиа: единственный играющий плеер на игру
+  // (см. modules/turns/components/widgets/media/useMediaPlayback.js)
+  activePlayback: null, // null | { turnId, widgetId }
   // @todo: get from config
   themeSettings: {
     colorSchema: undefined,
@@ -123,6 +126,36 @@ export const UIReducer = (state = initialUIState, { type, payload }) => {
       return {
         ...state,
         modal: payload,
+      };
+    }
+    case types.PLAYBACK_ACTIVE_SET: {
+      const prev = state.activePlayback;
+      if (
+        prev &&
+        prev.turnId === payload.turnId &&
+        prev.widgetId === payload.widgetId
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        activePlayback: { turnId: payload.turnId, widgetId: payload.widgetId },
+      };
+    }
+    case types.PLAYBACK_ACTIVE_CLEAR: {
+      const prev = state.activePlayback;
+      // освобождает только текущий владелец: пауза вытесненного плеера
+      // не должна сбрасывать ключ нового
+      if (
+        !prev ||
+        prev.turnId !== payload.turnId ||
+        prev.widgetId !== payload.widgetId
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        activePlayback: null,
       };
     }
     default:

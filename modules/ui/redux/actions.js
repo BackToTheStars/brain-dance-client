@@ -96,3 +96,23 @@ export const closeModal = () => (dispatch) => {
     payload: { open: false, type: null, params: {} },
   });
 };
+
+// Арбитр потоковых медиа: плеер, начавший играть, заявляет права;
+// предыдущий владелец, увидев чужой ключ, ставит себя на паузу.
+export const playbackClaim =
+  ({ turnId, widgetId }) =>
+  (dispatch) => {
+    dispatch({
+      type: types.PLAYBACK_ACTIVE_SET,
+      payload: { turnId, widgetId },
+    });
+  };
+
+export const playbackRelease =
+  ({ turnId, widgetId }) =>
+  (dispatch) => {
+    dispatch({
+      type: types.PLAYBACK_ACTIVE_CLEAR,
+      payload: { turnId, widgetId },
+    });
+  };

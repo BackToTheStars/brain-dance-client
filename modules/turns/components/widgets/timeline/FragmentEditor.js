@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Input, Slider, Timeline, TimePicker } from 'antd';
+import { Input, Slider, Timeline } from 'antd';
 import { getFormattedDuration } from '../../helpers/formatters/player';
-import { FiEdit, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiPlus, FiPlay, FiPause } from 'react-icons/fi';
 import {
   addTimelineFragment,
   getDefaultFragments,
@@ -112,7 +112,15 @@ const FragmentEditor = ({
   const [selectedFragment, setSelectedFragment] = useState(null);
 
   const [currentSelection, setCurrentSelection] = useState([0, 0]);
-  // const [selectedHandle, setSelectedHandle] = useState('start'); // 'start' или 'end'
+
+  // id фрагмента, внутри которого сейчас позиция воспроизведения
+  const currentFragmentId = useMemo(() => {
+    if (!duration || !(progress > 0)) return null;
+    const current = fragments.find(
+      (fragment) => progress >= fragment.start && progress < fragment.end,
+    );
+    return current ? current.id : null;
+  }, [fragments, duration, progress]);
 
   useEffect(() => {
     // Обновляем фрагменты при изменении existingFragments
@@ -164,24 +172,6 @@ const FragmentEditor = ({
   const addButtonDisabled =
     newStart >= newEnd || isOverlapping(newStart, newEnd);
 
-  // Управление воспроизведением и перемещением бегунка
-  // useEffect(() => {
-  //   let interval = null;
-  //   if (playing) {
-  //     interval = setInterval(() => {
-  //       setCurrentSelection((prevSelection) => {
-  //         const index = selectedHandle === 'start' ? 0 : 1;
-  //         const newSelection = [...prevSelection];
-  //         newSelection[index] = progress;
-  //         return newSelection;
-  //       });
-  //     }, 500);
-  //   } else if (!playing && interval) {
-  //     clearInterval(interval);
-  //   }
-  //   return () => clearInterval(interval);
-  // }, [playing, progress, selectedHandle]);
-
   return (
     <div
       className={`fragments-container flex flex-col h-full mode-${widgetMode}`}
@@ -218,18 +208,23 @@ const FragmentEditor = ({
                 formatter: getFormattedDuration,
               }}
               onAfterChange={(value) => {
-                // Определяем, какой бегунок был перемещен
-                // if (value[0] !== currentSelection[0]) {
-                //   setSelectedHandle('start');
-                // } else {
-                //   setSelectedHandle('end');
-                // }
                 setCurrentSelection(value);
               }}
             />
+            {duration > 0 && progress > 0 && (
+              <div
+                className="timeline-playhead"
+                style={{
+                  left: `${Math.min(progress / duration, 1) * 100}%`,
+                }}
+              />
+            )}
           </div>
 
           <div className="flex gap-2">
+            <button className="icon-button mt-2" onClick={togglePlay}>
+              {playing ? <FiPause /> : <FiPlay />}
+            </button>
             <button
               className={
                 'icon-button mt-2' + (addButtonDisabled ? ' disabled' : '')
@@ -302,6 +297,7 @@ const FragmentEditor = ({
                   children: (
                     <EditableFragment
                       withLine={dQuotesWithLines[fragment.id]}
+                      isCurrent={fragment.id === currentFragmentId}
                       widgetMode={widgetMode}
                       modeInfo={
                         fragment.id === selectedFragment?.id

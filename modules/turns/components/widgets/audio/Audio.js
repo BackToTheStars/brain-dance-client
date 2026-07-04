@@ -1,5 +1,5 @@
 import { Slider } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import ReactPlayer from 'react-player';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiPlay, FiPause, FiEdit } from 'react-icons/fi';
@@ -12,6 +12,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { MODE_WIDGET_AUDIO } from '@/config/panel';
 import { setPanelMode } from '@/modules/panels/redux/actions';
+import { useMediaPlayback } from '../media/useMediaPlayback';
 
 const Audio = ({
   registerHandleResize,
@@ -22,40 +23,26 @@ const Audio = ({
   const dispatch = useDispatch();
   const { can } = useUserContext();
   const title = useSelector((s) => s.turns.d[turnId].dWidgets.h_1?.text || '');
-  const playerRef = useRef(null);
   const audioUrl = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].url);
-  const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [speed, setSpeed] = useState(1);
-
-  const togglePlay = () => {
-    setPlaying(!playing);
-  };
-
-  const toggleMute = (val) => {
-    setMuted(val);
-  };
-
-  const handleVolumeChange = (value) => {
-    setVolume(value / 100);
-  };
-
-  const onTimeUpdate = (e) => {
-    const d = e.currentTarget.duration || 0;
-    setProgress(d ? e.currentTarget.currentTime / d : 0);
-  };
-
-  const onDurationChange = (e) => {
-    setDuration(e.currentTarget.duration || 0);
-  };
-
-  const handleSeek = (value) => {
-    if (playerRef.current) playerRef.current.currentTime = value;
-    setProgress(duration ? value / duration : 0);
-  };
+  const {
+    playerRef,
+    playing,
+    togglePlay,
+    progress,
+    duration,
+    muted,
+    setMuted,
+    volume,
+    handleVolumeChange,
+    speed,
+    setSpeed,
+    seek,
+    onTimeUpdate,
+    onDurationChange,
+    onPlay,
+    onPause,
+    onEnded,
+  } = useMediaPlayback(widgetId, turnId);
 
   useEffect(() => {
     registerHandleResize({
@@ -78,8 +65,8 @@ const Audio = ({
           <span className="truncate">{title}</span>
         </div>
         <div className="audio-info flex gap-2 items-center">
-          {can(RULE_TURNS_CRUD) && duration
-            && false // TODO: пока нет возможности редактировать цитаты медиа
+          {can(RULE_TURNS_CRUD) && duration > 0
+            && false // TODO: пока нет возможности редактировать цитаты медиа (см. docs/backlog.md)
             && (
             <button
               className="icon-button"
@@ -100,15 +87,13 @@ const Audio = ({
               <FiEdit />
             </button>
           )}
-          <span className="audio-time">
-            {getFormattedDuration(progress * duration)}
-          </span>
+          <span className="audio-time">{getFormattedDuration(progress)}</span>
           <SpeedControl speed={speed} setSpeed={setSpeed} />
           <VolumeControl
             volume={volume * 100}
             setVolume={handleVolumeChange}
             muted={muted}
-            setMuted={toggleMute}
+            setMuted={setMuted}
           />
         </div>
       </div>
@@ -116,8 +101,8 @@ const Audio = ({
         className="w-full timeline-slider"
         min={0}
         max={duration}
-        value={progress * duration}
-        onChange={handleSeek}
+        value={progress}
+        onChange={seek}
         tooltip={{
           open: false,
         }}
@@ -130,6 +115,9 @@ const Audio = ({
         volume={volume}
         onTimeUpdate={onTimeUpdate}
         onDurationChange={onDurationChange}
+        onPlay={onPlay}
+        onPause={onPause}
+        onEnded={onEnded}
         height="0"
         width="0"
         playbackRate={speed}

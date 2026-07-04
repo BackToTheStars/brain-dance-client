@@ -2,17 +2,20 @@ import { WIDGET_AUDIO_QUOTES } from '@/modules/turns/settings';
 import { updateAudioQuotesWidget } from '@/modules/turns/redux/actions';
 import { MODE_WIDGET_AUDIO_QUOTES_MANAGE } from '@/config/panel';
 import { TYPE_QUOTE_AUDIO } from '@/modules/quotes/settings';
+import { useMediaPlaybackState } from '../media/PlaybackContext';
 import TimelineQuotes from '../timeline/Quotes';
 
 const AudioQuotes = ({
   turnId,
   widgetId,
+  mediaWidgetId = 'a_1',
   registerHandleResize,
   unregisterHandleResize,
-  progress = 0,
-  playing,
-  togglePlay,
 }) => {
+  // живое состояние парного аудиоплеера (a_1) из PlaybackContext
+  const { progress, playing, togglePlay } =
+    useMediaPlaybackState(mediaWidgetId);
+
   return (
     <TimelineQuotes
       turnId={turnId}

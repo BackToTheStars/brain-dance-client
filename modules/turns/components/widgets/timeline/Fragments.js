@@ -17,6 +17,7 @@ export const InactiveFragment = ({ fragment, onClick = () => {} }) => {
 
 export const EditableFragment = ({
   withLine = false,
+  isCurrent = false,
   fragment,
   onChange = (fragment) => {},
   onDelete = (id) => {},
@@ -37,7 +38,7 @@ export const EditableFragment = ({
 
   return (
     <div
-      className={`editable-fragment flex items-start gap-2 ${selectedFragmentId ? 'selected' : ''}`}
+      className={`editable-fragment flex items-start gap-2 ${selectedFragmentId ? 'selected' : ''}${isCurrent ? ' now-playing' : ''}`}
       data-id={fragment.id}
     >
       <div className="flex flex-1 gap-2 items-start">
