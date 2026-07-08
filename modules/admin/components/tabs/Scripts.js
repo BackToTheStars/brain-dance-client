@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd';
+import { Button, Input, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { getAdminScriptsRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
@@ -7,6 +7,7 @@ import { CloseOutlined } from '@ant-design/icons';
 const ScriptsTab = () => {
   const [scripts, setScripts] = useState([]);
   const [activeCommand, setActiveCommand] = useState(null);
+  const [paramValues, setParamValues] = useState({});
   const [scriptResult, setScriptResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const columns = [
@@ -22,6 +23,7 @@ const ScriptsTab = () => {
         <div className="flex flex-col gap-2">
           {record.commands.map((command) => (
             <Button
+              key={command.name}
               type={
                 activeCommand?.script?.name === record.name &&
                 activeCommand?.command?.name === command.name
@@ -43,10 +45,22 @@ const ScriptsTab = () => {
     },
   ];
 
+  const commandParams = activeCommand?.command?.params || [];
+  const missingRequired = commandParams.some(
+    (param) => param.required && !String(paramValues[param.name] ?? '').trim(),
+  );
+
   const executeScript = () => {
     setIsLoading(true);
     const { script, command } = activeCommand;
-    runAdminScriptRequest(script.name, command.name)
+    const params = {};
+    commandParams.forEach((param) => {
+      const value = paramValues[param.name];
+      if (value !== undefined && String(value).trim() !== '') {
+        params[param.name] = value;
+      }
+    });
+    runAdminScriptRequest(script.name, command.name, params)
       .then((res) => {
         setScriptResult(res.result);
         setIsLoading(false);
@@ -72,6 +86,7 @@ const ScriptsTab = () => {
       return;
     }
     setScriptResult(null);
+    setParamValues({});
   }, [activeCommand]);
 
   return (
@@ -101,11 +116,37 @@ const ScriptsTab = () => {
                 </Button>
               </div>
             </div>
+            {commandParams.length > 0 && (
+              <div className="flex flex-col gap-2 mb-3">
+                {commandParams.map((param) => (
+                  <div key={param.name} className="flex flex-col gap-1">
+                    <label>
+                      {param.description || param.name}
+                      {param.required && (
+                        <span className="text-red-500"> *</span>
+                      )}
+                    </label>
+                    <Input
+                      value={paramValues[param.name] ?? ''}
+                      placeholder={param.name}
+                      onChange={(e) =>
+                        setParamValues((prev) => ({
+                          ...prev,
+                          [param.name]: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <div>
               {isLoading && <Loading />}
               {!isLoading && (
                 <>
-                  <Button onClick={executeScript}>execute</Button>
+                  <Button onClick={executeScript} disabled={missingRequired}>
+                    execute
+                  </Button>
                   {!!scriptResult &&
                     (typeof scriptResult === 'string' ? (
                       <pre>{scriptResult}</pre>

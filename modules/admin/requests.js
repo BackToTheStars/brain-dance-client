@@ -25,14 +25,14 @@ export const getAdminScriptsRequest = () => {
   }).then((res) => res.json());
 }
 
-export const runAdminScriptRequest = (scriptName, commandName) => {
+export const runAdminScriptRequest = (scriptName, commandName, params = {}) => {
   return fetch(`${API_URL}/admin/scripts`, {
     method: 'POST',
     headers: {
       authorization: `Bearer ${adminToken}`,
       'content-type': 'application/json',
     },
-    body: JSON.stringify({ scriptName, commandName }),
+    body: JSON.stringify({ scriptName, commandName, params }),
   }).then((res) => res.json());
 }
 
