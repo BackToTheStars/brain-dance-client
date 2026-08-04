@@ -2,7 +2,11 @@ import { getGameRequest, updateGameRequest } from '@/modules/game/requests';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
-import { updateCoordinatesRequest, updateScrollPositionsRequest } from '@/modules/turns/requests';
+import {
+  getTurnsGeometryRequest,
+  updateCoordinatesRequest,
+  updateScrollPositionsRequest,
+} from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { clearScrollPositions, loadTurnsGeometry, moveField } from '@/modules/turns/redux/actions';
 import {
@@ -36,36 +40,65 @@ export const loadShortGame = (hash) => (dispatch) => {
   });
 };
 
-export const loadFullGame = (hash) => (dispatch, getState) => {
-  // GET GAME DATA
-  return new Promise((resolve, reject) => {
-    const {
-      position: { x, y },
-    } = getGameSettings(hash);
-    const d = getState().panels.d;
-    const personalizedPanels = getPersonalizedPanelSettings(hash, d);
-    dispatch(setPanels({ d: personalizedPanels }));
-    getGameRequest(hash).then((data) => {
-      const position = {
-        x: snapRound(x, GRID_CELL_X),
-        y: snapRound(y, GRID_CELL_X),
+// Стартовая позиция вьюпорта: центр хода из ссылки (?turn=) поверх сохранённых
+// настроек игры; при неизвестном ходе — тихий откат на сохранённую позицию.
+const resolveStartPosition = (hash, focusTurnId, getState) => {
+  const { position: savedPosition } = getGameSettings(hash);
+  if (!focusTurnId) {
+    return Promise.resolve(savedPosition);
+  }
+  return getTurnsGeometryRequest(hash)
+    .then((data) => {
+      const turn = data.items.find((item) => item._id === focusTurnId);
+      if (!turn) return savedPosition;
+      const viewport = getState().game.viewport;
+      const viewportWidth = viewport.width || window.innerWidth;
+      const viewportHeight = viewport.height || window.innerHeight;
+      return {
+        x:
+          turn.position.x +
+          Math.floor(turn.size.width / 2) -
+          Math.floor(viewportWidth / 2),
+        y:
+          turn.position.y +
+          Math.floor(turn.size.height / 2) -
+          Math.floor(viewportHeight / 2),
       };
-      dispatch({
-        type: types.GAME_LOAD,
-        payload: { ...data.item, position },
-      });
+    })
+    .catch(() => savedPosition);
+};
 
-      dispatch({
-        type: linesTypes.LINES_LOAD,
-        payload: data.item.lines,
-      });
+export const loadFullGame =
+  (hash, { focusTurnId = null } = {}) =>
+  (dispatch, getState) => {
+    // GET GAME DATA
+    return new Promise((resolve, reject) => {
+      const d = getState().panels.d;
+      const personalizedPanels = getPersonalizedPanelSettings(hash, d);
+      dispatch(setPanels({ d: personalizedPanels }));
+      getGameRequest(hash).then((data) => {
+        resolveStartPosition(hash, focusTurnId, getState).then(({ x, y }) => {
+          const position = {
+            x: snapRound(x, GRID_CELL_X),
+            y: snapRound(y, GRID_CELL_X),
+          };
+          dispatch({
+            type: types.GAME_LOAD,
+            payload: { ...data.item, position },
+          });
 
-      dispatch(loadTurnsGeometry(hash, position)).then(() => {
-        resolve();
+          dispatch({
+            type: linesTypes.LINES_LOAD,
+            payload: data.item.lines,
+          });
+
+          dispatch(loadTurnsGeometry(hash, position)).then(() => {
+            resolve();
+          });
+        });
       });
     });
-  });
-};
+  };
 
 export const saveField = () => (dispatch, getState) => {
   const state = getState();

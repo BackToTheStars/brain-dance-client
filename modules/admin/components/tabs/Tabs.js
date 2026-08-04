@@ -3,12 +3,18 @@ import { Tabs } from 'antd';
 import GamesTab from './Games';
 import ScriptsTab from './Scripts';
 import LogsTab from './Logs';
+import MediaRelocateTab from './MediaRelocate';
 
 const tabs = [
   {
     key: 'scripts',
     label: 'Scripts',
     component: ScriptsTab,
+  },
+  {
+    key: 'media-relocate',
+    label: 'Media relocate',
+    component: MediaRelocateTab,
   },
   {
     key: 'games',

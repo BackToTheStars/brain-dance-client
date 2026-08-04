@@ -26,6 +26,9 @@ const GamePage = () => {
 
 const GamePageInner = () => {
   const { hash } = useParams();
+  // ссылка на ход (задача «поделиться адресом хода»): ?turn=<turnId>
+  const searchParams = useSearchParams();
+  const focusTurnId = searchParams.get('turn');
   const [hashChecked, setHashChecked] = useState(false);
   const router = useRouter();
 
@@ -37,7 +40,10 @@ const GamePageInner = () => {
     } = getGameInfo(hash) || {};
     // const { skipDialog } = info || {};
     if (!token) {
-      router.push(`/`);
+      // без токена — на диалог входа в игру, сохранив ход из ссылки
+      router.push(
+        `/game?hash=${hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
+      );
       return;
     }
     const [_, payload] = token.split('.');
@@ -78,7 +84,7 @@ const GamePageInner = () => {
           <Loading />
         ) : (
           <UserProvider hash={hash}>
-            <Game hash={hash} />
+            <Game hash={hash} focusTurnId={focusTurnId} />
           </UserProvider>
         )}
       </div>

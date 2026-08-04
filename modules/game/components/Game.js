@@ -28,7 +28,7 @@ import {
 
 const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
-const Game = ({ hash }) => {
+const Game = ({ hash, focusTurnId = null }) => {
   const gameBox = useRef();
   const dispatch = useDispatch();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -55,7 +55,7 @@ const Game = ({ hash }) => {
 
   useEffect(() => {
     if (!hash) return;
-    dispatch(loadFullGame(hash)).then(() => {
+    dispatch(loadFullGame(hash, { focusTurnId })).then(() => {
       dispatch(setGameStage(GAME_STAGE_ANIMATED_LOADING));
       dispatch(recalcAreaRect());
     });

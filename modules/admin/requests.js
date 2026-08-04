@@ -36,8 +36,9 @@ export const runAdminScriptRequest = (scriptName, commandName, params = {}) => {
   }).then((res) => res.json());
 }
 
-export const getAdminGamesRequest = () => {
-  return fetch(`${API_URL}/admin/games`, {
+export const getAdminGamesRequest = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  return fetch(`${API_URL}/admin/games${query ? `?${query}` : ''}`, {
     headers: {
       authorization: `Bearer ${adminToken}`,
     },

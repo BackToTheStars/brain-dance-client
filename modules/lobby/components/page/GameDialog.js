@@ -3,7 +3,7 @@ import { loadShortGame } from '@/modules/game/game-redux/actions';
 import Loading from '@/modules/ui/components/common/Loading';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
 import { Button, Checkbox, Input, Select } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
@@ -18,6 +18,12 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const [nickname, setNickname] = useState(info?.nickname || '');
   // const [skipDialog, setSkipDialog] = useState(false);
   const router = useRouter();
+  // ход из расшаренной ссылки (?turn=) — донести до страницы игры
+  const searchParams = useSearchParams();
+  const focusTurnId = searchParams.get('turn');
+  const gameViewUrl = `/game/view/${hash}${
+    focusTurnId ? `?turn=${focusTurnId}` : ''
+  }`;
 
   const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
   const myCodes = useMemo(() => {
@@ -69,10 +75,10 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         //     token,
         //   });
         //   reloadUserInfo();
-        //   router.push(`/game/view/${hash}`);
+        //   router.push(gameViewUrl);
         // } else {
         // ничего не требуется
-        router.push(`/game/view/${hash}`);
+        router.push(gameViewUrl);
         // }
       } else {
         // случаи, когда требуется только изменить никнейм
@@ -87,7 +93,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
             token,
           });
           reloadUserInfo();
-          router.push(`/game/view/${hash}`);
+          router.push(gameViewUrl);
         });
       }
       return;
@@ -123,7 +129,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
           token,
         });
         reloadUserInfo();
-        router.push(`/game/view/${hash}`);
+        router.push(gameViewUrl);
       });
     };
 

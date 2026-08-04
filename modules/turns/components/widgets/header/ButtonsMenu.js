@@ -5,15 +5,23 @@ import {
   PANEL_ADD_EDIT_TURN,
 } from '@/modules/panels/settings';
 import { cloneTurn, deleteTurn } from '../../../redux/actions';
-import { CopyIcon, DeleteIcon, EditIcon, ScissorIcon } from '../../icons/Turn';
+import {
+  CopyIcon,
+  DeleteIcon,
+  EditIcon,
+  LinkIcon,
+  ScissorIcon,
+} from '../../icons/Turn';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
+import { addNotification } from '@/modules/ui/redux/actions';
 
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const turnGeometry = useSelector((state) => state.turns.g[_id]);
+  const gameHash = useSelector((state) => state.game.game?.hash);
 
   const handleCut = (e) => {
     e.preventDefault();
@@ -57,8 +65,27 @@ const ButtonsMenu = ({ _id }) => {
     dispatch(cloneTurn(_id));
   };
 
+  const handleShare = (e) => {
+    e.preventDefault();
+    const url = `${window.location.origin}/game/view/${gameHash}?turn=${_id}`;
+    const notify = (text) =>
+      dispatch(addNotification({ title: 'Info:', text }));
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => notify('Turn link copied to clipboard'))
+        .catch(() => prompt('Copy turn link:', url));
+    } else {
+      // без clipboard API (например, не-HTTPS) — показать ссылку для ручного копирования
+      prompt('Copy turn link:', url);
+    }
+  };
+
   return (
     <div className="action-icons">
+      <a key="share" className="share-btn" onClick={handleShare}>
+        <LinkIcon />
+      </a>
       <a key="clone" className="clone-btn" onClick={handleClone}>
         <CopyIcon />
       </a>

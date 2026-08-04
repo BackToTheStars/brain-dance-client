@@ -25,6 +25,7 @@ export default async function RootLayout({ children }) {
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
         />
+        <link rel="icon" type="image/png" href="/favicon.png"/>
       </head>
       <ClientWrapper
         cookieColorSchema={cookieColorSchema}

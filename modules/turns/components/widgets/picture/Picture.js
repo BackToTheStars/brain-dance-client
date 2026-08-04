@@ -32,6 +32,14 @@ const Picture = ({
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageUrlToRender, setImageUrlToRender] = useState(imageUrl);
+
+  // useState фиксирует только начальное значение: при смене url в сторе
+  // (редактирование/первая загрузка картинки) без этого эффекта виджет
+  // продолжал показывать старую картинку или залипший /img/404.png
+  // до перезагрузки страницы
+  useEffect(() => {
+    setImageUrlToRender(imageUrl);
+  }, [imageUrl]);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const editWidgetId = useSelector((state) => state.panels.editWidgetId);
   const mode = useSelector((state) => state.panels.mode);
