@@ -40,6 +40,18 @@
     cursor: pointer;
   }
 
+  .drag-n-drop-loading {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .drag-n-drop-error {
+    margin-top: .25rem;
+    font-size: small;
+    color: #ff7875;
+  }
+
   input,
   .ant-picker,
   .ant-btn {

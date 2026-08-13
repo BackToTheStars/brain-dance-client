@@ -381,8 +381,6 @@ const fieldSettings = {
       },
     },
   },
-  // Пока только внешняя ссылка: загрузка PDF на свою статику (media) не сделана,
-  // поэтому FileUploading здесь нет — в отличие от картинки/видео/аудио.
   [FIELD_PDF]: {
     label: 'PDF URL',
     prefixClass: 'pdf-url',
@@ -391,14 +389,24 @@ const fieldSettings = {
     widgetSettings: {
       render: ({ changeHandler, label, prefixClass, value }) => {
         return (
-          <Input
-            data-test-id={TID.addTurn.field(prefixClass)}
-            placeholder={`${label}:`}
-            value={value}
-            onChange={(e) => {
-              changeHandler(e.target.value);
-            }}
-          />
+          <>
+            <Input
+              data-test-id={TID.addTurn.field(prefixClass)}
+              placeholder={`${label}:`}
+              value={value}
+              onChange={(e) => {
+                changeHandler(e.target.value);
+              }}
+            />
+            {/* Загрузка на свою статику — она же лечит чужой хост без CORS:
+                браузер читает PDF сам, и внешний файл без заголовков не откроется. */}
+            <FileUploading
+              changeHandler={changeHandler}
+              fileTypeLabel="a pdf"
+              accept={{ 'application/pdf': ['.pdf'] }}
+              uploadFunc={(file) => uploadMedia('pdfs', file)}
+            />
+          </>
         );
       },
     },

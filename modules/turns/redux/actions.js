@@ -498,18 +498,33 @@ export const resetTurnNextPastePosition = () => (dispatch, getState) => {
   }
 };
 
+// Загрузка файла на media: сначала одноразовый токен у сервера, потом multipart на статику.
+// Ошибку обязательно доводим до вызывающего (FileUploading показывает её и снимает спиннер):
+// media отдаёт `{ message }` на 400/413, а request() при ошибке сервера промис не завершает —
+// поэтому здесь и errorCallback, и проверка ответа статики.
 export const uploadMedia = (type, file) => () => {
-  return getTokenRequest('upload').then((data) => {
-    const token = data.item;
-    const formdata = new FormData();
-    formdata.append('file', file);
-    return fetch(`${STATIC_MEDIA_URL}/${type}/upload`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      method: 'POST',
-      body: formdata,
-    }).then((res) => res.json());
+  return new Promise((resolve, reject) => {
+    getTokenRequest('upload', {
+      errorCallback: (message) => reject(new Error(message)),
+    })
+      .then(async (data) => {
+        const token = data.item;
+        const formdata = new FormData();
+        formdata.append('file', file);
+        const res = await fetch(`${STATIC_MEDIA_URL}/${type}/upload`, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          method: 'POST',
+          body: formdata,
+        });
+        const result = await res.json().catch(() => ({}));
+        if (!res.ok || !result.src) {
+          throw new Error(result.message || `Ошибка загрузки (${res.status})`);
+        }
+        resolve(result);
+      })
+      .catch(reject);
   });
 };
 

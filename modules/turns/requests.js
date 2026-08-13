@@ -57,12 +57,18 @@ export const updateScrollPositionsRequest = (scrollPositions) => {
   });
 };
 
-export const getTokenRequest = (action) => {
-  return request(`codes/static-token?hash=${s.hash}`, {
-    tokenFlag: true,
-    method: 'POST',
-    body: {
-      action: action,
+// options прокидываются в request() — вызывающему может понадобиться errorCallback:
+// без него request() при ошибке сервера показывает alert и не завершает промис.
+export const getTokenRequest = (action, options) => {
+  return request(
+    `codes/static-token?hash=${s.hash}`,
+    {
+      tokenFlag: true,
+      method: 'POST',
+      body: {
+        action: action,
+      },
     },
-  });
+    options,
+  );
 };
