@@ -23,6 +23,10 @@ export const TURNS_GEOMETRY_TIMEOUT_DELAY = 40; // 25 изменений в се
 export const TURNS_POSITION_TIMEOUT_DELAY = 100; // 10 изменений в секунду
 export const WIDGET_PICTURE_CROP_TIMEOUT_DELAY = 500; // 2 изменения в секунду
 export const TURN_SCROLL_TIMEOUT_DELAY = 200;
+export const PDF_SCROLL_TIMEOUT_DELAY = 150; // запись позиции скролла PDF в стор
+export const PDF_QUOTES_TIMEOUT_DELAY = 60; // пересчёт координат цитат PDF при прокрутке
+export const PDF_RERENDER_TIMEOUT_DELAY = 300; // перерисовка страниц после ресайза
+export const PDF_PAGE_GAP = 8; // зазор между страницами, дублирует --turn-widget-pdf-page-gap
 
 export const NOTIFICATION_SHOWTIME = 3000;
 export const NOTIFICATION_TRANSITION = 500;

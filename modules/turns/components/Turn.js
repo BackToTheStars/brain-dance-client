@@ -20,6 +20,7 @@ import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
+import Pdf from './widgets/pdf/Pdf';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/video/Video';
 import { snapRound } from './helpers/grid';
@@ -143,6 +144,8 @@ export const Turn = memo(({ id }) => {
       vq_1: { duration: videoQuotesDuration },
       aq_1: { duration: audioQuotesDuration },
       a_1: { url: audioUrl },
+      // pdf_1 может отсутствовать у ходов из мок-стора (Storybook)
+      pdf_1: { url: pdfUrl } = {},
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
@@ -169,9 +172,17 @@ export const Turn = memo(({ id }) => {
       !!videoQuotesDuration + // Video quotes
       !!audioQuotesDuration + // Audio quotes
       !!audioUrl + // Audio
+      !!pdfUrl + // Pdf
       doesParagraphExist
     ); // Paragraph
-  }, [dontShowHeader, imageUrl, videoUrl, audioUrl, doesParagraphExist]);
+  }, [
+    dontShowHeader,
+    imageUrl,
+    videoUrl,
+    audioUrl,
+    pdfUrl,
+    doesParagraphExist,
+  ]);
 
   const { resizeDisabled, widgetsUpdatedTime } = useMemo(() => {
     return {
@@ -366,6 +377,14 @@ export const Turn = memo(({ id }) => {
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}
             pictureOnly={pictureOnly}
+          />
+        )}
+        {!!pdfUrl && (
+          <Pdf
+            widgetId={'pdf_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+            turnId={_id}
           />
         )}
         {doesParagraphExist && (

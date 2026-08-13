@@ -8,7 +8,10 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
+# scripts/ нужен до установки: postinstall копирует статику pdf.js
+# (воркер + шрифты) из node_modules в public/
 COPY package*.json ./
+COPY scripts ./scripts
 RUN npm ci --legacy-peer-deps
 
 COPY . .

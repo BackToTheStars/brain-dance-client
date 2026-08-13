@@ -1,5 +1,10 @@
 /node_modules
 /.next
+
+# статика pdf.js, копируется из node_modules на postinstall
+# (scripts/copy-pdf-worker.js)
+/public/js/pdf.worker.min.mjs
+/public/pdfjs
 .env
 .vs
 .vscode

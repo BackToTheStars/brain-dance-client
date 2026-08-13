@@ -25,6 +25,10 @@
   --turn-widget-paragraph-scrollbar-size: 6px;
   --turn-widget-paragraph-scrollbar-padding: 8px;
   --turn-widget-paragraph-padding: 6px;
+
+  // PDF — зазор дублирует PDF_PAGE_GAP в config/ui.js (участвует в расчёте
+  // максимальной высоты хода)
+  --turn-widget-pdf-page-gap: 8px;
   // @todo: добавить возможность управления через классы размеров
   --turn-widget-header-title-font-size: 24px;
   --turn-widget-header-subtitle-font-size: 16px;

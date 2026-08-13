@@ -14,7 +14,8 @@
     "redux-devtools": "redux-devtools --hostname=localhost --port=8000",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "start:test": "next start -p 5018"
+    "start:test": "next start -p 5018",
+    "postinstall": "node scripts/copy-pdf-worker.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "jquery-ui": "^1.14.2",
     "next": "^16.2.7",
     "next-intl": "^4.13.0",
+    "pdfjs-dist": "^6.2.108",
     "quill": "^2.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

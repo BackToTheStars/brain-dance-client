@@ -27,6 +27,7 @@ const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
 const FIELD_PICTURE = 'imageUrl';
 const FIELD_VIDEO = 'videoUrl';
 const FIELD_AUDIO = 'audioUrl';
+const FIELD_PDF = 'pdfUrl';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
@@ -42,6 +43,7 @@ export const WIDGET_VIDEO_QUOTES = 'video-quotes';
 export const WIDGET_AUDIO = 'audio';
 export const WIDGET_AUDIO_QUOTES = 'audio-quotes';
 export const WIDGET_SOURCE = 'source';
+export const WIDGET_PDF = 'pdf';
 
 export const widgetSettings = {
   [WIDGET_HEADER]: {
@@ -217,6 +219,12 @@ const settings = {
     requiredFields: [FIELD_AUDIO],
     availableFields: [FIELD_AUDIO],
   },
+  [TEMPLATE_PDF]: {
+    value: 'pdf',
+    label: 'Text / pdf',
+    requiredFields: [FIELD_PDF],
+    availableFields: [FIELD_PDF],
+  },
   [TEMPLATE_COMMENT]: {
     value: 'comment',
     label: 'Comment',
@@ -231,6 +239,7 @@ const templatesToShow = [
   TEMPLATE_PICTURE,
   TEMPLATE_VIDEO,
   TEMPLATE_AUDIO,
+  TEMPLATE_PDF,
   TEMPLATE_COMMENT,
   // TEMPLATE_CAROUSEL,
   // TEMPLATE_PICTURE_ONLY,
@@ -372,6 +381,28 @@ const fieldSettings = {
       },
     },
   },
+  // Пока только внешняя ссылка: загрузка PDF на свою статику (media) не сделана,
+  // поэтому FileUploading здесь нет — в отличие от картинки/видео/аудио.
+  [FIELD_PDF]: {
+    label: 'PDF URL',
+    prefixClass: 'pdf-url',
+    special: true,
+    inputType: 'component',
+    widgetSettings: {
+      render: ({ changeHandler, label, prefixClass, value }) => {
+        return (
+          <Input
+            data-test-id={TID.addTurn.field(prefixClass)}
+            placeholder={`${label}:`}
+            value={value}
+            onChange={(e) => {
+              changeHandler(e.target.value);
+            }}
+          />
+        );
+      },
+    },
+  },
   [FIELD_DATE]: {
     label: 'Date',
     prefixClass: 'date',
@@ -396,6 +427,7 @@ const fieldsToClone = [
   'imageUrl',
   'videoUrl',
   'audioUrl',
+  'pdfUrl',
   'date',
   'sourceUrl',
   'backgroundColor',
@@ -425,6 +457,7 @@ const turnSettings = {
   FIELD_DONT_SHOW_HEADER,
   FIELD_PICTURE,
   FIELD_VIDEO,
+  FIELD_PDF,
   FIELD_DATE,
   FIELD_SOURCE,
 

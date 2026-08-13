@@ -8,6 +8,9 @@ import {
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
+  MODE_WIDGET_PDF,
+  MODE_WIDGET_PDF_QUOTE_ACTIVE,
+  MODE_WIDGET_PDF_QUOTE_ADD,
   MODE_WIDGET_VIDEO,
   MODE_WIDGET_VIDEO_QUOTES_MANAGE,
 } from '@/config/panel';
@@ -22,6 +25,9 @@ import VideoMode from './buttons/video/VideoMode';
 import VideoQuotesManage from './buttons/video/VideoQuotesManage';
 import AudioQuotesManage from './buttons/audio/AudioQuotesManage';
 import AudioMode from './buttons/audio/AudioMode';
+import PdfMode from './buttons/pdf/PdfMode';
+import PdfQuoteAdd from './buttons/pdf/PdfQuoteAdd';
+import PdfQuoteActive from './buttons/pdf/PdfQuoteActive';
 
 export const Buttons = ({ buttons }) => {
   return (
@@ -49,6 +55,9 @@ const buttonSettings = {
   [MODE_WIDGET_PICTURE]: PictureMode,
   [MODE_WIDGET_PICTURE_QUOTE_ADD]: PictureQuoteAdd,
   [MODE_WIDGET_PICTURE_QUOTE_ACTIVE]: PictureQuoteActive,
+  [MODE_WIDGET_PDF]: PdfMode,
+  [MODE_WIDGET_PDF_QUOTE_ADD]: PdfQuoteAdd,
+  [MODE_WIDGET_PDF_QUOTE_ACTIVE]: PdfQuoteActive,
   [MODE_WIDGET_PARAGRAPH]: ParagraphMode,
   [MODE_OPERATION_PASTE]: TurnPasteMode,
   [MODE_WIDGET_VIDEO]: VideoMode,

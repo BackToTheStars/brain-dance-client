@@ -126,6 +126,13 @@
     cursor: pointer;
     transition: 0.2s;
     border-radius: var(--turn-quote-radius); // дублируется кроме переменных SCSS в общих переменных config/ui.js
+
+    // у PDF координаты пересчитываются на каждой прокрутке: анимация позиции
+    // превращалась бы в «шлейф» за уезжающей страницей
+    &_pdf {
+      transition: outline 0.2s;
+      z-index: 2;
+    }
   }
 
   &.quotes-queued {
@@ -325,6 +332,178 @@
 
       .ReactCrop__drag-handle {
         display: none;
+      }
+    }
+
+    // PDF
+    .stb-widget-pdf {
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+      // якорь для тулбара и слоя выделения; рамки цитат сюда НЕ попадают —
+      // они рендерятся вне виджета, в координатах карточки хода
+      position: relative;
+
+      &.active .pdf-scroll {
+        outline: 4px solid blue;
+        border-radius: var(--turn-corner-radius);
+      }
+
+      .pdf-toolbar {
+        position: absolute;
+        z-index: 2;
+        top: var(--turn-widget-inner-gap);
+        right: calc(
+          var(--turn-widgets-gap) + var(--turn-widget-paragraph-scrollbar-size)
+        );
+        display: flex;
+        align-items: center;
+        gap: var(--turn-widget-inner-gap);
+        opacity: 0.25;
+        transition: 0.3s;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        // кнопка правки живёт в тулбаре, а не в углу виджета
+        .widget-button {
+          position: static;
+          opacity: 1;
+          width: 26px;
+          height: 26px;
+        }
+      }
+
+      .pdf-page-bar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 2px 6px;
+        border-radius: 25px;
+        background-color: rgba(0, 0, 0, 0.45);
+        color: #fff;
+        font-size: 12px;
+        line-height: 1;
+        user-select: none;
+
+        &_edit {
+          background-color: rgba(0, 0, 255, 0.5);
+        }
+
+        &__btn {
+          background: none;
+          border: none;
+          color: inherit;
+          cursor: pointer;
+          font-size: 16px;
+          line-height: 1;
+          padding: 0 4px;
+
+          &:disabled {
+            opacity: 0.35;
+            cursor: default;
+          }
+        }
+
+        &__label {
+          white-space: nowrap;
+        }
+      }
+
+      // слой выделения области поверх активной страницы
+      .pdf-crop-layer {
+        position: absolute;
+        inset: 0;
+        cursor: crosshair;
+      }
+
+      .pdf-react-crop {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+
+        &__plate {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+
+        .ReactCrop__crop-selection {
+          position: absolute;
+          border: none;
+          cursor: move;
+          outline: 3px solid red;
+          background-image: none;
+        }
+
+        .ReactCrop__drag-handle {
+          display: none;
+        }
+      }
+
+      .pdf-scroll {
+        height: 100%;
+        // scroll, а не auto: полоса зарезервирована всегда, иначе появление
+        // скроллбара меняет ширину страниц и рендер начинает «дышать»
+        overflow-y: scroll;
+        overflow-x: hidden;
+        border-radius: var(--turn-corner-radius);
+
+        display: flex;
+        flex-direction: column;
+        gap: var(--turn-widget-pdf-page-gap);
+
+        &::-webkit-scrollbar {
+          width: var(--turn-widget-paragraph-scrollbar-size);
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: var(--turn-scrollbar-color);
+          border-radius: var(--turn-widget-paragraph-scrollbar-size);
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: transparent;
+        }
+      }
+
+      .pdf-page {
+        flex: none;
+        width: 100%;
+        background-color: #fff;
+        position: relative;
+
+        canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+
+        &_active {
+          outline: 2px dashed rgba(0, 0, 255, 0.6);
+          outline-offset: -2px;
+        }
+      }
+
+      .pdf-message {
+        padding: var(--turn-widget-inner-gap);
+        color: var(--turn-widget-notes-color);
+        font-size: var(--turn-widget-header-subtitle-font-size);
+
+        &_error {
+          color: #ff8a8a;
+          word-break: break-word;
+          display: flex;
+          flex-direction: column;
+          gap: var(--turn-widget-inner-gap);
+        }
+
+        &__url {
+          opacity: 0.6;
+          font-size: 0.8em;
+        }
       }
     }
 

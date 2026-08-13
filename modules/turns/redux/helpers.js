@@ -3,6 +3,7 @@ import {
   WIDGET_AUDIO_QUOTES,
   WIDGET_HEADER,
   WIDGET_PARAGRAPH,
+  WIDGET_PDF,
   WIDGET_PICTURE,
   WIDGET_SOURCE,
   WIDGET_VIDEO,
@@ -37,6 +38,17 @@ export class TurnHelper {
       ],
       [WIDGET_AUDIO]: [
         { id: 'a_1', show: !!turn.audioUrl, url: turn.audioUrl },
+      ],
+      [WIDGET_PDF]: [
+        {
+          id: 'pdf_1',
+          show: !!turn.pdfUrl,
+          url: turn.pdfUrl,
+          // одно поле scrollPosition на ход: у pdf-хода нет скроллящегося
+          // параграфа, поэтому конфликта с p_1 не возникает
+          scrollPosition: turn.scrollPosition || 0,
+          quotes: turn.quotes.filter((quote) => quote.type === 'pdf'),
+        },
       ],
       [WIDGET_SOURCE]: [
         {
@@ -146,6 +158,7 @@ export class TurnHelper {
         ...turn.dWidgets.i_1.quotes,
         ...turn.dWidgets.vq_1.quotes,
         ...turn.dWidgets.aq_1.quotes,
+        ...(turn.dWidgets.pdf_1?.quotes || []),
       ],
       contentType: turn.contentType, // turn.pictureOnly
       pictureOnly: turn.pictureOnly || false, // @todo: remove
@@ -172,6 +185,7 @@ export class TurnHelper {
           }
         : null,
       audioUrl: turn.dWidgets.a_1.url,
+      pdfUrl: turn.dWidgets.pdf_1?.url,
       sourceUrl: turn.sourceUrl,
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,

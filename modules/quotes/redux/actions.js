@@ -11,6 +11,7 @@ import {
 import { lineCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { useSelector } from 'react-redux';
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { TYPE_QUOTE_PDF, TYPE_QUOTE_PICTURE } from '../settings';
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
@@ -24,44 +25,58 @@ export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   });
 };
 
-export const savePictureQuoteByCrop = () => (dispatch, getState) => {
-  const state = getState();
-  const { turnData, turnGeometry, editWidgetParams } =
-    getWidgetDataFromState(state);
-  const { x, y, width, height } = editWidgetParams.crop;
-  const { activeQuoteId } = editWidgetParams;
+// Общая часть для прямоугольных цитат (картинка и PDF): координаты берутся из
+// выделения (crop) в процентах от бокса виджета/страницы. getExtraFields
+// добавляет специфику типа — у PDF это номер страницы.
+const saveRectQuoteByCrop =
+  (type, getExtraFields = () => ({})) =>
+  (dispatch, getState) => {
+    const state = getState();
+    const { turnData, turnGeometry, editWidgetParams } =
+      getWidgetDataFromState(state);
+    const { x, y, width, height } = editWidgetParams.crop;
+    const { activeQuoteId } = editWidgetParams;
 
-  let id = activeQuoteId || Math.floor(new Date().getTime() / 1000);
+    let id = activeQuoteId || Math.floor(new Date().getTime() / 1000);
 
-  const pictureQuote = {
-    id,
-    type: 'picture',
-    x,
-    y,
-    height,
-    width,
+    const rectQuote = {
+      id,
+      type,
+      x,
+      y,
+      height,
+      width,
+      ...getExtraFields(editWidgetParams),
+    };
+
+    return new Promise((resolve, reject) => {
+      dispatch(
+        resaveTurn(
+          {
+            _id: turnData._id,
+            quotes: activeQuoteId
+              ? turnData.quotes.map((quote) =>
+                  quote.id === activeQuoteId ? rectQuote : quote,
+                )
+              : [...turnData.quotes, rectQuote],
+            x: turnGeometry.position.x,
+            y: turnGeometry.position.y,
+          },
+          {
+            success: resolve,
+          },
+        ),
+      );
+    });
   };
 
-  return new Promise((resolve, reject) => {
-    dispatch(
-      resaveTurn(
-        {
-          _id: turnData._id,
-          quotes: activeQuoteId
-            ? turnData.quotes.map((quote) =>
-                quote.id === activeQuoteId ? pictureQuote : quote,
-              )
-            : [...turnData.quotes, pictureQuote],
-          x: turnGeometry.position.x,
-          y: turnGeometry.position.y,
-        },
-        {
-          success: resolve,
-        },
-      ),
-    );
-  });
-};
+export const savePictureQuoteByCrop = () =>
+  saveRectQuoteByCrop(TYPE_QUOTE_PICTURE);
+
+export const savePdfQuoteByCrop = () =>
+  saveRectQuoteByCrop(TYPE_QUOTE_PDF, (params) => ({
+    page: params.activePage,
+  }));
 
 export const processQuoteClicked =
   (currentQuoteKey, can) => (dispatch, getState) => {

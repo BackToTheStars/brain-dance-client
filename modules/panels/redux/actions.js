@@ -2,6 +2,7 @@ import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 import {
   MODE_GAME,
+  MODE_WIDGET_PDF,
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/config/panel';
@@ -44,6 +45,12 @@ export const setPanelMode = (payload) => (dispatch, getState) => {
         editWidgetParams: {},
       };
     } else if (payload.mode === MODE_WIDGET_PICTURE) {
+      params = {
+        editWidgetParams: {},
+      };
+    } else if (payload.mode === MODE_WIDGET_PDF) {
+      // вход в режим виджета PDF: сбрасываем прошлое выделение, активную
+      // страницу виджет проставит сам (он знает, где сейчас пользователь)
       params = {
         editWidgetParams: {},
       };

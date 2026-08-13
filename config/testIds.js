@@ -52,6 +52,19 @@ export const TID = {
   turnCard: 'turn-card', // карточка Turn (+ data-turn-id)
   quoteRect: 'quote-rect', // кликабельный прямоугольник цитаты (+ data-turn-id, data-quote-key)
 
+  // Виджет PDF (ход contentType=pdf)
+  pdf: {
+    scroll: 'pdf-scroll', // скролл-контейнер документа (+ data-turn-id)
+    page: 'pdf-page', // обёртка страницы (+ data-page-number)
+    error: 'pdf-error', // сообщение об ошибке загрузки документа
+    pageBar: 'pdf-page-bar', // индикатор активной страницы
+    pageLabel: 'pdf-page-label', // «N / M»
+    pagePrev: 'pdf-page-prev',
+    pageNext: 'pdf-page-next',
+    edit: 'pdf-edit', // кнопка входа в режим виджета (цитаты)
+    crop: 'pdf-crop', // слой выделения области на активной странице
+  },
+
   // Форма добавления/редактирования turn
   addTurn: {
     typeBtn: 'add-turn-type',
