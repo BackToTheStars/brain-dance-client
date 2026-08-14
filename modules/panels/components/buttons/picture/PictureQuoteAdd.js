@@ -4,7 +4,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { MODE_WIDGET_PICTURE } from '../../../settings';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 
 const PictureQuoteAdd = () => {
   //

@@ -29,28 +29,12 @@ import PdfMode from './buttons/pdf/PdfMode';
 import PdfQuoteAdd from './buttons/pdf/PdfQuoteAdd';
 import PdfQuoteActive from './buttons/pdf/PdfQuoteActive';
 
-export const Buttons = ({ buttons }) => {
-  return (
-    <>
-      {buttons.map((button, index) =>
-        !!button && (!button.show || button.show()) ? (
-          <button
-            key={index}
-            className="btn btn-primary"
-            data-test-id={button.testId}
-            onClick={() => button.callback()}
-          >
-            {button.text}
-          </button>
-        ) : (
-          <div key={index} className="empty-button-space"></div>
-        )
-      )}
-    </>
-  );
-};
-
-const buttonSettings = {
+// Карта строится при рендере, а не при инициализации модуля. Чтение default'ов
+// импортированных режимов на уровне модуля падало в прод-сборке
+// («Cannot access 'm' before initialization»): при циклическом импорте порядок
+// инициализации решает всё, и модуль режима мог быть ещё не выполнен.
+// К моменту рендера все модули инициализированы, поэтому здесь это безопасно.
+const getButtonSettings = () => ({
   [MODE_GAME]: GameMode,
   [MODE_WIDGET_PICTURE]: PictureMode,
   [MODE_WIDGET_PICTURE_QUOTE_ADD]: PictureQuoteAdd,
@@ -64,11 +48,11 @@ const buttonSettings = {
   [MODE_WIDGET_AUDIO]: AudioMode,
   [MODE_WIDGET_VIDEO_QUOTES_MANAGE]: VideoQuotesManage,
   [MODE_WIDGET_AUDIO_QUOTES_MANAGE]: AudioQuotesManage,
-};
+});
 
 const ButtonsPanel = () => {
   const mode = useSelector((state) => state.panels.mode);
-  const Component = useMemo(() => buttonSettings[mode], [mode]);
+  const Component = useMemo(() => getButtonSettings()[mode], [mode]);
   return <Component />;
 };
 

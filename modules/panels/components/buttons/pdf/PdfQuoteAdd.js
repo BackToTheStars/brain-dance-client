@@ -3,7 +3,7 @@ import { savePdfQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit } from '../../../redux/actions';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 
 const PdfQuoteAdd = () => {

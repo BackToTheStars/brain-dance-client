@@ -6,7 +6,7 @@ import {
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit } from '../../../redux/actions';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 
 const ParagraphMode = () => {
   const editTurnId = useSelector((state) => state.panels.editTurnId);

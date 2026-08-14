@@ -2,7 +2,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 import { MODE_WIDGET_AUDIO_QUOTES_MANAGE } from '@/config/panel';
 import { addAudioQuotesWidget } from '@/modules/turns/redux/actions'; //
 

@@ -2,7 +2,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 import { MODE_WIDGET_PDF_QUOTE_ADD } from '@/config/panel';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 

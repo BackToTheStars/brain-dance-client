@@ -11,7 +11,7 @@ import {
   PANEL_MINIMAP,
   PANEL_TURNS_PASTE,
 } from '../../settings';
-import { Buttons } from '../ButtonsPanel';
+import { Buttons } from './Buttons';
 import { MODE_OPERATION_PASTE } from '@/config/panel';
 import { TID } from '@/config/testIds';
 

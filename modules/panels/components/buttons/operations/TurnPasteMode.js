@@ -5,7 +5,7 @@ import {
   resetAndExit,
   togglePanel,
 } from '../../../redux/actions';
-import { Buttons } from '../../ButtonsPanel';
+import { Buttons } from '../Buttons';
 import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
 
 const TurnPasteMode = () => {
