@@ -272,10 +272,13 @@ const AddEditTurnPopup = () => {
     }
   };
 
+  // Только функциональный setState: два ColorPicker'а ставят свои дефолты в эффектах
+  // одного коммита, и обычный `{ ...form }` из замыкания терял значение первого
+  // (backgroundColor у комментария оставался пустым).
   const formChangeHandler = (field, value) => {
     if (!!error) setError(null);
 
-    setForm({ ...form, [field]: value });
+    setForm((prevForm) => ({ ...prevForm, [field]: value }));
   };
 
   if (Component) {
@@ -313,11 +316,7 @@ const AddEditTurnPopup = () => {
                     defaultChecked={true}
                     checked={!form[FIELD_DONT_SHOW_HEADER]}
                     onChange={(checked) => {
-                      if (!!error) setError(null);
-                      setForm({
-                        ...form,
-                        [FIELD_DONT_SHOW_HEADER]: !checked,
-                      });
+                      formChangeHandler(FIELD_DONT_SHOW_HEADER, !checked);
                     }}
                   />
                 </div>
@@ -330,10 +329,9 @@ const AddEditTurnPopup = () => {
                 placeholder="Source URL:"
                 data-test-id={TID.addTurn.field('source')}
                 value={form[FIELD_SOURCE]}
-                onChange={(e) => {
-                  if (!!error) setError(null);
-                  setForm({ ...form, [FIELD_SOURCE]: e.target.value });
-                }}
+                onChange={(e) =>
+                  formChangeHandler(FIELD_SOURCE, e.target.value)
+                }
               />
             </div>
             <div className="w-1/4">
@@ -341,14 +339,9 @@ const AddEditTurnPopup = () => {
                 value={form[FIELD_DATE] ? dayjs(form[FIELD_DATE]) : null}
                 data-test-id={TID.addTurn.field('date')}
                 style={{ width: '100%' }}
-                onChange={(d) => {
-                  if (!!error) setError(null);
-
-                  setForm({
-                    ...form,
-                    [FIELD_DATE]: d?.format('YYYY-MM-DD'),
-                  });
-                }}
+                onChange={(d) =>
+                  formChangeHandler(FIELD_DATE, d?.format('YYYY-MM-DD'))
+                }
               />
             </div>
           </div>
@@ -395,11 +388,7 @@ const AddEditTurnPopup = () => {
                     defaultChecked={true}
                     checked={!form[FIELD_DONT_SHOW_HEADER]}
                     onChange={(checked) => {
-                      if (!!error) setError(null);
-                      setForm({
-                        ...form,
-                        [FIELD_DONT_SHOW_HEADER]: !checked,
-                      });
+                      formChangeHandler(FIELD_DONT_SHOW_HEADER, !checked);
                     }}
                   />
                 </div>
@@ -410,10 +399,9 @@ const AddEditTurnPopup = () => {
                     placeholder="Source URL:"
                     data-test-id={TID.addTurn.field('source')}
                     value={form[FIELD_SOURCE]}
-                    onChange={(e) => {
-                      if (!!error) setError(null);
-                      setForm({ ...form, [FIELD_SOURCE]: e.target.value });
-                    }}
+                    onChange={(e) =>
+                      formChangeHandler(FIELD_SOURCE, e.target.value)
+                    }
                   />
                 </div>
                 <div className="w-1/4">
@@ -421,13 +409,9 @@ const AddEditTurnPopup = () => {
                     value={form[FIELD_DATE] ? dayjs(form[FIELD_DATE]) : null}
                     data-test-id={TID.addTurn.field('date')}
                     style={{ width: '100%' }}
-                    onChange={(d) => {
-                      if (!!error) setError(null);
-                      setForm({
-                        ...form,
-                        [FIELD_DATE]: d?.format('YYYY-MM-DD'),
-                      });
-                    }}
+                    onChange={(d) =>
+                      formChangeHandler(FIELD_DATE, d?.format('YYYY-MM-DD'))
+                    }
                   />
                 </div>
               </div>

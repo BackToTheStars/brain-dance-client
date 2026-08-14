@@ -8,7 +8,7 @@ const MinimapButtons = ({
   isMinimized,
 }) => {
   const handleMapMinus = () => {
-    if (minimapSizePercents <= 60) return false;
+    if (minimapSizePercents <= 30) return false;
     setMinimapSizePercents(minimapSizePercents - 10);
   };
 

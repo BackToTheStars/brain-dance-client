@@ -34,6 +34,37 @@ const FIELD_BACKGROUND_COLOR = 'backgroundColor';
 const FIELD_FONT_COLOR = 'fontColor';
 const FIELD_PICTURE_ONLY = 'pictureOnly';
 
+// Что принимают дропзоны — формат react-dropzone (mime → расширения).
+// Зеркало dMediaTypes в media/config/media.js: media отклоняет всё остальное
+// с 400 «Unsupported media type», здесь — чтобы не грузить файл впустую.
+export const UPLOAD_ACCEPT = {
+  images: {
+    'image/jpeg': ['.jpg', '.jpeg'],
+    'image/png': ['.png'],
+    'image/gif': ['.gif'],
+    'image/webp': ['.webp'],
+    'image/svg+xml': ['.svg'],
+    'image/x-icon': ['.ico'],
+  },
+  videos: {
+    'video/mp4': ['.mp4'],
+    'video/webm': ['.webm'],
+    'video/ogg': ['.ogg'],
+    'video/quicktime': ['.mov'],
+    'video/x-msvideo': ['.avi'],
+  },
+  audios: {
+    'audio/mpeg': ['.mp3'],
+    'audio/mp4': ['.m4a'],
+    'audio/wav': ['.wav'],
+    'audio/ogg': ['.ogg'],
+    'audio/webm': ['.webm'],
+  },
+  pdfs: {
+    'application/pdf': ['.pdf'],
+  },
+};
+
 export const WIDGET_PICTURE = 'picture';
 export const WIDGET_PARAGRAPH = 'paragraph';
 
@@ -297,6 +328,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="an image"
+              accept={UPLOAD_ACCEPT.images}
               uploadFunc={(file) => uploadMedia('images', file)}
             />
           </>
@@ -347,6 +379,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="a video"
+              accept={UPLOAD_ACCEPT.videos}
               uploadFunc={(file) => uploadMedia('videos', file)}
             />
           </>
@@ -374,6 +407,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="an audio"
+              accept={UPLOAD_ACCEPT.audios}
               uploadFunc={(file) => uploadMedia('audios', file)}
             />
           </>
@@ -403,7 +437,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="a pdf"
-              accept={{ 'application/pdf': ['.pdf'] }}
+              accept={UPLOAD_ACCEPT.pdfs}
               uploadFunc={(file) => uploadMedia('pdfs', file)}
             />
           </>

@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
 const ColorPicker = ({ value, changeHandler, widgetSettings, label }) => {
-  // @todo: проверить, почему настройки по умолчанию устанавливаются только
-  // для последнего ColorPicker
+  // дефолт ставится в эффекте на монтировании; оба ColorPicker'а формы делают это в
+  // одном коммите, поэтому formChangeHandler обязан быть функциональным setState —
+  // иначе второй вызов затирает первый (было: у комментария не сохранялся фон)
   useEffect(() => {
     if (!!widgetSettings.defaultColor && !value) {
       changeHandler(widgetSettings.defaultColor);

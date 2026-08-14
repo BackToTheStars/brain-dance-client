@@ -21,10 +21,8 @@ export default async function RootLayout({ children }) {
         <script src="/js/jquery.js"></script>
         <script src="/js/jquery-ui/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="/js/jquery-ui/jquery-ui.min.css" />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-        />
+        {/* font-awesome 5.15.1 лежит локально (public/fontawesome) — внешних CDN нет */}
+        <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
         <link rel="icon" type="image/png" href="/favicon.png"/>
       </head>
       <ClientWrapper
