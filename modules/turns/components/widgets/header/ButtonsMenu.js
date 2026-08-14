@@ -3,7 +3,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import {
   PANEL_ADD_EDIT_TURN,
-} from '@/modules/panels/settings';
+} from '@/config/panel';
 import { cloneTurn, deleteTurn } from '../../../redux/actions';
 import {
   CopyIcon,

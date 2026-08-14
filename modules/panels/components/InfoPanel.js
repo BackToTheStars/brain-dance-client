@@ -3,7 +3,7 @@ import CodeEnterForm from '@/modules/game/components/forms/CodeEnterForm';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { togglePanel } from '../redux/actions';
-import { PANEL_INFO } from '../settings';
+import { PANEL_INFO } from '@/config/panel';
 import EditGameForm from './info/EditGameForm';
 import { useState } from 'react';
 import { Button } from 'antd';

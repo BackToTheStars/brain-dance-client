@@ -7,7 +7,7 @@ import {
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';

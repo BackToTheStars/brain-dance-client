@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import MinimapButtons from './MinimapButtons';
-import { PANEL_MINIMAP } from '@/modules/panels/settings';
+import { PANEL_MINIMAP } from '@/config/panel';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import { areRectanglesIntersect } from '@/modules/turns/components/helpers/sizeHelper';

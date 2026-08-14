@@ -3,6 +3,33 @@ import dynamic from 'next/dynamic';
 
 import { panelSpacer } from '@/config/ui';
 import ClassList from '../classes/components/ClassList';
+// Константы панелей переехали в config/panel.js: этот модуль собирает массив `panels`
+// из компонентов, и импорт констант обратно сюда замыкал цикл (в прод-сборке — TDZ).
+// Реэкспорт оставлен для совместимости, но новым импортёрам брать из '@/config/panel'.
+import {
+  PANEL_ADD_EDIT_TURN,
+  PANEL_BUTTONS,
+  PANEL_BUTTONS_STYLES,
+  PANEL_CLASSES,
+  PANEL_INFO,
+  PANEL_LINES,
+  PANEL_MINIMAP,
+  PANEL_MINIMAP_STYLES,
+  PANEL_NOTIFICATIONS,
+  PANEL_SETTINGS,
+  PANEL_TURN_INFO,
+  PANEL_TURNS_PASTE,
+  POSITION_BOTTOM_CENTER,
+  POSITION_BOTTOM_LEFT,
+  POSITION_BOTTOM_RIGHT,
+  POSITION_FLEXIBLE,
+  POSITION_NOTIFICATIONS,
+  POSITION_UPPER_CENTER,
+  POSITION_UPPER_LEFT,
+  POSITION_UPPER_RIGHT,
+} from '@/config/panel';
+
+export * from '@/config/panel';
 
 const AddEditTurnPopup = dynamic(
   () => import('@/modules/turns/components/forms/AddEditTurn'),
@@ -19,29 +46,6 @@ import Notifications from '../ui/components/Notifications';
 import LinesPanel from './components/LinesPanel';
 import TurnInfo from '../turns/components/TurnInfo';
 import PasteTurnPanel from './components/PasteTurnPanel';
-
-export const POSITION_UPPER_LEFT = 'position_upper_left';
-export const POSITION_UPPER_CENTER = 'position_upper_center';
-export const POSITION_UPPER_RIGHT = 'position_upper_right';
-export const POSITION_BOTTOM_RIGHT = 'position_bottom_right';
-export const POSITION_BOTTOM_LEFT = 'position_bottom_left';
-export const POSITION_BOTTOM_CENTER = 'position_bottom_center';
-export const POSITION_NOTIFICATIONS = 'position_notifications';
-export const POSITION_FLEXIBLE = 'position_flexible';
-
-export const PANEL_CLASSES = 'panel_classes';
-export const PANEL_SETTINGS = 'panel_settings';
-export const PANEL_ADD_EDIT_TURN = 'panel_add_edit_turn';
-export const PANEL_BUTTONS = 'panel_buttons';
-export const PANEL_INFO = 'panel_info';
-export const PANEL_MINIMAP = 'panel_minimap';
-export const PANEL_NOTIFICATIONS = 'panel_notifications';
-export const PANEL_LINES = 'panel_lines';
-export const PANEL_TURN_INFO = 'panel_turn_info';
-export const PANEL_TURNS_PASTE = 'panel_turns_paste';
-
-export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
-export const PANEL_BUTTONS_STYLES = 'actions';
 
 export const panels = [
   {

@@ -33,10 +33,13 @@ import AudioQuotes from './widgets/audio/AudioQuotes';
 import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
 
-const turnGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
-const turnPositionQueue = getQueue(TURNS_POSITION_TIMEOUT_DELAY);
-
+// Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
+// предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
+// обновления геометрии почти всех ходов терялись: DOM внутренней карточки уже был
+// пересчитан по контенту, а в сторе (и во внешнем контейнере, к которому привязан блок
+// источника) оставалась высота с бэкенда.
 const TurnAdapter = ({ id }) => {
+  const turnPositionQueue = useRef(getQueue(TURNS_POSITION_TIMEOUT_DELAY)).current;
   const gamePosition = useSelector((state) => state.game.position);
   const dispatch = useDispatch();
   const wrapper = useRef(null);
@@ -128,6 +131,7 @@ const TurnAdapter = ({ id }) => {
 export const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id]);
   const dispatch = useDispatch();
+  const turnGeometryQueue = useRef(getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY)).current;
 
   const [widgets, setWidgets] = useState([]);
   const wrapper = useRef(null);
@@ -228,16 +232,18 @@ export const Turn = memo(({ id }) => {
     [widgets]
   );
 
-  const unregisterHandleResize = useCallback(
-    (widget) => {
-      setWidgets((widgets) => {
-        return widgets.filter(
-          (widgetToReturn) => widget.id !== widgetToReturn.id
-        );
-      });
-    },
-    [widgets]
-  );
+  // Виджеты зовут с объектом (`{ id }`), параграфные — строкой; принимаем оба вида.
+  // Раньше строка молча ничего не удаляла: запись размонтированного параграфа
+  // оставалась в widgets, число виджетов переставало сходиться (widgetsUpdatedTime
+  // === null) и пересчёт размера карточки выключался до перезагрузки страницы —
+  // отсюда пустая полоса на месте удалённого параграфа.
+  const unregisterHandleResize = useCallback((widget) => {
+    const widgetId = typeof widget === 'string' ? widget : widget?.id;
+    if (!widgetId) return;
+    setWidgets((widgets) =>
+      widgets.filter((widgetToReturn) => widgetToReturn.id !== widgetId)
+    );
+  }, []);
 
   const recalculateSize = useCallback(
     (width, passedHeight) => {

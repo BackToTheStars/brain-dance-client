@@ -1,6 +1,6 @@
 import * as types from './types';
 import * as panelTypes from '@/modules/panels/redux/types';
-import { PANEL_LINES } from '@/modules/panels/settings';
+import { PANEL_LINES } from '@/config/panel';
 import { resaveTurn } from '@/modules/turns/redux/actions';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 import {

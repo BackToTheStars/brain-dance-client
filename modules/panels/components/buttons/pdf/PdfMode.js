@@ -17,7 +17,10 @@ const PdfMode = () => {
 
   const buttons = [
     {
-      text: `Add Area${activePage ? ` (p. ${activePage})` : ''}`,
+      text: [
+        'Add Area',
+        activePage ? <><br/>(page {activePage})</> : '',
+      ].map((item, i) => <span key={i}>{item}</span>),
       callback: () => {
         dispatch(setPanelMode({ mode: MODE_WIDGET_PDF_QUOTE_ADD }));
       },

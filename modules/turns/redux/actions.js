@@ -25,7 +25,7 @@ import {
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
 import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
-import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
+import { PANEL_TURNS_PASTE } from '@/config/panel';
 import { STATIC_MEDIA_URL } from '@/config/server';
 
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';

@@ -261,7 +261,7 @@ const Compressor = ({
       },
     };
     registerHandleResize(resizeInfo);
-    return () => unregisterHandleResize(widgetId);
+    return () => unregisterHandleResize({ id: widgetId });
   }, [desiredHeight, compressedTextPieces]);
 
   // const paragraphCompressorTextWrapper = useMemo(() => {

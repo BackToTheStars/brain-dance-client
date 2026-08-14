@@ -221,10 +221,8 @@ const Pdf = ({
       .then(async (pdfjs) => {
         loadingTask = pdfjs.getDocument(getDocumentParams(url));
         const doc = await loadingTask.promise;
-        if (cancelled) {
-          doc.destroy();
-          return;
-        }
+        // ресурсы освобождает cleanup эффекта через loadingTask.destroy()
+        if (cancelled) return;
         docRef.current = doc;
 
         // размеры всех страниц нужны сразу: из них строятся placeholder'ы,
@@ -256,10 +254,13 @@ const Pdf = ({
     return () => {
       cancelled = true;
       cancelRenderTasks();
-      const doc = docRef.current;
       docRef.current = null;
-      if (doc) doc.destroy();
-      else if (loadingTask) loadingTask.destroy();
+      // У PDFDocumentProxy в pdfjs 6 нет destroy() — освобождает ресурсы (и закрывает
+      // воркер документа) только задача загрузки. Вызов doc.destroy() здесь ронял
+      // приложение при удалении pdf-хода: исключение в cleanup эффекта размонтирует
+      // всё дерево — «This page couldn't load».
+      // destroy() отклоняется, если задача ещё выполняется, — это ожидаемо.
+      if (loadingTask) loadingTask.destroy().catch(() => {});
     };
   }, [url]);
 

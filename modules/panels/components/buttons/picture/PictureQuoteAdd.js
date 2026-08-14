@@ -3,7 +3,7 @@ import { savePictureQuoteByCrop } from '@/modules/quotes/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
-import { MODE_WIDGET_PICTURE } from '../../../settings';
+import { MODE_WIDGET_PICTURE } from '@/config/panel';
 import { Buttons } from '../Buttons';
 
 const PictureQuoteAdd = () => {

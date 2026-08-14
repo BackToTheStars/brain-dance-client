@@ -7,7 +7,7 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/config/panel';
 import * as types from './types';
-import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '../settings';
+import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/config/panel';
 
 export const resetAndExit = () => (dispatch) => {
   dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });

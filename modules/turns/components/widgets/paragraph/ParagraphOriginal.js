@@ -8,7 +8,7 @@ import {
   updateScrollPosition,
 } from '@/modules/turns/redux/actions';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import {
@@ -57,6 +57,10 @@ const ParagraphOriginal = ({
     .join(',');
 
   const paragraphEl = useRef(null);
+  // цель восстановления прокрутки, которую пока не удалось применить (см. ниже),
+  // и последнее значение, выставленное нами, — чтобы отличить свою прокрутку от ручной
+  const pendingScrollRef = useRef(null);
+  const lastAppliedRef = useRef(null);
   const dispatch = useDispatch();
 
   const [scrollTop, setScrollTop] = useState(0); // дополнительный локальный стейт для быстрого ререндера цитат
@@ -192,6 +196,10 @@ const ParagraphOriginal = ({
 
     const scrollHandler = () => {
       if (!!paragraphEl.current) {
+        // прокрутил пользователь, а не мы — отменяем отложенное восстановление
+        if (Math.round(paragraphEl.current.scrollTop) !== lastAppliedRef.current) {
+          pendingScrollRef.current = null;
+        }
         setScrollTop(paragraphEl.current.scrollTop);
 
         paragraphScrollQueue.add(() => {
@@ -230,15 +238,42 @@ const ParagraphOriginal = ({
       },
     };
     registerHandleResize(resizeInfo);
-    return () => unregisterHandleResize(widgetId);
+    return () => unregisterHandleResize({ id: widgetId });
   }, [paragraphEl]);
+
+  // ВОССТАНОВЛЕНИЕ ПРОКРУТКИ
+  // Позиция приходит с сервера раньше, чем загрузится картинка хода: пока её нет,
+  // параграф выше итогового, и браузер зажимает scrollTop по текущему scrollHeight.
+  // Когда картинка доезжает и параграф уменьшается, повторно применить позицию
+  // некому — текст оставался не на том месте (расхождение доходило до сотен пикселей).
+  // Поэтому недостигнутую цель держим в pendingScrollRef и повторяем на ресайзе.
+  const applyScroll = useCallback((target) => {
+    const el = paragraphEl.current;
+    if (!el || target == null) return;
+    el.scrollTop = target;
+    lastAppliedRef.current = Math.round(el.scrollTop);
+    pendingScrollRef.current =
+      lastAppliedRef.current < Math.round(target) ? target : null;
+  }, []);
 
   useEffect(() => {
     if (!paragraphEl.current) return;
     if (scrollTop !== widget.scrollPosition) {
-      paragraphEl.current.scrollTop = widget.scrollPosition;
+      applyScroll(widget.scrollPosition);
     }
   }, [widget.scrollPosition]);
+
+  useEffect(() => {
+    const el = paragraphEl.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      if (pendingScrollRef.current != null) {
+        applyScroll(pendingScrollRef.current);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div

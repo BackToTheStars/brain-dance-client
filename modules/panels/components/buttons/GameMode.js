@@ -10,7 +10,7 @@ import {
   PANEL_INFO,
   PANEL_MINIMAP,
   PANEL_TURNS_PASTE,
-} from '../../settings';
+} from '@/config/panel';
 import { Buttons } from './Buttons';
 import { MODE_OPERATION_PASTE } from '@/config/panel';
 import { TID } from '@/config/testIds';

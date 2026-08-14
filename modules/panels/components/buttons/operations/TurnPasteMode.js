@@ -6,7 +6,7 @@ import {
   togglePanel,
 } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
-import { PANEL_TURNS_PASTE } from '@/modules/panels/settings';
+import { PANEL_TURNS_PASTE } from '@/config/panel';
 
 const TurnPasteMode = () => {
   const dispatch = useDispatch();

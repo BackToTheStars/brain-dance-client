@@ -1,5 +1,5 @@
 import { togglePanel } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN } from '@/modules/panels/settings';
+import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
 import { useDispatch, useSelector } from 'react-redux';
 import { HeaderEditForm } from '../widgets/header/EditForm';
 import { Button, Dropdown } from 'antd';

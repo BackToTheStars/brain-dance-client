@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { togglePanel } from '../redux/actions';
-import { PANEL_SETTINGS } from '../settings';
+import { PANEL_SETTINGS } from '@/config/panel';
 
 const SettingsButton = () => {
   const dispatch = useDispatch();

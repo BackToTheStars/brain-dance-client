@@ -1,5 +1,5 @@
 import { toggleMinimizePanel } from '@/modules/panels/redux/actions';
-import { PANEL_MINIMAP } from '@/modules/panels/settings';
+import { PANEL_MINIMAP } from '@/config/panel';
 import { useDispatch } from 'react-redux';
 
 const MinimapButtons = ({

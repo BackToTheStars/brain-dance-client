@@ -5,7 +5,7 @@ import { filterLinesByQuoteKey } from '@/modules/lines/components/helpers/line';
 import * as panelTypes from '@/modules/panels/redux/types';
 import { lineDelete } from '@/modules/lines/redux/actions';
 import { useEffect, useMemo } from 'react';
-import { PANEL_LINES } from '../settings';
+import { PANEL_LINES } from '@/config/panel';
 
 const cutTextToSize = (text, size) => {
   if (text.length < size + 3) return text;
