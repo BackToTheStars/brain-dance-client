@@ -141,7 +141,9 @@ export const toggleSidebar = (sidebar) => (dispatch, getState) => {
   });
 };
 
-export const lobbyEnterGameWithConfirm = (code, nickname) => (dispatch) => {
+export const lobbyEnterGameWithConfirm =
+  (code, nickname, focusTurnId = null) =>
+  (dispatch) => {
   return new Promise((resolve, reject) => {
     getGameUserTokenRequest(code, nickname).then((data) => {
       if (data.success) {
@@ -157,7 +159,10 @@ export const lobbyEnterGameWithConfirm = (code, nickname) => (dispatch) => {
                 info,
                 token,
               });
-              location.replace(`/game?hash=${hash}`);
+              // не терять ход из расшаренной ссылки (?turn=)
+              location.replace(
+                `/game?hash=${hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
+              );
             },
           }),
         );

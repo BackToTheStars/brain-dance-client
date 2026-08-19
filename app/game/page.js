@@ -28,6 +28,8 @@ const GamePage = () => {
 const GamePageInner = () => {
   const searchParams = useSearchParams();
   const hash = searchParams.get('hash');
+  // ход из расшаренной ссылки (?turn=) — не терять при редиректах
+  const focusTurnId = searchParams.get('turn');
 
   return (
     <div className="game-bg">
@@ -35,14 +37,14 @@ const GamePageInner = () => {
         <Loading />
       ) : (
         <UserProvider hash={hash}>
-          <GameDialogPage hash={hash} />
+          <GameDialogPage hash={hash} focusTurnId={focusTurnId} />
         </UserProvider>
       )}
     </div>
   );
 };
 
-const GameDialogPage = ({ hash }) => {
+const GameDialogPage = ({ hash, focusTurnId }) => {
   const dispatch = useDispatch();
   const [myGamesLoaded, setMyGamesLoaded] = useState(false); // @todo: перенести в store
   const myGames = useSelector((state) => state.settings.games);
@@ -64,12 +66,18 @@ const GameDialogPage = ({ hash }) => {
       return false;
     });
     if (existedGame) {
-      router.push(`/game?hash=${existedGame.hash}`);
+      router.push(
+        `/game?hash=${existedGame.hash}${
+          focusTurnId ? `&turn=${focusTurnId}` : ''
+        }`,
+      );
       return;
     }
-    dispatch(lobbyEnterGameWithConfirm(hash, 'user')).catch((msg) => {
-      alert(msg);
-    });
+    dispatch(lobbyEnterGameWithConfirm(hash, 'user', focusTurnId)).catch(
+      (msg) => {
+        alert(msg);
+      },
+    );
   }, [hash, myGames, myGamesLoaded]);
 
   // useEffect(() => {
