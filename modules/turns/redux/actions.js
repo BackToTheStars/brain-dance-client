@@ -88,7 +88,30 @@ export const loadTurnsData = (turnIds) => (dispatch) => {
   });
 };
 
-export const updateGeometry = (data) => (dispatch) => {
+// TURN_UPDATE_GEOMETRY помечает ход как изменённый (wasChanged), а `recalculateSize`
+// в components/Turn.js зовёт updateGeometry при монтировании каждой карточки — даже
+// когда пересчитанные размеры совпали с тем, что уже в сторе. Без этой проверки
+// достаточно открыть игру и проскроллить холст, чтобы Save Field отправил на сервер
+// геометрию всех отрисованных ходов.
+const isGeometryChanged = (current, { position, size }) => {
+  if (
+    position &&
+    (position.x !== current.position?.x || position.y !== current.position?.y)
+  ) {
+    return true;
+  }
+  if (
+    size &&
+    (size.width !== current.size?.width || size.height !== current.size?.height)
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const updateGeometry = (data) => (dispatch, getState) => {
+  const current = getState().turns.g[data._id];
+  if (current && !isGeometryChanged(current, data)) return;
   return dispatch({
     type: types.TURN_UPDATE_GEOMETRY,
     payload: data,

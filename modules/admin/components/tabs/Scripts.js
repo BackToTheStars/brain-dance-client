@@ -4,6 +4,20 @@ import { getAdminScriptsRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
 import { CloseOutlined } from '@ant-design/icons';
 
+// Скрипты возвращают либо строку, либо список строк (по строке на найденный случай),
+// либо произвольный объект. Список строк показываем построчно — иначе отчёт вроде
+// «ходы с недопустимым contentType» читается как JSON-массив в кавычках.
+const formatScriptResult = (result) => {
+  if (typeof result === 'string') return result;
+  if (
+    Array.isArray(result) &&
+    result.every((item) => typeof item === 'string')
+  ) {
+    return result.length ? result.join('\n') : '(пусто)';
+  }
+  return JSON.stringify(result, null, 2);
+};
+
 const ScriptsTab = () => {
   const [scripts, setScripts] = useState([]);
   const [activeCommand, setActiveCommand] = useState(null);
@@ -147,12 +161,11 @@ const ScriptsTab = () => {
                   <Button onClick={executeScript} disabled={missingRequired}>
                     execute
                   </Button>
-                  {!!scriptResult &&
-                    (typeof scriptResult === 'string' ? (
-                      <pre>{scriptResult}</pre>
-                    ) : (
-                      <pre>{JSON.stringify(scriptResult, null, 2)}</pre>
-                    ))}
+                  {scriptResult !== null && scriptResult !== undefined && (
+                    <pre className="whitespace-pre-wrap">
+                      {formatScriptResult(scriptResult)}
+                    </pre>
+                  )}
                 </>
               )}
             </div>
