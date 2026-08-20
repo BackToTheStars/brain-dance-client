@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { useDropzone } from 'react-dropzone';
 import { useCallback, useState } from 'react';
-import { Spin } from 'antd';
+import { Progress, Spin } from 'antd';
 
 // accept — формат react-dropzone: { 'application/pdf': ['.pdf'] }; без него принимается
 // любой файл (media всё равно проверяет расширение и размер и вернёт понятную ошибку).
@@ -13,12 +13,15 @@ const FileUploading = ({
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  // null — отправка ещё не началась; 0..100 — доля ушедшего тела запроса
+  const [progress, setProgress] = useState(null);
   const [error, setError] = useState(null);
 
   const submitData = ({ file }) => {
     setError(null);
+    setProgress(null);
     setLoading(true);
-    dispatch(uploadFunc(file))
+    dispatch(uploadFunc(file, setProgress))
       .then((data) => {
         changeHandler(data.src);
       })
@@ -27,6 +30,7 @@ const FileUploading = ({
       })
       .finally(() => {
         setLoading(false);
+        setProgress(null);
       });
   };
 
@@ -50,16 +54,29 @@ const FileUploading = ({
     disabled: loading,
   });
 
+  // после 100 % полоса бесполезна: тело ушло целиком, но media ещё пишет файл в GridFS —
+  // на крупном файле это выглядит как зависание, поэтому вторая фаза — спиннер
+  const processing = loading && progress === 100;
+
   return (
     <>
       <div className="drag-n-drop" {...getRootProps()}>
         <input {...getInputProps()} />
 
-        {/* не <p>: antd Spin рисует div, вложенный div в p — ошибка гидратации */}
+        {/* не <p>: antd Spin/Progress рисуют div, вложенный div в p — ошибка гидратации */}
         {loading ? (
-          <div className="drag-n-drop-loading">
-            <Spin size="small" /> Uploading...
-          </div>
+          processing ? (
+            <div className="drag-n-drop-loading">
+              <Spin size="small" /> Processing...
+            </div>
+          ) : (
+            <div className="drag-n-drop-progress">
+              <div>Uploading...</div>
+              {/* dropzone на время загрузки disabled, поэтому клик по полосе
+                  диалог выбора файла не откроет */}
+              <Progress percent={progress ?? 0} size="small" status="active" />
+            </div>
+          )
         ) : isDragActive ? (
           <p>Drop the files here ...</p>
         ) : (

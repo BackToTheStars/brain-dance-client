@@ -46,6 +46,13 @@
     gap: .5rem;
   }
 
+  .drag-n-drop-progress {
+    .ant-progress {
+      margin-bottom: 0;
+      cursor: default;
+    }
+  }
+
   .drag-n-drop-error {
     margin-top: .25rem;
     font-size: small;

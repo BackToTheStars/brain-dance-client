@@ -329,7 +329,9 @@ const fieldSettings = {
               changeHandler={changeHandler}
               fileTypeLabel="an image"
               accept={UPLOAD_ACCEPT.images}
-              uploadFunc={(file) => uploadMedia('images', file)}
+              uploadFunc={(file, onProgress) =>
+                uploadMedia('images', file, onProgress)
+              }
             />
           </>
         );
@@ -380,7 +382,9 @@ const fieldSettings = {
               changeHandler={changeHandler}
               fileTypeLabel="a video"
               accept={UPLOAD_ACCEPT.videos}
-              uploadFunc={(file) => uploadMedia('videos', file)}
+              uploadFunc={(file, onProgress) =>
+                uploadMedia('videos', file, onProgress)
+              }
             />
           </>
         );
@@ -408,7 +412,9 @@ const fieldSettings = {
               changeHandler={changeHandler}
               fileTypeLabel="an audio"
               accept={UPLOAD_ACCEPT.audios}
-              uploadFunc={(file) => uploadMedia('audios', file)}
+              uploadFunc={(file, onProgress) =>
+                uploadMedia('audios', file, onProgress)
+              }
             />
           </>
         );
@@ -438,7 +444,9 @@ const fieldSettings = {
               changeHandler={changeHandler}
               fileTypeLabel="a pdf"
               accept={UPLOAD_ACCEPT.pdfs}
-              uploadFunc={(file) => uploadMedia('pdfs', file)}
+              uploadFunc={(file, onProgress) =>
+                uploadMedia('pdfs', file, onProgress)
+              }
             />
           </>
         );

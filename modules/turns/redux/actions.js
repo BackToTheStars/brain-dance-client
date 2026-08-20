@@ -522,30 +522,60 @@ export const resetTurnNextPastePosition = () => (dispatch, getState) => {
 };
 
 // Загрузка файла на media: сначала одноразовый токен у сервера, потом multipart на статику.
-// Ошибку обязательно доводим до вызывающего (FileUploading показывает её и снимает спиннер):
+// Второй запрос идёт через XMLHttpRequest, а не fetch: fetch не сообщает прогресс отправки
+// тела, а `xhr.upload.onprogress` — сообщает. onProgress(percent) вызывается только для
+// второго запроса (получение токена мгновенное и в прогресс не входит); percent === 100
+// означает, что тело ушло целиком, но ответа media ещё нет — media пишет файл в GridFS
+// уже после полного приёма, поэтому вызывающий показывает вторую фазу «обработка».
+// Ошибку обязательно доводим до вызывающего (FileUploading показывает её и снимает индикатор):
 // media отдаёт `{ message }` на 400/413, а request() при ошибке сервера промис не завершает —
 // поэтому здесь и errorCallback, и проверка ответа статики.
-export const uploadMedia = (type, file) => () => {
+export const uploadMedia = (type, file, onProgress) => () => {
   return new Promise((resolve, reject) => {
     getTokenRequest('upload', {
       errorCallback: (message) => reject(new Error(message)),
     })
-      .then(async (data) => {
+      .then((data) => {
         const token = data.item;
         const formdata = new FormData();
         formdata.append('file', file);
-        const res = await fetch(`${STATIC_MEDIA_URL}/${type}/upload`, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-          method: 'POST',
-          body: formdata,
-        });
-        const result = await res.json().catch(() => ({}));
-        if (!res.ok || !result.src) {
-          throw new Error(result.message || `Ошибка загрузки (${res.status})`);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${STATIC_MEDIA_URL}/${type}/upload`);
+        xhr.setRequestHeader('authorization', `Bearer ${token}`);
+
+        if (typeof onProgress === 'function') {
+          onProgress(0);
+          xhr.upload.onprogress = (e) => {
+            // lengthComputable === false бывает при неизвестном размере тела —
+            // тогда просто не двигаем полосу, вызывающий останется на 0
+            if (!e.lengthComputable || !e.total) return;
+            onProgress(Math.round((e.loaded / e.total) * 100));
+          };
+          // тело ушло целиком — дальше ждём ответ media (запись в GridFS)
+          xhr.upload.onload = () => onProgress(100);
         }
-        resolve(result);
+
+        xhr.onload = () => {
+          let result = {};
+          try {
+            result = JSON.parse(xhr.responseText) || {};
+          } catch {
+            result = {};
+          }
+          const ok = xhr.status >= 200 && xhr.status < 300;
+          if (!ok || !result.src) {
+            reject(
+              new Error(result.message || `Ошибка загрузки (${xhr.status})`),
+            );
+            return;
+          }
+          resolve(result);
+        };
+        xhr.onerror = () => reject(new Error('Ошибка сети при загрузке файла'));
+        xhr.onabort = () => reject(new Error('Загрузка отменена'));
+
+        xhr.send(formdata);
       })
       .catch(reject);
   });
