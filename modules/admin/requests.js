@@ -16,6 +16,27 @@ export const loginRequest = ({ nickname, password }) => {
   }).then((res) => res.json());
 };
 
+// Общий helper для админских ручек. Соседние функции ниже отдают `res.json()` как есть,
+// а `fetch` не считает 4xx/5xx отказом — поэтому 400/404/413/502/504 приходят в компонент
+// неотличимо от успеха (конверт у ошибки другой: `{ message }` вместо `{ item }`).
+// Здесь отказ поднимается исключением с текстом от сервера, чтобы вызывающий показал его
+// пользователю. Таймаута нет намеренно: перенос YouTube-видео идёт минутами.
+const adminRequest = async (path, { method = 'GET', body } = {}) => {
+  const res = await fetch(`${API_URL}${path}`, {
+    method,
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+      ...(body ? { 'content-type': 'application/json' } : {}),
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || `Ошибка запроса (${res.status})`);
+  }
+  return data;
+};
+
 // ADMIN REQUESTS WITH TOKEN
 export const getAdminScriptsRequest = () => {
   return fetch(`${API_URL}/admin/scripts`, {
@@ -91,14 +112,33 @@ export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
   }).then((res) => res.json());
 };
 
-export const getAdminTurnRequest = (id) => {
-  return fetch(`${API_URL}/admin/turns/${id}`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
-};
+export const getAdminTurnRequest = (id) => adminRequest(`/admin/turns/${id}`);
 
+// Перенос всех «чужих» медиа хода одним вызовом (пять полей сразу, поэтому кнопка одна
+// на ход, а не на поле). Ответ — { item: { turn, results } }, results разбирает UI.
+export const relocateTurnMediaRequest = (turnId) =>
+  adminRequest('/admin/turns/relocate-media', {
+    method: 'POST',
+    body: { turnId },
+  });
+
+// Варианты YouTube-ролика: { item: { title, duration, formats } }.
+export const probeTurnYoutubeRequest = (turnId) =>
+  adminRequest('/admin/turns/youtube/probe', {
+    method: 'POST',
+    body: { turnId },
+  });
+
+// Перенос выбранного варианта: конверт тот же, что у relocate-media. Идёт минутами —
+// вызывающий обязан заблокировать повторный запуск.
+export const relocateTurnYoutubeRequest = (turnId, formatId) =>
+  adminRequest('/admin/turns/youtube/relocate', {
+    method: 'POST',
+    body: { turnId, formatId },
+  });
+
+// @deprecated — заменён на relocateTurnMediaRequest; сам эндпоинт снимается отдельной
+// задачей, поэтому функция пока остаётся, но из клиента не вызывается.
 export const moveAudioRequest = (data) => {
   return fetch(`${API_URL}/admin/turns/move-audio`, {
     method: 'POST',
