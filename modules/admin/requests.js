@@ -55,6 +55,16 @@ export const deleteAdminGameRequest = (id) => {
   }).then((res) => res.json()); // вернёт Promise
 };
 
+// Статистика хранилища media (прокси server → media). Ответ тяжёлый: разбивка по типам
+// считается агрегацией по всем файлам, поэтому запрос идёт только по кнопке, без автообновления.
+export const getAdminMediaStatsRequest = () => {
+  return fetch(`${API_URL}/admin/media/stats`, {
+    headers: {
+      authorization: `Bearer ${adminToken}`,
+    },
+  }).then((res) => res.json());
+};
+
 export const getAdminLogsRequest = () => {
   return fetch(`${API_URL}/admin/logs`, {
     headers: {

@@ -4,6 +4,7 @@ import GamesTab from './Games';
 import ScriptsTab from './Scripts';
 import LogsTab from './Logs';
 import MediaRelocateTab from './MediaRelocate';
+import StorageTab from './Storage';
 
 const tabs = [
   {
@@ -15,6 +16,11 @@ const tabs = [
     key: 'media-relocate',
     label: 'Media relocate',
     component: MediaRelocateTab,
+  },
+  {
+    key: 'storage',
+    label: 'Storage',
+    component: StorageTab,
   },
   {
     key: 'games',
