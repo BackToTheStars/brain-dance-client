@@ -32,7 +32,21 @@ const STATUS_VIEW = {
   error: { color: 'red', text: 'ошибка' },
 };
 
-const isLocalUrl = (url) => !!url && url.startsWith(STATIC_MEDIA_URL);
+// Своя ссылка = совпадение хоста с хостом STATIC_MEDIA_URL, а не префикс строки:
+// startsWith принимал бы localhost:30111 за localhost:3011, красил чужую ссылку
+// «своей» — и, если так совпали все поля, прятал кнопку переноса целиком.
+// Правил классификации это не дублирует (решение 9 в youtube-relocate.md):
+// хост — только для отображения и показа кнопки, статусы считает сервер.
+const getUrlHost = (url) => {
+  try {
+    return new URL(url).host;
+  } catch {
+    return null;
+  }
+};
+const MEDIA_HOST = getUrlHost(STATIC_MEDIA_URL);
+const isLocalUrl = (url) =>
+  !!url && !!MEDIA_HOST && getUrlHost(url) === MEDIA_HOST;
 
 // Сервер классифицирует все пять полей, и пустое приходит как 'local'. Строка
 // «Видео — уже своя» у хода без видео только мешает читать результат, поэтому
