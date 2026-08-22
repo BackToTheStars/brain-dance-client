@@ -4,9 +4,14 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import AdminTurnsTable from '../turns/Table';
 import { deleteAdminGameRequest } from '../../requests';
-import { Button } from 'antd';
+import { Alert, Button } from 'antd';
+import { useState } from 'react';
 
 const AdminGameDetails = ({ game }) => {
+  // удаление идёт через adminRequest: отказ приходит исключением с текстом сервера.
+  // Раньше он уходил в console.error, и неудачное удаление выглядело как «ничего
+  // не произошло» — страница просто не перезагружалась.
+  const [deleteError, setDeleteError] = useState(null);
   return (
     <>
       <div className="h-[325px]">
@@ -31,18 +36,27 @@ const AdminGameDetails = ({ game }) => {
               danger
               onClick={() => {
                 if (confirm('Delete the game?')) {
+                  setDeleteError(null);
                   deleteAdminGameRequest(game._id)
                     .then(() => {
                       window.location.reload();
                     })
                     .catch((err) => {
-                      console.error(err);
+                      setDeleteError(err?.message || String(err));
                     });
                 }
               }}
             >
               Delete
             </Button>
+            {!!deleteError && (
+              <Alert
+                className="mt-2"
+                type="error"
+                showIcon
+                message={deleteError}
+              />
+            )}
           </div>
           <div className="w-1/2">
             {game.image && (

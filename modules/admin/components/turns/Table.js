@@ -1,4 +1,4 @@
-import { Checkbox, Input, Space, Table } from 'antd';
+import { Alert, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminTurnsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
@@ -51,6 +51,9 @@ const allContentTypes = ['picture', 'audio', 'video', 'comment', 'picture-only']
 
 const AdminTurnsTable = ({ gameId = null }) => {
   const [turns, setTurns] = useState([]);
+  // adminRequest поднимает отказ исключением — без обработчика это необработанный
+  // reject и пустая таблица без объяснения
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [contentTypes, setContentTypes] = useState(allContentTypes);
   const [sortedInfo, setSortedInfo] = useState({});
@@ -87,11 +90,16 @@ const AdminTurnsTable = ({ gameId = null }) => {
   }, [columns]);
 
   useEffect(() => {
-    getAdminTurnsRequest({ gameId }).then((data) => setTurns(data.items));
+    getAdminTurnsRequest({ gameId })
+      .then((data) => setTurns(data.items || []))
+      .catch((err) => setError(err?.message || String(err)));
   }, [gameId]);
 
   return (
     <>
+      {!!error && (
+        <Alert className="mb-3" type="error" showIcon message={error} />
+      )}
       <Space size="small" className="mb-3">
         <Input
           value={search}

@@ -13,8 +13,9 @@ function ChatIdsPage() {
     getTgChatIdsRequest()
       .then((data) => setChatIds(data.items || []))
       .catch((err) => {
-        console.error(err);
-        message.error('Error loading chatIds');
+        // adminRequest поднимает Error с текстом сервера — показываем его,
+        // а не общее «Error loading chatIds»
+        message.error(err?.message || 'Error loading chatIds');
       });
   }, []);
 

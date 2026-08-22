@@ -53,7 +53,11 @@ export const AdminProvider = ({ children }) => {
     }
   }, []);
 
-  const login = ({ nickname, password }, onSuccess) => {
+  // Промис возвращается наружу: loginRequest переведён на adminRequest и на неверном
+  // пароле (401) бросает исключение с текстом сервера — раньше 401 приходил обычным
+  // ответом, в localStorage уезжала строка «undefined», а форма считала вход удачным.
+  // Показывает отказ вызывающий (AdminSigninForm), здесь только не пускаем дальше.
+  const login = ({ nickname, password }, onSuccess) =>
     loginRequest({ nickname, password }).then((data) => {
       const { token } = data;
       setTokenIntoStorage(token);
@@ -66,7 +70,6 @@ export const AdminProvider = ({ children }) => {
         onSuccess();
       }, 500);
     });
-  };
 
   const logout = () => {
     clearTokenFromStorage();

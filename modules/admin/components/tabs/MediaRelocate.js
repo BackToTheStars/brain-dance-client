@@ -1,4 +1,4 @@
-import { Button, Input, Tag } from 'antd';
+import { Alert, Button, Input, Tag } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { getAdminGamesRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
@@ -22,6 +22,9 @@ const MediaRelocateTab = () => {
   const [pendingId, setPendingId] = useState(null);
   // прогресс массового прогона: { command, total, done } | null
   const [bulk, setBulk] = useState(null);
+  // отказ на загрузке списка игр: раньше уходил в console.log, а вкладка просто
+  // показывала пустой список — неотличимо от «игр нет»
+  const [listError, setListError] = useState(null);
   const cancelRef = useRef(false);
 
   useEffect(() => {
@@ -30,7 +33,7 @@ const MediaRelocateTab = () => {
         setGames(res.items || []);
       })
       .catch((err) => {
-        console.log(err);
+        setListError(err?.message || String(err));
         setGames([]);
       });
   }, []);
@@ -55,7 +58,9 @@ const MediaRelocateTab = () => {
         [game._id]: {
           command: commandName,
           success: false,
-          text: String(err),
+          // adminRequest поднимает Error с текстом сервера — берём message,
+          // иначе в отчёт попадало бы «Error: …» с префиксом
+          text: err?.message || String(err),
         },
       }));
     } finally {
@@ -96,6 +101,7 @@ const MediaRelocateTab = () => {
 
   return (
     <div className="flex flex-col gap-3">
+      {!!listError && <Alert type="error" showIcon message={listError} />}
       <div className="flex gap-2 items-center">
         <Input
           className="w-64"

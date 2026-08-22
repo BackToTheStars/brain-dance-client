@@ -1,4 +1,4 @@
-import { Button, Checkbox, Input, Space, Table } from 'antd';
+import { Alert, Button, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminLogsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
@@ -33,6 +33,9 @@ const columns = [
 
 const AdminLogsTable = ({ onDetailsClick = () => {} }) => {
   const [logs, setLogs] = useState([]);
+  // adminRequest поднимает отказ исключением — без обработчика это необработанный
+  // reject и пустая таблица без объяснения
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [sortedInfo, setSortedInfo] = useState({});
   const handleChange = (pagination, filters, sorter) => {
@@ -58,18 +61,25 @@ const AdminLogsTable = ({ onDetailsClick = () => {} }) => {
   }, []);
 
   useEffect(() => {
-    getAdminLogsRequest().then((data) => {
-      setLogs(data.items);
-    });
+    getAdminLogsRequest()
+      .then((data) => {
+        setLogs(data.items || []);
+      })
+      .catch((err) => setError(err?.message || String(err)));
   }, []);
   return (
-    <Table
-      columns={columnsWithActions}
-      dataSource={filteredLogs}
-      rowKey="_id"
-      onChange={handleChange}
-      sorter={sortedInfo}
-    />
+    <>
+      {!!error && (
+        <Alert className="mb-3" type="error" showIcon message={error} />
+      )}
+      <Table
+        columns={columnsWithActions}
+        dataSource={filteredLogs}
+        rowKey="_id"
+        onChange={handleChange}
+        sorter={sortedInfo}
+      />
+    </>
   );
 };
 export default AdminLogsTable;

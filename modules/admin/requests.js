@@ -3,24 +3,13 @@ import { API_URL } from '@/config/server';
 let adminToken;
 export const setAdminToken = (nextAdminToken) => (adminToken = nextAdminToken);
 
-export const loginRequest = ({ nickname, password }) => {
-  return fetch(`${API_URL}/admin/auth/login`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      nickname,
-      password,
-    }),
-  }).then((res) => res.json());
-};
-
-// Общий helper для админских ручек. Соседние функции ниже отдают `res.json()` как есть,
-// а `fetch` не считает 4xx/5xx отказом — поэтому 400/404/413/502/504 приходят в компонент
-// неотличимо от успеха (конверт у ошибки другой: `{ message }` вместо `{ item }`).
-// Здесь отказ поднимается исключением с текстом от сервера, чтобы вызывающий показал его
-// пользователю. Таймаута нет намеренно: перенос YouTube-видео идёт минутами.
+// Общий helper для админских ручек — через него идут все запросы файла, кроме
+// `editGameRequest` (см. пометку у него). `fetch` не считает 4xx/5xx отказом, поэтому
+// голый `res.json()` отдавал 400/404/413/502/504 в компонент неотличимо от успеха
+// (конверт у ошибки другой: `{ message }` вместо `{ item }`). Здесь отказ поднимается
+// исключением с текстом от сервера, чтобы вызывающий показал его пользователю —
+// значит у каждого вызова обязан быть свой обработчик отказа.
+// Таймаута нет намеренно: перенос YouTube-видео идёт минутами.
 const adminRequest = async (path, { method = 'GET', body } = {}) => {
   const res = await fetch(`${API_URL}${path}`, {
     method,
@@ -37,79 +26,48 @@ const adminRequest = async (path, { method = 'GET', body } = {}) => {
   return data;
 };
 
-// ADMIN REQUESTS WITH TOKEN
-export const getAdminScriptsRequest = () => {
-  return fetch(`${API_URL}/admin/scripts`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
-}
-
-export const runAdminScriptRequest = (scriptName, commandName, params = {}) => {
-  return fetch(`${API_URL}/admin/scripts`, {
+// Вход в админку. Ручка /admin/auth смонтирована ДО adminMiddleware (server.js),
+// поэтому уходящий заголовок `Bearer undefined` она не смотрит. Успех —
+// { success, expires, token }, отказ (401) — исключение с текстом сервера:
+// раньше 401 приходил разрешённым промисом, и в localStorage уезжал undefined.
+export const loginRequest = ({ nickname, password }) =>
+  adminRequest('/admin/auth/login', {
     method: 'POST',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({ scriptName, commandName, params }),
-  }).then((res) => res.json());
-}
+    body: { nickname, password },
+  });
+
+// ADMIN REQUESTS WITH TOKEN
+export const getAdminScriptsRequest = () => adminRequest('/admin/scripts');
+
+export const runAdminScriptRequest = (scriptName, commandName, params = {}) =>
+  adminRequest('/admin/scripts', {
+    method: 'POST',
+    body: { scriptName, commandName, params },
+  });
 
 export const getAdminGamesRequest = (params = {}) => {
   const query = new URLSearchParams(params).toString();
-  return fetch(`${API_URL}/admin/games${query ? `?${query}` : ''}`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
+  return adminRequest(`/admin/games${query ? `?${query}` : ''}`);
 };
 
-export const deleteAdminGameRequest = (id) => {
-  return fetch(`${API_URL}/admin/games/${id}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-  }).then((res) => res.json()); // вернёт Promise
-};
+export const deleteAdminGameRequest = (id) =>
+  adminRequest(`/admin/games/${id}`, { method: 'DELETE' });
 
 // Статистика хранилища media (прокси server → media). Ответ тяжёлый: разбивка по типам
 // считается агрегацией по всем файлам, поэтому запрос идёт только по кнопке, без автообновления.
-export const getAdminMediaStatsRequest = () => {
-  return fetch(`${API_URL}/admin/media/stats`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
-};
+export const getAdminMediaStatsRequest = () => adminRequest('/admin/media/stats');
 
-export const getAdminLogsRequest = () => {
-  return fetch(`${API_URL}/admin/logs`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
-};
+export const getAdminLogsRequest = () => adminRequest('/admin/logs');
 
 export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
-  let url = `${API_URL}/admin/turns`;
   const params = {};
 
   if (gameId) {
     params.gameId = gameId;
   }
 
-  if (Object.keys(params).length) {
-    url += `?${new URLSearchParams(params).toString()}`;
-  }
-  return fetch(url, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-    },
-  }).then((res) => res.json());
+  const query = new URLSearchParams(params).toString();
+  return adminRequest(`/admin/turns${query ? `?${query}` : ''}`);
 };
 
 export const getAdminTurnRequest = (id) => adminRequest(`/admin/turns/${id}`);
@@ -137,20 +95,11 @@ export const relocateTurnYoutubeRequest = (turnId, formatId) =>
     body: { turnId, formatId },
   });
 
-// @deprecated — заменён на relocateTurnMediaRequest; сам эндпоинт снимается отдельной
-// задачей, поэтому функция пока остаётся, но из клиента не вызывается.
-export const moveAudioRequest = (data) => {
-  return fetch(`${API_URL}/admin/turns/move-audio`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json());
-};
-
-// @deprecated
+// @deprecated — вызовов нет: единственный был в `modules/game/games-redux/actions.js`
+// (thunk `editGame`), а сам этот модуль ниоткуда не импортируется. Правка игры в
+// интерфейсе идёт через `updateGame` из `modules/game/game-redux/actions.js`. На
+// `adminRequest` не переводился (в списке BP-16 его нет) и не удалён — решение за
+// пользователем.
 export const editGameRequest = (hash, data) => {
   return fetch(`${API_URL}/game?hash=${hash}`, {
     method: 'PUT',
@@ -162,48 +111,20 @@ export const editGameRequest = (hash, data) => {
   }).then((res) => res.json()); // вернёт Promise
 };
 
-export const deleteGameRequest = (hash) => {
-  return fetch(`${API_URL}/game?hash=${hash}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-  }).then((res) => res.json()); // вернёт Promise
-};
+export const deleteGameRequest = (hash) =>
+  adminRequest(`/game?hash=${hash}`, { method: 'DELETE' });
 
-export const addCodeRequest = (hash) => {
-  return fetch(`${API_URL}/codes?hash=${hash}`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-  }).then((res) => res.json()); // вернёт Promise
-};
+export const addCodeRequest = (hash) =>
+  adminRequest(`/codes?hash=${hash}`, { method: 'POST' });
 
-export const getTgChatIdsRequest = () => {
-  return fetch(`${API_URL}/admin/tg-logs/chat-ids`, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-  }).then((res) => res.json());
-};
+export const getTgChatIdsRequest = () => adminRequest('/admin/tg-logs/chat-ids');
 
+// Строка запроса собирается целиком, а не склейкой: раньше при пустом chatId
+// фильтр приписывался через `&` без предшествующего `?` — URL получался битым.
 export const getTgLogsRequest = (chatId, filter = {}) => {
-  let url = `${API_URL}/admin/tg-logs`;
-
-  if (chatId) {
-    url += `?chatId=${chatId}`;
-  }
-  if (Object.keys(filter).length) {
-    url += `&${new URLSearchParams(filter).toString()}`;
-  }
-  return fetch(url, {
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-  }).then((res) => res.json());
+  const query = new URLSearchParams({
+    ...(chatId ? { chatId } : {}),
+    ...filter,
+  }).toString();
+  return adminRequest(`/admin/tg-logs${query ? `?${query}` : ''}`);
 };

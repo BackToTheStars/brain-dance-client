@@ -31,8 +31,7 @@ function ChatReportPage() {
       if (!data.items) throw new Error('No logs found');
       setLogs(data.items);
     } catch (err) {
-      console.error(err);
-      message.error(err.message || 'Error loading logs');
+      message.error(err?.message || 'Error loading logs');
     } finally {
       setLoading(false);
     }

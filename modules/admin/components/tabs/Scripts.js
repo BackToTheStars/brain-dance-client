@@ -1,4 +1,4 @@
-import { Button, Input, Table } from 'antd';
+import { Alert, Button, Input, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { getAdminScriptsRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
@@ -24,6 +24,10 @@ const ScriptsTab = () => {
   const [paramValues, setParamValues] = useState({});
   const [scriptResult, setScriptResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  // Запросы идут через adminRequest: отказ приходит исключением с текстом сервера,
+  // и его надо показать — раньше он молча уходил в console.log.
+  const [listError, setListError] = useState(null);
+  const [runError, setRunError] = useState(null);
   const columns = [
     {
       title: 'Description',
@@ -66,6 +70,7 @@ const ScriptsTab = () => {
 
   const executeScript = () => {
     setIsLoading(true);
+    setRunError(null);
     const { script, command } = activeCommand;
     const params = {};
     commandParams.forEach((param) => {
@@ -80,7 +85,7 @@ const ScriptsTab = () => {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        setRunError(err?.message || String(err));
         setIsLoading(false);
       });
   };
@@ -88,10 +93,10 @@ const ScriptsTab = () => {
   useEffect(() => {
     getAdminScriptsRequest()
       .then((res) => {
-        setScripts(res.items);
+        setScripts(res.items || []);
       })
       .catch((err) => {
-        console.log(err);
+        setListError(err?.message || String(err));
       });
   }, []);
 
@@ -105,7 +110,8 @@ const ScriptsTab = () => {
 
   return (
     <div className="flex gap-2">
-      <div className="w-1/3">
+      <div className="w-1/3 flex flex-col gap-2">
+        {!!listError && <Alert type="error" showIcon message={listError} />}
         <Table
           className="w-full"
           dataSource={scripts}
@@ -161,6 +167,14 @@ const ScriptsTab = () => {
                   <Button onClick={executeScript} disabled={missingRequired}>
                     execute
                   </Button>
+                  {!!runError && (
+                    <Alert
+                      className="mt-2"
+                      type="error"
+                      showIcon
+                      message={runError}
+                    />
+                  )}
                   {scriptResult !== null && scriptResult !== undefined && (
                     <pre className="whitespace-pre-wrap">
                       {formatScriptResult(scriptResult)}

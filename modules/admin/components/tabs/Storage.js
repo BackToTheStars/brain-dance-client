@@ -55,12 +55,10 @@ const StorageTab = () => {
     setLoading(true);
     setError(null);
     try {
+      // сервер отдаёт 502, если media ответила ошибкой, и 503, если она недоступна;
+      // adminRequest поднимает эти ответы исключением с message от сервера, поэтому
+      // ручной проверки res.item здесь больше нет — до setStats доходит только 2xx
       const res = await getAdminMediaStatsRequest();
-      if (!res || !res.item) {
-        // сервер отдаёт 502, если media ответила ошибкой, и 503, если она недоступна —
-        // в обоих случаях в теле осмысленный message, показываем его текстом
-        throw new Error(res?.message || 'Не удалось получить статистику');
-      }
       setStats(res.item);
       setLoadedAt(new Date());
     } catch (err) {

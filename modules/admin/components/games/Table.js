@@ -1,4 +1,4 @@
-import { Button, Checkbox, Input, Space, Table } from 'antd';
+import { Alert, Button, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminGamesRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
@@ -38,6 +38,9 @@ const columns = [
 
 const AdminGamesTable = ({ onDetailsClick = () => {} }) => {
   const [games, setGames] = useState([]);
+  // запрос идёт через adminRequest — отказ приходит исключением; без обработчика
+  // это был бы необработанный reject и пустая таблица без объяснения
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [showPublic, setShowPublic] = useState(true);
   const [showPrivate, setShowPrivate] = useState(true);
@@ -71,11 +74,16 @@ const AdminGamesTable = ({ onDetailsClick = () => {} }) => {
   }, [columns, onDetailsClick]);
 
   useEffect(() => {
-    getAdminGamesRequest().then((data) => setGames(data.items));
+    getAdminGamesRequest()
+      .then((data) => setGames(data.items || []))
+      .catch((err) => setError(err?.message || String(err)));
   }, []);
 
   return (
     <>
+      {!!error && (
+        <Alert className="mb-3" type="error" showIcon message={error} />
+      )}
       <Space size="small" className="mb-3">
         <Input
           placeholder="Search"
