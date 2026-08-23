@@ -165,21 +165,20 @@ export const saveField = () => (dispatch, getState) => {
   }
 };
 
+// Стор обязан повторять буфер, в том числе когда буфер опустел: по
+// `turns.turnsToPaste` рисуется кнопка «Paste Turn» в игровом режиме
+// (GameMode.js) и таблица PasteTurnPanel. Раньше пустой результат не
+// доезжал до стора (`if (turnsToPaste.length)`), поэтому после вставки
+// последнего хода кнопка оставалась висеть — BP-27.
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {
-  const turnsToPaste = getTurnsFromBuffer();
-  if (turnsToPaste.length) {
-    dispatch({
-      type: turnsTypes.TURNS_LOAD_TO_PASTE,
-      payload: { turnsToPaste },
-    });
-  }
-  const linesToPaste = getLinesNotExpired();
-  if (Object.keys(linesToPaste).length) {
-    dispatch({
-      type: linesTypes.LINES_LOAD_TO_PASTE,
-      payload: { linesToPaste },
-    });
-  }
+  dispatch({
+    type: turnsTypes.TURNS_LOAD_TO_PASTE,
+    payload: { turnsToPaste: getTurnsFromBuffer() },
+  });
+  dispatch({
+    type: linesTypes.LINES_LOAD_TO_PASTE,
+    payload: { linesToPaste: getLinesNotExpired() },
+  });
 };
 
 export const reloadTurnsToPaste = () => (dispatch) => {

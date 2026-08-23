@@ -55,12 +55,13 @@ const PasteTurnPanel = () => {
                     // className="del-btn"
                     className="btn btn-primary me-2"
                     onClick={() => {
+                      // successCallback здесь был, но insertTurnFromBuffer его
+                      // никогда не вызывал — он передаёт в createTurn свой
+                      // обработчик. Ход и так уходит из буфера внутри вставки, а
+                      // стор обновляет loadTurnsAndLinesToPaste, так что убирать
+                      // запись отсюда больше не нужно (BP-27).
                       dispatch(
                         insertTurnFromBuffer(timeStamp, {
-                          successCallback: () => {
-                            dispatch(removeTurnFromBuffer(timeStamp));
-                            dispatch(reloadTurnsToPaste());
-                          },
                           errorCallback: (message) => {
                             console.log(message);
                           },

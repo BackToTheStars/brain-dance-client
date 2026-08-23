@@ -12,8 +12,8 @@ import {
 import {
   dataCopy,
   fieldRemover,
-  getTimeStamps,
   getTurnFromBufferAndRemove,
+  getTurnsFromBuffer,
   saveTurnInBuffer,
 } from '../components/helpers/dataCopier';
 import turnSettings from '../settings';
@@ -24,7 +24,7 @@ import {
 } from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
-import { setPanelMode, togglePanel } from '@/modules/panels/redux/actions';
+import { resetAndExit, togglePanel } from '@/modules/panels/redux/actions';
 import { PANEL_TURNS_PASTE } from '@/config/panel';
 import { STATIC_MEDIA_URL } from '@/config/server';
 
@@ -36,7 +36,6 @@ import {
   isBorderCoincides,
   isRectInsideArea,
 } from '../components/helpers/sizeHelper';
-import { MODE_GAME } from '@/config/panel';
 
 export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   const state = getState();
@@ -398,13 +397,30 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
   });
 };
 
+// Выход из режима вставки (BP-27). Тем же путём, что у Cancel в
+// `panels/components/buttons/operations/TurnPasteMode.js`: `resetAndExit`
+// возвращает mode в MODE_GAME и снимает активную цитату, плюс закрывается сама
+// панель. Раньше выход был написан только для Cancel, а вставка и удаление из
+// буфера решали это сами условием `getTimeStamps().length === 1` — по модульному
+// кэшу, который наполняется только копированием и после перезагрузки страницы
+// пуст. Отсюда «вырезал → F5 → вставил»: режим не выходил вовсе. Условие теперь
+// по фактическому остатку буфера.
+export const exitPasteModeIfBufferEmpty = () => (dispatch) => {
+  if (getTurnsFromBuffer().length) return;
+  dispatch(resetAndExit());
+  dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
+};
+
 export const insertTurnFromBuffer =
-  (timeStamp, { successCallback, errorCallback }) =>
+  (timeStamp, { errorCallback }) =>
   (dispatch, getState) => {
     const state = getState();
-    const timeStamps = getTimeStamps();
+    // запасной путь на случай вызова без метки — берём последнюю запись буфера.
+    // Раньше здесь тоже был getTimeStamps() (модульный кэш), и после перезагрузки
+    // страницы он пуст, то есть без метки вставлять было нечего.
+    const turnsInBuffer = getTurnsFromBuffer();
     const copiedTurnOldFormat = getTurnFromBufferAndRemove(
-      timeStamp ? timeStamp : timeStamps[timeStamps.length - 1],
+      timeStamp ? timeStamp : turnsInBuffer.at(-1)?.timeStamp,
     );
     const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
@@ -427,11 +443,7 @@ export const insertTurnFromBuffer =
     }
 
     dispatch(loadTurnsAndLinesToPaste());
-
-    if (timeStamps.length === 1) {
-      dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
-      dispatch(setPanelMode({ mode: MODE_GAME }));
-    }
+    dispatch(exitPasteModeIfBufferEmpty());
     // // @todo: get lines, connected with copied turn and display them
     dispatch(
       createTurn(TurnHelper.toOldFields(copiedTurn), {
@@ -505,13 +517,9 @@ export const insertTurnFromBuffer =
   };
 
 export const removeTurnFromBuffer = (timeStamp) => (dispatch) => {
-  const timeStamps = getTimeStamps();
   getTurnFromBufferAndRemove(timeStamp);
   dispatch(loadTurnsAndLinesToPaste());
-  if (timeStamps.length === 1) {
-    dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: false }));
-    dispatch(setPanelMode({ mode: MODE_GAME }));
-  }
+  dispatch(exitPasteModeIfBufferEmpty());
 };
 
 export const resetTurnNextPastePosition = () => (dispatch, getState) => {

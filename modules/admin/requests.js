@@ -3,9 +3,9 @@ import { API_URL } from '@/config/server';
 let adminToken;
 export const setAdminToken = (nextAdminToken) => (adminToken = nextAdminToken);
 
-// Общий helper для админских ручек — через него идут все запросы файла, кроме
-// `editGameRequest` (см. пометку у него). `fetch` не считает 4xx/5xx отказом, поэтому
-// голый `res.json()` отдавал 400/404/413/502/504 в компонент неотличимо от успеха
+// Общий helper для админских ручек — через него идут все запросы этого файла.
+// `fetch` не считает 4xx/5xx отказом, поэтому голый `res.json()` отдавал
+// 400/404/413/502/504 в компонент неотличимо от успеха
 // (конверт у ошибки другой: `{ message }` вместо `{ item }`). Здесь отказ поднимается
 // исключением с текстом от сервера, чтобы вызывающий показал его пользователю —
 // значит у каждого вызова обязан быть свой обработчик отказа.
@@ -94,22 +94,6 @@ export const relocateTurnYoutubeRequest = (turnId, formatId) =>
     method: 'POST',
     body: { turnId, formatId },
   });
-
-// @deprecated — вызовов нет: единственный был в `modules/game/games-redux/actions.js`
-// (thunk `editGame`), а сам этот модуль ниоткуда не импортируется. Правка игры в
-// интерфейсе идёт через `updateGame` из `modules/game/game-redux/actions.js`. На
-// `adminRequest` не переводился (в списке BP-16 его нет) и не удалён — решение за
-// пользователем.
-export const editGameRequest = (hash, data) => {
-  return fetch(`${API_URL}/game?hash=${hash}`, {
-    method: 'PUT',
-    headers: {
-      authorization: `Bearer ${adminToken}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  }).then((res) => res.json()); // вернёт Promise
-};
 
 export const deleteGameRequest = (hash) =>
   adminRequest(`/game?hash=${hash}`, { method: 'DELETE' });

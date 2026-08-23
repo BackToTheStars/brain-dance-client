@@ -9,12 +9,15 @@ import {
 } from '@/modules/panels/redux/actions';
 import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
 import { createTurn, resaveTurn } from '../../redux/actions';
-import { filterQuotesDeleted } from '@/modules/quotes/components/helpers/filters';
+import {
+  filterQuotesDeleted,
+  filterQuotesOrphanedByMedia,
+} from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
 import { linesDelete } from '@/modules/lines/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
-import { Button, DatePicker, Input, Switch } from 'antd';
+import { Button, DatePicker, Input, Modal, Switch } from 'antd';
 import dayjs from 'dayjs';
 import { cleanText } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
@@ -31,6 +34,16 @@ const {
   FIELD_SOURCE,
   FIELD_DATE,
 } = turnSettings;
+
+// Что именно потеряет ход, если сохранить замену файла (BP-26): цитаты старого
+// файла и логические линии, которые на них держались.
+const getOrphanedSummary = (orphaned, linesCount) => ({
+  quotesCount: orphaned.reduce((sum, item) => sum + item.quotes.length, 0),
+  byWidget: orphaned
+    .map((item) => `${item.label} — ${item.quotes.length}`)
+    .join(', '),
+  linesCount,
+});
 
 const getDate = (mixedDate) => {
   const d = new Date(mixedDate);
@@ -69,6 +82,10 @@ const AddEditTurnPopup = () => {
     check: true,
   });
   const [isMaximized, setIsMaximized] = useState(false);
+  // Подтверждение удаления цитат при замене файла (BP-26): здесь лежит уже
+  // собранное сохранение и то, что о нём показать. null — окна нет.
+  // { payload, summary } — payload уходит в commitSave по «Удалить и сохранить».
+  const [orphanConfirm, setOrphanConfirm] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -133,6 +150,31 @@ const AddEditTurnPopup = () => {
       getQuill('#editor-container-new', '#toolbar-container-new'),
     );
   }, []);
+
+  // Само сохранение. Вынесено из saveHandler, потому что при замене файла между
+  // «нажал Save» и записью встаёт модальное окно, а оно отвечает асинхронно
+  // (BP-26): saveHandler только собирает payload, коммитит либо он сам, либо
+  // кнопка «Удалить и сохранить».
+  const commitSave = ({ turnObj, lineIdsToDelete, isNew }) => {
+    if (lineIdsToDelete.length) {
+      dispatch(linesDelete(lineIdsToDelete));
+    }
+
+    const saveCallbacks = {
+      // @todo: передавать в виджет через props
+      success: () => {
+        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+        dispatch(toggleMaximizeQuill(false));
+      },
+    };
+
+    // @fixme
+    dispatch(
+      isNew
+        ? createTurn(turnObj, saveCallbacks)
+        : resaveTurn(turnObj, saveCallbacks),
+    );
+  };
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
@@ -219,22 +261,55 @@ const AddEditTurnPopup = () => {
 
     const prevQuotes = turnToEdit?.quotes || [];
 
+    // Замена файла обесценивает цитаты, заданные в его координатах (BP-26):
+    // прямоугольные у картинки и pdf, отрезки таймлайна у видео и аудио. Правило
+    // одно на все типы (TURN_MEDIA_QUOTE_BINDINGS) и срабатывает одинаково на
+    // замену файла, его очистку и смену типа хода.
+    const orphaned = turnToEdit
+      ? filterQuotesOrphanedByMedia({
+          prevFields: turnToEdit,
+          nextFields: preparedForm,
+          prevQuotes,
+          getTimelineQuotes: (widgetId) =>
+            turnData?.dWidgets?.[widgetId]?.quotes,
+        })
+      : [];
+
+    const dOrphanedQuoteIds = {};
+    for (const item of orphaned) {
+      for (const quote of item.quotes) {
+        dOrphanedQuoteIds[quote.id] = true;
+      }
+    }
+
     for (let prevQuote of prevQuotes) {
-      if (prevQuote.type !== TYPE_QUOTE_TEXT) {
+      if (
+        prevQuote.type !== TYPE_QUOTE_TEXT &&
+        !dOrphanedQuoteIds[prevQuote.id]
+      ) {
         quotes.push(prevQuote);
       }
     }
 
+    // Осиротевшие цитаты остались в prevQuotes и не попали в quotes, поэтому
+    // filterQuotesDeleted их и посчитает — линии за ними удалит общий путь в
+    // commitSave, отдельной ветки удаления для них не заводим.
     const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
 
-    const linesToDelete = filterLinesByQuoteKeys(
-      lines,
-      quotesDeleted.map((quote) => `${turnToEdit._id}_${quote.id}`),
-    );
+    const quoteKey = (quote) => `${turnToEdit._id}_${quote.id}`;
+    const linesToDelete = turnToEdit
+      ? filterLinesByQuoteKeys(lines, quotesDeleted.map(quoteKey))
+      : [];
 
-    if (!!quotesDeleted.length) {
-      dispatch(linesDelete(linesToDelete.map((l) => l._id)));
-    }
+    // Отдельно — линии, которые держались именно на цитатах заменённого файла:
+    // о них спрашивает окно, поэтому и счётчик в нём должен быть про них, а не
+    // про весь набор удаляемого (в тот же проход мог измениться и текст).
+    const orphanedLines = orphaned.length
+      ? filterLinesByQuoteKeys(
+          lines,
+          orphaned.flatMap((item) => item.quotes).map(quoteKey),
+        )
+      : [];
 
     let turnObj = {
       ...preparedForm,
@@ -243,21 +318,21 @@ const AddEditTurnPopup = () => {
       quotes: [...quotes],
     };
 
-    const saveCallbacks = {
-      // @todo: передавать в виджет через props
-      success: () => {
-        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
-        dispatch(toggleMaximizeQuill(false));
-      },
-    };
+    // Таймлайн видео/аудио лежит не в `quotes`, а отдельным полем хода, и его
+    // фрагменты обязаны покрывать длительность файла целиком (иначе виджет бросает
+    // «Last quote should end at duration»). У нового файла длительность другая,
+    // поэтому виджет снимается целиком — так же, как это делает
+    // deleteVideoQuotesWidget. На новом файле его можно добавить заново.
+    for (const item of orphaned) {
+      if (item.timelineField) {
+        turnObj[item.timelineField] = null;
+      }
+    }
 
     if (!!turnToEdit) {
       turnObj._id = turnToEdit._id;
       turnObj.x = turnToEdit.x;
       turnObj.y = turnToEdit.y;
-
-      // @fixme
-      dispatch(resaveTurn(turnObj, saveCallbacks));
     } else {
       turnObj.height = 600;
       turnObj.width = 800;
@@ -266,10 +341,26 @@ const AddEditTurnPopup = () => {
       turnObj.y =
         gamePosition.y +
         Math.round(window.innerHeight / 2 - turnObj.height / 2);
-
-      // @fixme
-      dispatch(createTurn(turnObj, saveCallbacks));
     }
+
+    const payload = {
+      turnObj,
+      isNew: !turnToEdit,
+      lineIdsToDelete: linesToDelete.map((line) => line._id),
+    };
+
+    // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
+    // числами и явным «Удалить и сохранить»; отказ не сохраняет ничего, то есть
+    // остаются и прежний файл, и цитаты, и связи.
+    if (orphaned.length) {
+      setOrphanConfirm({
+        payload,
+        summary: getOrphanedSummary(orphaned, orphanedLines.length),
+      });
+      return;
+    }
+
+    commitSave(payload);
   };
 
   // Только функциональный setState: два ColorPicker'а ставят свои дефолты в эффектах
@@ -506,6 +597,39 @@ const AddEditTurnPopup = () => {
           </div>
         </div>
       </div>
+
+      {/* Замена файла уносит цитаты старого и связи, которые на них держались
+          (BP-26). Окно контролируемое, а не Modal.confirm: статические методы
+          antd не видят контекст темы, а нам всё равно нужно своё состояние —
+          в нём лежит уже собранное сохранение. */}
+      <Modal
+        open={!!orphanConfirm}
+        title="Заменяется файл — цитаты будут удалены"
+        okText="Удалить и сохранить"
+        cancelText="Отмена"
+        okButtonProps={{ danger: true }}
+        onCancel={() => setOrphanConfirm(null)}
+        onOk={() => {
+          const { payload } = orphanConfirm;
+          setOrphanConfirm(null);
+          commitSave(payload);
+        }}
+      >
+        {!!orphanConfirm && (
+          <>
+            <p>
+              Цитаты привязаны к содержимому файла — к его страницам, областям и
+              секундам. После замены им не на что указывать, поэтому они
+              удаляются вместе со связями, которые на них держались.
+            </p>
+            <p className="mb-0">
+              Будет удалено цитат: <b>{orphanConfirm.summary.quotesCount}</b> (
+              {orphanConfirm.summary.byWidget}), связей:{' '}
+              <b>{orphanConfirm.summary.linesCount}</b>.
+            </p>
+          </>
+        )}
+      </Modal>
     </>
   );
 };
