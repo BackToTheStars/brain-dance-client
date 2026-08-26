@@ -57,6 +57,20 @@ export const deleteAdminGameRequest = (id) =>
 // считается агрегацией по всем файлам, поэтому запрос идёт только по кнопке, без автообновления.
 export const getAdminMediaStatsRequest = () => adminRequest('/admin/media/stats');
 
+// Список файлов media (тот же прокси server → media, операция токена `list`).
+// Фильтры, сортировка и пагинация — серверные: параметры уходят транзитом,
+// разбирает их media, и её 400 доезжает сюда текстом внутри `message`.
+// Пустые значения не отправляются: у media пустая строка и отсутствие
+// параметра значат одно и то же, а лишний `?name=` только зашумляет адрес.
+export const getAdminMediaFilesRequest = (params = {}) => {
+  const query = new URLSearchParams(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ),
+  ).toString();
+  return adminRequest(`/admin/media/files${query ? `?${query}` : ''}`);
+};
+
 export const getAdminLogsRequest = () => adminRequest('/admin/logs');
 
 export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
@@ -95,6 +109,13 @@ export const relocateTurnYoutubeRequest = (turnId, formatId) =>
     body: { turnId, formatId },
   });
 
+// НЕ ВЫЗЫВАТЬ: маршрутов под эти два запроса
+// с админским Bearer на сервере нет. `DELETE /game` закрыт gameMiddleware и ждёт
+// заголовок `game-token`, а `POST /codes` не существует вовсе (в
+// server/modules/game/routes/codes.js только /login, /add, /refresh,
+// /static-token) — админская версия получит 404. В UI ни та, ни другая не
+// выведена; лобби пользуется одноимёнными функциями из `modules/game/requests.js`,
+// и те ходят правильно. Оставлены до решения, нужны ли админке свои маршруты.
 export const deleteGameRequest = (hash) =>
   adminRequest(`/game?hash=${hash}`, { method: 'DELETE' });
 

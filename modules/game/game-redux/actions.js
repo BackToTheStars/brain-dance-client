@@ -100,6 +100,24 @@ export const loadFullGame =
     });
   };
 
+// Сохранённая позиция поля обязана побеждать при перезагрузке, а `?turn=` из
+// ссылки её перебивает: resolveStartPosition центрирует ход поверх сохранённого.
+// Поэтому после сохранения параметр уходит из адреса — без перезагрузки и не
+// трогая остальные параметры. Next патчит history.replaceState, так что
+// useSearchParams узнает об этом сам; перерисовка холста от этого не зависит —
+// focusTurnId читается один раз, на монтировании.
+const dropTurnFromUrl = () => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('turn')) return;
+  url.searchParams.delete('turn');
+  window.history.replaceState(
+    window.history.state,
+    '',
+    `${url.pathname}${url.search}${url.hash}`,
+  );
+};
+
 export const saveField = () => (dispatch, getState) => {
   const state = getState();
   const hash = state.game.game.hash;
@@ -156,6 +174,7 @@ export const saveField = () => (dispatch, getState) => {
     dispatch(resetAndExit());
   });
   updateGameSettings(hash, 'position', gamePosition);
+  dropTurnFromUrl();
   savePanelsSettings(hash, state.panels.d);
   if (scrollPositions.length) {
     updateScrollPositionsRequest(scrollPositions)
@@ -245,12 +264,18 @@ export const updateViewportGeometry = (viewport) => (dispatch, getState) => {
   });
 };
 
+// Правка игры из панели Info. `PUT /game` отвечает частью игры — name,
+// description, public, image, hash, — без position, codes, lines и auth,
+// поэтому кладём её слиянием (GAME_UPDATE), а не заменой (GAME_LOAD).
+// `_id` из ответа не берём: `GET /game` его намеренно не отдаёт, и в сторе
+// его никогда не было.
 export const updateGame = (data) => (dispatch) => {
   return new Promise((resolve) => {
     updateGameRequest(data).then((data) => {
+      const { _id, ...game } = data.item;
       dispatch({
-        type: types.GAME_LOAD,
-        payload: data.item,
+        type: types.GAME_UPDATE,
+        payload: game,
       });
 
       resolve(data.item);

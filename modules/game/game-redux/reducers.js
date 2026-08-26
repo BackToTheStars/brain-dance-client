@@ -4,7 +4,7 @@ import * as types from './types';
 const initialGameState = {
   stage: GAME_STAGE_INIT,
   game: null,
-  position: { left: 0, top: 0 },
+  position: { x: 0, y: 0 },
   viewport: { width: 1600, height: 1200 },
   areaRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
   error: null,
@@ -17,8 +17,21 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
       return {
         ...state,
         game: payload,
-        position: payload.position,
+        // позицию кладёт только loadFullGame; loadShortGame (диалог входа)
+        // отдаёт игру без неё — и не должен обнулять уже вычисленную
+        position: payload.position || state.position,
       };
+
+    // Правка игры из панели Info: ответ `PUT /game` — это ЧАСТЬ игры (name,
+    // description, public, image, hash), без position, codes, lines и auth.
+    // Через GAME_LOAD он заменял бы `game` целиком: позиция поля становилась
+    // undefined, и каждый TurnAdapter падал на `gamePosition.x`.
+    case types.GAME_UPDATE:
+      return {
+        ...state,
+        game: { ...state.game, ...payload },
+      };
+
     case types.GAME_FIELD_MOVE: {
       return {
         ...state,

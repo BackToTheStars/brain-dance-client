@@ -133,7 +133,10 @@ const TurnListControls = () => {
             <BookOutlined /> {t('Favorite_games')}
           </Button>
         </div>
-        <div className="cursor-pointer">
+        {/* «Content types» скрыта до релиза:
+            фильтра по типу контента нет ни здесь (onChange пустой), ни в ручке
+            /lobby/turns. Делать фильтр или убирать выпадашку — отдельной задачей. */}
+        {/* <div className="cursor-pointer">
           <DropdownList
             title={t('Content_types')}
             size={SIZE_SM}
@@ -141,7 +144,7 @@ const TurnListControls = () => {
             value={contentTypes[0].value}
             onChange={() => {}}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

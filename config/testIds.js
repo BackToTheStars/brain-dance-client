@@ -73,6 +73,17 @@ export const TID = {
     crop: 'pdf-crop', // слой выделения области на активной странице
   },
 
+  // Админка, вкладка Files: таблица файлов media (прокси `/admin/media/files`).
+  // Фильтры, сортировка и пагинация серверные — тесту нужны сами контролы.
+  adminFiles: {
+    table: 'admin-files-table',
+    reload: 'admin-files-reload',
+    reset: 'admin-files-reset',
+    error: 'admin-files-error',
+    filter: (name) => `admin-files-filter-${name}`, // type, name, min-size, max-size, dates
+    row: 'admin-files-row', // строка таблицы (+ data-file-id)
+  },
+
   // Форма добавления/редактирования turn
   addTurn: {
     typeBtn: 'add-turn-type',

@@ -191,7 +191,11 @@ const ContentSettings = () => {
           </div>
         </div>
       </div>
-      <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
+      {/* Выбор шрифта скрыт до релиза:
+          activeFontFamily пишется в стор и хранится, но в стиль карточки не
+          попадает — в TurnCard он только в зависимостях useMemo. Довести до
+          дела или убрать совсем — отдельной задачей. */}
+      {/* <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
         <div className="text-dark">{t('Font')}</div>
         <div className="flex gap-x-3 items-center w-[120px]">
           <ul>
@@ -212,7 +216,7 @@ const ContentSettings = () => {
             })}
           </ul>
         </div>
-      </div>
+      </div> */}
       <SwitchersBlock />
     </form>
   );

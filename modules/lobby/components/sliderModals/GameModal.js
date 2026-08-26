@@ -237,19 +237,21 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
                 alt="image"
               />
             )}
+            {/* «Players» и «Views» скрыты до релиза: настоящих данных за ними нет, оба числа выведены из
+                числа ходов. Считать их или убрать совсем — отдельной задачей. */}
             <div className="w-full h-auto flex gap-x-1 px-3">
-              <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
+              {/* <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
                 <div className="text-center font-semibold">{t('Players')}</div>
                 {Math.ceil(turnsCount / 20)}
-              </div>
+              </div> */}
               <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
                 <div className="text-center font-semibold">{t('Turns')}</div>
                 {turnsCount}
               </div>
-              <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
+              {/* <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
                 <div className="text-center font-semibold">{t('Views')}</div>
                 {Math.round(turnsCount * 17)}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

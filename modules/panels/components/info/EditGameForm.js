@@ -92,11 +92,14 @@ const EditGameForm = () => {
         >
           <Input value={name} onChange={(e) => setName(e.target.value)} />
         </Form.Item>
+        {/* Screenshot необязателен: поле было помечено required, и у игры без
+            картинки antd не доходил до onFinish — «Save» молча ничего не делал,
+            то есть имя было не переименовать. Сервер пустое image просто не
+            записывает (`if (image)` в editGame). */}
         <Form.Item
           initialValue={image}
           name="image"
           label={<span className="text-white">Screenshot</span>}
-          rules={[{ required: true, message: 'Please input image!' }]}
         >
           <Input value={image} onChange={(e) => setImage(e.target.value)} />
         </Form.Item>
