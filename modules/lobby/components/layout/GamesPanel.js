@@ -3,7 +3,7 @@ import { loadGames } from '@/modules/lobby/redux/actions';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GameRow from '../ui/GameRow';
-import Loading from '@/modules/ui/components/common/Loading';
+import { PanelStatus } from '../ui/PanelStatus';
 import { useTranslations } from 'next-intl';
 
 const GamesPanel = () => {
@@ -11,6 +11,7 @@ const GamesPanel = () => {
   const dispatch = useDispatch();
   const settingsGames = useSelector((s) => s.settings.games);
   const games = useSelector((s) => s.lobby.games);
+  const { loading, error } = useSelector((s) => s.lobby.gamesStatus);
 
   const dSettingsHashes = useMemo(() => {
     if (!settingsGames) return {};
@@ -49,7 +50,13 @@ const GamesPanel = () => {
         <div className="flex-1">{t('Games')}</div>
       </div>
       <div className="select-none">
-        {sortedGames.length === 0 && <Loading />}
+        <PanelStatus
+          loading={loading}
+          error={error}
+          empty={sortedGames.length === 0}
+          emptyText={t('No_games')}
+          onRetry={() => dispatch(loadGames())}
+        />
         {sortedGames.map((game, index) => {
           return (
             <GameRow

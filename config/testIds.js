@@ -34,6 +34,14 @@ export const TID = {
     submit: 'game-dialog-submit',
   },
 
+  // Диалог входа по коду из ссылки лобби
+  // (modules/lobby/components/page/CodeEnterDialog.js, /game?hash=<код>, код ещё
+  // не сохранён — спрашиваем только ник)
+  codeHandoff: {
+    nickname: 'code-handoff-nickname',
+    submit: 'code-handoff-submit',
+  },
+
   // Кнопки действий в игре (GameMode): add-turn, save-field, classes, info,
   // minimap, lobby, paste-turn
   gameAction: (name) => `game-action-${name}`,

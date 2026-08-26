@@ -1,5 +1,9 @@
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { ContentButton as Button } from '@/ui/button';
 import { useMainLayoutContext } from '../layout/MainLayoutContext';
+import { getGameUrl } from '../../utils/url';
 
 const getVideoImg = (url) => {
   if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -26,6 +30,9 @@ const TurnModal = ({ params }) => {
   const { sliderWidth } = useMainLayoutContext();
   const { id } = params;
   const turn = useSelector((s) => s.lobby.dTurns[id]);
+  const game = useSelector((s) => s.lobby.dGames[turn?.gameId]);
+  const router = useRouter();
+  const t = useTranslations('Lobby.game');
   const { header, imageUrl, videoUrl, paragraph, date, contentType, width } =
     turn || {};
   const newDate = new Date(date);
@@ -61,6 +68,17 @@ const TurnModal = ({ params }) => {
       <div className="h-auto overflow-auto p-4 dark:text-main-text text-dark-light">
         {!!text && <p>{text}</p>}
       </div>
+      {/* переход от хода: холст откроется с вьюпортом на нём (BP-29 п. 1) */}
+      {!!game?.hash && (
+        <div className="flex justify-end p-4 pt-0">
+          <Button
+            size="sm"
+            onClick={() => router.push(getGameUrl(game.hash, id))}
+          >
+            {t('Open_game')}
+          </Button>
+        </div>
+      )}
       {/* {!!contentType && <p>{contentType}</p>} */}
     </div>
   );

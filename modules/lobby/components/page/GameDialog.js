@@ -1,4 +1,4 @@
-import { ROLE_GAME_VISITOR, roleOptions } from '@/config/user';
+import { ROLES, ROLE_GAME_VISITOR, roleOptions } from '@/config/user';
 import { loadShortGame } from '@/modules/game/game-redux/actions';
 import Loading from '@/modules/ui/components/common/Loading';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
@@ -133,15 +133,22 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       });
     };
 
+    // Предупреждение о потере доступа. Вход другим кодом перезаписывает
+    // game_<hash>, и если текущая роль выше всех сохранённых кодов, вернуть её
+    // будет нечем. Прежнее условие (choosedRole > maxRole) не выполнялось
+    // никогда — в списке ролей есть только visitor, текущая роль и роли своих
+    // кодов, а равенство с текущей отсечено выше — и падало ReferenceError на
+    // неимпортированном ROLE_GAME_OWNER.
     const maxRole = myCodes.reduce(
       (acc, { role }) => Math.max(acc, role),
       ROLE_GAME_VISITOR,
     );
-    if (
-      choosedRole > maxRole &&
-      !myCodes.find((c) => c.role === ROLE_GAME_OWNER)
-    ) {
-      if (confirm(`Owner access will be lost. Do you want to continue?`)) {
+    const currentRole = info?.role || ROLE_GAME_VISITOR;
+    if (currentRole > maxRole && choosedRole < currentRole) {
+      const roleName = ROLES[currentRole]?.name || '';
+      if (
+        confirm(`${roleName} access will be lost. Do you want to continue?`)
+      ) {
         applyCodeAndGoToGame();
       }
     } else {

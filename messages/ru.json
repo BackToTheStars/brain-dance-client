@@ -1,6 +1,10 @@
 {
   "Lobby": {
     "Games": "Игры",
+    "No_games": "Игр нет",
+    "No_turns": "Ходов нет",
+    "Loading_failed": "Не удалось загрузить",
+    "Retry": "Повторить",
     "Enter_game": "Войти в игру",
     "Create_game": "Создать игру",
     "Donate": "Поддержать",

@@ -2,7 +2,8 @@ import { loadTurns } from '@/modules/lobby/redux/actions';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TurnCard from '../elements/TurnCard';
-import Loading from '@/modules/ui/components/common/Loading';
+import { PanelStatus } from '../ui/PanelStatus';
+import { useTranslations } from 'next-intl';
 
 const TurnsPanel = ({ connectedWidth }) => {
   const wrapperRef = useRef(null);
@@ -25,12 +26,14 @@ const MAX_TURN_WIDTH = 500;
 const desiredNumCols = 3;
 
 const TurnsPanelInner = ({ width }) => {
+  const t = useTranslations('Lobby');
   const dispatch = useDispatch();
   const columnCount = useSelector((s) => s.lobby.textSettings.columnCount);
   const mode = useSelector((s) => s.lobby.mode);
   const requestSettings = useSelector((s) => s.lobby.requestSettings);
   const turns = useSelector((s) => s.lobby.turns);
   const settingsGames = useSelector((s) => s.settings.games);
+  const { loading, error } = useSelector((s) => s.lobby.turnsStatus);
 
   const numCols = useMemo(() => {
     if (!width) return desiredNumCols;
@@ -59,7 +62,13 @@ const TurnsPanelInner = ({ width }) => {
 
   return (
     <div className="flex gap-4">
-      {turns.length === 0 && <Loading />}
+      <PanelStatus
+        loading={loading}
+        error={error}
+        empty={turns.length === 0}
+        emptyText={t('No_turns')}
+        onRetry={() => dispatch(loadTurns())}
+      />
       {turnGroups.map((innerTurns, i) => (
         <div
           key={i}

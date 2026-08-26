@@ -1,6 +1,10 @@
 {
   "Lobby": {
     "Games": "Games",
+    "No_games": "No games",
+    "No_turns": "No turns",
+    "Loading_failed": "Loading failed",
+    "Retry": "Retry",
     "Enter_game": "Enter game",
     "Create_game": "Create game",
     "Donate": "Donate",

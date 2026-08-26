@@ -99,31 +99,50 @@ export const switchTheme = () => (dispatch, getState) => {
   });
 };
 
+// текст отказа для панели: сообщение сервера, иначе — причина сбоя запроса
+const getRequestErrorText = (error) => error?.message || 'Неизвестная ошибка';
+
 export const loadGames = () => (dispatch) => {
-  return loadGamesRequest().then((data) => {
-    const dictionaryGames = data.items.reduce((acc, obj) => {
-      return {
-        ...acc,
-        [obj._id]: obj,
-      };
-    }, {});
-    dispatch({
-      type: types.LOBBY_GAMES_LOAD,
-      payload: { items: data.items, d: dictionaryGames },
+  dispatch({ type: types.LOBBY_GAMES_REQUEST });
+  return loadGamesRequest()
+    .then((data) => {
+      const dictionaryGames = data.items.reduce((acc, obj) => {
+        return {
+          ...acc,
+          [obj._id]: obj,
+        };
+      }, {});
+      dispatch({
+        type: types.LOBBY_GAMES_LOAD,
+        payload: { items: data.items, d: dictionaryGames },
+      });
+    })
+    .catch((error) => {
+      dispatch({
+        type: types.LOBBY_GAMES_ERROR,
+        payload: getRequestErrorText(error),
+      });
     });
-  });
 };
 export const loadTurns = () => (dispatch, getState) => {
   const mode = getState().lobby.mode;
   const requestSettings = getState().lobby.requestSettings;
   const loadTurnsRequest =
     mode === 'byGame' ? loadTurnsByGameRequest : loadTurnsChronoRequest;
-  return loadTurnsRequest(requestSettings).then((data) => {
-    dispatch({
-      type: types.LOBBY_TURNS_LOAD,
-      payload: data.items,
+  dispatch({ type: types.LOBBY_TURNS_REQUEST });
+  return loadTurnsRequest(requestSettings)
+    .then((data) => {
+      dispatch({
+        type: types.LOBBY_TURNS_LOAD,
+        payload: data.items,
+      });
+    })
+    .catch((error) => {
+      dispatch({
+        type: types.LOBBY_TURNS_ERROR,
+        payload: getRequestErrorText(error),
+      });
     });
-  });
 };
 
 export const switchMode = (mode) => (dispatch) => {
@@ -165,6 +184,35 @@ export const lobbyEnterGameWithConfirm =
               );
             },
           }),
+        );
+      } else {
+        reject(data?.message || 'Неизвестная ошибка');
+      }
+    });
+  });
+};
+
+// вход по коду из handoff-ссылки лобби: ник уже спросили диалогом, подтверждать
+// нечего — сохраняем доступ и уходим на хеш игры, где ждёт обычный pre-game диалог
+export const lobbyEnterGameByCode =
+  (code, nickname, focusTurnId = null) =>
+  (dispatch) => {
+  return new Promise((resolve, reject) => {
+    getGameUserTokenRequest(code, nickname).then((data) => {
+      if (data?.success) {
+        const { info, token } = data;
+        dispatch(
+          addGameCode({
+            hash: info.hash,
+            nickname: info.nickname,
+            role: info.role,
+            code: info.code,
+          }),
+        );
+        setGameInfoIntoStorage(info.hash, { info, token });
+        resolve(data);
+        location.replace(
+          `/game?hash=${info.hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
         );
       } else {
         reject(data?.message || 'Неизвестная ошибка');

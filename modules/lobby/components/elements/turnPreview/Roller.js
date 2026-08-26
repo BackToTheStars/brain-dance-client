@@ -28,7 +28,13 @@ const TurnPreviewRoller = ({ turn }) => {
         <Button
           size="sm"
           onClick={() =>
-            dispatch(toggleSliderModal(SLIDER_MODAL_GAME, { hash: game.hash }))
+            dispatch(
+              toggleSliderModal(SLIDER_MODAL_GAME, {
+                hash: game.hash,
+                // контекст хода: «Open game» слайдера игры откроет холст на нём
+                turnId: turn._id,
+              }),
+            )
           }
         >
           {t('Game_info')}

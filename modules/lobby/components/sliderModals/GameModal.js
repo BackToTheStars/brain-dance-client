@@ -26,6 +26,7 @@ import { addCodeRequest, deleteGameRequest } from '@/modules/game/requests';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
 import { useMainLayoutContext } from '../layout/MainLayoutContext';
 import { useSlider } from '../layout/useSlider';
+import { getGameUrl } from '../../utils/url';
 import { useTranslations } from 'next-intl';
 import { SIZE_SM } from '@/config/ui/size';
 import { DropdownList } from '../ui/DropdownList';
@@ -174,7 +175,7 @@ const CodesBlock = ({ codeData, codes, hash, can }) => {
   );
 };
 
-const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
+const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
   const t = useTranslations('Lobby.game');
   const dispatch = useDispatch();
   const myGames = useSelector((state) => state.settings.games);
@@ -303,7 +304,10 @@ const GameModalContent = memo(({ hash, closeModal = () => {} }) => {
               {t('Delete_game')}
             </Button>
           )}
-          <Button size="sm" onClick={() => router.push(`/game?hash=${hash}`)}>
+          <Button
+            size="sm"
+            onClick={() => router.push(getGameUrl(hash, turnId))}
+          >
             {t('Open_game')}
           </Button>
         </div>
@@ -316,7 +320,8 @@ const minWidthCallback = () => 400;
 const maxWidthCallback = () => 800;
 const GameModal = ({ params, closeModal = () => {} }) => {
   const modalRef = useRef();
-  const { hash } = params;
+  // turnId появляется, когда слайдер открыт от карточки хода, а не от строки игры
+  const { hash, turnId = null } = params;
   const { sliderWidth, setSliderWidth } = useMainLayoutContext();
 
   const { move, setIsDragging } = useSlider(
@@ -341,7 +346,7 @@ const GameModal = ({ params, closeModal = () => {} }) => {
         style={leftSideStyle}
         ref={modalRef}
       >
-        <GameModalContent hash={hash} closeModal={closeModal} />
+        <GameModalContent hash={hash} turnId={turnId} closeModal={closeModal} />
       </div>
       <VerticalSplit
         move={move}

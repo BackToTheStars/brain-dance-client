@@ -42,7 +42,7 @@ export const getGameInfo = (hash) => {
   return data;
 }
 
-export const logOut = () => {
+export const logOut = (hash) => {
   removeGameInfo(hash); // стираем token из LocalStorage
   window.location.reload(); // перезагружаем игру по тому же адресу
 };
