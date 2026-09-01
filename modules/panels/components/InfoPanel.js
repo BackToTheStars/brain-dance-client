@@ -8,11 +8,7 @@ import EditGameForm from './info/EditGameForm';
 import { useState } from 'react';
 import { Button } from 'antd';
 
-const getUrl = ({ hash }) => {
-  return typeof window === 'undefined' // SSR
-    ? `${process.env.NEXT_PUBLIC_SITE_URL}/game?hash=${hash}`
-    : window.location.href;
-};
+const getUrl = () => window.location.href;
 
 const InfoPanel = () => {
   const dispatch = useDispatch();
@@ -62,7 +58,7 @@ const InfoPanel = () => {
                 <tr className="border-b border-gray-300">
                   <td className="py-2 px-4">Visitor link:</td>
                   <td className="py-2 px-4">
-                    <a href={getUrl(info)}>{getUrl(info)}</a>
+                    <a href={getUrl()}>{getUrl()}</a>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-300">

@@ -1,6 +1,7 @@
 // Единый источник правды для `data-test-id` — контракт между client и e2e-проектом.
 // E2e-проект (Playwright) импортирует/копирует эту карту, как `config/user.js`
-// дублируется в server. Конвенция и перечень узлов — в `client/docs/test-ids.md`.
+// дублируется в server. Конвенция и перечень узлов —
+// в `../brain-platform/docs/services/client/test-ids.md`.
 //
 // Правила: kebab-case; НЕ опираться на antd-классы/`nth-child`; где есть семантика —
 // в тестах предпочитать getByRole/getByLabel, а testId использовать для неоднозначного
