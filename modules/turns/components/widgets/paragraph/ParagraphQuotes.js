@@ -65,9 +65,9 @@ const ParagraphQuotes = memo(({ turnId, widgetId }) => {
     return rawParagraphQuotes;
   }, [rawParagraphQuotes]);
 
-  const dLines = useSelector((store) => (store.lines ? store.lines.d : {})); // @fixme: optimize and update for storybook
+  const dLines = useSelector((store) => (store.lines ? store.lines.d : {})); // @fixme: optimize
   const lines = useMemo(() => Object.values(dLines), [dLines]);
-  const activeQuoteKey = useSelector((store) => store?.quotes?.activeQuoteKey); // @fixme: update for storybook
+  const activeQuoteKey = useSelector((store) => store?.quotes?.activeQuoteKey);
 
   const activeQuotesDictionary = useMemo(() => {
     return getActiveQuotesDictionary(paragraphQuotes, lines);

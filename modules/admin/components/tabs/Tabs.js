@@ -6,6 +6,7 @@ import LogsTab from './Logs';
 import MediaRelocateTab from './MediaRelocate';
 import StorageTab from './Storage';
 import FilesTab from './Files';
+import YoutubeTab from './Youtube';
 
 const tabs = [
   {
@@ -27,6 +28,11 @@ const tabs = [
     key: 'files',
     label: 'Files',
     component: FilesTab,
+  },
+  {
+    key: 'youtube',
+    label: 'YouTube',
+    component: YoutubeTab,
   },
   {
     key: 'games',

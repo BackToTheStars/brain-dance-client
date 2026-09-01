@@ -17,13 +17,6 @@
   }
 }
 
-.stb-turns-container {
-  // for storybook
-  position: relative;
-  min-height: 800px;
-  background-color: var(--game-bg-color);
-}
-
 .stb-react-turn {
   font-family: var(--turn-font-family);
   position: absolute;

@@ -49,7 +49,7 @@ const TurnAdapter = ({ id }) => {
   const contentType = useSelector((state) => state.turns.g[id].contentType);
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
-      left: `${position.x - (gamePosition.x || 0)}px`, // @fixme: update for storybook
+      left: `${position.x - (gamePosition.x || 0)}px`,
       top: `${position.y - (gamePosition.y || 0)}px`,
       width: `${width}px`,
       height: `${height}px`,
@@ -148,7 +148,7 @@ export const Turn = memo(({ id }) => {
       vq_1: { duration: videoQuotesDuration },
       aq_1: { duration: audioQuotesDuration },
       a_1: { url: audioUrl },
-      // pdf_1 может отсутствовать у ходов из мок-стора (Storybook)
+      // pdf_1 — защитный дефолт на случай отсутствия в dWidgets
       pdf_1: { url: pdfUrl } = {},
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },

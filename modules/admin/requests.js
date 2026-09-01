@@ -86,6 +86,19 @@ export const getAdminTurnsRequest = ({ gameId = null } = {}) => {
 
 export const getAdminTurnRequest = (id) => adminRequest(`/admin/turns/${id}`);
 
+// Опись ходов, чьё videoUrl распознано как YouTube (страница «YouTube» в админке).
+// Только для чтения: перезаливка videoUrl — руками, через сам ход, замороженный
+// перенос отсюда не вызывается. Параметры/пустые значения — как у getAdminMediaFilesRequest:
+// page (с 1), limit (1..500, дефолт 50), sort (createdAt|updatedAt), order (asc|desc).
+export const getAdminYoutubeListRequest = (params = {}) => {
+  const query = new URLSearchParams(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ),
+  ).toString();
+  return adminRequest(`/admin/turns/youtube-list${query ? `?${query}` : ''}`);
+};
+
 // Перенос всех «чужих» медиа хода одним вызовом (пять полей сразу, поэтому кнопка одна
 // на ход, а не на поле). Ответ — { item: { turn, results } }, results разбирает UI.
 export const relocateTurnMediaRequest = (turnId) =>

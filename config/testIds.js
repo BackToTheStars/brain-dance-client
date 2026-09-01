@@ -85,6 +85,15 @@ export const TID = {
     row: 'admin-files-row', // строка таблицы (+ data-file-id)
   },
 
+  // Админка, вкладка YouTube: опись ходов, чьё видео распознано как YouTube
+  // (`GET /admin/turns/youtube-list`). Только чтение — перезаливка `videoUrl`
+  // делается руками через ход/канвас, кнопки переноса на странице нет.
+  adminYoutube: {
+    table: 'admin-youtube-table', // обёртка таблицы
+    error: 'admin-youtube-error',
+    row: 'admin-youtube-row', // строка таблицы (+ data-turn-id)
+  },
+
   // Форма добавления/редактирования turn
   addTurn: {
     typeBtn: 'add-turn-type',

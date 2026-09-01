@@ -23,7 +23,7 @@ export const useMediaPlayback = (widgetId, turnId) => {
   const { publish, register } = useMediaPlaybackChannel(widgetId);
 
   const isActive = useSelector((s) => {
-    // в storybook-сторе ui-reducer отключён — арбитр считается выключенным,
+    // защитный guard: если ui-редьюсера в сторе нет, арбитр считается выключенным,
     // иначе isActive был бы вечно false и плеер паузил бы сам себя
     if (!s.ui) return true;
     const active = s.ui.activePlayback;

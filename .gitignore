@@ -9,8 +9,6 @@
 .vs
 .vscode
 
-*storybook.log
-
 CLAUDE.md
 AGENTS.md
 docs/

@@ -4,7 +4,6 @@
 #     --build-arg NEXT_PUBLIC_API_URL=https://server.brain-dance.net \
 #     --build-arg NEXT_PUBLIC_LOBBY_API_URL=https://server.brain-dance.net \
 #     --build-arg NEXT_PUBLIC_STATIC_MEDIA_URL=https://media.brain-dance.net
-# npm ci с --legacy-peer-deps — пиры Storybook 10 (см. client/docs/changes.md).
 FROM node:22-alpine AS build
 WORKDIR /app
 
@@ -12,7 +11,7 @@ WORKDIR /app
 # (воркер + шрифты) из node_modules в public/
 COPY package*.json ./
 COPY scripts ./scripts
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 COPY . .
 
