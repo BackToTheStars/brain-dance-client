@@ -153,11 +153,13 @@ export class TurnHelper {
       _id: turn._id,
       backgroundColor: turn.colors.background,
       fontColor: turn.colors.font,
+      // цитаты таймлайна (vq_1/aq_1) сюда не подмешиваются: они едут внутри
+      // videoQuotes/audioQuotes ниже, а этот плоский массив читается
+      // toNewFields только для picture/pdf/text — держать их здесь же было
+      // лишним дублем без схемы под start/active (см. videoQuotes/audioQuotes)
       quotes: [
         ...turn.dWidgets.p_1.quotes,
         ...turn.dWidgets.i_1.quotes,
-        ...turn.dWidgets.vq_1.quotes,
-        ...turn.dWidgets.aq_1.quotes,
         ...(turn.dWidgets.pdf_1?.quotes || []),
       ],
       contentType: turn.contentType, // turn.pictureOnly
@@ -176,12 +178,14 @@ export class TurnHelper {
         ? {
             duration: turn.dWidgets.vq_1.duration,
             connectedTo: turn.dWidgets.vq_1.connectedTo,
+            quotes: turn.dWidgets.vq_1.quotes ?? [],
           }
         : null,
       audioQuotes: turn.dWidgets.aq_1
         ? {
             duration: turn.dWidgets.aq_1.duration,
             connectedTo: turn.dWidgets.aq_1.connectedTo,
+            quotes: turn.dWidgets.aq_1.quotes ?? [],
           }
         : null,
       audioUrl: turn.dWidgets.a_1.url,

@@ -589,6 +589,16 @@ export const uploadMedia = (type, file, onProgress) => () => {
   });
 };
 
+// PUT videoQuotes/audioQuotes может ответить без quotes (сервер до починки
+// схемы их отбрасывал, старые ходы в базе тоже могут быть без массива) —
+// TimelineQuotes.js итерирует quotes без собственной защиты, поэтому
+// подстановка [] нужна здесь, в одном месте разбора ответа, для всех
+// четырёх действий ниже.
+const withQuotesFallback = (widget) => ({
+  ...widget,
+  quotes: widget?.quotes ?? [],
+});
+
 export const addVideoQuotesWidget =
   (turnId, editWidgetId, duration) => (dispatch, getState) => {
     const videoQuotes = {
@@ -609,7 +619,7 @@ export const addVideoQuotesWidget =
         payload: {
           turnId: turnId,
           widgetId: 'vq_1',
-          widget: data.item.videoQuotes,
+          widget: withQuotesFallback(data.item.videoQuotes),
         },
       });
     });
@@ -663,7 +673,7 @@ export const updateVideoQuotesWidget =
         payload: {
           turnId: turnId,
           widgetId: widgetId,
-          widget: data.item.videoQuotes,
+          widget: withQuotesFallback(data.item.videoQuotes),
         },
       });
     });
@@ -689,7 +699,7 @@ export const addAudioQuotesWidget =
         payload: {
           turnId: turnId,
           widgetId: 'aq_1',
-          widget: data.item.audioQuotes,
+          widget: withQuotesFallback(data.item.audioQuotes),
         },
       });
     });
@@ -743,7 +753,7 @@ export const updateAudioQuotesWidget =
         payload: {
           turnId: turnId,
           widgetId: widgetId,
-          widget: data.item.audioQuotes,
+          widget: withQuotesFallback(data.item.audioQuotes),
         },
       });
     });

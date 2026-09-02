@@ -490,6 +490,10 @@ const fieldsToClone = [
   'contentType',
   'paragraph',
   'quotes',
+  // цитаты таймлайна живут не в quotes, а тут; без них в списке fieldRemover
+  // стирал весь vq_1/aq_1 виджет у копии хода целиком (не только массив)
+  'videoQuotes',
+  'audioQuotes',
   'scrollPosition',
   'height',
   'width',

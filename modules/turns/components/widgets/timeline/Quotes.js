@@ -35,7 +35,9 @@ const TimelineQuotes = ({
   );
   const turn = useSelector((state) => state.turns.d[turnId]);
   const [widgetMode, setWidgetMode] = useState('view');
-  const { duration, quotes } = quotesWidget;
+  // ответ сервера может прийти без quotes (см. actions.js) — виджет должен
+  // остаться пустым, а не уронить итерацию по массиву ниже
+  const { duration, quotes = [] } = quotesWidget;
   const [fragments, setFragments] = useState(getDefaultFragments(duration));
   const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]);
 
