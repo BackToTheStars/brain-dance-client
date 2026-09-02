@@ -1,6 +1,7 @@
 import { Alert, Button, Progress, Table } from 'antd';
 import { useState } from 'react';
 import { getAdminMediaStatsRequest } from '../../requests';
+import { TID } from '@/config/testIds';
 
 // Место на диске сервера и разбивка по типам медиа.
 //
@@ -95,7 +96,14 @@ const StorageTab = () => {
         )}
       </div>
 
-      {!!error && <Alert type="error" showIcon message={error} />}
+      {!!error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          data-test-id={TID.adminStorage.error}
+        />
+      )}
 
       {!stats && !error && (
         <div className="text-gray-500">
@@ -123,6 +131,7 @@ const StorageTab = () => {
           dataSource={rows}
           pagination={false}
           size="small"
+          data-test-id={TID.adminStorage.table}
           summary={(data) => {
             const totalCount = data.reduce((sum, row) => sum + row.count, 0);
             const totalBytes = data.reduce((sum, row) => sum + row.bytes, 0);

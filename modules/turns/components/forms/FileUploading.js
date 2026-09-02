@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useDropzone } from 'react-dropzone';
 import { useCallback, useState } from 'react';
 import { Progress, Spin } from 'antd';
+import { TID } from '@/config/testIds';
 
 // accept — формат react-dropzone: { 'application/pdf': ['.pdf'] }; без него принимается
 // любой файл (media всё равно проверяет расширение и размер и вернёт понятную ошибку).
@@ -10,6 +11,7 @@ const FileUploading = ({
   fileTypeLabel = 'a file',
   uploadFunc = () => {},
   accept,
+  uploadType, // images | videos | audios | pdfs — только для data-upload-type
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -60,17 +62,28 @@ const FileUploading = ({
 
   return (
     <>
-      <div className="drag-n-drop" {...getRootProps()}>
+      <div
+        className="drag-n-drop"
+        {...getRootProps()}
+        data-test-id={TID.upload.dropzone}
+        data-upload-type={uploadType}
+      >
         <input {...getInputProps()} />
 
         {/* не <p>: antd Spin/Progress рисуют div, вложенный div в p — ошибка гидратации */}
         {loading ? (
           processing ? (
-            <div className="drag-n-drop-loading">
+            <div
+              className="drag-n-drop-loading"
+              data-test-id={TID.upload.processing}
+            >
               <Spin size="small" /> Processing...
             </div>
           ) : (
-            <div className="drag-n-drop-progress">
+            <div
+              className="drag-n-drop-progress"
+              data-test-id={TID.upload.progress}
+            >
               <div>Uploading...</div>
               {/* dropzone на время загрузки disabled, поэтому клик по полосе
                   диалог выбора файла не откроет */}
@@ -84,7 +97,11 @@ const FileUploading = ({
         )}
       </div>
 
-      {!!error && <div className="drag-n-drop-error">{error}</div>}
+      {!!error && (
+        <div className="drag-n-drop-error" data-test-id={TID.upload.error}>
+          {error}
+        </div>
+      )}
     </>
   );
 };

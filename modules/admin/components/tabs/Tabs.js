@@ -7,41 +7,46 @@ import MediaRelocateTab from './MediaRelocate';
 import StorageTab from './Storage';
 import FilesTab from './Files';
 import YoutubeTab from './Youtube';
+import { TID } from '@/config/testIds';
 
+// label — ReactNode: antd Tabs свои data-* до заголовка вкладки не доносит,
+// поэтому data-test-id висит на <span> внутри подписи
 const tabs = [
   {
     key: 'scripts',
-    label: 'Scripts',
+    label: <span data-test-id={TID.adminTab('scripts')}>Scripts</span>,
     component: ScriptsTab,
   },
   {
     key: 'media-relocate',
-    label: 'Media relocate',
+    label: (
+      <span data-test-id={TID.adminTab('media-relocate')}>Media relocate</span>
+    ),
     component: MediaRelocateTab,
   },
   {
     key: 'storage',
-    label: 'Storage',
+    label: <span data-test-id={TID.adminTab('storage')}>Storage</span>,
     component: StorageTab,
   },
   {
     key: 'files',
-    label: 'Files',
+    label: <span data-test-id={TID.adminTab('files')}>Files</span>,
     component: FilesTab,
   },
   {
     key: 'youtube',
-    label: 'YouTube',
+    label: <span data-test-id={TID.adminTab('youtube')}>YouTube</span>,
     component: YoutubeTab,
   },
   {
     key: 'games',
-    label: 'Games',
+    label: <span data-test-id={TID.adminTab('games')}>Games</span>,
     component: GamesTab,
   },
   {
     key: 'logs',
-    label: 'Logs',
+    label: <span data-test-id={TID.adminTab('logs')}>Logs</span>,
     component: LogsTab,
   },
 ];

@@ -207,6 +207,7 @@ const TimelineQuotes = ({
         playing={playing}
         togglePlay={togglePlay}
         duration={duration}
+        turnId={turnId}
         existingFragments={fragments}
         onFragmentsChange={handleFragmentsChange}
         onFragmentDelete={(id) => {

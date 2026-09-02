@@ -3,6 +3,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { MODE_WIDGET_PDF_QUOTE_ADD } from '@/config/panel';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 
@@ -21,6 +22,7 @@ const PdfMode = () => {
         'Add Area',
         activePage ? <><br/>(page {activePage})</> : '',
       ].map((item, i) => <span key={i}>{item}</span>),
+      testId: TID.panelAction('add-area'),
       callback: () => {
         dispatch(setPanelMode({ mode: MODE_WIDGET_PDF_QUOTE_ADD }));
       },
@@ -35,6 +37,7 @@ const PdfMode = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

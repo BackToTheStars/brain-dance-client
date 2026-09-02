@@ -6,6 +6,7 @@ import AdminTurnsTable from '../turns/Table';
 import { deleteAdminGameRequest } from '../../requests';
 import { Alert, Button } from 'antd';
 import { useState } from 'react';
+import { TID } from '@/config/testIds';
 
 const AdminGameDetails = ({ game }) => {
   // удаление идёт через adminRequest: отказ приходит исключением с текстом сервера.
@@ -34,6 +35,7 @@ const AdminGameDetails = ({ game }) => {
               className="px-2 py-1"
               type="primary"
               danger
+              data-test-id={TID.adminGames.delete}
               onClick={() => {
                 if (confirm('Delete the game?')) {
                   setDeleteError(null);
@@ -55,6 +57,7 @@ const AdminGameDetails = ({ game }) => {
                 type="error"
                 showIcon
                 message={deleteError}
+                data-test-id={TID.adminGames.deleteError}
               />
             )}
           </div>

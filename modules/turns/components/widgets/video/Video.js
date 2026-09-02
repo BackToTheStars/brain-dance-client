@@ -8,6 +8,7 @@ import {
   getYoutubePreviewUrl,
 } from '../../helpers/videoUrl';
 import MediaVideo from './Media';
+import { TID } from '@/config/testIds';
 
 const DEFAULT_PREVIEW = '/img/video-default.png';
 
@@ -90,6 +91,8 @@ const Video = ({
           />
           <PlayCircleFilled
             className="video__play"
+            data-test-id={TID.media.preview}
+            data-turn-id={turnId}
             onClick={() => {
               setPreviewMode(false);
             }}

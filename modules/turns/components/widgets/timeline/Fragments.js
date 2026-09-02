@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Input, Popconfirm } from 'antd';
 import { getFormattedDuration } from '../../helpers/formatters/player';
 import { FiEdit, FiTrash } from 'react-icons/fi';
+import { TID } from '@/config/testIds';
 
 export const InactiveFragment = ({ fragment, onClick = () => {} }) => {
   return (
@@ -16,6 +17,7 @@ export const InactiveFragment = ({ fragment, onClick = () => {} }) => {
 };
 
 export const EditableFragment = ({
+  turnId,
   withLine = false,
   isCurrent = false,
   fragment,
@@ -40,6 +42,9 @@ export const EditableFragment = ({
     <div
       className={`editable-fragment flex items-start gap-2 ${selectedFragmentId ? 'selected' : ''}${isCurrent ? ' now-playing' : ''}`}
       data-id={fragment.id}
+      data-test-id={TID.timeline.quote}
+      data-turn-id={turnId}
+      data-quote-id={fragment.id}
     >
       <div className="flex flex-1 gap-2 items-start">
         <div className="flex flex-col gap-1 w-full">
@@ -60,6 +65,7 @@ export const EditableFragment = ({
                   value={value}
                   autoFocus
                   size="small"
+                  data-test-id={TID.timeline.field('text')}
                   onChange={(e) => setValue(e.target.value)}
                   className="fragment-input flex-1"
                   onPressEnter={() => {
@@ -84,6 +90,7 @@ export const EditableFragment = ({
                 />
                 <button
                   className="icon-button inline-block"
+                  data-test-id={TID.timeline.save}
                   onClick={() => {
                     onChange({
                       ...fragment,
@@ -103,6 +110,7 @@ export const EditableFragment = ({
               <div className="text-with-buttons h-full cursor-pointer flex gap-2 items-center">
                 <span
                   className="pl-1"
+                  data-test-id={TID.timeline.quoteText}
                   onClick={() =>
                     setModeInfo({
                       id: fragment.id,
@@ -117,6 +125,7 @@ export const EditableFragment = ({
                   <>
                     <button
                       className="icon-button inline-block"
+                      data-test-id={TID.timeline.edit}
                       onClick={() =>
                         setModeInfo({
                           id: fragment.id,
@@ -132,6 +141,7 @@ export const EditableFragment = ({
                     >
                       <button
                         className="icon-button"
+                        data-test-id={TID.timeline.delete}
                         // onClick={() => onDelete(fragment.id)}
                       >
                         <FiTrash />

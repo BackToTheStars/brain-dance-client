@@ -16,6 +16,7 @@ import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { TID } from '@/config/testIds';
 
 const PictureQuotes = ({
   turnId,
@@ -143,6 +144,9 @@ const QuotesInner = memo(
               className="quote-rectangle"
               key={quote.id}
               style={style}
+              data-test-id={TID.quoteRect}
+              data-turn-id={turnId}
+              data-quote-key={`${turnId}_${quote.id}`}
               onClick={() => {
                 if (isQuoteActive) {
                   dispatch(setPanelMode({ mode: MODE_GAME }));

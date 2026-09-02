@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAdminScriptsRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
 import { CloseOutlined } from '@ant-design/icons';
+import { TID } from '@/config/testIds';
 
 // Скрипты возвращают либо строку, либо список строк (по строке на найденный случай),
 // либо произвольный объект. Список строк показываем построчно — иначе отчёт вроде
@@ -109,7 +110,7 @@ const ScriptsTab = () => {
   }, [activeCommand]);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" data-test-id={TID.adminScripts.root}>
       <div className="w-1/3 flex flex-col gap-2">
         {!!listError && <Alert type="error" showIcon message={listError} />}
         <Table

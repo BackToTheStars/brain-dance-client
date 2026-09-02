@@ -2,6 +2,7 @@ import { Alert, Button, Input, Tag } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { getAdminGamesRequest, runAdminScriptRequest } from '../../requests';
 import Loading from '@/modules/ui/components/common/Loading';
+import { TID } from '@/config/testIds';
 
 // Хардкод процедуры переноса медиа — единственной, ради которой существует вкладка
 // (см. server/modules/admin/services/scripts.js, SCRIPT_MEDIA).
@@ -100,7 +101,7 @@ const MediaRelocateTab = () => {
     : games;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3" data-test-id={TID.adminRelocate.root}>
       {!!listError && <Alert type="error" showIcon message={listError} />}
       <div className="flex gap-2 items-center">
         <Input

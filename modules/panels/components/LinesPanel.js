@@ -6,6 +6,7 @@ import * as panelTypes from '@/modules/panels/redux/types';
 import { lineDelete } from '@/modules/lines/redux/actions';
 import { useEffect, useMemo } from 'react';
 import { PANEL_LINES } from '@/config/panel';
+import { TID } from '@/config/testIds';
 
 const cutTextToSize = (text, size) => {
   if (text.length < size + 3) return text;
@@ -29,7 +30,7 @@ const LineRow = ({ line, can, handleDelete }) => {
     (s) => s.lines.quotesInfoByQuoteKey[`${line.targetTurnId}_${line.targetMarker}`],
   );
   return (
-    <tr>
+    <tr data-test-id={TID.linesPanel.row} data-line-id={line._id}>
       <td>{line.author}</td>
       <td>{line.type}</td>
       <td>{getQuoteLabel(sourceQuoteInfo)}</td>
@@ -38,6 +39,7 @@ const LineRow = ({ line, can, handleDelete }) => {
         <td className="text-end">
           <button
             className="btn btn-danger"
+            data-test-id={TID.linesPanel.delete}
             onClick={(e) => handleDelete(e, line._id)}
           >
             Delete

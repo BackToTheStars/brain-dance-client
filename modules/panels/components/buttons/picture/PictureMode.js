@@ -3,6 +3,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { MODE_WIDGET_PICTURE_QUOTE_ADD } from '@/config/panel';
 
 const PictureMode = () => {
@@ -12,6 +13,7 @@ const PictureMode = () => {
   const buttons = [
     {
       text: 'Add Area',
+      testId: TID.panelAction('add-area'),
       callback: () => {
         dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE_QUOTE_ADD }));
       },
@@ -26,6 +28,7 @@ const PictureMode = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

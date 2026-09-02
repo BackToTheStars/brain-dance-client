@@ -2,6 +2,7 @@ import { Alert, Button, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminLogsRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
+import { TID } from '@/config/testIds';
 
 const columns = [
   {
@@ -76,8 +77,10 @@ const AdminLogsTable = ({ onDetailsClick = () => {} }) => {
         columns={columnsWithActions}
         dataSource={filteredLogs}
         rowKey="_id"
+        data-test-id={TID.adminLogs.table}
         onChange={handleChange}
         sorter={sortedInfo}
+        onRow={() => ({ 'data-test-id': TID.adminLogs.row })}
       />
     </>
   );

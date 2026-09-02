@@ -4,6 +4,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
 
 const PdfQuoteAdd = () => {
@@ -18,6 +19,7 @@ const PdfQuoteAdd = () => {
   const buttons = [
     {
       text: 'Save Area',
+      testId: TID.panelAction('save-area'),
       callback: () => {
         if (!hasCrop) return;
         dispatch(savePdfQuoteByCrop()).then(() => {
@@ -35,6 +37,7 @@ const PdfQuoteAdd = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

@@ -328,6 +328,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="an image"
+              uploadType="images"
               accept={UPLOAD_ACCEPT.images}
               uploadFunc={(file, onProgress) =>
                 uploadMedia('images', file, onProgress)
@@ -381,6 +382,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="a video"
+              uploadType="videos"
               accept={UPLOAD_ACCEPT.videos}
               uploadFunc={(file, onProgress) =>
                 uploadMedia('videos', file, onProgress)
@@ -411,6 +413,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="an audio"
+              uploadType="audios"
               accept={UPLOAD_ACCEPT.audios}
               uploadFunc={(file, onProgress) =>
                 uploadMedia('audios', file, onProgress)
@@ -443,6 +446,7 @@ const fieldSettings = {
             <FileUploading
               changeHandler={changeHandler}
               fileTypeLabel="a pdf"
+              uploadType="pdfs"
               accept={UPLOAD_ACCEPT.pdfs}
               uploadFunc={(file, onProgress) =>
                 uploadMedia('pdfs', file, onProgress)

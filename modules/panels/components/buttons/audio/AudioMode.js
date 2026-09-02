@@ -3,6 +3,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { MODE_WIDGET_AUDIO_QUOTES_MANAGE } from '@/config/panel';
 import { addAudioQuotesWidget } from '@/modules/turns/redux/actions'; //
 
@@ -20,6 +21,7 @@ const AudioMode = () => {
   const buttons = [
     {
       text: 'Quotes On',
+      testId: TID.panelAction('quotes-on'),
       callback: () => {
         dispatch(addAudioQuotesWidget(editTurnId, editWidgetId, duration)).then(
           () => {
@@ -45,6 +47,7 @@ const AudioMode = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

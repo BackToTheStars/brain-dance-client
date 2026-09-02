@@ -6,6 +6,7 @@ import {
   togglePanel,
 } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { PANEL_TURNS_PASTE } from '@/config/panel';
 
 const TurnPasteMode = () => {
@@ -31,6 +32,7 @@ const TurnPasteMode = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: cancelCallback,
     },
   ];

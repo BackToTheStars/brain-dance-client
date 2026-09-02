@@ -30,6 +30,7 @@ import { getGameUrl } from '../../utils/url';
 import { useTranslations } from 'next-intl';
 import { SIZE_SM } from '@/config/ui/size';
 import { DropdownList } from '../ui/DropdownList';
+import { TID } from '@/config/testIds';
 
 const CreateCodeForm = ({ codeData, hash }) => {
   const t = useTranslations('Lobby.game');
@@ -44,6 +45,7 @@ const CreateCodeForm = ({ codeData, hash }) => {
       />
       <Button
         size={SIZE_SM}
+        data-test-id={TID.gameModal.addCode}
         onClick={(e) => {
           e.preventDefault();
           dispatch(
@@ -114,7 +116,12 @@ const CodesBlock = ({ codeData, codes, hash, can }) => {
             </thead>
             <tbody>
               {codes.map((codeData, i) => (
-                <tr key={codeData.code} className={i % 2 ? 'bg-gray-700' : ''}>
+                <tr
+                  key={codeData.code}
+                  className={i % 2 ? 'bg-gray-700' : ''}
+                  data-test-id={TID.gameModal.codeRow}
+                  data-code={codeData.code}
+                >
                   <td>{codeData.nickname}</td>
                   <td>{codeData.code}</td>
                   <td>{ROLES[codeData.role]?.name}</td>
@@ -280,6 +287,7 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
           {can(RULE_GAME_EDIT) && (
             <Button
               size="sm"
+              data-test-id={TID.gameModal.delete}
               onClick={() => {
                 dispatch(
                   openModal(MODAL_CONFIRM, {
@@ -308,6 +316,7 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
           )}
           <Button
             size="sm"
+            data-test-id={TID.gameModal.open}
             onClick={() => router.push(getGameUrl(hash, turnId))}
           >
             {t('Open_game')}

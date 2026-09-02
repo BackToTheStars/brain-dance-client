@@ -4,6 +4,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { MODE_WIDGET_PDF_QUOTE_ADD } from '@/config/panel';
 
 const PdfQuoteActive = () => {
@@ -13,6 +14,7 @@ const PdfQuoteActive = () => {
   const buttons = [
     {
       text: 'Modify',
+      testId: TID.panelAction('modify'),
       callback: () => {
         dispatch(setPanelMode({ mode: MODE_WIDGET_PDF_QUOTE_ADD }));
       },
@@ -20,6 +22,7 @@ const PdfQuoteActive = () => {
     },
     {
       text: 'Delete',
+      testId: TID.panelAction('delete'),
       callback: () => {
         dispatch(deleteQuote()).then(() => {
           dispatch(resetAndExit());
@@ -35,6 +38,7 @@ const PdfQuoteActive = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

@@ -13,6 +13,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { MODE_WIDGET_AUDIO } from '@/config/panel';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
+import { TID } from '@/config/testIds';
 
 const Audio = ({
   registerHandleResize,
@@ -56,10 +57,20 @@ const Audio = ({
   }, []);
 
   return (
-    <div className="turn-widget audio-player-wrapper flex flex-col w-full">
+    <div
+      className="turn-widget audio-player-wrapper flex flex-col w-full"
+      data-test-id={TID.media.player}
+      data-turn-id={turnId}
+      data-widget-id={widgetId}
+      data-playing={playing ? 'true' : 'false'}
+    >
       <div className="flex justify-between w-full gap-4">
         <div className="audio-title-wrapper flex gap-2 items-center">
-          <button className="icon-button" onClick={togglePlay}>
+          <button
+            className="icon-button"
+            data-test-id={TID.media.play}
+            onClick={togglePlay}
+          >
             {playing ? <FiPause /> : <FiPlay />}
           </button>
           <span className="truncate">{title}</span>

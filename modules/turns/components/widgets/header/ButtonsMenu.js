@@ -16,6 +16,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
+import { TID } from '@/config/testIds';
 
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
@@ -83,24 +84,49 @@ const ButtonsMenu = ({ _id }) => {
 
   return (
     <div className="action-icons">
-      <a key="share" className="share-btn" onClick={handleShare}>
+      <a
+        key="share"
+        className="share-btn"
+        data-test-id={TID.turnAction('share')}
+        onClick={handleShare}
+      >
         <LinkIcon />
       </a>
-      <a key="clone" className="clone-btn" onClick={handleClone}>
+      <a
+        key="clone"
+        className="clone-btn"
+        data-test-id={TID.turnAction('clone')}
+        onClick={handleClone}
+      >
         <CopyIcon />
       </a>
       {can(RULE_TURNS_CRUD) && (
-        <a key="edit" className="edit-btn" onClick={handleEdit}>
+        <a
+          key="edit"
+          className="edit-btn"
+          data-test-id={TID.turnAction('edit')}
+          onClick={handleEdit}
+        >
           <EditIcon />
         </a>
       )}
       {can(RULE_TURNS_CRUD) && (
-        <a key="cut" className="cut-btn" onClick={handleCut}>
+        <a
+          key="cut"
+          className="cut-btn"
+          data-test-id={TID.turnAction('cut')}
+          onClick={handleCut}
+        >
           <ScissorIcon />
         </a>
       )}
       {can(RULE_TURNS_CRUD) && (
-        <a key="delete" className="delete-btn" onClick={handleDelete}>
+        <a
+          key="delete"
+          className="delete-btn"
+          data-test-id={TID.turnAction('delete')}
+          onClick={handleDelete}
+        >
           <DeleteIcon />
         </a>
       )}

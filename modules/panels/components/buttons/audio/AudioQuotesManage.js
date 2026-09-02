@@ -3,6 +3,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { deleteAudioQuotesWidget } from '@/modules/turns/redux/actions'; //
 // import { MODE_WIDGET_AUDIO_QUOTES_MANAGE } from '@/config/panel';
 
@@ -17,6 +18,7 @@ const AudioQuotesManage = () => {
     null,
     {
       text: 'Delete',
+      testId: TID.panelAction('delete-quotes'),
       callback: () => {
         dispatch(deleteAudioQuotesWidget(editTurnId, editWidgetId)).then(() => {
           dispatch(resetAndExit());
@@ -32,6 +34,7 @@ const AudioQuotesManage = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

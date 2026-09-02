@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { MODE_WIDGET_PICTURE } from '@/config/panel';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 
 const PictureQuoteAdd = () => {
   //
@@ -14,6 +15,7 @@ const PictureQuoteAdd = () => {
   const buttons = [
     {
       text: 'Save Area',
+      testId: TID.panelAction('save-area'),
       callback: () => {
         dispatch(savePictureQuoteByCrop()).then(() => {
           dispatch(resetAndExit());
@@ -30,6 +32,7 @@ const PictureQuoteAdd = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         // dispatch(setPanelMode({ mode: MODE_WIDGET_PICTURE }));
         dispatch(resetAndExit());

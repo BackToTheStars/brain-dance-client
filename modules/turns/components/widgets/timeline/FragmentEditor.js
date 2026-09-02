@@ -9,6 +9,7 @@ import {
 } from '../../helpers/timeline/fragments';
 import BgFragments from './BgFragments';
 import { EditableFragment, InactiveFragment } from './Fragments';
+import { TID } from '@/config/testIds';
 
 const formatDuration = (seconds) => {
   const h = Math.floor(seconds / 3600);
@@ -25,7 +26,13 @@ const parseDuration = (timeStr) => {
 const checkTimeFormat = (timeStr) =>
   /^[0-9]{2}:[0-9]{2}:[0-9]{2}$/.test(timeStr);
 
-const TimeInput = ({ initialSeconds, onTimeChange, minTime, maxTime }) => {
+const TimeInput = ({
+  initialSeconds,
+  onTimeChange,
+  minTime,
+  maxTime,
+  testId,
+}) => {
   const [value, setValue] = useState(formatDuration(initialSeconds));
 
   useEffect(() => {
@@ -35,6 +42,7 @@ const TimeInput = ({ initialSeconds, onTimeChange, minTime, maxTime }) => {
   return (
     <Input
       size="small"
+      data-test-id={testId}
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onPressEnter={() => {
@@ -58,7 +66,8 @@ const TimeInput = ({ initialSeconds, onTimeChange, minTime, maxTime }) => {
   );
 };
 
-const EditablePoint = ({ value, minValue, maxValue, onChange }) => {
+// name — start | end: только для data-test-id поля и карандаша
+const EditablePoint = ({ name, value, minValue, maxValue, onChange }) => {
   const [mode, setMode] = useState('view');
   return (
     <div className="editable-point flex items-center gap-2">
@@ -67,10 +76,15 @@ const EditablePoint = ({ value, minValue, maxValue, onChange }) => {
           <span className="editable-point__value">
             {getFormattedDuration(value)}
           </span>
-          <FiEdit className="cursor-pointer" onClick={() => setMode('edit')} />
+          <FiEdit
+            className="cursor-pointer"
+            data-test-id={TID.timeline.pointEdit(name)}
+            onClick={() => setMode('edit')}
+          />
         </>
       ) : (
         <TimeInput
+          testId={TID.timeline.field(name)}
           minTime={minValue}
           maxTime={maxValue}
           initialSeconds={value}
@@ -85,6 +99,7 @@ const EditablePoint = ({ value, minValue, maxValue, onChange }) => {
 };
 
 const FragmentEditor = ({
+  turnId,
   playing = false,
   togglePlay = () => {},
   progress = 0,
@@ -222,13 +237,18 @@ const FragmentEditor = ({
           </div>
 
           <div className="flex gap-2">
-            <button className="icon-button mt-2" onClick={togglePlay}>
+            <button
+              className="icon-button mt-2"
+              data-test-id={TID.timeline.play}
+              onClick={togglePlay}
+            >
               {playing ? <FiPause /> : <FiPlay />}
             </button>
             <button
               className={
                 'icon-button mt-2' + (addButtonDisabled ? ' disabled' : '')
               }
+              data-test-id={TID.timeline.add}
               onClick={addFragment}
             >
               <FiPlus />
@@ -238,6 +258,7 @@ const FragmentEditor = ({
               <div className="flex items-center gap-2">
                 Start:{' '}
                 <EditablePoint
+                  name="start"
                   minValue={0}
                   maxValue={currentSelection[1]}
                   value={currentSelection[0]}
@@ -249,6 +270,7 @@ const FragmentEditor = ({
               <div className="flex items-center gap-2">
                 End:{' '}
                 <EditablePoint
+                  name="end"
                   minValue={currentSelection[0]}
                   maxValue={duration}
                   value={currentSelection[1]}
@@ -296,6 +318,7 @@ const FragmentEditor = ({
                   key: fragment.id,
                   children: (
                     <EditableFragment
+                      turnId={turnId}
                       withLine={dQuotesWithLines[fragment.id]}
                       isCurrent={fragment.id === currentFragmentId}
                       widgetMode={widgetMode}

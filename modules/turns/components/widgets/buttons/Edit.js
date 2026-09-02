@@ -1,6 +1,7 @@
 // const { MODE_WIDGET_PARAGRAPH } = require('@/config/panel');
 const { setPanelMode } = require('@/modules/panels/redux/actions');
 const { useDispatch } = require('react-redux');
+const { TID } = require('@/config/testIds');
 
 const WidgetEditButton = ({
   turnId,
@@ -13,6 +14,9 @@ const WidgetEditButton = ({
     <a
       className="widget-button"
       href="#"
+      data-test-id={TID.widgetEdit}
+      data-turn-id={turnId}
+      data-widget-id={widgetId}
       onClick={(e) => {
         e.preventDefault();
         dispatch(

@@ -14,6 +14,7 @@ import {
   unpinAllCodes,
 } from '@/modules/settings/redux/actions';
 import { ROLES, ROLE_GAME_VISITOR } from '@/config/user';
+import { TID } from '@/config/testIds';
 
 const GameRow = ({ game, index, settings = {} }) => {
   const dispatch = useDispatch();
@@ -21,7 +22,11 @@ const GameRow = ({ game, index, settings = {} }) => {
   const { name, image, status, description, hash } = game;
   const params = { hash };
   return (
-    <div className="game-row game-item-row lobby-panel__divider-b s_py-1">
+    <div
+      className="game-row game-item-row lobby-panel__divider-b s_py-1"
+      data-test-id={TID.lobbyGame.row}
+      data-game-hash={hash}
+    >
       <div className="circle-cell">
         <span className="circle-cell__text">{index + 1}</span>
       </div>
@@ -40,6 +45,7 @@ const GameRow = ({ game, index, settings = {} }) => {
           <Button
             className="hover-show"
             size="sm"
+            data-test-id={TID.lobbyGame.open}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

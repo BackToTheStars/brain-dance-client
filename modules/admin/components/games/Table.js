@@ -2,6 +2,7 @@ import { Alert, Button, Checkbox, Input, Space, Table } from 'antd';
 import { getAdminGamesRequest } from '../../requests';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
+import { TID } from '@/config/testIds';
 
 const columns = [
   {
@@ -64,7 +65,11 @@ const AdminGamesTable = ({ onDetailsClick = () => {} }) => {
         title: 'Actions',
         key: 'actions',
         render: (text, record) => (
-          <Button htmlType="button" onClick={() => onDetailsClick(record)}>
+          <Button
+            htmlType="button"
+            data-test-id={TID.adminGames.details}
+            onClick={() => onDetailsClick(record)}
+          >
             Details
           </Button>
         ),
@@ -88,6 +93,7 @@ const AdminGamesTable = ({ onDetailsClick = () => {} }) => {
         <Input
           placeholder="Search"
           size="small"
+          data-test-id={TID.adminGames.search}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full"
@@ -112,6 +118,10 @@ const AdminGamesTable = ({ onDetailsClick = () => {} }) => {
         rowKey="_id"
         onChange={handleChange}
         sorter={sortedInfo}
+        onRow={(record) => ({
+          'data-test-id': TID.adminGames.row,
+          'data-game-id': record._id,
+        })}
       />
     </>
   );

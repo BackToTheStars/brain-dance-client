@@ -7,6 +7,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 
 const ParagraphMode = () => {
   const editTurnId = useSelector((state) => state.panels.editTurnId);
@@ -22,6 +23,7 @@ const ParagraphMode = () => {
     canBeCompressed && !paragraphWidget?.compressed
       ? {
           text: 'Compress',
+          testId: TID.panelAction('compress'),
           callback: () => {
             dispatch(compressParagraph());
           },
@@ -29,6 +31,7 @@ const ParagraphMode = () => {
       : paragraphWidget?.compressed
         ? {
             text: 'Uncompress',
+            testId: TID.panelAction('uncompress'),
             callback: () => {
               dispatch(unCompressParagraph());
             },
@@ -43,6 +46,7 @@ const ParagraphMode = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },

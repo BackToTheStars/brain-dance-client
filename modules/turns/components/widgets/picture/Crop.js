@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import ReactCrop from 'react-image-crop';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
+import { TID } from '@/config/testIds';
 
 const cropQueue = getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY);
 
@@ -43,7 +44,7 @@ const PictureCrop = ({ imageUrl, widgetKey, stateCrop, activeQuoteId }) => {
         setCrop(newPercentCrop);
       }}
     >
-      <img src={imageUrl} alt="crop" />
+      <img src={imageUrl} alt="crop" data-test-id={TID.pictureCrop} />
     </ReactCrop>
   );
 };

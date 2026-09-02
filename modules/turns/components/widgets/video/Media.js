@@ -16,6 +16,7 @@ import { MODE_WIDGET_VIDEO } from '@/config/panel';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { VolumeControl, SpeedControl } from './Controls';
+import { TID } from '@/config/testIds';
 
 const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
   const { can } = useUserContext();
@@ -66,6 +67,10 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
     <div
       className="video-player-wrapper not-draggable cursor-auto"
       ref={fsRef}
+      data-test-id={TID.media.player}
+      data-turn-id={turnId}
+      data-widget-id={widgetId}
+      data-playing={playing ? 'true' : 'false'}
     >
       <ReactPlayer
         ref={playerRef}
@@ -97,7 +102,11 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
         />
         {/* Элементы управления */}
         <div className="controls-row">
-          <button className="icon-button play-button" onClick={togglePlay}>
+          <button
+            className="icon-button play-button"
+            data-test-id={TID.media.play}
+            onClick={togglePlay}
+          >
             {playing ? <FiPause /> : <FiPlay />}
           </button>
           <VolumeControl

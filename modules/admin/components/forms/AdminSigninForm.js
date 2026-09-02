@@ -1,6 +1,7 @@
 import { Alert, Button, Form, Input } from 'antd';
 import { useState } from 'react';
 import { useAdminContext } from '../../contexts/AdminContext';
+import { TID } from '@/config/testIds';
 
 const AdminSigninForm = ({ onSuccessSubmit }) => {
   const { login } = useAdminContext();
@@ -27,15 +28,36 @@ const AdminSigninForm = ({ onSuccessSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} className="border border-gray-300 p-4 flex flex-col gap-3">
-      {!!error && <Alert type="error" showIcon message={error} />}
+      {!!error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          data-test-id={TID.adminLogin.error}
+        />
+      )}
       <div>
-        <Input name="nickname" type="text" placeholder="Login" />
+        <Input
+          name="nickname"
+          type="text"
+          placeholder="Login"
+          data-test-id={TID.adminLogin.nickname}
+        />
       </div>
       <div>
-        <Input name="password" type="password" placeholder="Password" />
+        <Input
+          name="password"
+          type="password"
+          placeholder="Password"
+          data-test-id={TID.adminLogin.password}
+        />
       </div>
       <div className="text-end">
-        <Button htmlType="submit" loading={pending}>
+        <Button
+          htmlType="submit"
+          loading={pending}
+          data-test-id={TID.adminLogin.submit}
+        >
           Login
         </Button>
       </div>

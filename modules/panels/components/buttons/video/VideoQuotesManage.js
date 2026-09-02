@@ -3,6 +3,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAndExit, setPanelMode } from '../../../redux/actions';
 import { Buttons } from '../Buttons';
+import { TID } from '@/config/testIds';
 import { deleteVideoQuotesWidget } from '@/modules/turns/redux/actions';
 // import { MODE_WIDGET_VIDEO_QUOTES_MANAGE } from '@/config/panel';
 
@@ -17,6 +18,7 @@ const VideoQuotesManage = () => {
     null,
     {
       text: 'Delete',
+      testId: TID.panelAction('delete-quotes'),
       callback: () => {
         dispatch(deleteVideoQuotesWidget(editTurnId, editWidgetId)).then(() => {
           dispatch(resetAndExit());
@@ -32,6 +34,7 @@ const VideoQuotesManage = () => {
     null,
     {
       text: 'Cancel',
+      testId: TID.panelAction('cancel'),
       callback: () => {
         dispatch(resetAndExit());
       },
