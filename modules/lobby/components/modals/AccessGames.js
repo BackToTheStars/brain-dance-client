@@ -143,7 +143,15 @@ const AccessGames = () => {
                       ).then((data) => {
                         if (data.item) {
                           alert(`game ${data.item.gameId} checked`);
-                        } else if (data.message) {
+                          return;
+                        }
+                        // Токен негоден — доступ к игре потерян: снимаем
+                        // запись, чтобы она не висела в списке навсегда.
+                        if (data.httpStatus === 401) {
+                          removeGameInfo(gameAuthAccess.info.hash);
+                          loadGamesFromLocalStorage();
+                        }
+                        if (data.message) {
                           alert(data.message);
                         }
                       });

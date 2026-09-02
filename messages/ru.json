@@ -23,7 +23,8 @@
     "Upload_import_file": "Загрузите файл импорта",
     "gameDialog": {
       "Go_to_the_game": "Перейти в игру",
-      "Skip_this_dialog_next_time": "Пропустить этот диалог в следующий раз"
+      "Skip_this_dialog_next_time": "Пропустить этот диалог в следующий раз",
+      "Access_update_failed": "Не удалось обновить доступ. Введите код заново."
     },
     "game": {
       "Game_info": "Об игре",

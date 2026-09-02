@@ -397,7 +397,7 @@ export const cloneTurn = (_id) => (dispatch, getState) => {
   });
 };
 
-// Выход из режима вставки (BP-27). Тем же путём, что у Cancel в
+// Выход из режима вставки. Тем же путём, что у Cancel в
 // `panels/components/buttons/operations/TurnPasteMode.js`: `resetAndExit`
 // возвращает mode в MODE_GAME и снимает активную цитату, плюс закрывается сама
 // панель. Раньше выход был написан только для Cancel, а вставка и удаление из

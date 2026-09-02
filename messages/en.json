@@ -28,7 +28,8 @@
 
     "gameDialog": {
       "Go_to_the_game": "Go to the game",
-      "Skip_this_dialog_next_time": "Skip this dialog next time"
+      "Skip_this_dialog_next_time": "Skip this dialog next time",
+      "Access_update_failed": "Could not update access. Enter the code again."
     },
 
     "game": {

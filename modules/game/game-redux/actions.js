@@ -188,7 +188,7 @@ export const saveField = () => (dispatch, getState) => {
 // `turns.turnsToPaste` рисуется кнопка «Paste Turn» в игровом режиме
 // (GameMode.js) и таблица PasteTurnPanel. Раньше пустой результат не
 // доезжал до стора (`if (turnsToPaste.length)`), поэтому после вставки
-// последнего хода кнопка оставалась висеть — BP-27.
+// последнего хода кнопка оставалась висеть.
 export const loadTurnsAndLinesToPaste = () => (dispatch) => {
   dispatch({
     type: turnsTypes.TURNS_LOAD_TO_PASTE,

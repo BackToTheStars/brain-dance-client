@@ -59,7 +59,7 @@ const PasteTurnPanel = () => {
                       // никогда не вызывал — он передаёт в createTurn свой
                       // обработчик. Ход и так уходит из буфера внутри вставки, а
                       // стор обновляет loadTurnsAndLinesToPaste, так что убирать
-                      // запись отсюда больше не нужно (BP-27).
+                      // запись отсюда больше не нужно.
                       dispatch(
                         insertTurnFromBuffer(timeStamp, {
                           errorCallback: (message) => {

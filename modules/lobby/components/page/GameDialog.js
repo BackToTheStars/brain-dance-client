@@ -1,7 +1,10 @@
 import { ROLES, ROLE_GAME_VISITOR, roleOptions } from '@/config/user';
 import { loadShortGame } from '@/modules/game/game-redux/actions';
 import Loading from '@/modules/ui/components/common/Loading';
-import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
+import {
+  removeGameInfo,
+  setGameInfoIntoStorage,
+} from '@/modules/user/contexts/UserContext';
 import { Button, Checkbox, Input, Select } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -26,6 +29,8 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   }`;
 
   const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
+  // отказ обновления токена показываем прямо в диалоге, а не alert'ом
+  const [accessError, setAccessError] = useState('');
   const myCodes = useMemo(() => {
     if (!myGames) return [];
     const myGame = myGames.find((g) => g.hash === hash);
@@ -48,8 +53,18 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     return roleOptions.filter((option) => roles[option.value]);
   }, [info, myCodes]);
 
+  // Обновление токена может не пройти: подпись подделана, ключ сервера сменился
+  // или сети нет. Тогда сохранённый доступ негоден — снимаем его и остаёмся в
+  // диалоге, чтобы код можно было ввести заново.
+  const handleRefreshFailure = (message) => {
+    removeGameInfo(hash);
+    reloadUserInfo();
+    setAccessError(message || t('gameDialog.Access_update_failed'));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAccessError('');
     const choosedRole = +role;
     // случаи, когда нужно просто открыть игру без применения кода
     if (choosedRole === info.role) {
@@ -82,19 +97,25 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         // }
       } else {
         // случаи, когда требуется только изменить никнейм
-        refreshTokenRequest(hash, token, nickname).then((data) => {
-          const { info, token } = data;
-          setGameInfoIntoStorage(info.hash, {
-            info,
-            // info: {
-            //   ...info,
-            //   skipDialog,
-            // },
-            token,
-          });
-          reloadUserInfo();
-          router.push(gameViewUrl);
-        });
+        refreshTokenRequest(hash, token, nickname)
+          .then((data) => {
+            if (!data?.success) {
+              handleRefreshFailure(data?.message);
+              return;
+            }
+            const { info, token } = data;
+            setGameInfoIntoStorage(info.hash, {
+              info,
+              // info: {
+              //   ...info,
+              //   skipDialog,
+              // },
+              token,
+            });
+            reloadUserInfo();
+            router.push(gameViewUrl);
+          })
+          .catch(() => handleRefreshFailure());
       }
       return;
     }
@@ -200,6 +221,9 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
               <div>{t('gameDialog.Skip_this_dialog_next_time')}</div>
             </div> */}
             {/* game.description and game.image */}
+            {accessError && (
+              <div className="text-red-500 text-sm">{accessError}</div>
+            )}
             <div className="flex justify-end">
               <Button htmlType="submit" data-test-id={TID.gameDialog.submit}>
                 {t('gameDialog.Go_to_the_game')}

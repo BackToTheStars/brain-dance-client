@@ -11,7 +11,7 @@ import { settingsReducer } from '@/modules/settings/redux/reducers';
 import languageReducer from '@/modules/settings/redux/lang/languageSlice';
 
 // COMBINED REDUCERS
-// Ключа `games` здесь больше нет (BP-23): слайс `games-redux` был мёртв целиком —
+// Ключа `games` здесь больше нет: слайс `games-redux` был мёртв целиком —
 // его действия жили в модуле, который никто не импортировал, а `state.games`
 // не читал ни один компонент (лобби смотрит в `state.lobby.games` и
 // `state.settings.games`).

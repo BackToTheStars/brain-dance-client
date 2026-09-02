@@ -68,7 +68,7 @@ const TurnModal = ({ params }) => {
       <div className="h-auto overflow-auto p-4 dark:text-main-text text-dark-light">
         {!!text && <p>{text}</p>}
       </div>
-      {/* переход от хода: холст откроется с вьюпортом на нём (BP-29 п. 1) */}
+      {/* переход от хода: холст откроется с вьюпортом на нём */}
       {!!game?.hash && (
         <div className="flex justify-end p-4 pt-0">
           <Button

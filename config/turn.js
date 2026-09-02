@@ -1,14 +1,15 @@
 import { GRID_CELL_X } from "./ui";
 
 export const TURN_SIZE_MIN_WIDTH = GRID_CELL_X * 12;
-// 250 клеток по 24 px = 6000 px (BP-28). Потолок живёт только здесь и только в
-// клиенте: серверной валидации ширины хода нет вовсе, ограничивает он ровно одно
-// место — maxWidth у jQuery-UI resizable в `modules/turns/components/Turn.js`.
+// Потолок ширины хода: 250 клеток по 24 px = 6000 px. Живёт только здесь и
+// только в клиенте: серверной валидации ширины хода нет вовсе, ограничивает он
+// ровно одно место — maxWidth у jQuery-UI resizable в
+// `modules/turns/components/Turn.js`.
 export const TURN_SIZE_MAX_WIDTH = GRID_CELL_X * 250;
 export const TURN_SIZE_WIDTH = 800;
 export const TURN_SIZE_HEIGHT = 600;
 
-// Какие цитаты привязаны к содержимому какого файла хода (BP-26).
+// Какие цитаты привязаны к содержимому какого файла хода.
 //
 // Цитата задана в координатах конкретного файла: прямоугольные (картинка, pdf) —
 // в процентах от его геометрии, таймлайновые (видео, аудио) — отрезками его

@@ -61,7 +61,9 @@ export const UserProvider = ({ children, hash }) => {
   const { info, token } = userInfo;
 
   const can = (rule) => checkRuleByRole(rule, info.role);
-  const reloadUserInfo = () => setUserInfo(loadGameInfo(hash));
+  // Откат на гостя обязателен: перезагрузка после снятия негодного доступа
+  // не находит записи, и без него весь контекст становится null.
+  const reloadUserInfo = () => setUserInfo(loadGameInfo(hash) || guestUser);
 
   const value = {
     info,

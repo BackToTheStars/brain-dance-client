@@ -51,10 +51,15 @@ export const loadGamesByHashesRequest = (hashes) => {
   ).then((res) => res.json());
 };
 
+// Единственная ручка лобби, которая ходит с game-token. Код ответа нужен
+// вызову: 401 означает, что токен негоден и сохранённый доступ к этой игре
+// пора считать потерянным. Своего поля `httpStatus` у ответа нет.
 export const checkGameRequest = (hash, token) => {
   return fetch(`${LOBBY_API_URL}/lobby/check-game?hash=${hash}`, {
     headers: {
       'game-token': token,
     },
-  }).then((res) => res.json());
+  }).then((res) =>
+    res.json().then((data) => ({ ...data, httpStatus: res.status })),
+  );
 };
