@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadSettings } from '@/modules/settings/redux/actions';
 import GameDialog from '@/modules/lobby/components/page/GameDialog';
 import CodeEnterDialog from '@/modules/lobby/components/page/CodeEnterDialog';
+import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
 
 const GAME_ID_HASH_LENGTH = 3;
 
@@ -28,8 +29,10 @@ const GamePage = () => {
 const GamePageInner = () => {
   const searchParams = useSearchParams();
   const hash = searchParams.get('hash');
-  // ход из расшаренной ссылки (?turn=) — не терять при редиректах
+  // ход из расшаренной ссылки (?turn=) и экскурсия из ссылки-приглашения
+  // (?tour=) — не терять при редиректах
   const focusTurnId = searchParams.get('turn');
+  const tourId = searchParams.get('tour');
 
   return (
     <div className="game-bg">
@@ -37,14 +40,18 @@ const GamePageInner = () => {
         <Loading />
       ) : (
         <UserProvider hash={hash}>
-          <GameDialogPage hash={hash} focusTurnId={focusTurnId} />
+          <GameDialogPage
+            hash={hash}
+            focusTurnId={focusTurnId}
+            tourId={tourId}
+          />
         </UserProvider>
       )}
     </div>
   );
 };
 
-const GameDialogPage = ({ hash, focusTurnId }) => {
+const GameDialogPage = ({ hash, focusTurnId, tourId }) => {
   const dispatch = useDispatch();
   const [myGamesLoaded, setMyGamesLoaded] = useState(false); // @todo: перенести в store
   const myGames = useSelector((state) => state.settings.games);
@@ -69,11 +76,7 @@ const GameDialogPage = ({ hash, focusTurnId }) => {
       return false;
     });
     if (existedGame) {
-      router.push(
-        `/game?hash=${existedGame.hash}${
-          focusTurnId ? `&turn=${focusTurnId}` : ''
-        }`,
-      );
+      router.push(gameEntryUrl(existedGame.hash, { focusTurnId, tourId }));
       return;
     }
     // код неизвестен: спрашиваем ник диалогом, а не логинимся молча под 'user'
@@ -104,7 +107,11 @@ const GameDialogPage = ({ hash, focusTurnId }) => {
     // pre-game диалог умеет только хеш игры, поэтому до разбора кода — ожидание
     return unknownCode ? (
       <div className="game-dialog">
-        <CodeEnterDialog code={hash} focusTurnId={focusTurnId} />
+        <CodeEnterDialog
+          code={hash}
+          focusTurnId={focusTurnId}
+          tourId={tourId}
+        />
       </div>
     ) : (
       <Loading />

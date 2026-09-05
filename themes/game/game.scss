@@ -75,6 +75,39 @@
   }
 }
 
+// Marker of the guide's cursor, shown to everyone on their tour. It lies inside
+// #game-box, above the lines layer (3) and the cards (2), and never takes a
+// click: the follower keeps working while the guide points at things.
+.guide-cursor {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  transition: left 0.08s linear, top 0.08s linear;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.guide-cursor__point {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff4d4f;
+  border: 2px solid #fff;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  flex: none;
+}
+
+.guide-cursor__name {
+  background: #ff4d4f;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 5px;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
 // .remove-line-transition {
 //   #lines {
 //     path {

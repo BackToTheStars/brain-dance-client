@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
+import { gameViewUrl } from '../../helpers/shareParams';
 import { refreshTokenRequest } from '@/modules/game/requests';
 import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
@@ -21,12 +22,12 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const [nickname, setNickname] = useState(info?.nickname || '');
   // const [skipDialog, setSkipDialog] = useState(false);
   const router = useRouter();
-  // ход из расшаренной ссылки (?turn=) — донести до страницы игры
+  // ход из расшаренной ссылки (?turn=) и экскурсия из ссылки-приглашения
+  // (?tour=) — донести до страницы игры
   const searchParams = useSearchParams();
   const focusTurnId = searchParams.get('turn');
-  const gameViewUrl = `/game/view/${hash}${
-    focusTurnId ? `?turn=${focusTurnId}` : ''
-  }`;
+  const tourId = searchParams.get('tour');
+  const viewUrl = gameViewUrl(hash, { focusTurnId, tourId });
 
   const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
   // отказ обновления токена показываем прямо в диалоге, а не alert'ом
@@ -90,10 +91,10 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         //     token,
         //   });
         //   reloadUserInfo();
-        //   router.push(gameViewUrl);
+        //   router.push(viewUrl);
         // } else {
         // ничего не требуется
-        router.push(gameViewUrl);
+        router.push(viewUrl);
         // }
       } else {
         // случаи, когда требуется только изменить никнейм
@@ -113,7 +114,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
               token,
             });
             reloadUserInfo();
-            router.push(gameViewUrl);
+            router.push(viewUrl);
           })
           .catch(() => handleRefreshFailure());
       }
@@ -150,7 +151,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
           token,
         });
         reloadUserInfo();
-        router.push(gameViewUrl);
+        router.push(viewUrl);
       });
     };
 

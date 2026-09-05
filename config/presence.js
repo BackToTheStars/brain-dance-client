@@ -24,8 +24,28 @@ export const MSG_WELCOME = 'welcome';
 export const MSG_MEMBERS = 'members';
 export const MSG_ERROR = 'error';
 
-// The only broadcast kind of this stage: the centre of the leader's viewport.
+// What a guide broadcasts: the centre of their viewport (by the button) and,
+// while "Show my cursor" is on, the position of their mouse over the canvas.
 export const CAST_VIEWPORT = 'viewport';
+export const CAST_CURSOR = 'cursor';
+
+// The guide's cursor is sent at most once per CURSOR_SEND_MS and only when it
+// has moved at least CURSOR_MIN_MOVE_PX from the last sent point: a mouse
+// produces far more events than a tour needs, and the server drops the excess.
+export const CURSOR_SEND_MS = 50;
+export const CURSOR_MIN_MOVE_PX = 2;
+
+// The invite link is `/game/view/<hash>?tour=<tourId>`: this is the parameter
+// name, shared by the link builder, the canvas page and the socket.
+export const TOUR_PARAM = 'tour';
+
+// `error.code` from the server: a rejected command, the connection lives.
+export const ERROR_LEADER = 'leader'; // I am a guide myself
+export const ERROR_NO_LEADER = 'no-leader'; // no such tour (it is over)
+export const ERROR_NOT_LEADER = 'not-leader'; // only a guide broadcasts
+export const ERROR_BAD_CAST = 'bad-cast';
+export const ERROR_BAD_MESSAGE = 'bad-message';
+export const ERROR_ROLE = 'role'; // only players and the owner start a tour
 
 // Reconnect: 1 → 2 → 4 → … → 30 s, ±25 % jitter, reset after `welcome`.
 export const RECONNECT_BASE_MS = 1000;

@@ -7,6 +7,7 @@
 
 import { API_URL } from '@/config/server';
 import {
+  CAST_CURSOR,
   CAST_VIEWPORT,
   CLOSE_AMBIGUOUS,
   CLOSE_BAD_MESSAGE,
@@ -14,9 +15,11 @@ import {
   CLOSE_GAME_NOT_FOUND,
   CLOSE_NORMAL,
   CLOSE_TOKEN,
+  ERROR_NO_LEADER,
   FULL_RETRY_MS,
   MSG_CAST,
   MSG_ERROR,
+  MSG_FOLLOW,
   MSG_HELLO,
   MSG_LEAD,
   MSG_MEMBERS,
@@ -27,6 +30,7 @@ import {
   STATUS_CONNECTING,
   STATUS_ERROR,
   STATUS_RECONNECTING,
+  TOUR_PARAM,
   WS_PATH,
 } from '@/config/presence';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
@@ -51,16 +55,62 @@ const conn = {
   // Failed attempts since the last welcome — drives the backoff.
   attempt: 0,
   timer: null,
-  // Leader mode is restored by the client after a reconnect (the server has
-  // forgotten it with the old connection); a follow is not — the leader may
-  // have a new sid by then, the user picks again from the list.
-  leadWanted: false,
+  // My own id in the last snapshot.
+  sid: null,
+  // The id of the tour I am guiding, learned from the last snapshot. It
+  // outlives the connection on purpose: after a reconnect the client asks for
+  // that very tour back, and its followers stay with it.
+  tour: null,
+  // The tour I follow, so that a reconnect restores the subscription; the id is
+  // stable now, unlike the guide's sid in the first version of the protocol.
+  followWanted: null,
+  // The tour from an invite link: joined once, right after the first welcome.
+  joinTour: null,
+  // The sid of the guide of the tour I follow — whose cursor frames to accept.
+  guideSid: null,
+  // A follow this client sent on its own (from a link or restoring a
+  // subscription): a "no such tour" answer to it is the "Tour ended" notice,
+  // not a command the user has to be told about.
+  autoFollow: false,
   // One token refresh per rejected token; a second rejection drops the access.
   tokenRefreshed: false,
   listening: false,
 };
 
 const socketUrl = () => `${API_URL.replace(/^http/, 'ws')}${WS_PATH}`;
+
+// The invite link has done its job once the subscription is sent: the address
+// bar goes back to the plain canvas so that a reload (or a copied address) does
+// not try to join the tour a second time. Same trick as the one that drops the
+// shared turn from the address, but a function of its own — that one belongs to
+// saving the field.
+const dropTourFromUrl = () => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(TOUR_PARAM)) return;
+  url.searchParams.delete(TOUR_PARAM);
+  window.history.replaceState(
+    window.history.state,
+    '',
+    `${url.pathname}${url.search}${url.hash}`,
+  );
+};
+
+// What the connection has to remember from a snapshot to survive a reconnect:
+// my tour, my subscription and the guide whose cursor frames I accept. Taken
+// from `members` only — the `welcome` list is the state before this connection
+// said anything, and reading it would erase what has to be restored.
+const syncFromMembers = (members) => {
+  const me = members.find((member) => member.sid === conn.sid) || null;
+  conn.tour = me?.tour || null;
+  conn.followWanted = me?.following || null;
+  conn.guideSid = conn.followWanted
+    ? members.find((member) => member.tour === conn.followWanted)?.sid || null
+    : null;
+  // The subscription this connection asked for on its own went through; a
+  // refusal that arrives later is about something else.
+  if (conn.followWanted) conn.autoFollow = false;
+};
 
 const setStatus = (status, error = null) =>
   conn.dispatch({ type: types.PRESENCE_STATUS_SET, payload: { status, error } });
@@ -184,45 +234,107 @@ const handleClose = (ws, event) => {
   scheduleReconnect(backoffDelay());
 };
 
+// The tour this connection has to ask for again after a reconnect: the one the
+// invite link named, otherwise the one I was following.
+const restoreTour = () => {
+  if (conn.joinTour) {
+    const tour = conn.joinTour;
+    conn.joinTour = null;
+    dropTourFromUrl();
+    return tour;
+  }
+  return conn.followWanted;
+};
+
+const handleWelcome = (msg) => {
+  conn.attempt = 0;
+  conn.tokenRefreshed = false;
+  conn.sid = msg.sid;
+  conn.dispatch({
+    type: types.PRESENCE_WELCOME,
+    payload: { sid: msg.sid, members: msg.members || [] },
+  });
+  // A guide takes their tour back by its id: the followers are still on it,
+  // waiting out the break. A new connection with no tour behind it just asks
+  // to follow again — the id is stable, so this works now.
+  if (conn.tour) {
+    send({ t: MSG_LEAD, on: true, tour: conn.tour });
+    conn.joinTour = null;
+    dropTourFromUrl();
+    return;
+  }
+  const tour = restoreTour();
+  if (!tour) return;
+  conn.autoFollow = true;
+  send({ t: MSG_FOLLOW, tour });
+};
+
+const handleCast = (msg) => {
+  if (
+    msg.kind === CAST_VIEWPORT &&
+    Number.isFinite(msg.x) &&
+    Number.isFinite(msg.y)
+  ) {
+    conn.dispatch(centerViewportAtPosition({ x: msg.x, y: msg.y }));
+    return;
+  }
+  if (msg.kind === CAST_CURSOR) {
+    // Only my own guide draws on my canvas.
+    if (!conn.guideSid || msg.from !== conn.guideSid) return;
+    const cursor =
+      msg.off === true || !Number.isFinite(msg.x) || !Number.isFinite(msg.y)
+        ? null
+        : { from: msg.from, x: msg.x, y: msg.y };
+    conn.dispatch({ type: types.PRESENCE_CURSOR_SET, payload: { cursor } });
+    return;
+  }
+  console.warn('presence: unsupported cast', msg.kind);
+};
+
+const handleError = (msg) => {
+  // The tour from the link (or the one I was following) is gone: that is a
+  // state of the tour block, not a failed command of mine.
+  if (msg.code === ERROR_NO_LEADER && conn.autoFollow) {
+    conn.autoFollow = false;
+    conn.followWanted = null;
+    conn.guideSid = null;
+    conn.dispatch({
+      type: types.PRESENCE_TOUR_ENDED_SET,
+      payload: { tourEnded: true },
+    });
+    return;
+  }
+  // A rejected command — the connection lives, the panel shows the text.
+  conn.dispatch({
+    type: types.PRESENCE_ERROR_SET,
+    payload: {
+      error: msg.message || `Command rejected (${msg.code || 'unknown'})`,
+    },
+  });
+};
+
 const handleMessage = (msg) => {
   switch (msg.t) {
     case MSG_WELCOME:
-      conn.attempt = 0;
-      conn.tokenRefreshed = false;
-      conn.dispatch({
-        type: types.PRESENCE_WELCOME,
-        payload: { sid: msg.sid, members: msg.members || [] },
-      });
-      if (conn.leadWanted) send({ t: MSG_LEAD, on: true });
+      handleWelcome(msg);
       return;
 
-    case MSG_MEMBERS:
+    case MSG_MEMBERS: {
+      const members = msg.members || [];
+      syncFromMembers(members);
       conn.dispatch({
         type: types.PRESENCE_MEMBERS_SET,
-        payload: { members: msg.members || [] },
+        payload: { members },
       });
       return;
+    }
 
     case MSG_CAST:
-      if (
-        msg.kind === CAST_VIEWPORT &&
-        Number.isFinite(msg.x) &&
-        Number.isFinite(msg.y)
-      ) {
-        conn.dispatch(centerViewportAtPosition({ x: msg.x, y: msg.y }));
-      } else {
-        console.warn('presence: unsupported cast', msg.kind);
-      }
+      handleCast(msg);
       return;
 
     case MSG_ERROR:
-      // A rejected command — the connection lives, the panel shows the text.
-      conn.dispatch({
-        type: types.PRESENCE_ERROR_SET,
-        payload: {
-          error: msg.message || `Command rejected (${msg.code || 'unknown'})`,
-        },
-      });
+      handleError(msg);
       return;
 
     default:
@@ -303,11 +415,19 @@ const removeListeners = () => {
   window.removeEventListener('pagehide', onPageHide);
 };
 
-export const connect = ({ hash, dispatch, reloadUserInfo = null }) => {
+// `joinTour` is the tour from an invite link: the subscription goes out once,
+// right after the first welcome.
+export const connect = ({
+  hash,
+  dispatch,
+  reloadUserInfo = null,
+  joinTour = null,
+}) => {
   if (typeof window === 'undefined' || !hash) return;
   if (conn.wanted && conn.hash === hash) {
     conn.dispatch = dispatch;
     conn.reloadUserInfo = reloadUserInfo;
+    if (joinTour) conn.joinTour = joinTour;
     wakeUp();
     return;
   }
@@ -315,6 +435,7 @@ export const connect = ({ hash, dispatch, reloadUserInfo = null }) => {
   conn.hash = hash;
   conn.dispatch = dispatch;
   conn.reloadUserInfo = reloadUserInfo;
+  conn.joinTour = joinTour;
   conn.wanted = true;
   addListeners();
   open();
@@ -327,14 +448,19 @@ export const disconnect = (code = CLOSE_NORMAL) => {
   closeSocket(code);
   conn.opened = 0;
   conn.attempt = 0;
-  conn.leadWanted = false;
+  conn.sid = null;
+  conn.tour = null;
+  conn.followWanted = null;
+  conn.joinTour = null;
+  conn.guideSid = null;
+  conn.autoFollow = false;
   conn.tokenRefreshed = false;
 };
 
-// Returns true when the message went out. Remembers the leader mode the user
-// asked for, so that it can be restored after a reconnect.
+// Returns true when the message went out. Ending a tour is remembered here and
+// not waited for in a snapshot: nothing should ask that id back after it.
 export const send = (msg) => {
-  if (msg.t === MSG_LEAD) conn.leadWanted = !!msg.on;
+  if (msg.t === MSG_LEAD && !msg.on) conn.tour = null;
   if (!isOpen()) return false;
   conn.ws.send(JSON.stringify(msg));
   return true;

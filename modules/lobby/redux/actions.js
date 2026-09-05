@@ -10,6 +10,7 @@ import { openModal } from '@/modules/ui/redux/actions';
 import { MODAL_CONFIRM } from '@/config/lobby/modal';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
 import { getGameUserTokenRequest } from '@/modules/game/requests';
+import { gameEntryUrl } from '../helpers/shareParams';
 
 export const loadTextSettings = (settings) => (dispatch) => {
   dispatch({
@@ -160,8 +161,9 @@ export const toggleSidebar = (sidebar) => (dispatch, getState) => {
   });
 };
 
+// `share` — хвост адреса из ссылки: ход (`?turn=`) и экскурсия (`?tour=`)
 export const lobbyEnterGameWithConfirm =
-  (code, nickname, focusTurnId = null) =>
+  (code, nickname, share = {}) =>
   (dispatch) => {
   return new Promise((resolve, reject) => {
     getGameUserTokenRequest(code, nickname).then((data) => {
@@ -178,10 +180,8 @@ export const lobbyEnterGameWithConfirm =
                 info,
                 token,
               });
-              // не терять ход из расшаренной ссылки (?turn=)
-              location.replace(
-                `/game?hash=${hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
-              );
+              // не терять ход и экскурсию из ссылки (?turn=, ?tour=)
+              location.replace(gameEntryUrl(hash, share));
             },
           }),
         );
@@ -195,7 +195,7 @@ export const lobbyEnterGameWithConfirm =
 // вход по коду из handoff-ссылки лобби: ник уже спросили диалогом, подтверждать
 // нечего — сохраняем доступ и уходим на хеш игры, где ждёт обычный pre-game диалог
 export const lobbyEnterGameByCode =
-  (code, nickname, focusTurnId = null) =>
+  (code, nickname, share = {}) =>
   (dispatch) => {
   return new Promise((resolve, reject) => {
     getGameUserTokenRequest(code, nickname).then((data) => {
@@ -211,9 +211,7 @@ export const lobbyEnterGameByCode =
         );
         setGameInfoIntoStorage(info.hash, { info, token });
         resolve(data);
-        location.replace(
-          `/game?hash=${info.hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
-        );
+        location.replace(gameEntryUrl(info.hash, share));
       } else {
         reject(data?.message || 'Неизвестная ошибка');
       }

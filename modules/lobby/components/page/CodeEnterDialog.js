@@ -8,7 +8,7 @@ import { lobbyEnterGameByCode } from '../../redux/actions';
 
 // Диалог входа по неизвестному коду на `/game?hash=<код>` (ссылка из лобби).
 // До него здесь был тихий автологин с ником 'user', и ник при переходе терялся.
-const CodeEnterDialog = ({ code, focusTurnId }) => {
+const CodeEnterDialog = ({ code, focusTurnId, tourId }) => {
   const t = useTranslations('Lobby');
   const dispatch = useDispatch();
   const myGames = useSelector((state) => state.settings.games);
@@ -33,12 +33,12 @@ const CodeEnterDialog = ({ code, focusTurnId }) => {
     }
     setError('');
     setPending(true);
-    dispatch(lobbyEnterGameByCode(code, nickname.trim(), focusTurnId)).catch(
-      (msg) => {
-        setPending(false);
-        setError(msg);
-      },
-    );
+    dispatch(
+      lobbyEnterGameByCode(code, nickname.trim(), { focusTurnId, tourId }),
+    ).catch((msg) => {
+      setPending(false);
+      setError(msg);
+    });
   };
 
   return (

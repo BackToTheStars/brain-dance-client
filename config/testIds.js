@@ -205,18 +205,29 @@ export const TID = {
 
   // Присутствие в игре: переключатель Online в панели Info
   // (modules/panels/components/InfoPanel.js) и панель присутствия
-  // (modules/presence/components/PresencePanel.js) — список тех, кто онлайн,
-  // режим ведущего, кнопка «перенести всех подписчиков ко мне»
+  // (modules/presence/components/PresencePanel.js) — слева список тех, кто
+  // онлайн, справа блок экскурсии: гид (прицел «перенести всех ко мне»,
+  // ссылка-приглашение, «Show my cursor») или ведомый. Маркер курсора гида
+  // (modules/presence/components/GuideCursor.js) живёт на холсте.
   presence: {
     toggle: 'presence-toggle', // antd Switch «Online» в InfoPanel (атрибут на кнопке role=switch)
     panel: 'presence-panel', // корень панели присутствия
     status: 'presence-status', // текст статуса (+ data-status: connecting|online|reconnecting|error)
-    lead: 'presence-lead', // antd Switch «Leader mode»
+    lead: 'presence-lead', // кнопка «Start a tour» / «End the tour» (+ data-on="true|false")
     cast: (kind) => `presence-cast-${kind}`, // кнопка трансляции: viewport («Bring everyone to me»)
-    member: 'presence-member', // строка участника (+ data-sid, data-nickname, data-leader, data-following)
-    follow: 'presence-follow', // Follow/Unfollow в строке чужого ведущего (+ data-sid)
-    unfollow: 'presence-unfollow', // Unfollow в строке «You follow <ник>»
-    followers: 'presence-followers', // число подписчиков у ведущего (+ data-count)
+    member: 'presence-member', // строка участника (+ data-sid, data-nickname, data-leader, data-tour, data-following)
+    follow: 'presence-follow', // «Join the tour» / «Leave the tour» в строке чужого гида (+ data-tour)
+    unfollow: 'presence-unfollow', // «Leave the tour» в строке «You follow <ник>»
+    followers: 'presence-followers', // число подписчиков у гида (+ data-count)
+    guide: 'presence-guide', // блок гида в правом столбце (виден, когда веду)
+    follower: 'presence-follower', // блок ведомого в правом столбце (виден, когда не веду)
+    tourLink: 'presence-tour-link', // readOnly-поле со ссылкой-приглашением (ссылка — в value)
+    tourCopy: 'presence-tour-copy', // кнопка «Copy» рядом с полем ссылки
+    cursor: 'presence-cursor', // antd Switch «Show my cursor» у гида
+    guideCursor: 'presence-guide-cursor', // маркер курсора гида на холсте (+ data-sid, data-nickname)
+    guideAway: 'presence-guide-away', // «Guide is reconnecting…» у ведомого
+    tourEnded: 'presence-tour-ended', // «Tour ended» у ведомого
+    close: 'presence-close', // кнопка «Close» панели (то же, что выключить Online)
     error: 'presence-error', // текст ошибки: отказ команды сервером или причина остановки
   },
 

@@ -16,7 +16,8 @@ import {
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { leaveGame } from '@/modules/presence/redux/actions';
+import GuideCursor from '@/modules/presence/components/GuideCursor';
+import { leaveGame, setOnline } from '@/modules/presence/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,8 +30,9 @@ import {
 
 const updateViewportGeometryQueue = getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY);
 
-const Game = ({ hash, focusTurnId = null }) => {
+const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const gameBox = useRef();
+  const tourJoined = useRef(false);
   const dispatch = useDispatch();
   const [isEditMode, setIsEditMode] = useState(false);
   const stage = useSelector((state) => state.game.stage);
@@ -39,7 +41,7 @@ const Game = ({ hash, focusTurnId = null }) => {
     [stage],
   );
 
-  const { info } = useUserContext();
+  const { info, reloadUserInfo } = useUserContext();
   const { nickname } = info;
 
   const gameBoxClasses = useMemo(() => {
@@ -59,6 +61,12 @@ const Game = ({ hash, focusTurnId = null }) => {
     dispatch(loadFullGame(hash, { focusTurnId })).then(() => {
       dispatch(setGameStage(GAME_STAGE_ANIMATED_LOADING));
       dispatch(recalcAreaRect());
+      // Пришли по ссылке-приглашению: включаем присутствие сами и подписываемся
+      // на экскурсию — один раз, дальше адрес уже без параметра
+      if (tourId && !tourJoined.current) {
+        tourJoined.current = true;
+        dispatch(setOnline(true, { reloadUserInfo, joinTour: tourId }));
+      }
     });
     dispatch(
       addNotification({
@@ -143,6 +151,7 @@ const Game = ({ hash, focusTurnId = null }) => {
           <>
             <Turns />
             <QuotesLinesLayer />
+            <GuideCursor />
             {isEditMode && (
               <div className="rec-rectangle">
                 <div className="rec-label" />

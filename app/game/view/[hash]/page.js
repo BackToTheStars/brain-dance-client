@@ -12,6 +12,7 @@ import {
 import Loading from '@/modules/ui/components/common/Loading';
 import { TOKEN_REFETCH_DELAY } from '@/config/user';
 import { refreshTokenRequest } from '@/modules/game/requests';
+import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
 const Game = dynamic(() => import('@/modules/game/components/Game'), {
   ssr: false,
 });
@@ -27,8 +28,10 @@ const GamePage = () => {
 const GamePageInner = () => {
   const { hash } = useParams();
   // ссылка на ход (задача «поделиться адресом хода»): ?turn=<turnId>
+  // ссылка-приглашение в экскурсию: ?tour=<tourId>
   const searchParams = useSearchParams();
   const focusTurnId = searchParams.get('turn');
+  const tourId = searchParams.get('tour');
   const [hashChecked, setHashChecked] = useState(false);
   const router = useRouter();
 
@@ -40,10 +43,8 @@ const GamePageInner = () => {
     } = getGameInfo(hash) || {};
     // const { skipDialog } = info || {};
     if (!token) {
-      // без токена — на диалог входа в игру, сохранив ход из ссылки
-      router.push(
-        `/game?hash=${hash}${focusTurnId ? `&turn=${focusTurnId}` : ''}`,
-      );
+      // без токена — на диалог входа в игру, сохранив ход и экскурсию из ссылки
+      router.push(gameEntryUrl(hash, { focusTurnId, tourId }));
       return;
     }
     const [_, payload] = token.split('.');
@@ -84,7 +85,7 @@ const GamePageInner = () => {
           <Loading />
         ) : (
           <UserProvider hash={hash}>
-            <Game hash={hash} focusTurnId={focusTurnId} />
+            <Game hash={hash} focusTurnId={focusTurnId} tourId={tourId} />
           </UserProvider>
         )}
       </div>
