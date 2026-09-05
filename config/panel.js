@@ -22,6 +22,7 @@ export const PANEL_NOTIFICATIONS = 'panel_notifications';
 export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
 export const PANEL_TURNS_PASTE = 'panel_turns_paste';
+export const PANEL_PRESENCE = 'panel_presence';
 
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';

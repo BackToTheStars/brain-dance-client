@@ -9,6 +9,7 @@ import { combineReducers } from 'redux';
 import { lobbyReducer } from '@/modules/lobby/redux/reducers';
 import { settingsReducer } from '@/modules/settings/redux/reducers';
 import languageReducer from '@/modules/settings/redux/lang/languageSlice';
+import { presenceReducer } from '@/modules/presence/redux/reducers';
 
 // COMBINED REDUCERS
 // Ключа `games` здесь больше нет: слайс `games-redux` был мёртв целиком —
@@ -28,6 +29,7 @@ const reducers = {
   lobby: lobbyReducer,
   settings: settingsReducer,
   lang: languageReducer,
+  presence: presenceReducer,
 };
 
 export default combineReducers(reducers);

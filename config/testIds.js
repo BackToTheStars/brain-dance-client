@@ -203,6 +203,23 @@ export const TID = {
     row: 'admin-youtube-row', // строка таблицы (+ data-turn-id)
   },
 
+  // Присутствие в игре: переключатель Online в панели Info
+  // (modules/panels/components/InfoPanel.js) и панель присутствия
+  // (modules/presence/components/PresencePanel.js) — список тех, кто онлайн,
+  // режим ведущего, кнопка «перенести всех подписчиков ко мне»
+  presence: {
+    toggle: 'presence-toggle', // antd Switch «Online» в InfoPanel (атрибут на кнопке role=switch)
+    panel: 'presence-panel', // корень панели присутствия
+    status: 'presence-status', // текст статуса (+ data-status: connecting|online|reconnecting|error)
+    lead: 'presence-lead', // antd Switch «Leader mode»
+    cast: (kind) => `presence-cast-${kind}`, // кнопка трансляции: viewport («Bring everyone to me»)
+    member: 'presence-member', // строка участника (+ data-sid, data-nickname, data-leader, data-following)
+    follow: 'presence-follow', // Follow/Unfollow в строке чужого ведущего (+ data-sid)
+    unfollow: 'presence-unfollow', // Unfollow в строке «You follow <ник>»
+    followers: 'presence-followers', // число подписчиков у ведущего (+ data-count)
+    error: 'presence-error', // текст ошибки: отказ команды сервером или причина остановки
+  },
+
   // Форма добавления/редактирования turn
   addTurn: {
     typeBtn: 'add-turn-type',

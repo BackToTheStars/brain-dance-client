@@ -16,6 +16,7 @@ import {
   PANEL_MINIMAP,
   PANEL_MINIMAP_STYLES,
   PANEL_NOTIFICATIONS,
+  PANEL_PRESENCE,
   PANEL_SETTINGS,
   PANEL_TURN_INFO,
   PANEL_TURNS_PASTE,
@@ -46,6 +47,7 @@ import Notifications from '../ui/components/Notifications';
 import LinesPanel from './components/LinesPanel';
 import TurnInfo from '../turns/components/TurnInfo';
 import PasteTurnPanel from './components/PasteTurnPanel';
+import PresencePanel from '../presence/components/PresencePanel';
 
 export const panels = [
   {
@@ -128,5 +130,15 @@ export const panels = [
     component: PasteTurnPanel,
     isDisplayed: false,
     width: () => `50vw`,
+  },
+  // Присутствие в игре: кто онлайн, режим ведущего. Открывается и закрывается
+  // вместе с переключателем Online в панели Info; ничего не запоминает —
+  // online по умолчанию выключен при каждой загрузке (без fieldsToSave).
+  {
+    type: PANEL_PRESENCE,
+    position: POSITION_FLEXIBLE,
+    component: PresencePanel,
+    isDisplayed: false,
+    width: () => '360px',
   },
 ];

@@ -6,16 +6,22 @@ import { togglePanel } from '../redux/actions';
 import { PANEL_INFO } from '@/config/panel';
 import EditGameForm from './info/EditGameForm';
 import { useState } from 'react';
-import { Button } from 'antd';
+import { Button, Switch } from 'antd';
+import { TID } from '@/config/testIds';
+import { STATUS_OFF } from '@/config/presence';
+import { setOnline } from '@/modules/presence/redux/actions';
 
 const getUrl = () => window.location.href;
 
 const InfoPanel = () => {
   const dispatch = useDispatch();
   const game = useSelector((state) => state.game.game);
+  // Переключатель следует за состоянием соединения, а не хранит своё:
+  // включён при любом статусе, кроме «выключено», в том числе при ошибке
+  const online = useSelector((state) => state.presence.status !== STATUS_OFF);
   const [viewMode, setViewMode] = useState(true);
 
-  const { info, can } = useUserContext();
+  const { info, can, reloadUserInfo } = useUserContext();
   const { role, nickname } = info;
 
   if (!game) return <>Loading...</>;
@@ -70,6 +76,21 @@ const InfoPanel = () => {
             <tr className="border-b border-gray-300">
               <td className="py-2 px-4">Your nickname:</td>
               <td className="py-2 px-4">{nickname}</td>
+            </tr>
+            {/* Присутствие в игре: открывает сокет и панель со списком тех,
+                кто онлайн; доступно любой роли */}
+            <tr className="border-b border-gray-300">
+              <td className="py-2 px-4">Online:</td>
+              <td className="py-2 px-4">
+                <Switch
+                  size="small"
+                  checked={online}
+                  onChange={(checked) =>
+                    dispatch(setOnline(checked, { reloadUserInfo }))
+                  }
+                  data-test-id={TID.presence.toggle}
+                />
+              </td>
             </tr>
             <tr className="border-b border-gray-300">
               <td className="py-2 px-4">Your role:</td>

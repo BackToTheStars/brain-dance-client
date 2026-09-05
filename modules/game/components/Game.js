@@ -16,6 +16,7 @@ import {
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
+import { leaveGame } from '@/modules/presence/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -67,6 +68,12 @@ const Game = ({ hash, focusTurnId = null }) => {
     );
     return () => dispatch(setGameStage(GAME_STAGE_INIT));
   }, [hash]);
+
+  // Уход с холста (в лобби, на другую игру) не должен оставлять соединение
+  // присутствия: закрываем сокет и его панель, online снова выключен
+  useEffect(() => {
+    return () => dispatch(leaveGame());
+  }, []);
 
   useEffect(() => {
     if (!window) return;
