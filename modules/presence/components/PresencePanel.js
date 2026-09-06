@@ -1,13 +1,28 @@
 'use client';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AimOutlined } from '@ant-design/icons';
-import { Button, Input, Switch, Tooltip } from 'antd';
+import {
+  AimOutlined,
+  ClearOutlined,
+  DragOutlined,
+  EditOutlined,
+  LinkOutlined,
+  PoweroffOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+import { Input, Switch, Tooltip } from 'antd';
 
-import { CAST_VIEWPORT, STATUS_ONLINE, TOUR_PARAM } from '@/config/presence';
+import {
+  CAST_VIEWPORT,
+  STATUS_CONNECTING,
+  STATUS_ONLINE,
+  STATUS_RECONNECTING,
+  TOUR_PARAM,
+} from '@/config/presence';
 import { TID } from '@/config/testIds';
 import { ROLE_GAME_OWNER, ROLE_GAME_PLAYER, ROLES } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
+import Button from '@/modules/panels/components/PanelButton';
 import {
   castViewport,
   follow,
@@ -21,10 +36,8 @@ import {
 
 const roleName = (role) => ROLES[role]?.name || `Role ${role}`;
 
-// Who is online in this game, and the tour: the left column is the list, the
-// right one is either the guide's own controls or what a follower sees. The
-// panel is movable: jQuery UI draggable on the panel wrapper, the same recipe
-// as TurnInfo. Its position is not remembered.
+// Tour actions first; the people list opens for choosing a guide and folds
+// while on a tour. Only the heading moves the panel, not its controls.
 const PresencePanel = () => {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.presence.status);
@@ -41,11 +54,15 @@ const PresencePanel = () => {
 
   const ref = useRef();
   const linkRef = useRef();
+  const id = useId();
+  const [peopleOpen, setPeopleOpen] = useState(true);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!ref.current) return;
     if (typeof $ === 'undefined') return;
     const el = $(ref.current.parentNode);
-    el.draggable();
+    el.draggable({ handle: '.presence-panel__header', containment: 'window' });
     return () => el.draggable('destroy');
   }, []);
 
@@ -66,6 +83,22 @@ const PresencePanel = () => {
   // a visitor is not offered the button at all.
   const canLead = [ROLE_GAME_OWNER, ROLE_GAME_PLAYER].includes(info?.role);
 
+  useEffect(() => {
+    setPeopleOpen(!iLead && !following);
+  }, [iLead, following]);
+  useEffect(() => {
+    setInviteOpen(false);
+    setCopied(false);
+  }, [myTour]);
+
+  // Choosing the already active tool is harmless. Only Clear & exit calls
+  // setPencil(false), whose existing contract clears the shared strokes.
+  const selectTool = (erasing) => {
+    if (!online) return;
+    if (!pencil) dispatch(setPencil(true));
+    if (eraser !== erasing) dispatch(setEraser(erasing));
+  };
+
   const tourLink = useMemo(() => {
     if (!myTour || !hash) return '';
     const origin = typeof window === 'undefined' ? '' : window.location.origin;
@@ -81,218 +114,237 @@ const PresencePanel = () => {
       selectField();
       return;
     }
-    navigator.clipboard.writeText(tourLink).catch(selectField);
+    navigator.clipboard.writeText(tourLink)
+      .then(() => setCopied(true))
+      .catch(selectField);
   };
 
   return (
-    <div ref={ref} className="p-3" data-test-id={TID.presence.panel}>
+    <div ref={ref} className="presence-panel p-3" data-test-id={TID.presence.panel}>
+      <div
+        className="presence-panel__header flex items-center justify-between gap-3 pb-3"
+        data-test-id={TID.presence.status}
+        data-status={status}
+      >
+        <span className="flex items-center gap-2 font-bold">
+          <TeamOutlined /> People &amp; tours
+        </span>
+        <Tooltip title="Drag to move the panel"><DragOutlined /></Tooltip>
+      </div>
+      {!online && (
+        <div className="pb-3" role="status" data-test-id={TID.presence.connection}>
+          {status === STATUS_CONNECTING ? 'Connecting…' :
+            status === STATUS_RECONNECTING ? 'Reconnecting…' : 'Connection unavailable'}
+        </div>
+      )}
       {error && (
-        <div className="pb-2 text-red-300" data-test-id={TID.presence.error}>
+        <div className="pb-3 text-red-300" role="alert" data-test-id={TID.presence.error}>
           {error}
         </div>
       )}
 
-      <div className="flex gap-3">
-        <div className="w-1/2 min-w-0">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
-            <span>
-              Status:{' '}
-              <b data-test-id={TID.presence.status} data-status={status}>
-                {status}
-              </b>
-            </span>
-            <span>{info.nickname}</span>
+      {iLead ? (
+        <div className="flex flex-col gap-3" data-test-id={TID.presence.guide}>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="font-bold">Your tour</div>
+              <div data-test-id={TID.presence.followers} data-count={followersCount}>
+                {followersCount} {followersCount === 1 ? 'follower' : 'followers'}
+              </div>
+            </div>
+            <Button
+              disabled={!online}
+              onClick={() => dispatch(setLead(false))}
+              data-test-id={TID.presence.lead}
+              data-on="true"
+            >End tour</Button>
           </div>
-
-          <ul className="m-0 list-none border-t border-gray-500 p-0">
-            {members.map((member) => {
-              const isMe = member.sid === sid;
-              const followed = !!following && following === member.tour;
-              return (
-                <li
-                  key={member.sid}
-                  className="flex flex-wrap items-center gap-x-2 border-b border-gray-500 py-1"
-                  data-test-id={TID.presence.member}
-                  data-sid={member.sid}
-                  data-nickname={member.nickname}
-                  data-leader={member.leader ? 'true' : 'false'}
-                  data-tour={member.tour || ''}
-                  data-following={member.following || ''}
-                >
-                  <span className="truncate font-bold">{member.nickname}</span>
-                  <span className="opacity-70">{roleName(member.role)}</span>
-                  {member.leader && (
-                    <span className="rounded bg-blue-500 px-1 text-xs text-white">
-                      guide
-                    </span>
-                  )}
-                  {isMe && <span className="opacity-70">(you)</span>}
-                  {member.leader && !isMe && (
-                    <Button
-                      size="small"
-                      className="ml-auto"
-                      disabled={!online || iLead}
-                      onClick={() =>
-                        dispatch(follow(followed ? null : member.tour))
-                      }
-                      data-test-id={TID.presence.follow}
-                      data-tour={member.tour || ''}
-                    >
-                      {followed ? 'Leave the tour' : 'Join the tour'}
-                    </Button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <div className="w-1/2 min-w-0">
-          {iLead ? (
-            <div data-test-id={TID.presence.guide}>
-              <div className="flex items-center gap-2 pb-2">
-                <Tooltip title="Bring everyone to me">
-                  <Button
-                    size="small"
-                    icon={<AimOutlined />}
-                    disabled={!online}
-                    onClick={() => dispatch(castViewport())}
-                    data-test-id={TID.presence.cast(CAST_VIEWPORT)}
-                  />
-                </Tooltip>
-                <span
-                  data-test-id={TID.presence.followers}
-                  data-count={followersCount}
-                >
-                  {followersCount}{' '}
-                  {followersCount === 1 ? 'follower' : 'followers'}
-                </span>
-              </div>
-
-              <div className="pb-2">
-                <div className="pb-1">Tour link</div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    size="small"
-                    readOnly
-                    ref={linkRef}
-                    value={tourLink}
-                    className="min-w-0 flex-1"
-                    data-test-id={TID.presence.tourLink}
-                  />
-                  <Button
-                    size="small"
-                    onClick={copyTourLink}
-                    data-test-id={TID.presence.tourCopy}
-                  >
-                    Copy
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pb-2">
-                <span>Show my cursor</span>
-                <Switch
-                  size="small"
-                  checked={cursorSharing}
-                  disabled={!online}
-                  onChange={(on) => dispatch(setCursorSharing(on))}
-                  data-test-id={TID.presence.cursor}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pb-2">
-                <span>Pencil</span>
-                <Switch
-                  size="small"
-                  checked={pencil}
-                  disabled={!online}
-                  onChange={(on) => dispatch(setPencil(on))}
-                  data-test-id={TID.presence.pencil}
-                />
-                <span className="pl-2">Eraser</span>
-                <Switch
-                  size="small"
-                  checked={eraser}
-                  disabled={!online || !pencil}
-                  onChange={(on) => dispatch(setEraser(on))}
-                  data-test-id={TID.presence.eraser}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pb-2">
-                <span>Show the group on the minimap</span>
-                <Switch
-                  size="small"
-                  checked={groupOnMinimap}
-                  disabled={!online}
-                  onChange={(on) => dispatch(setGroupOnMinimap(on))}
-                  data-test-id={TID.presence.group}
-                />
-              </div>
-
+          <div className="flex flex-wrap items-center">
+            <Tooltip title="Bring everyone to me">
               <Button
-                size="small"
+                wide
+                icon={<AimOutlined />}
                 disabled={!online}
-                onClick={() => dispatch(setLead(false))}
-                data-test-id={TID.presence.lead}
-                data-on="true"
+                onClick={() => dispatch(castViewport())}
+                data-test-id={TID.presence.cast(CAST_VIEWPORT)}
+              >Bring group here</Button>
+            </Tooltip>
+            <Button
+              icon={<LinkOutlined />}
+              aria-expanded={inviteOpen}
+              aria-controls={`${id}-invite`}
+              onClick={() => { setInviteOpen(!inviteOpen); setCopied(false); }}
+              data-test-id={TID.presence.invite}
+            >Invite</Button>
+          </div>
+          <div id={`${id}-invite`} hidden={!inviteOpen}>
+            <label htmlFor={`${id}-link`} className="block pb-1">Tour link</label>
+            <div className="flex items-center">
+              <Input
+                id={`${id}-link`}
+                readOnly
+                ref={linkRef}
+                value={tourLink}
+                onFocus={(event) => event.target.select()}
+                className="min-w-0 flex-1"
+                data-test-id={TID.presence.tourLink}
+              />
+              <Button
+                onClick={copyTourLink}
+                data-test-id={TID.presence.tourCopy}
               >
-                End the tour
+                {copied ? 'Copied' : 'Copy'}
               </Button>
             </div>
-          ) : (
-            <div data-test-id={TID.presence.follower}>
-              <div className="pb-2">Tour</div>
-              {canLead && (
+          </div>
+
+          <div>
+            <div className="pb-2">Drawing</div>
+            <div className="flex flex-wrap" role="group" aria-label="Drawing tools">
+              <Button
+                icon={<EditOutlined />}
+                aria-pressed={pencil && !eraser}
+                disabled={!online}
+                onClick={() => selectTool(false)}
+                data-test-id={TID.presence.pencil}
+              >Pencil</Button>
+              <Button
+                icon={<ClearOutlined />}
+                aria-pressed={pencil && eraser}
+                disabled={!online}
+                onClick={() => selectTool(true)}
+                data-test-id={TID.presence.eraser}
+              >Eraser</Button>
+              {pencil && (
                 <Button
-                  size="small"
                   disabled={!online}
-                  onClick={() => dispatch(setLead(true))}
-                  data-test-id={TID.presence.lead}
-                  data-on="false"
-                >
-                  Start a tour
-                </Button>
+                  onClick={() => dispatch(setPencil(false))}
+                  data-test-id={TID.presence.drawClear}
+                >Clear &amp; exit</Button>
               )}
-              {!!guide && (
-                <div className="flex items-center gap-2 pt-2">
-                  <span>
-                    You follow <b>{guide.nickname}</b>
-                  </span>
-                  <Button
-                    size="small"
-                    disabled={!online}
-                    onClick={() => dispatch(follow(null))}
-                    data-test-id={TID.presence.unfollow}
-                  >
-                    Leave the tour
-                  </Button>
-                </div>
-              )}
-              {!!following && !guide && (
-                <div className="pt-2" data-test-id={TID.presence.guideAway}>
+            </div>
+            <div className="pt-2 text-sm">
+              {pencil ? 'Clear & exit removes your strokes for everyone.' : 'Drawing is off.'}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                id={`${id}-cursor`}
+                size="small"
+                checked={cursorSharing}
+                disabled={!online}
+                onChange={(on) => dispatch(setCursorSharing(on))}
+                data-test-id={TID.presence.cursor}
+              />
+              <label htmlFor={`${id}-cursor`}>Share cursor</label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id={`${id}-group`}
+                size="small"
+                checked={groupOnMinimap}
+                disabled={!online}
+                onChange={(on) => dispatch(setGroupOnMinimap(on))}
+                data-test-id={TID.presence.group}
+              />
+              <label htmlFor={`${id}-group`}>Group on minimap</label>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-start gap-3" data-test-id={TID.presence.follower}>
+          <div className="font-bold">
+            {following ? (guide ? `${guide.nickname}’s tour` : 'Following a tour') : 'You’re exploring'}
+          </div>
+          {tourEnded && !following && (
+            <div role="status" data-test-id={TID.presence.tourEnded}>Tour ended</div>
+          )}
+          {!following && canLead && (
+            <Button
+              disabled={!online}
+              onClick={() => dispatch(setLead(true))}
+              data-test-id={TID.presence.lead}
+              data-on="false"
+            >
+              Start a tour
+            </Button>
+          )}
+          {!!following && (
+            <>
+              {!guide && online && (
+                <div role="status" data-test-id={TID.presence.guideAway}>
                   Guide is reconnecting…
                 </div>
               )}
-              {tourEnded && !following && (
-                <div className="pt-2" data-test-id={TID.presence.tourEnded}>
-                  Tour ended
-                </div>
-              )}
-            </div>
+              <Button
+                disabled={!online}
+                onClick={() => dispatch(follow(null))}
+                data-test-id={TID.presence.unfollow}
+              >
+                Leave tour
+              </Button>
+            </>
           )}
         </div>
-      </div>
+      )}
 
-      <div className="pt-3">
+      <details
+        className="presence-panel__people mt-3 pt-3"
+        open={peopleOpen}
+        onToggle={(event) => setPeopleOpen(event.currentTarget.open)}
+        data-test-id={TID.presence.people}
+      >
+        <summary>People · {members.length}</summary>
+        <ul className="m-0 flex list-none flex-col gap-3 p-0 pt-3">
+          {members.map((member) => {
+            const isMe = member.sid === sid;
+            const memberGuide = member.following
+              ? members.find((person) => person.tour === member.following)
+              : null;
+            const tourRole = member.leader
+              ? (following === member.tour ? 'Your guide' : 'Tour guide')
+              : member.following
+                ? (member.following === myTour ? 'Following you' :
+                  memberGuide ? `Following ${memberGuide.nickname}` : 'Following a tour')
+                : null;
+            return (
+              <li
+                key={member.sid}
+                className="flex items-center justify-between gap-3"
+                data-test-id={TID.presence.member}
+                data-sid={member.sid}
+                data-nickname={member.nickname}
+                data-leader={member.leader ? 'true' : 'false'}
+                data-tour={member.tour || ''}
+                data-following={member.following || ''}
+              >
+                <div className="min-w-0 break-words">
+                  <div className="font-bold">{member.nickname}{isMe && ' (you)'}</div>
+                  <div className="text-sm">{roleName(member.role)}{tourRole && ` · ${tourRole}`}</div>
+                </div>
+                {!iLead && !following && member.leader && !isMe && (
+                  <Button
+                    className="shrink-0"
+                    disabled={!online}
+                    onClick={() => dispatch(follow(member.tour))}
+                    data-test-id={TID.presence.follow}
+                    data-tour={member.tour || ''}
+                  >Join tour</Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </details>
+
+      <div className="presence-panel__footer mt-3 flex justify-end pt-3">
         <Button
-          size="small"
+          icon={<PoweroffOutlined />}
           onClick={() => dispatch(setOnline(false))}
-          className="px-3 py-2 bg-blue-500 text-white rounded"
           data-test-id={TID.presence.close}
         >
-          Close
+          Go offline
         </Button>
       </div>
     </div>

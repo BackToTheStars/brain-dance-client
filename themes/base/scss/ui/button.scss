@@ -1,3 +1,8 @@
+// Keep control labels out of text selections across all standard button families.
+button, .btn, .base-button, .ant-btn {
+  user-select: none;
+}
+
 .base-button {
   display: inline-flex;
   align-items: center;

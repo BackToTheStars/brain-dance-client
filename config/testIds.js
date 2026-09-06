@@ -205,36 +205,37 @@ export const TID = {
 
   // Присутствие в игре: переключатель Online в панели Info
   // (modules/panels/components/InfoPanel.js) и панель присутствия
-  // (modules/presence/components/PresencePanel.js) — слева список тех, кто
-  // онлайн, справа блок экскурсии: гид (прицел «перенести всех ко мне»,
-  // ссылка-приглашение, «Show my cursor», карандаш) или ведомый. Маркер курсора
-  // гида (modules/presence/components/GuideCursor.js) и штрихи карандаша
-  // (modules/presence/components/DrawLayer.js) живут на холсте.
+  // (modules/presence/components/PresencePanel.js): действия текущей экскурсии
+  // и раскрываемый список участников. Курсор и штрихи живут на холсте.
   presence: {
     toggle: 'presence-toggle', // antd Switch «Online» в InfoPanel (атрибут на кнопке role=switch)
     panel: 'presence-panel', // корень панели присутствия
-    status: 'presence-status', // текст статуса (+ data-status: connecting|online|reconnecting|error)
+    status: 'presence-status', // заголовок панели с data-status; обычный online не выводится текстом
+    connection: 'presence-connection', // сообщение о подключении, восстановлении или недоступности связи
+    people: 'presence-people', // раскрываемый список участников (details)
+    invite: 'presence-invite', // показать/скрыть поле ссылки
+    drawClear: 'presence-draw-clear', // Clear & exit: стереть свои штрихи и выйти из рисования
     lead: 'presence-lead', // кнопка «Start a tour» / «End the tour» (+ data-on="true|false")
     cast: (kind) => `presence-cast-${kind}`, // кнопка трансляции: viewport («Bring everyone to me»)
     member: 'presence-member', // строка участника (+ data-sid, data-nickname, data-leader, data-tour, data-following)
-    follow: 'presence-follow', // «Join the tour» / «Leave the tour» в строке чужого гида (+ data-tour)
-    unfollow: 'presence-unfollow', // «Leave the tour» в строке «You follow <ник>»
+    follow: 'presence-follow', // Join tour в списке ведущих, только вне экскурсии (+ data-tour)
+    unfollow: 'presence-unfollow', // единственная Leave tour у спутника
     followers: 'presence-followers', // число подписчиков у гида (+ data-count)
-    guide: 'presence-guide', // блок гида в правом столбце (виден, когда веду)
-    follower: 'presence-follower', // блок ведомого в правом столбце (виден, когда не веду)
+    guide: 'presence-guide', // действия ведущего
+    follower: 'presence-follower', // состояние спутника или вход в экскурсию
     tourLink: 'presence-tour-link', // readOnly-поле со ссылкой-приглашением (ссылка — в value)
     tourCopy: 'presence-tour-copy', // кнопка «Copy» рядом с полем ссылки
-    cursor: 'presence-cursor', // antd Switch «Show my cursor» у гида
+    cursor: 'presence-cursor', // antd Switch «Share cursor» у ведущего
     guideCursor: 'presence-guide-cursor', // маркер курсора гида на холсте (+ data-sid, data-nickname)
-    pencil: 'presence-pencil', // antd Switch «Pencil» у гида (атрибут на кнопке role=switch)
-    eraser: 'presence-eraser', // antd Switch «Eraser» у гида (disabled, пока «Pencil» выключен)
-    group: 'presence-group', // antd Switch «Show the group on the minimap» у ведущего (атрибут на кнопке role=switch, aria-checked; disabled, пока не online)
+    pencil: 'presence-pencil', // кнопка панели (PanelButton), aria-pressed: выбран карандаш
+    eraser: 'presence-eraser', // кнопка панели (PanelButton), aria-pressed: выбран ластик
+    group: 'presence-group', // antd Switch Group on minimap, aria-checked
     drawCapture: 'presence-draw-capture', // слой захвата пера на холсте (+ data-erasing), есть только при включённом «Pencil»
     drawLayer: 'presence-draw-layer', // svg со штрихами внутри #game-box
     stroke: 'presence-stroke', // polyline штриха (+ data-id, data-from)
     guideAway: 'presence-guide-away', // «Guide is reconnecting…» у ведомого
     tourEnded: 'presence-tour-ended', // «Tour ended» у ведомого
-    close: 'presence-close', // кнопка «Close» панели (то же, что выключить Online)
+    close: 'presence-close', // Go offline: отключение Online, а не просто скрытие панели
     error: 'presence-error', // текст ошибки: отказ команды сервером или причина остановки
   },
 

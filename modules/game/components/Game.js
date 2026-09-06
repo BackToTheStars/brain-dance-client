@@ -58,8 +58,10 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const { nickname } = info;
 
   const gameBoxClasses = useMemo(() => {
+    // Following exposes card contents without enabling canvas editing.
+    if (following) return 'following-tour';
     return isEditMode ? 'edit-mode' : '';
-  }, [isEditMode]);
+  }, [isEditMode, following]);
 
   useEffect(() => {
     if (stage === GAME_STAGE_ANIMATED_LOADING) {

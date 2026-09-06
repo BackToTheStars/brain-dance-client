@@ -68,7 +68,8 @@
 #game-box {
   width: 100vw;
   height: 100vh;
-  &.edit-mode {
+  &.edit-mode,
+  &.following-tour {
     #lines {
       z-index: 0;
     }

@@ -195,25 +195,37 @@ const giveUpAccess = () => {
 };
 
 const refreshAccessAndRetry = () => {
-  const { token, info } = getGameInfo(conn.hash) || {};
+  const hash = conn.hash;
+  const { token, info } = getGameInfo(hash) || {};
   if (!token || conn.tokenRefreshed) {
     giveUpAccess();
     return;
   }
   conn.tokenRefreshed = true;
-  refreshTokenRequest(conn.hash, token, info?.nickname)
+  // A response belongs to the game and access record that requested it.
+  // Navigation or a newer login must not let an old refresh replace access.
+  const canApplyRefresh = () => {
+    if (!conn.wanted || conn.hash !== hash) return false;
+    if (getGameInfo(hash)?.token !== token) {
+      // A newer login already supplied access. Use it instead of this reply.
+      open();
+      return false;
+    }
+    return true;
+  };
+  refreshTokenRequest(hash, token, info?.nickname)
     .then((data) => {
-      if (!conn.wanted) return;
+      if (!canApplyRefresh()) return;
       if (!data?.success || !data.token) {
         giveUpAccess();
         return;
       }
-      setGameInfoIntoStorage(conn.hash, { info: data.info, token: data.token });
+      setGameInfoIntoStorage(hash, { info: data.info, token: data.token });
       if (conn.reloadUserInfo) conn.reloadUserInfo();
       open();
     })
     .catch(() => {
-      if (conn.wanted) giveUpAccess();
+      if (canApplyRefresh()) giveUpAccess();
     });
 };
 

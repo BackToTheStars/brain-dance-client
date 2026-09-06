@@ -1,10 +1,12 @@
 import { getGameRequest } from '@/modules/game/requests';
+import { STATUS_ONLINE } from '@/config/presence';
 import * as linesTypes from '@/modules/lines/redux/types';
 import {
   loadTurnsData,
   loadTurnsGeometry,
   recalcAreaRect,
 } from '@/modules/turns/redux/actions';
+import { selectFollowing } from './selectors';
 
 // The guide saved the field: a follower fetches the geometry of every turn
 // against the current position of the canvas (so the canvas stays where it
@@ -21,15 +23,26 @@ import {
 export const refreshAfterSave = () => (dispatch, getState) => {
   const state = getState();
   const hash = state.game.game?.hash;
-  if (!hash) return Promise.resolve();
-  return dispatch(loadTurnsGeometry(hash, state.game.position)).then(() => {
+  const sid = state.presence.sid;
+  const following = selectFollowing(state);
+  if (!hash || !following) return Promise.resolve();
+  const isCurrent = () => {
+    const current = getState();
+    return current.game.game?.hash === hash &&
+      current.presence.status === STATUS_ONLINE &&
+      current.presence.sid === sid && selectFollowing(current) === following;
+  };
+  return dispatch(loadTurnsGeometry(hash, null, { isCurrent })).then(() => {
+    if (!isCurrent()) return;
     const { d, g } = getState().turns;
     const ids = Object.keys(d).filter((id) => !!g[id]);
-    const data = ids.length ? dispatch(loadTurnsData(ids)) : Promise.resolve();
+    const data = ids.length ? dispatch(loadTurnsData(ids, { isCurrent })) : Promise.resolve();
     const lines = getGameRequest(hash).then((res) => {
-      if (!res?.item?.lines) return;
+      if (!isCurrent() || !res?.item?.lines) return;
       dispatch({ type: linesTypes.LINES_LOAD, payload: res.item.lines });
     });
-    return Promise.all([data, lines]).then(() => dispatch(recalcAreaRect()));
+    return Promise.all([data, lines]).then(() => {
+      if (isCurrent()) dispatch(recalcAreaRect());
+    });
   });
 };

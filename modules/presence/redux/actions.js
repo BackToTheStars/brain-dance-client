@@ -33,7 +33,7 @@ import * as types from './types';
 export { refreshAfterSave } from './refresh';
 
 // Online is one state: the socket and the presence panel open and close
-// together, and the "Close" button of the panel is the same as switching
+// together, and the "Go offline" button of the panel is the same as switching
 // online off in the Info panel.
 const goOffline = (dispatch, code) => {
   // The socket goes with it, so there is nobody left to tell: just let the
@@ -97,7 +97,7 @@ export const setLead = (on) => (dispatch) => {
   socket.send({ t: MSG_LEAD, on: !!on });
 };
 
-// "Show the group on the minimap": my own switch, the server knows nothing
+// "Group on minimap": my own switch, the server knows nothing
 // about it. The rectangles of the followers are kept all the while I guide,
 // so switching it on shows the group at once, without waiting for them to move.
 export const setGroupOnMinimap = (on) => (dispatch) => {
@@ -243,7 +243,7 @@ export const castCursorOff = () => () => {
   socket.send({ t: MSG_CAST, kind: CAST_CURSOR, off: true });
 };
 
-// "Show my cursor": my own switch, the server knows nothing about it. Turning
+// "Share cursor": my own switch, the server knows nothing about it. Turning
 // it off tells the followers to take the marker away.
 export const setCursorSharing = (on) => (dispatch, getState) => {
   if (!on) {
@@ -297,8 +297,7 @@ const attachPen = (dispatch, getState) =>
     onEnd: (id) => castDraw({ op: DRAW_END, id }),
   });
 
-// "Pencil": my own switch, like "Show my cursor" — the server knows nothing
-// about it. Switching it off is the way to erase everything: the marks go from
+// Drawing is local state. "Clear & exit" turns it off and erases everything: marks go from
 // my canvas and, by one frame, from the followers'. `cast: false` is for the
 // cases where there is nobody to tell any more (the tour is ending, online is
 // going off): the followers erase by the members snapshot themselves.

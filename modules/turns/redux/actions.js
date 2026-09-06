@@ -49,17 +49,18 @@ export const moveFieldToTopLeft = (turn) => (dispatch, getState) => {
   dispatch(moveField(gameFieldMoveVector));
 };
 
-export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
-  return new Promise((resolve, reject) => {
-    const state = getState();
-    const viewport = {
-      position,
-      size: {
-        width: state.game.viewport.width,
-        height: state.game.viewport.height,
-      },
-    };
+// A refresh may finish after the user has left. Check before dispatching,
+// and use the live viewport when no initial position was explicitly supplied.
+export const loadTurnsGeometry =
+  (hash, position, { isCurrent = () => true } = {}) =>
+  (dispatch, getState) => {
     return getTurnsGeometryRequest(hash).then((data) => {
+      if (!isCurrent()) return;
+      const state = getState();
+      const viewport = {
+        position: position || state.game.position,
+        size: state.game.viewport,
+      };
       dispatch({
         type: types.TURNS_LOAD_GEOMETRY,
         payload: {
@@ -71,13 +72,12 @@ export const loadTurnsGeometry = (hash, position) => (dispatch, getState) => {
         type: gameTypes.GAME_SCREEN_RECT_SET,
         payload: getBoundingAreaRect([...data.items], viewport),
       });
-      resolve();
     });
-  });
-};
+  };
 
-export const loadTurnsData = (turnIds) => (dispatch) => {
+export const loadTurnsData = (turnIds, { isCurrent = () => true } = {}) => (dispatch) => {
   return getTurnsByIdsRequest(turnIds).then((data) => {
+    if (!isCurrent()) return;
     dispatch({
       type: types.TURNS_LOAD_DATA,
       payload: {

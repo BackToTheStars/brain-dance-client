@@ -50,7 +50,7 @@ const strokesAfterSnapshot = (strokes, members, following, sid) => {
   const guideSid = following
     ? members.find((member) => member.tour === following)?.sid || null
     : null;
-  const kept = {};
+  const kept = Object.create(null);
   ids.forEach((id) => {
     const { from } = strokes[id];
     if ((sid && from === sid) || (guideSid && from === guideSid))
@@ -168,7 +168,9 @@ export const presenceReducer = (
     case types.PRESENCE_STROKE_POINTS: {
       // A portion for a stroke this tab never saw open (joined the tour in the
       // middle of it) starts the stroke instead of being thrown away.
-      const stroke = state.strokes[payload.id];
+      const stroke = Object.hasOwn(state.strokes, payload.id)
+        ? state.strokes[payload.id]
+        : null;
       return {
         ...state,
         strokes: {
@@ -181,7 +183,7 @@ export const presenceReducer = (
     }
 
     case types.PRESENCE_STROKE_REMOVE: {
-      if (!state.strokes[payload.id]) return state;
+      if (!Object.hasOwn(state.strokes, payload.id)) return state;
       const strokes = { ...state.strokes };
       delete strokes[payload.id];
       return { ...state, strokes };
@@ -191,7 +193,7 @@ export const presenceReducer = (
       // `from` names whose marks go; without it the canvas is cleared whole.
       const { from = null } = payload || {};
       if (!from) return { ...state, strokes: {} };
-      const strokes = {};
+      const strokes = Object.create(null);
       Object.keys(state.strokes).forEach((id) => {
         if (state.strokes[id].from !== from) strokes[id] = state.strokes[id];
       });

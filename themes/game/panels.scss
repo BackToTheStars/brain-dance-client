@@ -1,3 +1,14 @@
+// Shared by the Actions panel and individual controls in other game panels.
+@mixin panel-action-button-size {
+  padding: 0;
+  height: 30px;
+  width: 90px;
+  text-align: center;
+  margin: 5px;
+  font-size: 14px;
+  line-height: 1;
+}
+
 .panel {
   position: fixed;
   z-index: 4;
@@ -123,16 +134,41 @@
 
     button,
     .empty-button-space {
-      padding: 0px;
-      height: 30px;
-      width: 90px;
-      text-align: center;
-      margin: 5px;
-      font-size: 14px;
-      line-height: 1;
+      @include panel-action-button-size;
     }
   }
 
+}
+
+.panel-action-button {
+  @include panel-action-button-size;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 5px;
+
+  // Two 90px buttons plus the 10px between their margins.
+  &--wide { width: 190px; }
+
+  // Light pressed variant: only colours change, never geometry or typography.
+  &[aria-pressed='true'] {
+    background-color: var(--panel-buttons-font-color);
+    color: var(--panels-background-color);
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--panel-buttons-hover-bg-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+    background-color: var(--panel-buttons-bg-color);
+    color: var(--panel-buttons-font-color);
+  }
 }
 
 // PANEL SETTINGS
@@ -339,6 +375,9 @@
   left: var(--panels-spacer-size);
   transition: 0s;
   cursor: move;
+
+  // Presence has a dedicated drag handle; its body keeps the normal cursor.
+  &:has(> .presence-panel) { cursor: auto; }
 }
 
 // Paste Turn Panel

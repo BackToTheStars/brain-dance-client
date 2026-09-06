@@ -27,6 +27,28 @@
 }
 
 // antd overrides
+// Keep the off track visible in every site colour scheme; Ant Design owns
+// the checked colour, thumb, focus and disabled states.
+.ant-switch:not(.ant-switch-checked) {
+  background-color: color-mix(in srgb, var(--text-base) 35%, var(--bg-panel));
+  box-shadow: inset 0 0 0 1px var(--border-base);
+
+  &:not(.ant-switch-disabled):hover {
+    background-color: color-mix(in srgb, var(--text-base) 45%, var(--bg-panel));
+  }
+}
+
+.presence-panel {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+
+  &__header { cursor: move; }
+  &__people, &__footer { border-top: 1px solid var(--border-panel-divider); }
+  &__people summary { cursor: pointer; }
+  label { cursor: pointer; }
+  .ant-switch { flex-shrink: 0; }
+}
+
 .radio-group_white-text {
   .ant-radio-wrapper {
     color: #fff;
