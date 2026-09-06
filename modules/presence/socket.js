@@ -8,6 +8,7 @@
 import { API_URL } from '@/config/server';
 import {
   CAST_CURSOR,
+  CAST_DRAW,
   CAST_VIEWPORT,
   CLOSE_AMBIGUOUS,
   CLOSE_BAD_MESSAGE,
@@ -15,6 +16,10 @@ import {
   CLOSE_GAME_NOT_FOUND,
   CLOSE_NORMAL,
   CLOSE_TOKEN,
+  DRAW_CLEAR,
+  DRAW_MOVE,
+  DRAW_REMOVE,
+  DRAW_START,
   ERROR_NO_LEADER,
   FULL_RETRY_MS,
   MSG_CAST,
@@ -39,6 +44,7 @@ import {
   getGameInfo,
   setGameInfoIntoStorage,
 } from '@/modules/user/contexts/UserContext';
+import { stopDrawing } from './draw';
 import * as types from './redux/types';
 
 const conn = {
@@ -250,6 +256,10 @@ const handleWelcome = (msg) => {
   conn.attempt = 0;
   conn.tokenRefreshed = false;
   conn.sid = msg.sid;
+  // A connection starts with a clean canvas: the pencil is off and the marks
+  // are gone (the slice does that on welcome). A guide coming back from a break
+  // sees what the followers have been seeing all along — nothing.
+  stopDrawing();
   conn.dispatch({
     type: types.PRESENCE_WELCOME,
     payload: { sid: msg.sid, members: msg.members || [] },
@@ -269,6 +279,45 @@ const handleWelcome = (msg) => {
   send({ t: MSG_FOLLOW, tour });
 };
 
+// A frame of the guide's pencil. The server keeps nothing and sends nothing on
+// its own, so a portion of points for a stroke this tab never saw open (joined
+// the tour in the middle of it, a frame the rate limit dropped) opens the
+// stroke instead of being lost. `end` needs nothing: the stroke is already on
+// the canvas.
+const handleDrawCast = (msg) => {
+  const { op, id, from } = msg;
+  const hasId = typeof id === 'string' && !!id;
+  if (
+    op === DRAW_START &&
+    hasId &&
+    Number.isFinite(msg.x) &&
+    Number.isFinite(msg.y)
+  ) {
+    conn.dispatch({
+      type: types.PRESENCE_STROKE_START,
+      payload: { id, from, points: [msg.x, msg.y] },
+    });
+    return;
+  }
+  if (op === DRAW_MOVE && hasId && Array.isArray(msg.points)) {
+    const { points } = msg;
+    if (points.length < 2 || points.length % 2) return;
+    if (!points.every((value) => Number.isFinite(value))) return;
+    conn.dispatch({
+      type: types.PRESENCE_STROKE_POINTS,
+      payload: { id, from, points },
+    });
+    return;
+  }
+  if (op === DRAW_REMOVE && hasId) {
+    conn.dispatch({ type: types.PRESENCE_STROKE_REMOVE, payload: { id } });
+    return;
+  }
+  if (op === DRAW_CLEAR) {
+    conn.dispatch({ type: types.PRESENCE_STROKES_CLEAR, payload: { from } });
+  }
+};
+
 const handleCast = (msg) => {
   if (
     msg.kind === CAST_VIEWPORT &&
@@ -286,6 +335,12 @@ const handleCast = (msg) => {
         ? null
         : { from: msg.from, x: msg.x, y: msg.y };
     conn.dispatch({ type: types.PRESENCE_CURSOR_SET, payload: { cursor } });
+    return;
+  }
+  if (msg.kind === CAST_DRAW) {
+    // Only my own guide draws on my canvas.
+    if (!conn.guideSid || msg.from !== conn.guideSid) return;
+    handleDrawCast(msg);
     return;
   }
   console.warn('presence: unsupported cast', msg.kind);

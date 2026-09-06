@@ -15,16 +15,22 @@ const tracker = {
   onLeave: null,
 };
 
+// Screen point of an event → point of the canvas. The rectangle is read at
+// event time: dragging the canvas moves the box itself while the stored
+// position only catches up when the drag stops. The pencil uses the same
+// formula, so a stroke and a cursor land on the same card.
+export const canvasPoint = (box, position, event) => {
+  const rect = box.getBoundingClientRect();
+  return {
+    x: Math.round(event.clientX - rect.left + (position?.x || 0)),
+    y: Math.round(event.clientY - rect.top + (position?.y || 0)),
+  };
+};
+
 const handleMove = (event) => {
   if (!tracker.box) return;
-  // The rectangle is read at event time: dragging the canvas moves the box
-  // itself while the stored position only catches up when the drag stops.
-  const rect = tracker.box.getBoundingClientRect();
-  const position = tracker.getPosition() || { x: 0, y: 0 };
-  tracker.onMove(
-    Math.round(event.clientX - rect.left + (position.x || 0)),
-    Math.round(event.clientY - rect.top + (position.y || 0)),
-  );
+  const { x, y } = canvasPoint(tracker.box, tracker.getPosition(), event);
+  tracker.onMove(x, y);
 };
 
 const handleLeave = () => {

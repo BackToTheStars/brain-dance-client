@@ -16,6 +16,7 @@ import {
   resetTurnNextPastePosition,
 } from '@/modules/turns/redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
+import DrawLayer from '@/modules/presence/components/DrawLayer';
 import GuideCursor from '@/modules/presence/components/GuideCursor';
 import { leaveGame, setOnline } from '@/modules/presence/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
@@ -152,6 +153,7 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
             <Turns />
             <QuotesLinesLayer />
             <GuideCursor />
+            <DrawLayer />
             {isEditMode && (
               <div className="rec-rectangle">
                 <div className="rec-label" />

@@ -24,16 +24,41 @@ export const MSG_WELCOME = 'welcome';
 export const MSG_MEMBERS = 'members';
 export const MSG_ERROR = 'error';
 
-// What a guide broadcasts: the centre of their viewport (by the button) and,
-// while "Show my cursor" is on, the position of their mouse over the canvas.
+// What a guide broadcasts: the centre of their viewport (by the button),
+// while "Show my cursor" is on, the position of their mouse over the canvas,
+// and, while "Pencil" is on, the strokes they draw over it.
 export const CAST_VIEWPORT = 'viewport';
 export const CAST_CURSOR = 'cursor';
+export const CAST_DRAW = 'draw';
 
 // The guide's cursor is sent at most once per CURSOR_SEND_MS and only when it
 // has moved at least CURSOR_MIN_MOVE_PX from the last sent point: a mouse
 // produces far more events than a tour needs, and the server drops the excess.
 export const CURSOR_SEND_MS = 50;
 export const CURSOR_MIN_MOVE_PX = 2;
+
+// Operations of `cast draw`: a stroke opens, grows by portions of points and
+// closes; the eraser takes one stroke away, switching the pencil off takes all
+// of them. Nothing is stored on the server, so a late follower sees new
+// strokes only.
+export const DRAW_START = 'start';
+export const DRAW_MOVE = 'move';
+export const DRAW_END = 'end';
+export const DRAW_REMOVE = 'remove';
+export const DRAW_CLEAR = 'clear';
+
+// The pen is sampled like the cursor: one portion per DRAW_SEND_MS, a point
+// closer than DRAW_MIN_MOVE_PX to the previous one dropped. A portion carries
+// at most DRAW_MAX_POINTS points — a longer one is refused by the server.
+export const DRAW_SEND_MS = 50;
+export const DRAW_MIN_MOVE_PX = 2;
+export const DRAW_MAX_POINTS = 150;
+// How many hex characters a stroke id has (the server allows up to 32).
+export const DRAW_ID_LENGTH = 8;
+
+// The class of the layer that takes the pointer while the pencil is on: shared
+// by the layer itself and by the listeners that read the events from it.
+export const DRAW_CAPTURE_CLASS = 'draw-capture';
 
 // The invite link is `/game/view/<hash>?tour=<tourId>`: this is the parameter
 // name, shared by the link builder, the canvas page and the socket.

@@ -108,6 +108,56 @@
   white-space: nowrap;
 }
 
+// The guide's pencil. The capture layer is on the canvas while the pencil is
+// on: it takes the pointer, so the canvas is not dragged from under the pen
+// (the class is what the draggable of #game-box cancels on). With the eraser
+// on it lets the pointer through, and the marks themselves take the click.
+.draw-capture {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.draw-capture_erasing {
+  pointer-events: none;
+  cursor: default;
+}
+
+// The marks of the tour. The svg is a 1x1 box with the drawing spilling out of
+// it: the polylines are placed in canvas coordinates minus the canvas offset,
+// like the cards and the cursor marker, so they travel with the canvas.
+.draw-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.draw-layer__line {
+  fill: none;
+  stroke: #ffb300;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+// The invisible twin of a mark: what the eraser clicks on.
+.draw-layer__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
 // .remove-line-transition {
 //   #lines {
 //     path {

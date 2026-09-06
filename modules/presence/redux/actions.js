@@ -1,17 +1,24 @@
 import { PANEL_PRESENCE } from '@/config/panel';
 import {
   CAST_CURSOR,
+  CAST_DRAW,
   CAST_VIEWPORT,
   CLOSE_GOING_AWAY,
   CLOSE_NORMAL,
   CURSOR_MIN_MOVE_PX,
   CURSOR_SEND_MS,
+  DRAW_CLEAR,
+  DRAW_END,
+  DRAW_MOVE,
+  DRAW_REMOVE,
+  DRAW_START,
   MSG_CAST,
   MSG_FOLLOW,
   MSG_LEAD,
 } from '@/config/presence';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import { startTracking, stopTracking } from '../cursor';
+import { isStroking, startDrawing, stopDrawing } from '../draw';
 import * as socket from '../socket';
 import * as types from './types';
 
@@ -20,8 +27,9 @@ import * as types from './types';
 // online off in the Info panel.
 const goOffline = (dispatch, code) => {
   // The socket goes with it, so there is nobody left to tell: just let the
-  // canvas listeners go.
+  // canvas listeners go. The reset takes the marks off the canvas with them.
   stopTracking();
+  stopDrawing();
   socket.disconnect(code);
   dispatch({ type: types.PRESENCE_RESET });
   dispatch(togglePanel({ type: PANEL_PRESENCE, open: false }));
@@ -66,7 +74,12 @@ const clearNotices = (dispatch) => {
 // the id and asks for it as soon as the connection is up again.
 export const setLead = (on) => (dispatch) => {
   clearNotices(dispatch);
-  if (!on) dispatch(setCursorSharing(false));
+  if (!on) {
+    dispatch(setCursorSharing(false));
+    // The tour is over in a moment: the followers take the marks off by the
+    // next snapshot themselves, so there is nothing to broadcast.
+    dispatch(setPencil(false, { cast: false }));
+  }
   socket.send({ t: MSG_LEAD, on: !!on });
 };
 
@@ -95,6 +108,9 @@ export const castViewport = () => (dispatch, getState) => {
 let lastCursorCast = { x: null, y: null, at: 0 };
 
 export const castCursor = (x, y) => () => {
+  // While a stroke is being drawn the pen is the cursor: one stream instead of
+  // two, and both of them together stay inside the frame budget of the tour.
+  if (isStroking()) return;
   const now = Date.now();
   if (now - lastCursorCast.at < CURSOR_SEND_MS) return;
   if (
@@ -136,4 +152,69 @@ export const setCursorSharing = (on) => (dispatch, getState) => {
     type: types.PRESENCE_CURSOR_SHARING_SET,
     payload: { on: started },
   });
+};
+
+// One frame of the pencil. The guide draws locally at once and does not wait
+// for an echo — the server forwards to the followers and keeps nothing.
+const castDraw = (body) =>
+  socket.send({ t: MSG_CAST, kind: CAST_DRAW, ...body });
+
+// The pen went down: the stroke opens on my own canvas and on the followers'.
+const strokeStarted = (id, x, y) => (dispatch, getState) => {
+  dispatch({
+    type: types.PRESENCE_STROKE_START,
+    payload: { id, from: getState().presence.sid, points: [x, y] },
+  });
+  castDraw({ op: DRAW_START, id, x, y });
+};
+
+const strokeGrew = (id, points) => (dispatch, getState) => {
+  dispatch({
+    type: types.PRESENCE_STROKE_POINTS,
+    payload: { id, from: getState().presence.sid, points },
+  });
+  castDraw({ op: DRAW_MOVE, id, points });
+};
+
+const attachPen = (dispatch, getState) =>
+  startDrawing({
+    getPosition: () => getState().game.position,
+    onStart: (id, x, y) => dispatch(strokeStarted(id, x, y)),
+    onPoints: (id, points) => dispatch(strokeGrew(id, points)),
+    onEnd: (id) => castDraw({ op: DRAW_END, id }),
+  });
+
+// "Pencil": my own switch, like "Show my cursor" — the server knows nothing
+// about it. Switching it off is the way to erase everything: the marks go from
+// my canvas and, by one frame, from the followers'. `cast: false` is for the
+// cases where there is nobody to tell any more (the tour is ending, online is
+// going off): the followers erase by the members snapshot themselves.
+export const setPencil =
+  (on, { cast = true } = {}) =>
+  (dispatch, getState) => {
+    if (!on) {
+      const wasOn = getState().presence.pencil;
+      stopDrawing();
+      dispatch({ type: types.PRESENCE_PENCIL_SET, payload: { on: false } });
+      dispatch({ type: types.PRESENCE_STROKES_CLEAR, payload: { from: null } });
+      if (wasOn && cast) castDraw({ op: DRAW_CLEAR });
+      return;
+    }
+    const started = attachPen(dispatch, getState);
+    dispatch({ type: types.PRESENCE_PENCIL_SET, payload: { on: started } });
+  };
+
+// "Eraser": the same layer switched to picking strokes instead of drawing them
+// — the pen stops listening and the marks themselves take the clicks.
+export const setEraser = (on) => (dispatch, getState) => {
+  if (on && !getState().presence.pencil) return;
+  if (on) stopDrawing();
+  else attachPen(dispatch, getState);
+  dispatch({ type: types.PRESENCE_ERASER_SET, payload: { on: !!on } });
+};
+
+// A mark clicked with the eraser: it goes from my canvas and from theirs.
+export const eraseStroke = (id) => (dispatch) => {
+  dispatch({ type: types.PRESENCE_STROKE_REMOVE, payload: { id } });
+  castDraw({ op: DRAW_REMOVE, id });
 };

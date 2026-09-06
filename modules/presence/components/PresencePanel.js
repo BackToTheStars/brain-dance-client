@@ -12,8 +12,10 @@ import {
   castViewport,
   follow,
   setCursorSharing,
+  setEraser,
   setLead,
   setOnline,
+  setPencil,
 } from '../redux/actions';
 
 const roleName = (role) => ROLES[role]?.name || `Role ${role}`;
@@ -29,6 +31,8 @@ const PresencePanel = () => {
   const members = useSelector((state) => state.presence.members);
   const error = useSelector((state) => state.presence.error);
   const cursorSharing = useSelector((state) => state.presence.cursorSharing);
+  const pencil = useSelector((state) => state.presence.pencil);
+  const eraser = useSelector((state) => state.presence.eraser);
   const tourEnded = useSelector((state) => state.presence.tourEnded);
   const hash = useSelector((state) => state.game.game?.hash);
   const { info } = useUserContext();
@@ -192,6 +196,25 @@ const PresencePanel = () => {
                   disabled={!online}
                   onChange={(on) => dispatch(setCursorSharing(on))}
                   data-test-id={TID.presence.cursor}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pb-2">
+                <span>Pencil</span>
+                <Switch
+                  size="small"
+                  checked={pencil}
+                  disabled={!online}
+                  onChange={(on) => dispatch(setPencil(on))}
+                  data-test-id={TID.presence.pencil}
+                />
+                <span className="pl-2">Eraser</span>
+                <Switch
+                  size="small"
+                  checked={eraser}
+                  disabled={!online || !pencil}
+                  onChange={(on) => dispatch(setEraser(on))}
+                  data-test-id={TID.presence.eraser}
                 />
               </div>
 

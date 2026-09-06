@@ -207,8 +207,9 @@ export const TID = {
   // (modules/panels/components/InfoPanel.js) и панель присутствия
   // (modules/presence/components/PresencePanel.js) — слева список тех, кто
   // онлайн, справа блок экскурсии: гид (прицел «перенести всех ко мне»,
-  // ссылка-приглашение, «Show my cursor») или ведомый. Маркер курсора гида
-  // (modules/presence/components/GuideCursor.js) живёт на холсте.
+  // ссылка-приглашение, «Show my cursor», карандаш) или ведомый. Маркер курсора
+  // гида (modules/presence/components/GuideCursor.js) и штрихи карандаша
+  // (modules/presence/components/DrawLayer.js) живут на холсте.
   presence: {
     toggle: 'presence-toggle', // antd Switch «Online» в InfoPanel (атрибут на кнопке role=switch)
     panel: 'presence-panel', // корень панели присутствия
@@ -225,6 +226,11 @@ export const TID = {
     tourCopy: 'presence-tour-copy', // кнопка «Copy» рядом с полем ссылки
     cursor: 'presence-cursor', // antd Switch «Show my cursor» у гида
     guideCursor: 'presence-guide-cursor', // маркер курсора гида на холсте (+ data-sid, data-nickname)
+    pencil: 'presence-pencil', // antd Switch «Pencil» у гида (атрибут на кнопке role=switch)
+    eraser: 'presence-eraser', // antd Switch «Eraser» у гида (disabled, пока «Pencil» выключен)
+    drawCapture: 'presence-draw-capture', // слой захвата пера на холсте (+ data-erasing), есть только при включённом «Pencil»
+    drawLayer: 'presence-draw-layer', // svg со штрихами внутри #game-box
+    stroke: 'presence-stroke', // polyline штриха (+ data-id, data-from)
     guideAway: 'presence-guide-away', // «Guide is reconnecting…» у ведомого
     tourEnded: 'presence-tour-ended', // «Tour ended» у ведомого
     close: 'presence-close', // кнопка «Close» панели (то же, что выключить Online)
