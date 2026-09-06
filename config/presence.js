@@ -30,12 +30,23 @@ export const MSG_ERROR = 'error';
 export const CAST_VIEWPORT = 'viewport';
 export const CAST_CURSOR = 'cursor';
 export const CAST_DRAW = 'draw';
+// What goes the other way, from a follower to the guide of their tour: the
+// rectangle of the canvas the follower sees, for the guide's minimap. And one
+// more frame of the guide: the field has been saved, the followers fetch the
+// geometry and the content again.
+export const CAST_VIEWPORT_REPORT = 'viewport-report';
+export const CAST_SAVED = 'saved';
 
 // The guide's cursor is sent at most once per CURSOR_SEND_MS and only when it
 // has moved at least CURSOR_MIN_MOVE_PX from the last sent point: a mouse
 // produces far more events than a tour needs, and the server drops the excess.
 export const CURSOR_SEND_MS = 50;
 export const CURSOR_MIN_MOVE_PX = 2;
+
+// A follower's viewport is reported at most once per VIEWPORT_REPORT_MS. The
+// last frame always goes out (a trailing timer), a frame equal to the previous
+// one never does.
+export const VIEWPORT_REPORT_MS = 50;
 
 // Operations of `cast draw`: a stroke opens, grows by portions of points and
 // closes; the eraser takes one stroke away, switching the pencil off takes all
@@ -68,6 +79,7 @@ export const TOUR_PARAM = 'tour';
 export const ERROR_LEADER = 'leader'; // I am a guide myself
 export const ERROR_NO_LEADER = 'no-leader'; // no such tour (it is over)
 export const ERROR_NOT_LEADER = 'not-leader'; // only a guide broadcasts
+export const ERROR_NOT_FOLLOWING = 'not-following'; // only a follower reports a viewport
 export const ERROR_BAD_CAST = 'bad-cast';
 export const ERROR_BAD_MESSAGE = 'bad-message';
 export const ERROR_ROLE = 'role'; // only players and the owner start a tour

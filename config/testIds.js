@@ -228,6 +228,7 @@ export const TID = {
     guideCursor: 'presence-guide-cursor', // маркер курсора гида на холсте (+ data-sid, data-nickname)
     pencil: 'presence-pencil', // antd Switch «Pencil» у гида (атрибут на кнопке role=switch)
     eraser: 'presence-eraser', // antd Switch «Eraser» у гида (disabled, пока «Pencil» выключен)
+    group: 'presence-group', // antd Switch «Show the group on the minimap» у ведущего (атрибут на кнопке role=switch, aria-checked; disabled, пока не online)
     drawCapture: 'presence-draw-capture', // слой захвата пера на холсте (+ data-erasing), есть только при включённом «Pencil»
     drawLayer: 'presence-draw-layer', // svg со штрихами внутри #game-box
     stroke: 'presence-stroke', // polyline штриха (+ data-id, data-from)
@@ -235,6 +236,13 @@ export const TID = {
     tourEnded: 'presence-tour-ended', // «Tour ended» у ведомого
     close: 'presence-close', // кнопка «Close» панели (то же, что выключить Online)
     error: 'presence-error', // текст ошибки: отказ команды сервером или причина остановки
+  },
+
+  // Миникарта (modules/minimap/components/Minimap.js). Прямоугольники видимой
+  // области спутников экскурсии рисует modules/presence/components/FollowerRects.js
+  // внутри её svg — только пока веду и включён «Show the group on the minimap».
+  minimap: {
+    follower: 'minimap-follower', // <g> с рамкой и ником спутника (+ data-sid, data-nickname)
   },
 
   // Форма добавления/редактирования turn

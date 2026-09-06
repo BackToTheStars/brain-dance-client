@@ -18,7 +18,15 @@ import {
 import { addNotification } from '@/modules/ui/redux/actions';
 import DrawLayer from '@/modules/presence/components/DrawLayer';
 import GuideCursor from '@/modules/presence/components/GuideCursor';
-import { leaveGame, setOnline } from '@/modules/presence/redux/actions';
+import {
+  leaveGame,
+  reportViewport,
+  setOnline,
+} from '@/modules/presence/redux/actions';
+import {
+  selectFollowing,
+  selectGuideSid,
+} from '@/modules/presence/redux/selectors';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +45,10 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const dispatch = useDispatch();
   const [isEditMode, setIsEditMode] = useState(false);
   const stage = useSelector((state) => state.game.stage);
+  const position = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.game.viewport);
+  const following = useSelector(selectFollowing);
+  const guideSid = useSelector(selectGuideSid);
   const toShowContent = useMemo(
     () => [GAME_STAGE_ANIMATED_LOADING, GAME_STAGE_READY].includes(stage),
     [stage],
@@ -101,8 +113,32 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
     update();
     dispatch(loadTurnsAndLinesToPaste());
 
-    return window.removeEventListener('resize', invokeUpdateWithQueue);
+    // A function, not a call: the listener has to outlive this effect. Calling
+    // removeEventListener here took the listener off right after it was
+    // added, and the window size was read once, at mount.
+    return () => window.removeEventListener('resize', invokeUpdateWithQueue);
   }, []);
+
+  // While I follow a tour the guide's minimap shows where I look: a frame on
+  // every change of the canvas position or the window size, once when the
+  // subscription starts and once more when the guide comes back with a new
+  // sid. The thunk throttles and skips a frame equal to the previous one.
+  useEffect(() => {
+    dispatch(reportViewport());
+  }, [
+    position.x,
+    position.y,
+    viewport.width,
+    viewport.height,
+    following,
+    guideSid,
+  ]);
+
+  // A follower only watches: the edit mode goes off with the subscription, and
+  // a double click does not bring it back until I leave the tour.
+  useEffect(() => {
+    if (following) setIsEditMode(false);
+  }, [following]);
 
   useEffect(() => {
     if (!window) return;
@@ -146,7 +182,9 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
         data-test-id={TID.canvas}
         className={gameBoxClasses}
         ref={gameBox}
-        onDoubleClick={(e) => setIsEditMode(!isEditMode)}
+        onDoubleClick={() => {
+          if (!following) setIsEditMode((on) => !on);
+        }}
       >
         {toShowContent && (
           <>

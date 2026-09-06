@@ -9,7 +9,9 @@ import { API_URL } from '@/config/server';
 import {
   CAST_CURSOR,
   CAST_DRAW,
+  CAST_SAVED,
   CAST_VIEWPORT,
+  CAST_VIEWPORT_REPORT,
   CLOSE_AMBIGUOUS,
   CLOSE_BAD_MESSAGE,
   CLOSE_FULL,
@@ -45,6 +47,7 @@ import {
   setGameInfoIntoStorage,
 } from '@/modules/user/contexts/UserContext';
 import { stopDrawing } from './draw';
+import { refreshAfterSave } from './redux/refresh';
 import * as types from './redux/types';
 
 const conn = {
@@ -74,6 +77,9 @@ const conn = {
   joinTour: null,
   // The sid of the guide of the tour I follow — whose cursor frames to accept.
   guideSid: null,
+  // The sids of the followers of the tour I guide — whose viewport reports to
+  // accept.
+  followers: new Set(),
   // A follow this client sent on its own (from a link or restoring a
   // subscription): a "no such tour" answer to it is the "Tour ended" notice,
   // not a command the user has to be told about.
@@ -113,6 +119,13 @@ const syncFromMembers = (members) => {
   conn.guideSid = conn.followWanted
     ? members.find((member) => member.tour === conn.followWanted)?.sid || null
     : null;
+  conn.followers = new Set(
+    conn.tour
+      ? members
+          .filter((member) => member.following === conn.tour)
+          .map((member) => member.sid)
+      : [],
+  );
   // The subscription this connection asked for on its own went through; a
   // refusal that arrives later is about something else.
   if (conn.followWanted) conn.autoFollow = false;
@@ -343,6 +356,26 @@ const handleCast = (msg) => {
     handleDrawCast(msg);
     return;
   }
+  if (msg.kind === CAST_VIEWPORT_REPORT) {
+    // The rectangle a follower sees — only while I guide, and only from
+    // someone on my tour (the server routes it to me, but the snapshot is
+    // the judge of who is on the tour right now).
+    if (!conn.tour || !conn.followers.has(msg.from)) return;
+    const { from, x, y, width, height } = msg;
+    if (![x, y, width, height].every(Number.isFinite)) return;
+    if (width <= 0 || height <= 0) return;
+    conn.dispatch({
+      type: types.PRESENCE_VIEWPORT_REPORTED,
+      payload: { from, x, y, width, height },
+    });
+    return;
+  }
+  if (msg.kind === CAST_SAVED) {
+    // My own guide saved the field: fetch what was saved, the canvas stays put.
+    if (!conn.guideSid || msg.from !== conn.guideSid) return;
+    conn.dispatch(refreshAfterSave());
+    return;
+  }
   console.warn('presence: unsupported cast', msg.kind);
 };
 
@@ -508,6 +541,7 @@ export const disconnect = (code = CLOSE_NORMAL) => {
   conn.followWanted = null;
   conn.joinTour = null;
   conn.guideSid = null;
+  conn.followers = new Set();
   conn.autoFollow = false;
   conn.tokenRefreshed = false;
 };

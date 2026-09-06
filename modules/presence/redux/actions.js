@@ -2,7 +2,9 @@ import { PANEL_PRESENCE } from '@/config/panel';
 import {
   CAST_CURSOR,
   CAST_DRAW,
+  CAST_SAVED,
   CAST_VIEWPORT,
+  CAST_VIEWPORT_REPORT,
   CLOSE_GOING_AWAY,
   CLOSE_NORMAL,
   CURSOR_MIN_MOVE_PX,
@@ -15,12 +17,20 @@ import {
   MSG_CAST,
   MSG_FOLLOW,
   MSG_LEAD,
+  STATUS_ONLINE,
+  VIEWPORT_REPORT_MS,
 } from '@/config/presence';
 import { togglePanel } from '@/modules/panels/redux/actions';
 import { startTracking, stopTracking } from '../cursor';
 import { isStroking, startDrawing, stopDrawing } from '../draw';
 import * as socket from '../socket';
+import { selectFollowing, selectGuideSid, selectMyTour } from './selectors';
 import * as types from './types';
+
+// What a follower does on the guide's "saved" frame. It lives in its own file
+// (the socket dispatches it, and this file imports the socket); exported from
+// here too, so that the thunks of the presence module are all in one place.
+export { refreshAfterSave } from './refresh';
 
 // Online is one state: the socket and the presence panel open and close
 // together, and the "Close" button of the panel is the same as switching
@@ -30,6 +40,7 @@ const goOffline = (dispatch, code) => {
   // canvas listeners go. The reset takes the marks off the canvas with them.
   stopTracking();
   stopDrawing();
+  forgetViewportReport();
   socket.disconnect(code);
   dispatch({ type: types.PRESENCE_RESET });
   dispatch(togglePanel({ type: PANEL_PRESENCE, open: false }));
@@ -79,8 +90,110 @@ export const setLead = (on) => (dispatch) => {
     // The tour is over in a moment: the followers take the marks off by the
     // next snapshot themselves, so there is nothing to broadcast.
     dispatch(setPencil(false, { cast: false }));
+    // Nobody follows an ended tour: the group leaves the minimap with it.
+    dispatch(setGroupOnMinimap(false));
+    dispatch({ type: types.PRESENCE_VIEWPORTS_CLEAR });
   }
   socket.send({ t: MSG_LEAD, on: !!on });
+};
+
+// "Show the group on the minimap": my own switch, the server knows nothing
+// about it. The rectangles of the followers are kept all the while I guide,
+// so switching it on shows the group at once, without waiting for them to move.
+export const setGroupOnMinimap = (on) => (dispatch) => {
+  dispatch({ type: types.PRESENCE_GROUP_ON_MINIMAP_SET, payload: { on: !!on } });
+};
+
+// "Save Field" went through: one frame that tells the followers to fetch the
+// saved geometry and content again. Only a guide sends it — from anyone else
+// the server would answer with an error the panel would show.
+export const castSaved = () => (dispatch, getState) => {
+  if (!selectMyTour(getState())) return;
+  socket.send({ t: MSG_CAST, kind: CAST_SAVED });
+};
+
+// The rectangle of the canvas I see, for the guide's minimap: the last frame
+// sent (to compare the next one with — the same rectangle to the same guide is
+// not sent twice) and the trailing timer of the throttle.
+const viewportReport = { last: null, timer: null };
+
+const forgetViewportReport = () => {
+  if (viewportReport.timer) {
+    clearTimeout(viewportReport.timer);
+    viewportReport.timer = null;
+  }
+  viewportReport.last = null;
+};
+
+const sendViewportReport = (getState) => {
+  const state = getState();
+  if (state.presence.status !== STATUS_ONLINE || !selectFollowing(state)) {
+    forgetViewportReport();
+    return;
+  }
+  const { position, viewport } = state.game;
+  const frame = {
+    x: position.x,
+    y: position.y,
+    width: viewport.width,
+    height: viewport.height,
+    to: selectGuideSid(state),
+  };
+  if (
+    ![frame.x, frame.y, frame.width, frame.height].every(Number.isFinite) ||
+    frame.width <= 0 ||
+    frame.height <= 0
+  )
+    return;
+  const { last } = viewportReport;
+  if (
+    last &&
+    last.x === frame.x &&
+    last.y === frame.y &&
+    last.width === frame.width &&
+    last.height === frame.height &&
+    last.to === frame.to
+  )
+    return;
+  viewportReport.last = { ...frame, at: Date.now() };
+  socket.send({
+    t: MSG_CAST,
+    kind: CAST_VIEWPORT_REPORT,
+    x: frame.x,
+    y: frame.y,
+    width: frame.width,
+    height: frame.height,
+  });
+};
+
+// Report my viewport to the guide of the tour I follow. The canvas calls this
+// on every change of the position or the window, when the subscription starts
+// and when the guide comes back with a new sid (the server keeps nothing, so
+// a guide with a fresh connection has an empty minimap until the followers
+// report again). Throttled to one frame per VIEWPORT_REPORT_MS with a trailing
+// timer, so the last frame always goes. Not following (any more): the memory
+// of the last frame goes too, so that the next subscription reports even from
+// the same spot.
+export const reportViewport = () => (dispatch, getState) => {
+  const state = getState();
+  if (state.presence.status !== STATUS_ONLINE || !selectFollowing(state)) {
+    forgetViewportReport();
+    return;
+  }
+  const since = Date.now() - (viewportReport.last?.at || 0);
+  if (since >= VIEWPORT_REPORT_MS) {
+    if (viewportReport.timer) {
+      clearTimeout(viewportReport.timer);
+      viewportReport.timer = null;
+    }
+    sendViewportReport(getState);
+    return;
+  }
+  if (viewportReport.timer) return;
+  viewportReport.timer = setTimeout(() => {
+    viewportReport.timer = null;
+    sendViewportReport(getState);
+  }, VIEWPORT_REPORT_MS - since);
 };
 
 // The id of a tour to join, or null to leave the one I am on.

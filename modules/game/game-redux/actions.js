@@ -8,7 +8,12 @@ import {
   updateScrollPositionsRequest,
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { clearScrollPositions, loadTurnsGeometry, moveField } from '@/modules/turns/redux/actions';
+import {
+  clearScrollPositions,
+  loadTurnsGeometry,
+  moveField,
+  recalcAreaRect,
+} from '@/modules/turns/redux/actions';
 import {
   getLinesNotExpired,
   getTurnsFromBuffer,
@@ -118,7 +123,13 @@ const dropTurnFromUrl = () => {
   );
 };
 
-export const saveField = () => (dispatch, getState) => {
+// `onSaved` is called once both requests of the save are through — the
+// geometry and the scroll positions (when there were any): the guide of a tour
+// tells the followers to fetch the field again, and they have to see what was
+// saved, not what is being saved. The presence module is not imported here on
+// purpose (a cycle with it breaks the production bundle): the button that
+// saves passes the callback in.
+export const saveField = ({ onSaved = null } = {}) => (dispatch, getState) => {
   const state = getState();
   const hash = state.game.game.hash;
   const g = state.turns.g;
@@ -162,7 +173,7 @@ export const saveField = () => (dispatch, getState) => {
     };
   });
 
-  updateCoordinatesRequest(changedTurns).then((data) => {
+  const coordinatesSaved = updateCoordinatesRequest(changedTurns).then((data) => {
     dispatch({
       type: turnsTypes.TURNS_UPDATE_GEOMETRY,
       payload: {
@@ -176,11 +187,13 @@ export const saveField = () => (dispatch, getState) => {
   updateGameSettings(hash, 'position', gamePosition);
   dropTurnFromUrl();
   savePanelsSettings(hash, state.panels.d);
-  if (scrollPositions.length) {
-    updateScrollPositionsRequest(scrollPositions)
-      .then(() => {
+  const scrollSaved = scrollPositions.length
+    ? updateScrollPositionsRequest(scrollPositions).then(() => {
         dispatch(clearScrollPositions());
       })
+    : Promise.resolve();
+  if (typeof onSaved === 'function') {
+    Promise.all([coordinatesSaved, scrollSaved]).then(() => onSaved());
   }
 };
 
@@ -262,6 +275,15 @@ export const updateViewportGeometry = (viewport) => (dispatch, getState) => {
     type: types.GAME_VIEWPORT_SET,
     payload: viewport,
   });
+  // Which cards are drawn is decided only when the field loads or moves, and
+  // the area of the minimap is recalculated by the same events: without this a
+  // window grown wider showed an empty strip until the next drag, and the
+  // minimap kept the old area. The position does not change — only the size.
+  dispatch({
+    type: turnsTypes.TURNS_FIELD_WAS_MOVED,
+    payload: { position: state.game.position, size: viewport },
+  });
+  dispatch(recalcAreaRect());
 };
 
 // Правка игры из панели Info. `PUT /game` отвечает частью игры — name,

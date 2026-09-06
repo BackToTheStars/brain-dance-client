@@ -13,6 +13,7 @@ import {
   follow,
   setCursorSharing,
   setEraser,
+  setGroupOnMinimap,
   setLead,
   setOnline,
   setPencil,
@@ -33,6 +34,7 @@ const PresencePanel = () => {
   const cursorSharing = useSelector((state) => state.presence.cursorSharing);
   const pencil = useSelector((state) => state.presence.pencil);
   const eraser = useSelector((state) => state.presence.eraser);
+  const groupOnMinimap = useSelector((state) => state.presence.groupOnMinimap);
   const tourEnded = useSelector((state) => state.presence.tourEnded);
   const hash = useSelector((state) => state.game.game?.hash);
   const { info } = useUserContext();
@@ -215,6 +217,17 @@ const PresencePanel = () => {
                   disabled={!online || !pencil}
                   onChange={(on) => dispatch(setEraser(on))}
                   data-test-id={TID.presence.eraser}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pb-2">
+                <span>Show the group on the minimap</span>
+                <Switch
+                  size="small"
+                  checked={groupOnMinimap}
+                  disabled={!online}
+                  onChange={(on) => dispatch(setGroupOnMinimap(on))}
+                  data-test-id={TID.presence.group}
                 />
               </div>
 

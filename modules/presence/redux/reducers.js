@@ -9,9 +9,11 @@ import * as types from './types';
 // cursor" switch — the server knows nothing about it — and `tourEnded` says
 // that the tour I followed is over. `strokes` are the pencil marks over the
 // canvas (canvas coordinates, mine when I guide, the guide's when I follow),
-// `pencil` and `eraser` are my own switches, like `cursorSharing`. Nothing here
-// is persisted — online is off on every load, and marks live only while the
-// tour does.
+// `pencil` and `eraser` are my own switches, like `cursorSharing`. `viewports`
+// are the rectangles of the canvas the followers of my tour see (canvas
+// coordinates, by their sid), kept all the while I guide; `groupOnMinimap` is
+// my own switch that shows them on the minimap. Nothing here is persisted —
+// online is off on every load, and marks live only while the tour does.
 const initialPresenceState = {
   status: STATUS_OFF,
   sid: null,
@@ -23,6 +25,8 @@ const initialPresenceState = {
   strokes: {},
   pencil: false,
   eraser: false,
+  viewports: {},
+  groupOnMinimap: false,
 };
 
 const meIn = (members, sid) =>
@@ -55,6 +59,23 @@ const strokesAfterSnapshot = (strokes, members, following, sid) => {
   return Object.keys(kept).length === ids.length ? strokes : kept;
 };
 
+// The rectangles belong to the followers of my tour: a snapshot keeps the ones
+// whose owners still follow it and drops the rest — someone left the tour or
+// the game, the tour is over, I am not guiding any more.
+const viewportsAfterSnapshot = (viewports, members, sid) => {
+  const sids = Object.keys(viewports);
+  if (!sids.length) return viewports;
+  const myTour = meIn(members, sid)?.tour || null;
+  const kept = {};
+  if (myTour) {
+    members.forEach((member) => {
+      if (member.following === myTour && viewports[member.sid])
+        kept[member.sid] = viewports[member.sid];
+    });
+  }
+  return Object.keys(kept).length === sids.length ? viewports : kept;
+};
+
 export const presenceReducer = (
   state = initialPresenceState,
   { type, payload },
@@ -71,7 +92,9 @@ export const presenceReducer = (
       // A fresh connection: the marker of the previous one means nothing, the
       // "Tour ended" notice survives — a reconnect is not my action. The marks
       // go too: a guide coming back after a break finds a clean canvas, which
-      // is what the followers saw the moment the guide dropped out.
+      // is what the followers saw the moment the guide dropped out. So do the
+      // rectangles of the followers: they report again as soon as they see the
+      // guide's new sid.
       return {
         ...state,
         status: STATUS_ONLINE,
@@ -82,6 +105,8 @@ export const presenceReducer = (
         strokes: {},
         pencil: false,
         eraser: false,
+        viewports: {},
+        groupOnMinimap: false,
       };
 
     case types.PRESENCE_MEMBERS_SET: {
@@ -101,6 +126,7 @@ export const presenceReducer = (
           following,
           state.sid,
         ),
+        viewports: viewportsAfterSnapshot(state.viewports, members, state.sid),
       };
     }
 
@@ -171,6 +197,23 @@ export const presenceReducer = (
       });
       return { ...state, strokes };
     }
+
+    case types.PRESENCE_VIEWPORT_REPORTED: {
+      const { from, x, y, width, height } = payload;
+      return {
+        ...state,
+        viewports: { ...state.viewports, [from]: { x, y, width, height } },
+      };
+    }
+
+    case types.PRESENCE_VIEWPORTS_CLEAR:
+      return { ...state, viewports: {} };
+
+    case types.PRESENCE_GROUP_ON_MINIMAP_SET:
+      return {
+        ...state,
+        groupOnMinimap: payload.on,
+      };
 
     case types.PRESENCE_TOUR_ENDED_SET:
       return {

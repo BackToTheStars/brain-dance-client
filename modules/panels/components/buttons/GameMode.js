@@ -1,5 +1,7 @@
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { saveField } from '@/modules/game/game-redux/actions';
+import { castSaved } from '@/modules/presence/redux/actions';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +24,9 @@ const GameMode = () => {
   const isTurnInBuffer = useSelector(
     (state) => !!state.turns.turnsToPaste.length
   );
+  // A follower of a tour only watches: no adding, saving or pasting until they
+  // leave the tour (the buttons come back by themselves).
+  const following = useSelector(selectFollowing);
 
   const dispatch = useDispatch();
 
@@ -38,13 +43,17 @@ const GameMode = () => {
           })
         );
       },
-      show: () => can(RULE_TURNS_CRUD),
+      show: () => can(RULE_TURNS_CRUD) && !following,
     },
     {
       text: 'Save Field',
       testId: TID.gameAction('save-field'),
-      callback: () => dispatch(saveField()),
-      show: () => can(RULE_TURNS_CRUD),
+      // The guide of a tour tells the followers that the field is saved — one
+      // frame, once both requests of the save are through (castSaved is a
+      // no-op for everyone else).
+      callback: () =>
+        dispatch(saveField({ onSaved: () => dispatch(castSaved()) })),
+      show: () => can(RULE_TURNS_CRUD) && !following,
     },
     {
       text: 'Classes',
@@ -79,7 +88,7 @@ const GameMode = () => {
         dispatch(togglePanel({ type: PANEL_TURNS_PASTE, open: true }));
         dispatch(setPanelMode({ mode: MODE_OPERATION_PASTE }));
       },
-      show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer,
+      show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer && !following,
     },
     null,
     null,

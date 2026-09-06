@@ -32,6 +32,7 @@ import VideoQuotes from './widgets/video/VideoQuotes';
 import AudioQuotes from './widgets/audio/AudioQuotes';
 import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 
 // Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
 // предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
@@ -47,6 +48,10 @@ const TurnAdapter = ({ id }) => {
   const width = useSelector((state) => state.turns.g[id].size?.width);
   const height = useSelector((state) => state.turns.g[id].size?.height);
   const contentType = useSelector((state) => state.turns.g[id].contentType);
+  // While I follow a tour the card is not dragged (the follower only watches);
+  // it is still scrolled and played, so the draggable is simply not created
+  // rather than disabled — jQuery UI's `disable` would take the pointer away.
+  const following = useSelector(selectFollowing);
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       left: `${position.x - (gamePosition.x || 0)}px`,
@@ -67,6 +72,7 @@ const TurnAdapter = ({ id }) => {
   // DRAGGABLE
   useEffect(() => {
     if (typeof $ === 'undefined') return;
+    if (following) return;
     $(wrapper.current).draggable({
       // grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
@@ -113,7 +119,7 @@ const TurnAdapter = ({ id }) => {
     });
 
     return () => $(wrapper.current).draggable('destroy');
-  }, [gamePosition]);
+  }, [gamePosition, following]);
 
   return (
     <div

@@ -5,6 +5,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import { areRectanglesIntersect } from '@/modules/turns/components/helpers/sizeHelper';
 import { utils } from '@/modules/game/components/helpers/game';
+import FollowerRects from '@/modules/presence/components/FollowerRects';
 
 const BUTTONS_SIZE = 38;
 const STANDARD_SQUARE = 60000;
@@ -172,6 +173,7 @@ const SVGMiniMap = memo(({ width, height }) => {
         })}
       </g>
       <ViewportRect k={k} />
+      <FollowerRects k={k} />
       <filter id="blurMe">
         <feGaussianBlur
           in="SourceGraphic"
