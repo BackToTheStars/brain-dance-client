@@ -26,8 +26,15 @@
   // --turn-border-color: rgba(47, 69, 101, 0.623);
   --turn-border-color: rgba(98, 143, 211, .623); // @todo: изменить на цвет без прозрачности
   --turn-bg-color: #0c1e35;
-  // @todo: добавить зависимость от цвета параграфа
-  --turn-scrollbar-color: #183968; // rgba(24, 57, 104, 0.5);
+  // Ползунок полосы прокрутки в карточке — полупрозрачный, чтобы читаться над любым
+  // фоном: светлый над тёмным, тёмный над светлым (прежний #183968 на #0c1e35 почти
+  // не был виден). Обычный ход берёт значение «над тёмным»; комментарию Turn.js
+  // подставляет --turn-scrollbar-color inline по яркости его фона
+  // (helpers/color.js, getScrollbarColor). Пару «над светлым» использует и редактор
+  // формы хода (panels.scss) — там фон белый при любом цветовом наборе.
+  --turn-scrollbar-thumb-on-dark: rgba(255, 255, 255, 0.35);
+  --turn-scrollbar-thumb-on-light: rgba(0, 0, 0, 0.35);
+  --turn-scrollbar-color: var(--turn-scrollbar-thumb-on-dark);
   --turn-widget-notes-color: #c3c3c3;
   --turn-widget-header-color: #294377;
   --turn-widget-header-title-color: rgb(10, 10, 10);

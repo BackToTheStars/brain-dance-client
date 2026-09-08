@@ -36,3 +36,11 @@ export const getNeedBlackText = (backgroundColor) => {
   contrastSettings[backgroundColor] = brightness > 150;
   return contrastSettings[backgroundColor];
 };
+
+// Цвет ползунка полосы прокрутки по фону карточки — тот же порог яркости, что у
+// цвета текста. Сами значения — токены в themes/game/vars/color-vars.scss, здесь
+// только выбор между ними; результат идёт в inline --turn-scrollbar-color карточки.
+export const getScrollbarColor = (backgroundColor) =>
+  getNeedBlackText(backgroundColor)
+    ? 'var(--turn-scrollbar-thumb-on-light)'
+    : 'var(--turn-scrollbar-thumb-on-dark)';

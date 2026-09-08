@@ -1,8 +1,4 @@
-import {
-  TURN_QUOTE_BORDER_RADIUS,
-  TURN_SCROLLBAR_MARGIN,
-  widgetSpacer,
-} from '@/config/ui';
+import { TURN_QUOTE_BORDER_RADIUS, widgetSpacer } from '@/config/ui';
 import React, {
   useEffect,
   useRef,

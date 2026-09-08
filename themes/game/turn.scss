@@ -221,19 +221,7 @@
         line-height: var(--turn-widget-paragraph-line-height);
         max-height: 100%;
         overflow-y: scroll;
-
-        &::-webkit-scrollbar {
-          width: var(--turn-widget-paragraph-scrollbar-size);
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background-color: var(--turn-scrollbar-color);
-          border-radius: var(--turn-widget-paragraph-scrollbar-size);
-        }
-
-        &::-webkit-scrollbar-track {
-          background-color: transparent;
-        }
+        @include turn-scrollbar(var(--turn-scrollbar-color));
 
         span {
           word-wrap: break-word;
@@ -250,6 +238,9 @@
 
       .paragraphText {
         overflow-y: auto;
+        // та же полоса, что у полного абзаца: раньше сюда доставало только глобальное
+        // правило scroll.scss, и в наборах без --scrollbar-* ползунок был прозрачным
+        @include turn-scrollbar(var(--turn-scrollbar-color));
         line-height: var(--turn-widget-paragraph-line-height);
         // padding-top: 10px;
         // padding-bottom: 10px;
@@ -338,6 +329,12 @@
       // якорь для тулбара и слоя выделения; рамки цитат сюда НЕ попадают —
       // они рендерятся вне виджета, в координатах карточки хода
       position: relative;
+      // Бокс тот же, что у абзаца: 6px у виджета плюс 8px внутри скроллера (ниже).
+      // Страница остаётся в 14px от края карточки — там же, где текст абзаца, — а
+      // полоса отодвинута от страницы на 8px и стоит в одном столбце с полосой
+      // абзаца под pdf.
+      padding-left: var(--turn-widget-paragraph-padding);
+      padding-right: var(--turn-widget-paragraph-padding);
 
       &.active .pdf-scroll {
         outline: 4px solid blue;
@@ -348,8 +345,11 @@
         position: absolute;
         z-index: 2;
         top: var(--turn-widget-inner-gap);
+        // правый край тулбара — правый край страницы (левый край полосы)
         right: calc(
-          var(--turn-widgets-gap) + var(--turn-widget-paragraph-scrollbar-size)
+          var(--turn-widget-paragraph-padding) +
+            var(--turn-widget-paragraph-scrollbar-padding) +
+            var(--turn-widget-paragraph-scrollbar-size)
         );
         display: flex;
         align-items: center;
@@ -455,23 +455,16 @@
         overflow-y: scroll;
         overflow-x: hidden;
         border-radius: var(--turn-corner-radius);
+        // отступ между страницей и полосой — тот же, что у абзаца. Страница занимает
+        // content-box скроллера: Pdf.js меряет именно его, а за точку отсчёта рамок
+        // цитат берёт левый край страницы, а не скроллера
+        padding-left: var(--turn-widget-paragraph-scrollbar-padding);
+        padding-right: var(--turn-widget-paragraph-scrollbar-padding);
+        @include turn-scrollbar(var(--turn-scrollbar-color));
 
         display: flex;
         flex-direction: column;
         gap: var(--turn-widget-pdf-page-gap);
-
-        &::-webkit-scrollbar {
-          width: var(--turn-widget-paragraph-scrollbar-size);
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background-color: var(--turn-scrollbar-color);
-          border-radius: var(--turn-widget-paragraph-scrollbar-size);
-        }
-
-        &::-webkit-scrollbar-track {
-          background-color: transparent;
-        }
       }
 
       .pdf-page {

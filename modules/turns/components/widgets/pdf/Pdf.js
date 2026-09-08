@@ -98,6 +98,7 @@ const Pdf = ({
   const visibleRef = useRef(new Set());
   const aspectsRef = useRef([]); // соотношения height/width страниц
   const pageWidthRef = useRef(0);
+  const chromeRef = useRef(2 * widgetSpacer); // ширина карточки минус ширина страницы
   const appliedScrollRef = useRef(null);
 
   const scrollQueue = useRef(getQueue(PDF_SCROLL_TIMEOUT_DELAY)).current;
@@ -264,12 +265,24 @@ const Pdf = ({
     };
   }, [url]);
 
-  // ШИРИНА: следим только за ней, высота приходит от ресайза карточки
+  // ШИРИНА: следим только за ней, высота приходит от ресайза карточки.
+  // Страница занимает content-box скроллера — без полосы и без внутренних отступов
+  // (отступ отодвигает полосу от страницы, как у абзаца), поэтому clientWidth здесь
+  // не годится: в него входит padding. Разницу между шириной карточки и страницы
+  // запоминаем — по ней maxHeightCallback считает высоту документа для новой ширины
+  // хода, не дублируя размеры из SCSS.
   useEffect(() => {
     const el = scrollEl.current;
     if (!el) return;
     const measure = () => {
-      const next = el.clientWidth;
+      const style = getComputedStyle(el);
+      const next = Math.round(
+        el.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight),
+      );
+      const inner = el.closest('.stb-react-turn__inner');
+      if (inner) chromeRef.current = inner.clientWidth - next;
       setPageWidth((prev) => (prev === next ? prev : next));
     };
     measure();
@@ -385,14 +398,18 @@ const Pdf = ({
 
     const rect = el.getBoundingClientRect();
     const turnRect = turnEl.getBoundingClientRect();
+    // По горизонтали точка отсчёта — столбец страниц, а не скроллер: между ними
+    // внутренний отступ скроллера, а рамки цитат и краевые маркеры должны лежать
+    // на странице. Все страницы стоят в одном столбце, достаточно первой.
+    const pageRect = pageElsRef.current.get(1)?.getBoundingClientRect() || rect;
     const withCoords = getPdfQuotesWithCoords({
       quotes: quotes || [],
       pageOffsets,
       pageWidth,
       scrollTop: el.scrollTop,
-      viewportWidth: el.clientWidth,
+      viewportWidth: pageWidth,
       viewportHeight: el.clientHeight,
-      widgetLeft: Math.round(rect.left - turnRect.left),
+      widgetLeft: Math.round(pageRect.left - turnRect.left),
       widgetTop: Math.round(rect.top - turnRect.top),
       turnId,
     });
@@ -436,7 +453,8 @@ const Pdf = ({
       maxHeightCallback: (newTurnWidth) => {
         const aspects = aspectsRef.current;
         if (!aspects.length) return PDF_UNBOUNDED_HEIGHT;
-        const width = Math.max(newTurnWidth - 2 * widgetSpacer, 1);
+        // ширина страницы при новой ширине хода: разница замерена в DOM (см. ШИРИНА)
+        const width = Math.max(newTurnWidth - chromeRef.current, 1);
         return Math.round(
           aspects.reduce((acc, aspect) => acc + width * aspect, 0) +
             PDF_PAGE_GAP * (aspects.length - 1),

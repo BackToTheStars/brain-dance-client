@@ -15,6 +15,7 @@ import {
 } from '../redux/actions';
 import turnSettings from '../settings';
 import { getQueue } from './helpers/queueHelper';
+import { getScrollbarColor } from './helpers/color';
 import { checkIfParagraphExists } from './helpers/quillHelper';
 import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
@@ -206,6 +207,8 @@ export const Turn = memo(({ id }) => {
 
     if (!!background && contentType === turnSettings.TEMPLATE_COMMENT) {
       wrapperStyles.backgroundColor = background;
+      // полоса прокрутки абзаца — от того же фона, что и карточка
+      wrapperStyles['--turn-scrollbar-color'] = getScrollbarColor(background);
     }
     return wrapperStyles;
   }, [background, contentType]);
