@@ -7,7 +7,20 @@ import {
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
+import PanelButton from '@/modules/panels/components/PanelButton';
+import EditorPanelSplit from '@/modules/panels/components/EditorPanelSplit';
+import {
+  clampEditorFontSize,
+  readEditorFontSize,
+  saveEditorFontSize,
+} from '@/modules/panels/helpers/editorPanel';
+import {
+  EDITOR_FONT_SIZE_DEFAULT,
+  EDITOR_FONT_SIZE_MAX,
+  EDITOR_FONT_SIZE_MIN,
+  EDITOR_FONT_SIZE_STEP,
+  PANEL_ADD_EDIT_TURN,
+} from '@/config/panel';
 import { createTurn, resaveTurn } from '../../redux/actions';
 import {
   filterQuotesDeleted,
@@ -82,6 +95,10 @@ const AddEditTurnPopup = () => {
     check: true,
   });
   const [isMaximized, setIsMaximized] = useState(false);
+  // Размер шрифта редактора (A− / A+): переменная на .quill-wrapper, помнится на
+  // пользователя и в ход не пишется. Читается в эффекте — хранилище есть только
+  // в браузере.
+  const [fontSize, setFontSize] = useState(EDITOR_FONT_SIZE_DEFAULT);
   // Подтверждение удаления цитат при замене файла: здесь лежит уже
   // собранное сохранение и то, что о нём показать. null — окна нет.
   // { payload, summary } — payload уходит в commitSave по «Удалить и сохранить».
@@ -99,6 +116,16 @@ const AddEditTurnPopup = () => {
   const toggleMaximize = (value) => {
     setIsMaximized(value);
     dispatch(toggleMaximizeQuill(value));
+  };
+
+  useEffect(() => {
+    setFontSize(readEditorFontSize());
+  }, []);
+
+  const changeFontSize = (delta) => {
+    const next = clampEditorFontSize(fontSize + delta);
+    setFontSize(next);
+    saveEditorFontSize(next);
   };
 
   useEffect(() => {
@@ -374,6 +401,8 @@ const AddEditTurnPopup = () => {
 
   if (Component) {
     return (
+      <>
+      <EditorPanelSplit />
       <div
         className={`panel-inner flex flex-col h-full flex-1`}
       >
@@ -441,11 +470,13 @@ const AddEditTurnPopup = () => {
         </div>
         <Component />
       </div>
+      </>
     );
   }
 
   return (
     <>
+      <EditorPanelSplit />
       <div
         className={`panel-inner flex flex-col h-full flex-1`}
       >
@@ -536,7 +567,11 @@ const AddEditTurnPopup = () => {
             </div>
           </>
         )}
-        <div className="flex-1 quill-wrapper panel-cell mt-0">
+        <div
+          className="flex-1 quill-wrapper panel-cell mt-0"
+          style={{ '--editor-font-size': `${fontSize}px` }}
+          data-font-size={fontSize}
+        >
           <div id="toolbar-container-new">
             <span className="ql-formats">
               <select className="ql-background">
@@ -585,6 +620,23 @@ const AddEditTurnPopup = () => {
             >
               Format
             </button>
+
+            <PanelButton
+              data-test-id={TID.addTurn.fontDec}
+              title="Smaller text in the editor"
+              disabled={fontSize <= EDITOR_FONT_SIZE_MIN}
+              onClick={() => changeFontSize(-EDITOR_FONT_SIZE_STEP)}
+            >
+              A−
+            </PanelButton>
+            <PanelButton
+              data-test-id={TID.addTurn.fontInc}
+              title="Larger text in the editor"
+              disabled={fontSize >= EDITOR_FONT_SIZE_MAX}
+              onClick={() => changeFontSize(EDITOR_FONT_SIZE_STEP)}
+            >
+              A+
+            </PanelButton>
 
             <div className="flex-1" />
             <button

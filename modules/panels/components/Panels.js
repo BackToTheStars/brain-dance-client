@@ -25,6 +25,7 @@ const PanelAdapter = memo(({ id }) => {
       width={panel?.width}
       isMinimized={panel.isMinimized}
       priorityStyle={panel?.priorityStyle}
+      testId={panel?.testId}
     >
       <panel.component id={id} />
     </UIPanel>

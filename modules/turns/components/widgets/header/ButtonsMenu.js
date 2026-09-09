@@ -16,6 +16,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
+import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
 import { TID } from '@/config/testIds';
 
 const ButtonsMenu = ({ _id }) => {
@@ -23,6 +24,7 @@ const ButtonsMenu = ({ _id }) => {
   const dispatch = useDispatch();
   const turnGeometry = useSelector((state) => state.turns.g[_id]);
   const gameHash = useSelector((state) => state.game.game?.hash);
+  const editorPanelWidth = useSelector(getEditorPanelWidth);
 
   const handleCut = (e) => {
     e.preventDefault();
@@ -50,12 +52,15 @@ const ButtonsMenu = ({ _id }) => {
       }),
     );
 
+    // Панель редактора прижата вправо, поэтому центр вьюпорта уходит вправо на
+    // половину её фактической ширины (state.panels.d, тянется сплитом) — карточка
+    // встаёт в центр свободной области слева от панели.
     dispatch(
       centerViewportAtPosition({
         x:
           turnGeometry.position.x +
           Math.floor(turnGeometry.size.width / 2) +
-          450, // в settings PANEL_ADD_EDIT_TURN ширина 700px
+          Math.round(editorPanelWidth / 2),
         y: turnGeometry.position.y + Math.floor(turnGeometry.size.height / 2),
       }),
     );

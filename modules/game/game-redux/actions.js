@@ -18,7 +18,11 @@ import {
   getLinesNotExpired,
   getTurnsFromBuffer,
 } from '@/modules/turns/components/helpers/dataCopier';
-import { resetAndExit, setPanels } from '@/modules/panels/redux/actions';
+import {
+  applyUserPanelSettings,
+  resetAndExit,
+  setPanels,
+} from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '@/modules/turns/components/helpers/grid';
 import { getGameSettings, updateGameSettings } from './storage';
@@ -81,6 +85,9 @@ export const loadFullGame =
       const d = getState().panels.d;
       const personalizedPanels = getPersonalizedPanelSettings(hash, d);
       dispatch(setPanels({ d: personalizedPanels }));
+      // поверх настроек игры — то, что помнится на пользователя (ширина панели
+      // редактора хода)
+      dispatch(applyUserPanelSettings());
       getGameRequest(hash).then((data) => {
         resolveStartPosition(hash, focusTurnId, getState).then(({ x, y }) => {
           const position = {

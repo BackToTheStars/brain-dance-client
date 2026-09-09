@@ -1,5 +1,9 @@
 import { updateGame } from '@/modules/game/game-redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
+import FileUploading from '@/modules/turns/components/forms/FileUploading';
+import { UPLOAD_ACCEPT } from '@/modules/turns/settings';
+import { uploadMedia } from '@/modules/turns/redux/actions';
+import { TID } from '@/config/testIds';
 import { Button, Form, Input, Radio } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 // должна быть доступна только для ROLE_GAME_OWNER (RULE_GAME_EDIT)
 const EditGameForm = () => {
   const dispatch = useDispatch();
+  // antd Form держит значение поля в своём сторе, а handleSubmit берёт image из
+  // стейта — после загрузки картинки обновляются оба, иначе в поле остался бы
+  // старый адрес, а сохранился бы новый.
+  const [form] = Form.useForm();
   //
   const editGame = (data) => {
     dispatch(updateGame(data))
@@ -26,6 +34,11 @@ const EditGameForm = () => {
     game.public ? 'true' : 'false',
   );
   const [description, setDescription] = useState(game.description);
+
+  const setImageFromUpload = (src) => {
+    setImage(src);
+    form.setFieldValue('image', src);
+  };
 
   const showConfirmDialog = ({ text, okCallback }) => {
     if (confirm(text)) {
@@ -64,7 +77,9 @@ const EditGameForm = () => {
   return (
     <div className="p-3">
       <Form
+        form={form}
         className="ant-card"
+        data-test-id={TID.info.form}
         onFinish={(e) => handleSubmit(e)}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
@@ -103,6 +118,24 @@ const EditGameForm = () => {
         >
           <Input value={image} onChange={(e) => setImage(e.target.value)} />
         </Form.Item>
+        {/* Превью игры можно и загрузить: файл уходит на media как картинка хода
+            (одноразовый токен upload у владельца есть), адрес встаёт в поле выше и
+            сохраняется по Save. К игре файл на media не привязывается. Обёртка
+            text-white — как у подписей полей: цвет .ant-form-item задан неслойным
+            правилом antd и перебивает утилиты Tailwind на самом Form.Item. */}
+        <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+          <div className="text-white">
+            <FileUploading
+              changeHandler={setImageFromUpload}
+              fileTypeLabel="an image"
+              uploadType="images"
+              accept={UPLOAD_ACCEPT.images}
+              uploadFunc={(file, onProgress) =>
+                uploadMedia('images', file, onProgress)
+              }
+            />
+          </div>
+        </Form.Item>
         <Form.Item
           initialValue={description}
           name="description"
@@ -115,7 +148,12 @@ const EditGameForm = () => {
           />
         </Form.Item>
         <Form.Item>
-          <Button size="small" type="primary" htmlType="submit">
+          <Button
+            size="small"
+            type="primary"
+            htmlType="submit"
+            data-test-id={TID.info.save}
+          >
             Save
           </Button>
         </Form.Item>

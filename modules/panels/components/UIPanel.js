@@ -7,6 +7,7 @@ const UIPanel = ({
   width,
   isMinimized,
   priorityStyle,
+  testId,
 }) => {
   const calcStyles = useMemo(() => {
     let style = {};
@@ -34,7 +35,7 @@ const UIPanel = ({
   );
 
   return (
-    <div className={classNames} style={calcStyles}>
+    <div className={classNames} style={calcStyles} data-test-id={testId}>
       {children}
     </div>
   );

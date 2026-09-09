@@ -10,9 +10,15 @@ export const MainLayoutProvider = ({ children }) => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const layoutSettings = getStore().layoutSettings;
-    if (layoutSettings && Object.keys(layoutSettings).length) {
+    // Только свои ключи, и только если они есть: в layoutSettings лежат и ключи
+    // панели редактора хода (editorPanelWidth, editorFontSize), и «объект не
+    // пуст» больше не значит «лобби уже сохраняло ширины» — иначе sliderWidth
+    // становился undefined, и слайдер игры открывался на максимуме вместо 465.
+    const layoutSettings = getStore().layoutSettings || {};
+    if (layoutSettings.leftSideWidth) {
       setLeftSideWidth(layoutSettings.leftSideWidth);
+    }
+    if (layoutSettings.sliderWidth) {
       setSliderWidth(layoutSettings.sliderWidth);
     }
     setTimeout(() => {

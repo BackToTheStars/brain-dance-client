@@ -1,11 +1,11 @@
 'use client';
 import { useMemo, useRef } from 'react';
 import GamesPanel from './GamesPanel';
-import { VerticalSplit } from '../elements/VerticalSplit';
+import { VerticalSplit } from '@/modules/ui/components/common/VerticalSplit';
 import TurnsPanel from './TurnsPanel';
 import CommonSliderModal from '../sliderModals/CommonSliderModal';
 import { useMainLayoutContext } from './MainLayoutContext';
-import { useSlider } from './useSlider';
+import { useSlider } from '@/modules/ui/hooks/useSlider';
 
 const MIN_LEFT_SIDE_WIDTH = 400;
 

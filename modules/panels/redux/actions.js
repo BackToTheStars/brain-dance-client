@@ -8,6 +8,7 @@ import {
 } from '@/config/panel';
 import * as types from './types';
 import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/config/panel';
+import { readEditorPanelWidth } from '../helpers/editorPanel';
 
 export const resetAndExit = () => (dispatch) => {
   dispatch({ type: types.PANELS_WIDGETS_QUOTES_RESET });
@@ -96,6 +97,16 @@ export const changeWidgetParams = (payload) => (dispatch) => {
     type: types.PANEL_CHANGE_WIDGET_PARAMS,
     payload: payload, // widgetKey, params
   });
+};
+
+// Ширина панели редактора хода помнится на пользователя, а не на игру (это не
+// fieldsToSave миникарты): читается из userSettings.layoutSettings при загрузке
+// игры, ужимается в границы сплита и кладётся в геометрию панели числом — так её
+// видит и сдвиг холста при правке хода ещё до первого открытия панели.
+export const applyUserPanelSettings = () => (dispatch) => {
+  dispatch(
+    changePanelGeometry(PANEL_ADD_EDIT_TURN, { width: readEditorPanelWidth() }),
+  );
 };
 
 export const toggleMaximizeQuill = (isMaximized) => (dispatch) => {

@@ -24,8 +24,11 @@
     background-color: #fff;
   }
 
+  // Размер шрифта редактора задаёт форма хода переменной на .quill-wrapper
+  // (кнопки A− / A+, помнится на пользователя); Maximize — тот же контейнер,
+  // так что и размер тот же. В сохранённый ход это не попадает.
   .ql-container {
-    font-size: 22px;
+    font-size: var(--editor-font-size, 22px);
     overflow-y: auto;
   }
 
@@ -92,6 +95,12 @@
     width: 70px;
     font-size: 14px;
     line-height: 1;
+  }
+
+  // PanelButton в ряду кнопок формы (A− / A+): размер как у соседей задаёт
+  // правило выше, а отступы mixin'а Actions-панели здесь лишние — их даёт gap.
+  .panel-buttons .panel-action-button {
+    margin: 0;
   }
 
   // Notification panel
@@ -374,6 +383,9 @@
   right: var(--panels-spacer-size);
   // форма хода шириной 900px на экране уже ~920px уходила за левый край вместе с «Save»
   max-width: calc(100vw - 2 * var(--panels-spacer-size));
+  // Ширину тянет сплит — она должна меняться мгновенно; 0.5s от .panel остаётся
+  // только для bottom (Maximize).
+  transition-property: bottom;
 }
 
 .position_upper_center {
@@ -420,10 +432,20 @@
   overflow: hidden;
 }
 
-#editor-container {
-  flex: 1;
-  background-color: white;
-  max-height: 60vh;
+// Ручка сплита панели редактора хода: общий .vertical-split (themes/base/scss/ui),
+// поставленный на левый край панели и наполовину выступающий на холст. Панель
+// прижата вправо, поэтому тянется именно левый край. z-index даёт ручке свой
+// контекст наложения — линия разделителя (z-index -1) рисуется поверх фона
+// панели, а не под ним. Сверху и снизу ручка отступает на радиус скругления
+// панели: линия во всю высоту торчала за скруглённые углы.
+.panel .vertical-split.editor-panel__split {
+  position: absolute;
+  top: var(--turn-corner-radius);
+  left: 0;
+  height: calc(100% - 2 * var(--turn-corner-radius));
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  z-index: 1;
 }
 
 .color-picker-widget {

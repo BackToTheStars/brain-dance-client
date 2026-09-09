@@ -253,6 +253,21 @@ export const TID = {
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
     // медиа-URL-инпуты используют field(prefixClass): image-url / video-url / audio-url
     save: 'add-turn-save',
+    // Панель редактора: корень — обёртка .panel (её getBoundingClientRect().width и есть
+    // ширина панели, та же, что state.panels.d.panel_add_edit_turn.width); ручка
+    // сплита на левом краю; A− / A+ — кнопки размера шрифта (PanelButton, disabled на
+    // границах ряда), текущее значение — data-font-size на .quill-wrapper
+    panel: 'add-turn-panel',
+    split: 'add-turn-split',
+    fontDec: 'add-turn-font-dec',
+    fontInc: 'add-turn-font-inc',
+  },
+
+  // Панель Info: форма правки игры владельцем (modules/panels/components/info/EditGameForm.js).
+  // Дропзона превью игры внутри формы — общий upload.dropzone с data-upload-type="images"
+  info: {
+    form: 'info-form', // корень antd Form
+    save: 'info-save', // кнопка Save формы
   },
 };
 

@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { ContentButton as Button } from '@/ui/button';
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { VerticalSplit } from '../elements/VerticalSplit';
+import { VerticalSplit } from '@/modules/ui/components/common/VerticalSplit';
 import { useRouter } from 'next/navigation';
 import {
   ROLES,
@@ -25,7 +25,7 @@ import {
 import { addCodeRequest, deleteGameRequest } from '@/modules/game/requests';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
 import { useMainLayoutContext } from '../layout/MainLayoutContext';
-import { useSlider } from '../layout/useSlider';
+import { useSlider } from '@/modules/ui/hooks/useSlider';
 import { getGameUrl } from '../../utils/url';
 import { useTranslations } from 'next-intl';
 import { SIZE_SM } from '@/config/ui/size';

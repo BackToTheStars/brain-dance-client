@@ -6,7 +6,9 @@ import ClassList from '../classes/components/ClassList';
 // Константы панелей переехали в config/panel.js: этот модуль собирает массив `panels`
 // из компонентов, и импорт констант обратно сюда замыкал цикл (в прод-сборке — TDZ).
 // Реэкспорт оставлен для совместимости, но новым импортёрам брать из '@/config/panel'.
+import { TID } from '@/config/testIds';
 import {
+  EDITOR_PANEL_DEFAULT_WIDTH,
   PANEL_ADD_EDIT_TURN,
   PANEL_BUTTONS,
   PANEL_BUTTONS_STYLES,
@@ -72,12 +74,17 @@ export const panels = [
     isDisplayed: false,
     width: () => '800px',
   },
+  // Ширина — число (UIPanel пишет число как px): её тянет сплит по левому краю и
+  // при загрузке игры подменяет сохранённая на пользователя (applyUserPanelSettings),
+  // а сдвиг холста при правке хода считается от неё же. testId ложится на обёртку
+  // .panel — её ширина и есть ширина панели.
   {
     type: PANEL_ADD_EDIT_TURN,
     position: POSITION_UPPER_RIGHT,
     component: AddEditTurnPopup,
     isDisplayed: false,
-    width: () => '900px',
+    width: EDITOR_PANEL_DEFAULT_WIDTH,
+    testId: TID.addTurn.panel,
   },
   {
     type: PANEL_BUTTONS,

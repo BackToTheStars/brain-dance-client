@@ -27,6 +27,21 @@ export const PANEL_PRESENCE = 'panel_presence';
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';
 
+// Панель редактора хода: ширина тянется сплитом за левый край и помнится на
+// пользователя (userSettings.layoutSettings.editorPanelWidth). Минимум снят на
+// стенде: уже 650px подпись дропдауна типа хода вылезает за кнопку; максимум —
+// окно минус два отступа панелей (как max-width в panels.scss).
+export const EDITOR_PANEL_DEFAULT_WIDTH = 900;
+export const EDITOR_PANEL_MIN_WIDTH = 650;
+
+// Размер шрифта в редакторе хода (A− / A+), помнится там же
+// (layoutSettings.editorFontSize) и в ход не пишется — карточка сохранённого
+// хода берёт свой --turn-widget-paragraph-font-size.
+export const EDITOR_FONT_SIZE_DEFAULT = 22;
+export const EDITOR_FONT_SIZE_MIN = 14;
+export const EDITOR_FONT_SIZE_MAX = 36;
+export const EDITOR_FONT_SIZE_STEP = 2;
+
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
 export const MODE_WIDGET_PARAGRAPH = 'widget-paragraph';
