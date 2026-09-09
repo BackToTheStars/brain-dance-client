@@ -1,4 +1,7 @@
-import { getQuill } from '@/modules/turns/components/helpers/quillHelper';
+import {
+  getQuill,
+  getQuoteElements,
+} from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState, useMemo } from 'react';
 import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
@@ -32,7 +35,7 @@ import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Modal, Switch } from 'antd';
 import dayjs from 'dayjs';
-import { cleanText } from '../helpers/textHelper';
+import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { TID } from '@/config/testIds';
 
@@ -103,6 +106,9 @@ const AddEditTurnPopup = () => {
   // собранное сохранение и то, что о нём показать. null — окна нет.
   // { payload, summary } — payload уходит в commitSave по «Удалить и сохранить».
   const [orphanConfirm, setOrphanConfirm] = useState(null);
+  // Подтверждение перед Format: что именно снимется с абзаца (getFormatLoss).
+  // null — окна нет, значит и терять было нечего.
+  const [formatConfirm, setFormatConfirm] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -151,14 +157,14 @@ const AddEditTurnPopup = () => {
           const paragraphQuotes = turnToEdit.quotes
             ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
             : [];
-          const spans = document.querySelectorAll('.ql-editor span');
+          const quoteEls = getQuoteElements();
           let i = 0;
           let incId = Math.floor(new Date().getTime() / 1000);
-          for (let span of spans) {
+          for (let quoteEl of quoteEls) {
             const quoteId = paragraphQuotes[i]
               ? paragraphQuotes[i].id
               : (incId += 1);
-            span.setAttribute('id', quoteId);
+            quoteEl.setAttribute('id', quoteId);
             i += 1;
           }
         }, 300);
@@ -211,19 +217,16 @@ const AddEditTurnPopup = () => {
 
     const resTextArr = [];
     let i = 0;
-    const spans = document.querySelectorAll('.ql-editor span');
 
-    let j = 0;
     let newIncId = Math.floor(new Date().getTime() / 1000);
-    const spanIds = [];
-    for (let span of spans) {
-      if (span.id) {
-        spanIds.push(span.id);
+    const quoteIds = [];
+    for (let quoteEl of getQuoteElements()) {
+      if (quoteEl.id) {
+        quoteIds.push(quoteEl.id);
       } else {
         newIncId += 1;
-        spanIds.push(newIncId);
+        quoteIds.push(newIncId);
       }
-      j += 1;
     }
 
     for (let textItem of textArr) {
@@ -235,7 +238,7 @@ const AddEditTurnPopup = () => {
       let quoteId = textItem.attributes.id;
 
       if (!quoteId) {
-        quoteId = !!turnToEdit && spanIds[i] ? spanIds[i] : (incId += 1);
+        quoteId = !!turnToEdit && quoteIds[i] ? quoteIds[i] : (incId += 1);
       }
       i += 1;
       resTextArr.push({
@@ -388,6 +391,20 @@ const AddEditTurnPopup = () => {
     }
 
     commitSave(payload);
+  };
+
+  // Format переклеивает переносы и пробелы, а вместе с ними теряет всю разметку:
+  // документ заменяется плоским текстом. Отобразить старые диапазоны на новый текст
+  // нечем — смещения после чистки другие, — поэтому спрашиваем.
+  const applyFormat = () => {
+    const { quill } = quillConstants;
+    quill.setText(cleanText(quill.getText()));
+  };
+
+  const formatHandler = () => {
+    const loss = getFormatLoss(quillConstants.getQuillTextArr());
+    if (!loss.total) return applyFormat();
+    setFormatConfirm(loss);
   };
 
   // Только функциональный setState: два ColorPicker'а ставят свои дефолты в эффектах
@@ -587,6 +604,14 @@ const AddEditTurnPopup = () => {
                   <option value={val} key={i} />
                 ))}
               </select>
+              <button
+                className="ql-bold"
+                data-test-id={TID.addTurn.toolbar('bold')}
+              />
+              <button
+                className="ql-italic"
+                data-test-id={TID.addTurn.toolbar('italic')}
+              />
               <button className="ql-link" />
             </span>
           </div>
@@ -603,7 +628,7 @@ const AddEditTurnPopup = () => {
             </button>
             <button
               className="btn btn-primary"
-              // id="cancel-turn-modal"
+              data-test-id={TID.addTurn.cancel}
               onClick={(e) => hidePanel()}
             >
               Cancel
@@ -611,12 +636,8 @@ const AddEditTurnPopup = () => {
 
             <button
               className="btn btn-primary"
-              onClick={() => {
-                const cleanedText = cleanText(
-                  quillConstants.quill.getText(),
-                );
-                quillConstants.quill.setText(cleanedText);
-              }}
+              data-test-id={TID.addTurn.format}
+              onClick={() => formatHandler()}
             >
               Format
             </button>
@@ -678,6 +699,37 @@ const AddEditTurnPopup = () => {
               Будет удалено цитат: <b>{orphanConfirm.summary.quotesCount}</b> (
               {orphanConfirm.summary.byWidget}), связей:{' '}
               <b>{orphanConfirm.summary.linesCount}</b>.
+            </p>
+          </>
+        )}
+      </Modal>
+
+      <Modal
+        open={!!formatConfirm}
+        title="Format снимет оформление абзаца"
+        okText="Отформатировать"
+        cancelText="Отмена"
+        okButtonProps={{
+          danger: !!formatConfirm?.quotes,
+          'data-test-id': TID.addTurn.formatConfirm,
+        }}
+        onCancel={() => setFormatConfirm(null)}
+        onOk={() => {
+          setFormatConfirm(null);
+          applyFormat();
+        }}
+      >
+        {!!formatConfirm && (
+          <>
+            <p>
+              Format переклеивает переносы и лишние пробелы и оставляет от абзаца
+              голый текст. Цитаты пропадут из хода при сохранении — вместе со
+              связями, которые на них держались.
+            </p>
+            <p className="mb-0">
+              Будет снято: цитат <b>{formatConfirm.quotes}</b>, ссылок{' '}
+              <b>{formatConfirm.links}</b>, фрагментов с выделением{' '}
+              <b>{formatConfirm.marked}</b>.
             </p>
           </>
         )}

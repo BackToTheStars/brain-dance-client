@@ -147,6 +147,7 @@ const CodesBlock = ({ codeData, codes, hash, can }) => {
                       <Button
                         size={SIZE_SM}
                         className="justify-center"
+                        data-test-id={TID.gameModal.codeRemove}
                         onClick={() => {
                           dispatch(
                             openModal(MODAL_CONFIRM, {

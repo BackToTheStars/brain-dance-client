@@ -6,6 +6,7 @@ import {
   removeTurnFromBuffer,
 } from '@/modules/turns/redux/actions';
 import { reloadTurnsToPaste } from '@/modules/game/game-redux/actions';
+import { TID } from '@/config/testIds';
 
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
@@ -54,6 +55,7 @@ const PasteTurnPanel = () => {
                   <button
                     // className="del-btn"
                     className="btn btn-primary me-2"
+                    data-test-id={TID.pasteTurn.paste}
                     onClick={() => {
                       // successCallback здесь был, но insertTurnFromBuffer его
                       // никогда не вызывал — он передаёт в createTurn свой
@@ -74,6 +76,7 @@ const PasteTurnPanel = () => {
                   <button
                     // className="del-btn"
                     className="btn btn-danger"
+                    data-test-id={TID.pasteTurn.delete}
                     onClick={() => {
                       if (confirm('Confirm: Delete turn from buffer?')) {
                         dispatch(removeTurnFromBuffer(timeStamp));

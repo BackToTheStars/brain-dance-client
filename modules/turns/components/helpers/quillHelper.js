@@ -50,6 +50,21 @@ const getQuill = (containerSelector, toolbarSelector) => {
   };
 };
 
+// Элементы редактора с фоном — ими помечены текстовые цитаты. Фон Quill ставит
+// атрибутом стиля, а не отдельным блотом: у голого текста получается span, а внутри
+// жирного, курсива или ссылки фон ложится прямо на strong / em / a, и выборка по span
+// такую цитату теряла бы. Вложенные повторы отбрасываем: цитата — одна на фрагмент.
+const getQuoteElements = (containerSelector = '#editor-container-new') => {
+  const root = document.querySelector(`${containerSelector} .ql-editor`);
+  if (!root) return [];
+  const withBackground = [...root.querySelectorAll('*')].filter(
+    (el) => !!el.style?.backgroundColor,
+  );
+  return withBackground.filter(
+    (el) => !withBackground.some((other) => other !== el && other.contains(el)),
+  );
+};
+
 const checkIfParagraphExists = (inserts) => {
   return !!inserts
     .map((item) => item.insert)
@@ -66,4 +81,4 @@ const paragraphToString = (paragraph, length = 200) => {
   return text.length > length ? `${text.slice(0, length)}...` : text;
 };
 
-export { getQuill, checkIfParagraphExists, paragraphToString };
+export { getQuill, getQuoteElements, checkIfParagraphExists, paragraphToString };

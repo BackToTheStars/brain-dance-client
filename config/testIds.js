@@ -150,6 +150,7 @@ export const TID = {
     addCode: 'game-modal-add-code',
     delete: 'game-modal-delete', // подтверждение — ConfirmModal (confirm.ok)
     codeRow: 'game-modal-code-row', // строка таблицы кодов (+ data-code)
+    codeRemove: 'game-modal-code-remove', // «Remove code» в строке (подтверждение — confirm.ok)
   },
 
   // Админка: форма входа (modules/admin/components/forms/AdminSigninForm.js)
@@ -262,6 +263,14 @@ export const TID = {
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
     // медиа-URL-инпуты используют field(prefixClass): image-url / video-url / audio-url
     save: 'add-turn-save',
+    cancel: 'add-turn-cancel',
+    // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
+    // button.ql-link, их берём по классам Quill)
+    toolbar: (name) => `add-turn-toolbar-${name}`,
+    // «Format» и подтверждение перед ним: кнопка чистит текст и снимает всё
+    // оформление, поэтому при цитатах, ссылках и выделении сначала спрашивает
+    format: 'add-turn-format',
+    formatConfirm: 'add-turn-format-confirm',
     // Панель редактора: корень — обёртка .panel (её getBoundingClientRect().width и есть
     // ширина панели, та же, что state.panels.d.panel_add_edit_turn.width); ручка
     // сплита на левом краю; A− / A+ — кнопки размера шрифта (PanelButton, disabled на
@@ -270,6 +279,14 @@ export const TID = {
     split: 'add-turn-split',
     fontDec: 'add-turn-font-dec',
     fontInc: 'add-turn-font-inc',
+  },
+
+  // Панель вставки хода из буфера (modules/panels/components/PasteTurnPanel.js):
+  // строка на каждый ход буфера, Paste создаёт ход, Delete убирает из буфера
+  // (нативный confirm)
+  pasteTurn: {
+    paste: 'paste-turn-paste',
+    delete: 'paste-turn-delete',
   },
 
   // Панель Info: форма правки игры владельцем (modules/panels/components/info/EditGameForm.js).

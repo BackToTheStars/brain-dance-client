@@ -31,12 +31,16 @@ const TurnCard = ({ id }) => {
     paragraph,
     contentType,
   } = turn || {};
-  let text = (paragraph && paragraph[0]?.insert) || '';
-  if (text) {
-    text =
-      text.length > 350 ? text.slice(0, text.indexOf(' ', 350)) + ' ...' : text;
+  // Превью — весь текст абзаца, а не первый инсерт: цитата, жирный или курсив бьют
+  // абзац на несколько инсертов, и от карточки оставался бы кусок до первого из них.
+  let text = (paragraph || [])
+    .map((item) => (typeof item?.insert === 'string' ? item.insert : ''))
+    .join('')
+    .trim();
+  if (text.length > 350) {
+    const space = text.indexOf(' ', 350);
+    text = `${text.slice(0, space === -1 ? 350 : space)} ...`;
   }
-  text = text.trim();
 
   const imageSrc = useMemo(() => {
     if (imageUrl) return imageUrl;

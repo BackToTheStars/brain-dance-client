@@ -8,6 +8,7 @@ import React, {
   useContext,
 } from 'react';
 import { colorSet, getNeedBlackText } from '../../helpers/color';
+import { attributesToStyle } from '../../helpers/attributesHelper';
 import { CompressorContext } from './Compressor';
 
 /** Утилита для разбиения строки по переводу строки с добавлением <br /> */
@@ -126,7 +127,7 @@ export const OriginalSpanTextPiece = ({ textItem, newInserts, compressed }) => {
   }
   return (
     <span
-      style={textItem.attributes}
+      style={attributesToStyle(textItem.attributes)}
       data-id={isItQuote ? textItem.attributes.id : ''}
       className={isItQuote && compressed ? 'compressed-quote' : ''}
     >
@@ -170,7 +171,7 @@ export const CompressorSpanTextPiece = ({ textItem, newInserts }) => {
       : {};
   return (
     <span
-      style={textItem.attributes}
+      style={attributesToStyle(textItem.attributes)}
       className={isTextQuote ? 'compressed-quote' : ''}
       {...additionalAttributes}
     >
