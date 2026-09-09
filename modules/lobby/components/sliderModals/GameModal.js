@@ -341,6 +341,7 @@ const GameModal = ({ params, closeModal = () => {} }) => {
     modalRef?.current?.parentNode,
     minWidthCallback,
     maxWidthCallback,
+    { clamp: true },
   );
 
   const leftSideStyle = useMemo(() => {

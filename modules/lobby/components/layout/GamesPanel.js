@@ -1,6 +1,7 @@
 import { loadGames } from '@/modules/lobby/redux/actions';
 
 import { useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import GameRow from '../ui/GameRow';
 import { PanelStatus } from '../ui/PanelStatus';
@@ -9,6 +10,7 @@ import { useTranslations } from 'next-intl';
 const GamesPanel = () => {
   const t = useTranslations('Lobby');
   const dispatch = useDispatch();
+  const router = useRouter();
   const settingsGames = useSelector((s) => s.settings.games);
   const games = useSelector((s) => s.lobby.games);
   const { loading, error } = useSelector((s) => s.lobby.gamesStatus);
@@ -30,6 +32,12 @@ const GamesPanel = () => {
   useEffect(() => {
     dispatch(loadGames());
   }, [settingsGames]);
+
+  // Забираем чанки страницы входа заранее: иначе клик встаёт в очередь браузера за
+  // миниатюрами ленты с внешних адресов и ждёт секунды.
+  useEffect(() => {
+    router.prefetch('/game');
+  }, []);
 
   const sortedGames = useMemo(() => {
     const sorted = [...games];

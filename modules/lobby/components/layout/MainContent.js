@@ -22,6 +22,7 @@ const MainContent = () => {
     wrapperRef.current,
     minWidthCallback,
     maxWidthCallback,
+    { clamp: true },
   );
 
   const leftSideStyle = useMemo(() => {

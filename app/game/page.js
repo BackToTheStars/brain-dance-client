@@ -20,7 +20,7 @@ const GAME_ID_HASH_LENGTH = 3;
 
 const GamePage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <GamePageInner />
     </Suspense>
   );
@@ -92,10 +92,10 @@ const GameDialogPage = ({ hash, focusTurnId, tourId }) => {
   // }, [hash, info, token, myGames, myGamesLoaded]);
 
   useEffect(() => {
+    // loadSettings — синхронный thunk поверх localStorage: после dispatch список
+    // игр уже в store, ждать таймером нечего.
     dispatch(loadSettings());
-    setTimeout(() => {
-      setMyGamesLoaded(true);
-    }, 300)
+    setMyGamesLoaded(true);
   }, [])
 
   // if (!myGamesLoaded || info?.skipDialog) {

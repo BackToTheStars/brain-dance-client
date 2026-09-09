@@ -1,19 +1,14 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-// Ширина перетаскиваемой панели в границах [min, max] от wrapper'а: move(delta)
-// получает накопленный сдвиг от начала перетаскивания (VerticalSplit), сеттер
-// зовётся и числом, и функцией от прежнего значения (как setState). Общий для
-// панелей лобби, слайдера игры и панели редактора хода (modules/panels).
-// options.clamp — шаг за границу упирает ширину в границу вместо того, чтобы
-// пропасть: при быстром движении мыши накопленный сдвиг перескакивает край, и
-// без ужатия ширина останавливалась на шаг раньше максимума. Включает панель
-// редактора хода; лобби живёт по-старому (шаги за границу игнорируются).
+// Ширина перетаскиваемой панели в границах [min, max] от wrapper'а; move(delta) —
+// накопленный сдвиг от начала перетаскивания. options.clamp упирает шаг за границу в
+// границу, иначе при быстрой мыши ширина не дотягивает до максимума.
 export const useSlider = (
   leftSideWidth,
   setLeftSideWidth,
   wrapper,
-  minWidthCallbac = () => 0,
+  minWidthCallback = () => 0,
   maxWidthCallback = () => 0,
   { clamp = false } = {},
 ) => {
@@ -46,10 +41,9 @@ export const useSlider = (
 
     const applyBounds = () => {
       const max = maxWidthCallback(wrapper);
-      setMinMaxWidth([minWidthCallbac(wrapper), max]);
-      // Сохранённая ширина может превышать текущий вьюпорт (напр. 1400px на экране
-      // 1000px) — ужимаем до максимума. Иначе левая панель шире контейнера, и
-      // ResizeObserver зацикливает пересчёт → лобби виснет.
+      setMinMaxWidth([minWidthCallback(wrapper), max]);
+      // Сохранённая ширина может превышать вьюпорт — ужимаем, иначе панель шире
+      // контейнера и ResizeObserver зацикливает пересчёт.
       setLeftSideWidth((prev) => (prev != null && prev > max ? max : prev));
     };
 

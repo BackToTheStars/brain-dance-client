@@ -19,7 +19,7 @@ const Game = dynamic(() => import('@/modules/game/components/Game'), {
 
 const GamePage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <GamePageInner />
     </Suspense>
   );

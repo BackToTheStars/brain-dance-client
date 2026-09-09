@@ -14,13 +14,8 @@ import {
 const minWidthCallback = () => EDITOR_PANEL_MIN_WIDTH;
 const maxWidthCallback = (wrapper) => getEditorPanelMaxWidth(wrapper);
 
-// Ручка на левом краю панели редактора хода — те же VerticalSplit и useSlider,
-// что у разделителя лобби. Панель прижата вправо, поэтому сдвиг мыши влево
-// должен её расширять: дельта инвертируется здесь, лобби этого не видит.
-// Ширина живёт в геометрии панели (state.panels.d, UIPanel пишет число как px);
-// границы — минимум из config/panel и окно минус отступы панелей; ResizeObserver
-// внутри useSlider следит за documentElement и ужимает ширину при сужении окна.
-// На пользователя ширина записывается по отпусканию мыши, не на каждый шаг.
+// Ручка на левом краю: панель прижата вправо, поэтому сдвиг влево её расширяет —
+// дельта инвертируется здесь. Ширина живёт в геометрии панели, пишется по mouseup.
 const EditorPanelSplit = () => {
   const dispatch = useDispatch();
   const store = useStore();

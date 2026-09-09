@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 const MOVE_DELTA = 10;
 
-// Перетаскиваемый вертикальный разделитель: mousedown на ручке, move/up на
-// document, шаг 10px; move(delta) получает накопленный сдвиг от начала
-// перетаскивания. Общий для лобби (панели, слайдер игры) и для панели
-// редактора хода на холсте — там обёртка инвертирует дельту. Стили —
-// themes/base/scss/ui/vertical-split.scss.
+// Перетаскиваемый разделитель: mousedown на ручке, move/up на document, шаг 10px.
+// Общий для лобби и панели редактора хода — та инвертирует дельту.
 export const VerticalSplit = ({
   move = () => {},
   setIsDragging = () => {},

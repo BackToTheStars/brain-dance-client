@@ -99,10 +99,8 @@ export const changeWidgetParams = (payload) => (dispatch) => {
   });
 };
 
-// Ширина панели редактора хода помнится на пользователя, а не на игру (это не
-// fieldsToSave миникарты): читается из userSettings.layoutSettings при загрузке
-// игры, ужимается в границы сплита и кладётся в геометрию панели числом — так её
-// видит и сдвиг холста при правке хода ещё до первого открытия панели.
+// Ширина панели редактора помнится на пользователя: читается при загрузке игры и
+// кладётся в геометрию панели, чтобы сдвиг холста знал её до первого открытия.
 export const applyUserPanelSettings = () => (dispatch) => {
   dispatch(
     changePanelGeometry(PANEL_ADD_EDIT_TURN, { width: readEditorPanelWidth() }),

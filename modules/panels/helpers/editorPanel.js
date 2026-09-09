@@ -12,12 +12,8 @@ import {
   lsUpdateLayoutSettings,
 } from '@/modules/settings/redux/requests';
 
-// Настройки панели редактора хода, которые помнятся на пользователя, а не на
-// игру (g_settings_<hash> / fieldsToSave — не сюда): ширина панели и размер
-// шрифта редактора. Лежат в userSettings.layoutSettings рядом с ширинами панелей
-// лобби, ключи editorPanelWidth и editorFontSize; запись — слиянием
-// (lsUpdateLayoutSettings), так что ключи лобби не задеваются. Читать только на
-// клиенте: getStore ходит в localStorage.
+// Настройки панели редактора, которые помнятся на пользователя, а не на игру: ширина
+// и размер шрифта в userSettings.layoutSettings. Только на клиенте — ходит в localStorage.
 
 // Максимум ширины — окно минус два отступа панелей, тот же clamp, что max-width
 // в panels.scss. wrapper — тот, за кем следит ResizeObserver сплита.

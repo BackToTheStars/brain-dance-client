@@ -50,10 +50,8 @@ export const lsUpdateGames = (games) => {
   updateStore('games', games);
 };
 
-// Слияние, а не замена: лобби при каждом монтировании пишет свои два ключа
-// (leftSideWidth, sliderWidth) целиком, а панель редактора хода держит здесь свои
-// (editorPanelWidth, editorFontSize) — без слияния заход на «/» стирал чужие ключи
-// (проверено на стенде: лишний ключ пропадал после открытия лобби).
+// Слияние, а не замена: лобби пишет свои два ключа целиком, панель редактора — свои,
+// и без слияния заход на «/» стирал чужие.
 export const lsUpdateLayoutSettings = (settings) => {
   const { layoutSettings = {} } = getStore();
   updateStore('layoutSettings', { ...layoutSettings, ...settings });

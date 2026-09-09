@@ -62,12 +62,10 @@ const ClientWrapper = ({
 }) => {
   const store = useStore();
 
-  // E2E-хуки (только при NEXT_PUBLIC_E2E=1, no-op в обычной сборке):
-  // 1) доступ к каноническому состоянию Redux для ассертов; 2) ускорение
-  // анимаций/переходов почти до нуля, чтобы стабилизировать drag/скриншоты.
-  // ВАЖНО: не `animation:none` — antd (rc-motion) дожидается animationend/transitionend,
-  // чтобы раскрыть overlay (dropdown/modal/tooltip); полное отключение оставляет их
-  // скрытыми. Делаем длительности ~0, события при этом срабатывают.
+  // E2E-хуки при NEXT_PUBLIC_E2E=1: состояние Redux для ассертов и ускорение анимаций.
+  // Не `animation:none` — rc-motion ждёт animationend, чтобы раскрыть overlay antd.
+  // Точки спиннера исключены: их анимации бесконечные, с длительностью ~0 они мельтешат.
+  // Исключение селектором, а не через `revert`: тот откатывает к 0s, а не к значению antd.
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_E2E !== '1') return;
     if (typeof window === 'undefined') return;
@@ -76,7 +74,7 @@ const ClientWrapper = ({
     const style = document.createElement('style');
     style.setAttribute('data-e2e', '');
     style.textContent =
-      '*,*::before,*::after{transition-duration:0.001ms!important;transition-delay:0ms!important;animation-duration:0.001ms!important;animation-delay:0ms!important;scroll-behavior:auto!important}';
+      '*:not(:where(.ant-spin-dot,.ant-spin-dot *)),*::before,*::after{transition-duration:0.001ms!important;transition-delay:0ms!important;animation-duration:0.001ms!important;animation-delay:0ms!important;scroll-behavior:auto!important}';
     document.head.appendChild(style);
     return () => style.remove();
   }, [store]);

@@ -11,9 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 // должна быть доступна только для ROLE_GAME_OWNER (RULE_GAME_EDIT)
 const EditGameForm = () => {
   const dispatch = useDispatch();
-  // antd Form держит значение поля в своём сторе, а handleSubmit берёт image из
-  // стейта — после загрузки картинки обновляются оба, иначе в поле остался бы
-  // старый адрес, а сохранился бы новый.
+  // antd Form держит значение в своём сторе, а handleSubmit берёт image из стейта —
+  // после загрузки обновляем оба.
   const [form] = Form.useForm();
   //
   const editGame = (data) => {

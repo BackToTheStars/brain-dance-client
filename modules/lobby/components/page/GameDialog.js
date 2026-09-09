@@ -63,6 +63,30 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     setAccessError(message || t('gameDialog.Access_update_failed'));
   };
 
+  const applyCodeAndGoToGame = (code) => {
+    dispatch(lobbyEnterGameForRequest(hash, code, nickname))
+      .then((data) => {
+        const { info, token } = data;
+        setGameInfoIntoStorage(info.hash, {
+          info,
+          // info: {
+          //   ...info,
+          //   skipDialog,
+          // },
+          token,
+        });
+        reloadUserInfo();
+        router.push(viewUrl);
+      })
+      .catch((message) =>
+        setAccessError(
+          typeof message === 'string'
+            ? message
+            : t('gameDialog.Access_update_failed'),
+        ),
+      );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAccessError('');
@@ -96,6 +120,17 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         // ничего не требуется
         router.push(viewUrl);
         // }
+      } else if (!token) {
+        // Гость по ссылке: токена нет, /codes/refresh ответит 401 — входим по коду
+        // (у посетителя код — это хеш игры).
+        const guestCode =
+          myCodes.find((c) => c.role === choosedRole)?.code ||
+          (choosedRole === ROLE_GAME_VISITOR ? hash : null);
+        if (!guestCode) {
+          setAccessError(t('gameDialog.Access_update_failed'));
+          return;
+        }
+        applyCodeAndGoToGame(guestCode);
       } else {
         // случаи, когда требуется только изменить никнейм
         refreshTokenRequest(hash, token, nickname)
@@ -138,22 +173,6 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       });
       await prm;
     }
-    
-    const applyCodeAndGoToGame = () => {
-      dispatch(lobbyEnterGameForRequest(hash, code, nickname)).then((data) => {
-        const { info, token } = data;
-        setGameInfoIntoStorage(info.hash, {
-          info,
-          // info: {
-          //   ...info,
-          //   skipDialog,
-          // },
-          token,
-        });
-        reloadUserInfo();
-        router.push(viewUrl);
-      });
-    };
 
     // Предупреждение о потере доступа. Вход другим кодом перезаписывает
     // game_<hash>, и если текущая роль выше всех сохранённых кодов, вернуть её
@@ -171,10 +190,10 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       if (
         confirm(`${roleName} access will be lost. Do you want to continue?`)
       ) {
-        applyCodeAndGoToGame();
+        applyCodeAndGoToGame(code);
       }
     } else {
-      applyCodeAndGoToGame();
+      applyCodeAndGoToGame(code);
     }
   };
 
