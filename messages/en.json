@@ -35,9 +35,7 @@
     "game": {
       "Game_info": "Game info",
       "Turn_info": "Turn info",
-      "Players": "Players",
       "Turns": "Turns",
-      "Views": "Views",
       "Game_data": "Game data",
       "Login": "Login",
       "Logout": "Logout",
@@ -57,8 +55,7 @@
       "Game_limit": "Game limit",
       "Turn_limit": "Turn limit",
       "Chrono": "Chrono",
-      "Favorite_games": "Favorite games",
-      "Content_types": "Content types"
+      "Favorite_games": "Favorite games"
     },
     "settingsPanel": {
       "Settings": "Settings",
@@ -67,8 +64,7 @@
       "Rows_count": "Rows count",
       "Font_size": "Font size",
       "Line_spacing": "Line spacing",
-      "Text_align": "Text align",
-      "Font": "Font"
+      "Text_align": "Text align"
     },
     "uploadModal": {
       "Drag_drop": "Drag and drop a file here",

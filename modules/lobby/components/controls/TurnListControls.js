@@ -1,6 +1,3 @@
-import { SIZE_SM } from '@/config/ui/size';
-import { DropdownList } from '../ui/DropdownList';
-import { contentTypes } from '@/config/lobby/contentType';
 import {
   changeRequestSettings,
   switchMode,
@@ -47,7 +44,6 @@ const TurnListControls = () => {
 
   const btnStyle =
     'w-[30px] h-[30px] border border-main rounded-btn-border leading-[1] flex items-center justify-center select-none';
-  // элементы управления списком ходов (фильтрация, позже - сортировка и поиск)
   return (
     <div className="turn-list-controls">
       <div className="flex justify-between items-center mb-3">
@@ -133,18 +129,6 @@ const TurnListControls = () => {
             <BookOutlined /> {t('Favorite_games')}
           </Button>
         </div>
-        {/* «Content types» скрыта до релиза:
-            фильтра по типу контента нет ни здесь (onChange пустой), ни в ручке
-            /lobby/turns. Делать фильтр или убирать выпадашку — отдельной задачей. */}
-        {/* <div className="cursor-pointer">
-          <DropdownList
-            title={t('Content_types')}
-            size={SIZE_SM}
-            options={contentTypes}
-            value={contentTypes[0].value}
-            onChange={() => {}}
-          />
-        </div> */}
       </div>
     </div>
   );

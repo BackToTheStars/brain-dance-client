@@ -1,4 +1,3 @@
-import { FONT_INTER } from '@/config/lobby/fonts';
 import * as types from './types';
 
 // загрузка/ошибка/пусто у списков лобби раньше не различались: пустой список
@@ -10,7 +9,6 @@ const initialState = {
   dGames: {},
   gamesStatus: initialRequestStatus,
   turnsStatus: initialRequestStatus,
-  modal: { open: false, type: null, params: {} },
   sliderModal: { open: false, type: null, params: {} },
   textSettings: {
     columnCount: 3,
@@ -20,18 +18,10 @@ const initialState = {
     lineSpacing: 1.5,
     padding: 12,
     alignment: 'left',
-    activeFontFamily: FONT_INTER,
-  },
-  layoutSettings: {
-    desiredNumCols: 2,
-    turnLimit: 5,
-    contentType: 'video',
   },
   dictionaryGame: {},
-  sidebar: {},
   turns: [],
   dTurns: {},
-  theme: '',
   mode: 'chrono', // 'byGame',
   requestSettings: {
     gameLimit: 5,
@@ -64,21 +54,6 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
           ...state.requestSettings,
           [payload.field]: payload.value,
         },
-      };
-    }
-    case types.LOBBY_LAYOUT_SETTINGS_SET: {
-      return {
-        ...state,
-        layoutSettings: {
-          ...state.layoutSettings,
-          [payload.field]: payload.value,
-        },
-      };
-    }
-    case types.LOBBY_MODAL_SET: {
-      return {
-        ...state,
-        modal: payload,
       };
     }
     case types.LOBBY_SLIDER_MODAL_SET: {
@@ -128,18 +103,6 @@ export const lobbyReducer = (state = initialState, { type, payload }) => {
           return acc;
         }, {}),
         turnsStatus: { loading: false, error: null },
-      };
-    }
-    case types.LOBBY_SIDEBAR: {
-      return {
-        ...state,
-        sidebar: payload,
-      };
-    }
-    case types.LOBBY_THEME: {
-      return {
-        ...state,
-        textSettings: { ...state.textSettings, theme: payload },
       };
     }
     case types.LOBBY_MODE_SET: {

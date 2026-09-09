@@ -20,10 +20,6 @@ const lobbyRequest = (url, options) => {
   });
 };
 
-export const loadTurnsRequest = () => {
-  return fetch(`${LOBBY_API_URL}/turns?hash=373`).then((res) => res.json());
-};
-
 export const loadTurnsByGameRequest = ({ gameLimit, turnLimit }) => {
   const codeStr = getCodesString();
   let url = `${LOBBY_API_URL}/lobby/turns?mode=byGame&codes=${codeStr}`;

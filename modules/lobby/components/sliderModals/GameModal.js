@@ -3,7 +3,6 @@ import { ContentButton as Button } from '@/ui/button';
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalSplit } from '@/modules/ui/components/common/VerticalSplit';
-import { useRouter } from 'next/navigation';
 import {
   ROLES,
   ROLE_GAME_VISITOR,
@@ -186,7 +185,6 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
   const t = useTranslations('Lobby.game');
   const dispatch = useDispatch();
   const myGames = useSelector((state) => state.settings.games);
-  const router = useRouter();
   const game = useSelector((state) =>
     state.lobby.games.find((g) => g.hash === hash),
   );
@@ -244,21 +242,11 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
                 alt="image"
               />
             )}
-            {/* «Players» и «Views» скрыты до релиза: настоящих данных за ними нет, оба числа выведены из
-                числа ходов. Считать их или убрать совсем — отдельной задачей. */}
             <div className="w-full h-auto flex gap-x-1 px-3">
-              {/* <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
-                <div className="text-center font-semibold">{t('Players')}</div>
-                {Math.ceil(turnsCount / 20)}
-              </div> */}
               <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
                 <div className="text-center font-semibold">{t('Turns')}</div>
                 {turnsCount}
               </div>
-              {/* <div className="w-full py-2 text-center bg-main-dark bg-opacity-90 rounded">
-                <div className="text-center font-semibold">{t('Views')}</div>
-                {Math.round(turnsCount * 17)}
-              </div> */}
             </div>
           </div>
         </div>
@@ -317,7 +305,7 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
           <Button
             size="sm"
             data-test-id={TID.gameModal.open}
-            onClick={() => router.push(getGameUrl(hash, turnId))}
+            onClick={() => window.location.assign(getGameUrl(hash, turnId))}
           >
             {t('Open_game')}
           </Button>

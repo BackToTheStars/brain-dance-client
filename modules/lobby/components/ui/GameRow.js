@@ -7,7 +7,7 @@ import { IntButton as Button } from '@/ui/button';
 import { useDispatch } from 'react-redux';
 import { SLIDER_MODAL_GAME } from '@/config/lobby/sliderModal';
 import { toggleSliderModal } from '../../redux/actions';
-import { useRouter } from 'next/navigation';
+import { getGameUrl } from '../../utils/url';
 import {
   addGameCode,
   pinFirstCode,
@@ -18,7 +18,6 @@ import { TID } from '@/config/testIds';
 
 const GameRow = ({ game, index, settings = {} }) => {
   const dispatch = useDispatch();
-  const router = useRouter();
   const { name, image, status, description, hash } = game;
   const params = { hash };
   return (
@@ -49,7 +48,9 @@ const GameRow = ({ game, index, settings = {} }) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              router.push(`/game?hash=${hash}`);
+              // полный переход, а не router.push: клиентская навигация наследует
+              // очередь запросов лобби и ждёт недостижимые миниатюры ленты
+              window.location.assign(getGameUrl(hash));
             }}
           >
             <DoubleRightOutlined />

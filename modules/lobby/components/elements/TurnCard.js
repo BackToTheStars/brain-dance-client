@@ -4,6 +4,7 @@ import TurnPreviewHeader from './turnPreview/Header';
 import TurnPreviewWrapper from './turnPreview/Wrapper';
 import TurnPreviewRoller from './turnPreview/Roller';
 import TurnPreviewAudio from './turnPreview/Audio';
+import TurnImage from './TurnImage';
 
 const getVideoImg = (videoUrl) => {
   if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
@@ -20,9 +21,6 @@ const TurnCard = ({ id }) => {
   const lineSpacing = useSelector((s) => s.lobby.textSettings.lineSpacing);
   const alignment = useSelector((s) => s.lobby.textSettings.alignment);
   const cardPadding = useSelector((s) => s.lobby.textSettings.padding);
-  const activeFontFamily = useSelector(
-    (s) => s.lobby.textSettings.activeFontFamily,
-  );
 
   const {
     dontShowHeader,
@@ -52,7 +50,7 @@ const TurnCard = ({ id }) => {
       lineHeight: `${lineSpacing * fontSize}px`,
       textAlign: alignment,
     };
-  }, [fontSize, lineSpacing, alignment, activeFontFamily]);
+  }, [fontSize, lineSpacing, alignment]);
 
   const paddingStyle = useMemo(() => {
     return {
@@ -65,13 +63,7 @@ const TurnCard = ({ id }) => {
       {!dontShowHeader && !!header && <TurnPreviewHeader header={header} />}
       <div className="base-card__body" style={paddingStyle}>
         {!!audioUrl && <TurnPreviewAudio audioUrl={audioUrl} header={header} />}
-        {!!imageSrc && (
-          <img
-            src={imageSrc}
-            alt="#"
-            className={`base-card__widget w-full h-auto rounded`}
-          />
-        )}
+        {!!imageSrc && <TurnImage src={imageSrc} />}
         {!!text && (
           <div className="base-card__widget" style={textStyle}>
             {text}

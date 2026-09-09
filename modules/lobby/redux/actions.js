@@ -5,7 +5,6 @@ import {
   loadTurnsChronoRequest,
 } from './requests';
 import * as types from './types';
-// import { loadTurnsRequest } from './requests';
 import { openModal } from '@/modules/ui/redux/actions';
 import { MODAL_CONFIRM } from '@/config/lobby/modal';
 import { setGameInfoIntoStorage } from '@/modules/user/contexts/UserContext';
@@ -32,20 +31,6 @@ export const changeRequestSettings = (field, value) => (dispatch) => {
     payload: { field, value },
   });
 }
-
-export const changeLayoutSettings = (field, value) => (dispatch) => {
-  dispatch({
-    type: types.LOBBY_LAYOUT_SETTINGS_SET,
-    payload: { field, value },
-  });
-};
-
-export const closeModal = () => (dispatch) => {
-  dispatch({
-    type: types.LOBBY_MODAL_SET,
-    payload: { open: false, type: null, params: {} },
-  });
-};
 
 export const toggleSliderModal = (type, params) => (dispatch, getState) => {
   const prevModal = getState().lobby.sliderModal;
@@ -83,22 +68,6 @@ export const closeSliderModal =
       });
     }
   };
-
-export const switchTheme = () => (dispatch, getState) => {
-  const html = document.querySelector('html');
-  const theme = getState().lobby.textSettings.theme;
-  localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
-
-  if (html) {
-    html.classList.remove(theme);
-    html.classList.add(localStorage.getItem('theme'));
-  }
-
-  dispatch({
-    type: types.LOBBY_THEME,
-    payload: theme === 'light' ? 'dark' : 'light',
-  });
-};
 
 // текст отказа для панели: сообщение сервера, иначе — причина сбоя запроса
 const getRequestErrorText = (error) => error?.message || 'Неизвестная ошибка';
@@ -148,17 +117,6 @@ export const loadTurns = () => (dispatch, getState) => {
 
 export const switchMode = (mode) => (dispatch) => {
   dispatch({ type: types.LOBBY_MODE_SET, payload: mode });
-};
-
-const sidebarObj = {};
-export const toggleSidebar = (sidebar) => (dispatch, getState) => {
-  const state = getState();
-  sidebarObj[sidebar] =
-    sidebar in state.lobby.sidebar ? !state.lobby.sidebar[sidebar] : true;
-  return dispatch({
-    type: types.LOBBY_SIDEBAR,
-    payload: { ...sidebarObj },
-  });
 };
 
 // `share` — хвост адреса из ссылки: ход (`?turn=`) и экскурсия (`?tour=`)

@@ -137,6 +137,13 @@ export const TID = {
     open: 'lobby-game-open', // «»» — сразу в игру
   },
 
+  // Лобби: миниатюра карточки ленты (modules/lobby/components/elements/TurnImage.js).
+  // Обёртка держит место под картинку; data-image-state: idle (запроса ещё нет) |
+  // loading (адрес подставлен) | loaded. Заглушка — /img/video-default.png
+  lobbyTurn: {
+    image: 'turn-card-image',
+  },
+
   // Лобби: слайдер игры (modules/lobby/components/sliderModals/GameModal.js)
   gameModal: {
     open: 'game-modal-open',
@@ -201,6 +208,8 @@ export const TID = {
     table: 'admin-youtube-table', // обёртка таблицы
     error: 'admin-youtube-error',
     row: 'admin-youtube-row', // строка таблицы (+ data-turn-id)
+    game: 'admin-youtube-game', // ссылка «в игре» (+ data-game-hash), новая вкладка,
+    // ведёт на /game?hash=&turn= — то есть на диалог входа, а не сразу на холст
   },
 
   // Присутствие в игре: переключатель Online в панели Info

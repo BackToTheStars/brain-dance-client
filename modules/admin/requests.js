@@ -122,19 +122,6 @@ export const relocateTurnYoutubeRequest = (turnId, formatId) =>
     body: { turnId, formatId },
   });
 
-// НЕ ВЫЗЫВАТЬ: маршрутов под эти два запроса
-// с админским Bearer на сервере нет. `DELETE /game` закрыт gameMiddleware и ждёт
-// заголовок `game-token`, а `POST /codes` не существует вовсе (в
-// server/modules/game/routes/codes.js только /login, /add, /refresh,
-// /static-token) — админская версия получит 404. В UI ни та, ни другая не
-// выведена; лобби пользуется одноимёнными функциями из `modules/game/requests.js`,
-// и те ходят правильно. Оставлены до решения, нужны ли админке свои маршруты.
-export const deleteGameRequest = (hash) =>
-  adminRequest(`/game?hash=${hash}`, { method: 'DELETE' });
-
-export const addCodeRequest = (hash) =>
-  adminRequest(`/codes?hash=${hash}`, { method: 'POST' });
-
 export const getTgChatIdsRequest = () => adminRequest('/admin/tg-logs/chat-ids');
 
 // Строка запроса собирается целиком, а не склейкой: раньше при пустом chatId

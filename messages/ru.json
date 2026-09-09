@@ -29,9 +29,7 @@
     "game": {
       "Game_info": "Об игре",
       "Turn_info": "О ходе",
-      "Players": "Игроки",
       "Turns": "Ходы",
-      "Views": "Просмотры",
       "Game_data": "Данные игры",
       "Login": "Войти",
       "Logout": "Выйти",
@@ -50,8 +48,7 @@
       "Game_limit": "Лимит игр",
       "Turn_limit": "Лимит ходов",
       "Chrono": "Хроно",
-      "Favorite_games": "Избранные игры",
-      "Content_types": "Типы ходов"
+      "Favorite_games": "Избранные игры"
     },
     "settingsPanel": {
       "Settings": "Настройки",
@@ -60,8 +57,7 @@
       "Rows_count": "Количество строк",
       "Font_size": "Размер шрифта",
       "Line_spacing": "Пространство между строками",
-      "Text_align": "Выравнивание текста",
-      "Font": "Шрифт"
+      "Text_align": "Выравнивание текста"
     },
     "uploadModal": {
       "Drag_drop": "Перетащите файл сюда",

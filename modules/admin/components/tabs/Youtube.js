@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { getAdminYoutubeListRequest } from '../../requests';
+import { getGameUrl } from '@/modules/lobby/utils/url';
 import { TID } from '@/config/testIds';
 
 // Опись ходов, чьи videoUrl распознаны как YouTube — «что ещё держится на
@@ -63,6 +64,23 @@ const HeaderCell = ({ record }) => (
   </Link>
 );
 
+// Через диалог входа (/game?hash=), а не прямо на холст: админ выбирает, кем войти.
+// hash приходит null у хода без игры — открывать нечего.
+const GameCell = ({ record }) =>
+  record.hash ? (
+    <a
+      href={getGameUrl(record.hash, record.turnId)}
+      target="_blank"
+      rel="noreferrer"
+      data-test-id={TID.adminYoutube.game}
+      data-game-hash={record.hash}
+    >
+      в игре
+    </a>
+  ) : (
+    <span>—</span>
+  );
+
 const YoutubeTab = () => {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
@@ -116,6 +134,12 @@ const YoutubeTab = () => {
         dataIndex: 'header',
         key: 'turn',
         render: (text, record) => <HeaderCell record={record} />,
+      },
+      {
+        title: 'В игре',
+        key: 'game',
+        width: 90,
+        render: (text, record) => <GameCell record={record} />,
       },
       {
         title: 'Создан',

@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ContentButton as Button } from '@/ui/button';
 import { useMainLayoutContext } from '../layout/MainLayoutContext';
@@ -31,7 +30,6 @@ const TurnModal = ({ params }) => {
   const { id } = params;
   const turn = useSelector((s) => s.lobby.dTurns[id]);
   const game = useSelector((s) => s.lobby.dGames[turn?.gameId]);
-  const router = useRouter();
   const t = useTranslations('Lobby.game');
   const { header, imageUrl, videoUrl, paragraph, date, contentType, width } =
     turn || {};
@@ -73,7 +71,7 @@ const TurnModal = ({ params }) => {
         <div className="flex justify-end p-4 pt-0">
           <Button
             size="sm"
-            onClick={() => router.push(getGameUrl(game.hash, id))}
+            onClick={() => window.location.assign(getGameUrl(game.hash, id))}
           >
             {t('Open_game')}
           </Button>

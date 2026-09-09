@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
   TextCenterIcon,
   TextLeftIcon,
@@ -6,8 +5,6 @@ import {
 } from '@/modules/lobby/components/iconsComponents/SvgIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeTextSettings } from '@/modules/lobby/redux/actions';
-import { fontSettings } from '@/config/lobby/fonts';
-// import { ThemeSwitcher } from './SwitchTheme';
 import { Slider } from 'antd';
 import SwitchersBlock from './SwitchersBlock';
 import ModeToggle from '@/modules/ui/components/switchers/ModeToggle';
@@ -25,7 +22,6 @@ const ContentSettings = () => {
     lineSpacing,
     alignment,
     padding: cardPadding,
-    activeFontFamily,
     limitLineHeader,
   } = textSettings;
 
@@ -72,18 +68,6 @@ const ContentSettings = () => {
     dispatch(changeTextSettings('alignment', type));
   };
 
-  const fontFamilyOptions = useMemo(() => {
-    return Object.keys(fontSettings).map((field) => ({
-      ...fontSettings[field],
-      active: field === activeFontFamily,
-      key: field,
-    }));
-  }, [activeFontFamily]);
-
-  const setActiveFontFamily = (fontFamily) => {
-    dispatch(changeTextSettings('activeFontFamily', fontFamily));
-  };
-
   // const btnStyle =
   //   'w-[40px] h-[40px] border border-main rounded-btn-border leading-[1] flex items-center justify-center select-none';
   const btnStyle =
@@ -93,7 +77,6 @@ const ContentSettings = () => {
     <form>
       <div className="flex justify-between items-center mb-3">
         <div className="text-lg font-semibold">{t('Settings')}</div>
-        {/* <ThemeSwitcher /> */}
         <div className="flex gap-3">
           <LangSwitcher />
           <ModeToggle />
@@ -191,32 +174,6 @@ const ContentSettings = () => {
           </div>
         </div>
       </div>
-      {/* Выбор шрифта скрыт до релиза:
-          activeFontFamily пишется в стор и хранится, но в стиль карточки не
-          попадает — в TurnCard он только в зависимостях useMemo. Довести до
-          дела или убрать совсем — отдельной задачей. */}
-      {/* <div className="cursor-pointer py-3 border-y dark:border-white border-dark-light dark:border-opacity-10 border-opacity-10 flex justify-between items-center">
-        <div className="text-dark">{t('Font')}</div>
-        <div className="flex gap-x-3 items-center w-[120px]">
-          <ul>
-            {fontFamilyOptions.map((el) => {
-              return (
-                <li
-                  className={` ${
-                    el.active
-                      ? 'dark:text-main-light text-main-light'
-                      : 'text-dark'
-                  }`}
-                  key={el.label}
-                  onClick={() => setActiveFontFamily(el.key)}
-                >
-                  {el.label}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div> */}
       <SwitchersBlock />
     </form>
   );
