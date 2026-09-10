@@ -36,6 +36,7 @@ import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Modal, Switch } from 'antd';
 import dayjs from 'dayjs';
 import { cleanText, getFormatLoss } from '../helpers/textHelper';
+import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { TID } from '@/config/testIds';
 
@@ -250,6 +251,15 @@ const AddEditTurnPopup = () => {
       });
     }
 
+    const prevQuotes = turnToEdit?.quotes || [];
+
+    const paragraphOps = collapseSplitQuotes(
+      resTextArr,
+      prevQuotes
+        .filter((quote) => quote.type === TYPE_QUOTE_TEXT)
+        .map((quote) => quote.id),
+    );
+
     const preparedForm = {};
     for (let fieldToShow of fieldsToShow) {
       if (
@@ -270,16 +280,16 @@ const AddEditTurnPopup = () => {
 
     if (
       requiredParagraph &&
-      (!resTextArr ||
-        !resTextArr.length ||
-        (resTextArr.length === 1 && resTextArr[0].insert.trim() === ''))
+      (!paragraphOps ||
+        !paragraphOps.length ||
+        (paragraphOps.length === 1 && paragraphOps[0].insert.trim() === ''))
     ) {
       return setError({ message: 'Need text body' });
     }
 
     const quotes = [];
 
-    for (let textItem of resTextArr) {
+    for (let textItem of paragraphOps) {
       if (textItem.attributes && textItem.attributes.id) {
         quotes.push({
           id: textItem.attributes.id,
@@ -288,8 +298,6 @@ const AddEditTurnPopup = () => {
         });
       }
     }
-
-    const prevQuotes = turnToEdit?.quotes || [];
 
     // Замена файла обесценивает цитаты, заданные в его координатах:
     // прямоугольные у картинки и pdf, отрезки таймлайна у видео и аудио. Правило
@@ -343,7 +351,7 @@ const AddEditTurnPopup = () => {
 
     let turnObj = {
       ...preparedForm,
-      paragraph: resTextArr,
+      paragraph: paragraphOps,
       contentType: activeTemplate,
       quotes: [...quotes],
     };
