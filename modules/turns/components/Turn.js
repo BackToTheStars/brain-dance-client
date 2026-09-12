@@ -61,14 +61,16 @@ const TurnAdapter = ({ id }) => {
       height: `${height}px`,
     };
 
-    const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType].join(
-      ' '
-    );
+    // Without a draggable of its own the card would hand the mousedown to the
+    // board, and dragging a card would drag the whole canvas.
+    const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType]
+      .concat(following ? 'not-draggable' : [])
+      .join(' ');
     return {
       wrapperClasses,
       wrapperStyles,
     };
-  }, [gamePosition, position, width, height]);
+  }, [gamePosition, position, width, height, following]);
 
   // DRAGGABLE
   useEffect(() => {

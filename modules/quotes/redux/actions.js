@@ -79,7 +79,7 @@ export const savePdfQuoteByCrop = () =>
   }));
 
 export const processQuoteClicked =
-  (currentQuoteKey, can) => (dispatch, getState) => {
+  (currentQuoteKey, can, onDeactivated) => (dispatch, getState) => {
     const state = getState();
     const cancelCallback = state.game.cancelCallback;
     // прежняя выбранная цитата
@@ -122,6 +122,9 @@ export const processQuoteClicked =
           }),
         );
         dispatch(setActiveQuoteKey(null));
+        // связали — активной цитаты больше нет, и панель picture/pdf
+        // quote-active (если это она нас сюда привела) должна закрыться следом
+        onDeactivated?.();
       }
     }, 100);
   };

@@ -1,10 +1,15 @@
 import { Alert, Table } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { getAdminYoutubeListRequest } from '../../requests';
 import { getGameUrl } from '@/modules/lobby/utils/url';
 import { TID } from '@/config/testIds';
+import {
+  IMAGE_TIMEOUT_MS,
+  enqueueImage,
+  isForeignImage,
+} from '@/modules/lobby/utils/imageQueue';
 
 // Опись ходов, чьи videoUrl распознаны как YouTube — «что ещё держится на
 // чужом хостинге», чтобы админ открыл ход и перезалил видео руками. Никакого
@@ -29,26 +34,85 @@ const toQuery = (sort, order, page, limit) => ({
   limit,
 });
 
+const THUMBNAIL_BOX = { width: 60, height: 45 };
+
+const NoThumbnail = ({ title }) => (
+  <div
+    className="flex items-center justify-center bg-gray-200 text-gray-500 text-xs shrink-0"
+    style={THUMBNAIL_BOX}
+    title={title}
+  >
+    нет превью
+  </div>
+);
+
+// img.youtube.com недостижим — та же очередь и тот же таймаут, что у миниатюр
+// ленты лобби (modules/lobby/utils/imageQueue.js): без них полсотни строк на
+// странице держали слот разрешения имён браузера по 19-38 с каждая.
+const VideoThumbnail = ({ youtubeId }) => {
+  const src = `https://img.youtube.com/vi/${youtubeId}/default.jpg`;
+  const releaseRef = useRef(null);
+  const timerRef = useRef(null);
+  const [shownSrc, setShownSrc] = useState(null);
+  const [failed, setFailed] = useState(false);
+
+  const release = useCallback(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
+    if (releaseRef.current) {
+      releaseRef.current();
+      releaseRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    setShownSrc(null);
+    setFailed(false);
+    if (!isForeignImage(src)) {
+      setShownSrc(src);
+      return undefined;
+    }
+    releaseRef.current = enqueueImage(() => {
+      setShownSrc(src);
+      timerRef.current = setTimeout(() => {
+        setFailed(true);
+        release();
+      }, IMAGE_TIMEOUT_MS);
+    });
+    return release;
+  }, [src, release]);
+
+  if (failed) {
+    return <NoThumbnail title="Превью не загрузилось" />;
+  }
+  if (!shownSrc) {
+    return <div className="bg-gray-100 shrink-0" style={THUMBNAIL_BOX} />;
+  }
+
+  return (
+    <img
+      src={shownSrc}
+      alt=""
+      loading="lazy"
+      width={THUMBNAIL_BOX.width}
+      height={THUMBNAIL_BOX.height}
+      onLoad={release}
+      onError={() => {
+        release();
+        setFailed(true);
+      }}
+    />
+  );
+};
+
 // youtubeId бывает null — ссылка на канал/плейлист опознаётся по хосту, но id
 // ролика в ней нет. Собирать превью не из чего, показываем заглушку.
 const VideoCell = ({ record }) => (
   <div className="flex items-center gap-2">
     {record.youtubeId ? (
-      <img
-        src={`https://img.youtube.com/vi/${record.youtubeId}/default.jpg`}
-        alt=""
-        loading="lazy"
-        width={60}
-        height={45}
-      />
+      <VideoThumbnail youtubeId={record.youtubeId} />
     ) : (
-      <div
-        className="flex items-center justify-center bg-gray-200 text-gray-500 text-xs shrink-0"
-        style={{ width: 60, height: 45 }}
-        title="Ссылка без id ролика (канал или плейлист) — превью нет"
-      >
-        нет превью
-      </div>
+      <NoThumbnail title="Ссылка без id ролика (канал или плейлист) — превью нет" />
     )}
     <a href={record.videoUrl} target="_blank" rel="noreferrer" className="break-all">
       {record.videoUrl}

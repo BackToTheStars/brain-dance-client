@@ -165,7 +165,11 @@ const QuotesInner = memo(
                     },
                   }),
                 );
-                dispatch(processQuoteClicked(`${turnId}_${quote.id}`, can));
+                dispatch(
+                  processQuoteClicked(`${turnId}_${quote.id}`, can, () =>
+                    dispatch(setPanelMode({ mode: MODE_GAME })),
+                  ),
+                );
               }}
             />
           );

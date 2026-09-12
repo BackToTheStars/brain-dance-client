@@ -17,6 +17,7 @@ import {
   MSG_CAST,
   MSG_FOLLOW,
   MSG_LEAD,
+  STATUS_OFF,
   STATUS_ONLINE,
   VIEWPORT_REPORT_MS,
 } from '@/config/presence';
@@ -70,6 +71,24 @@ export const leaveGame = () => (dispatch) => {
   goOffline(dispatch, CLOSE_GOING_AWAY);
 };
 
+// Entering under another code while online: the member is built from the token
+// that came with `hello`, so a new role or nickname needs a new connection —
+// and the presence state starts over, losing a subscription to a tour.
+export const reconnectWithNewAccess =
+  ({ reloadUserInfo = null } = {}) =>
+  (dispatch, getState) => {
+    const state = getState();
+    if (state.presence.status === STATUS_OFF) return;
+    const hash = state.game.game?.hash;
+    if (!hash) return;
+    stopTracking();
+    stopDrawing();
+    forgetViewportReport();
+    socket.disconnect(CLOSE_NORMAL);
+    dispatch({ type: types.PRESENCE_RESET });
+    socket.connect({ hash, dispatch, reloadUserInfo });
+  };
+
 // Any deliberate step of mine clears both the last refusal and the "Tour ended"
 // notice — it stands only until the user does something about it.
 const clearNotices = (dispatch) => {
@@ -102,6 +121,12 @@ export const setLead = (on) => (dispatch) => {
 // so switching it on shows the group at once, without waiting for them to move.
 export const setGroupOnMinimap = (on) => (dispatch) => {
   dispatch({ type: types.PRESENCE_GROUP_ON_MINIMAP_SET, payload: { on: !!on } });
+};
+
+// "Lines on top": my own switch as a follower, the server knows nothing about
+// it, and the snapshot of a tour I no longer follow drops it.
+export const setLinesOnTop = (on) => (dispatch) => {
+  dispatch({ type: types.PRESENCE_LINES_ON_TOP_SET, payload: { on: !!on } });
 };
 
 // "Save Field" went through: one frame that tells the followers to fetch the

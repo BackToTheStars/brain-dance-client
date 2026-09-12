@@ -45,8 +45,32 @@
   &__header { cursor: move; }
   &__people, &__footer { border-top: 1px solid var(--border-panel-divider); }
   &__people summary { cursor: pointer; }
+  &__collapse { cursor: pointer; }
   label { cursor: pointer; }
   .ant-switch { flex-shrink: 0; }
+
+  // Свёрнутый вид — строка иконок: display: contents снимает группировку
+  // развёрнутого вида, и все контролы становятся элементами одной строки.
+  &[data-collapsed='true'] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    max-width: min(420px, calc(100vw - 20px));
+
+    .presence-panel__header,
+    [role='status'],
+    [role='alert'],
+    .presence-panel__wide { flex-basis: 100%; }
+
+    .presence-panel__controls,
+    .presence-panel__group,
+    .presence-panel__footer { display: contents; }
+
+    .presence-panel__switch { margin: 0 5px; }
+
+    .panel-action-button { width: 30px; }
+    .panel-action-button__label { display: none; }
+  }
 }
 
 .radio-group_white-text {

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Input } from 'antd';
 import { getGameUserTokenRequest } from '../../requests';
 import { setGameInfoIntoStorage, useUserContext } from '@/modules/user/contexts/UserContext';
+import { reconnectWithNewAccess } from '@/modules/presence/redux/actions';
 import { TID } from '@/config/testIds';
 
 const CodeEnterForm = ({ hash }) => {
+  const dispatch = useDispatch();
   const { reloadUserInfo } = useUserContext();
   const [accessCode, setAccessCode] = useState('');
   const [userNickname, setUserNickname] = useState('');
@@ -23,6 +25,7 @@ const CodeEnterForm = ({ hash }) => {
           info,
           token,
         });
+        dispatch(reconnectWithNewAccess({ reloadUserInfo }));
         setTimeout(() => {
           reloadUserInfo();
         }, 300)

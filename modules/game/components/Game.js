@@ -21,6 +21,7 @@ import GuideCursor from '@/modules/presence/components/GuideCursor';
 import {
   leaveGame,
   reportViewport,
+  setLinesOnTop,
   setOnline,
 } from '@/modules/presence/redux/actions';
 import {
@@ -49,6 +50,7 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const viewport = useSelector((state) => state.game.viewport);
   const following = useSelector(selectFollowing);
   const guideSid = useSelector(selectGuideSid);
+  const linesOnTop = useSelector((state) => state.presence.linesOnTop);
   const toShowContent = useMemo(
     () => [GAME_STAGE_ANIMATED_LOADING, GAME_STAGE_READY].includes(stage),
     [stage],
@@ -58,10 +60,11 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const { nickname } = info;
 
   const gameBoxClasses = useMemo(() => {
-    // Following exposes card contents without enabling canvas editing.
-    if (following) return 'following-tour';
+    // Following exposes card contents without enabling canvas editing; the
+    // follower may still raise the lines back over them to read the reasoning.
+    if (following) return linesOnTop ? 'following-tour lines-on-top' : 'following-tour';
     return isEditMode ? 'edit-mode' : '';
-  }, [isEditMode, following]);
+  }, [isEditMode, following, linesOnTop]);
 
   useEffect(() => {
     if (stage === GAME_STAGE_ANIMATED_LOADING) {
@@ -185,7 +188,8 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
         className={gameBoxClasses}
         ref={gameBox}
         onDoubleClick={() => {
-          if (!following) setIsEditMode((on) => !on);
+          if (following) dispatch(setLinesOnTop(!linesOnTop));
+          else setIsEditMode((on) => !on);
         }}
       >
         {toShowContent && (

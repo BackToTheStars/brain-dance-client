@@ -213,7 +213,7 @@ const TimelineQuotes = ({
         existingFragments={fragments}
         onFragmentsChange={handleFragmentsChange}
         onFragmentDelete={(id) => {
-          const linesToDelete = dLines[id] || [];
+          const linesToDelete = (dLines && dLines[id]) || [];
           if (linesToDelete.length) {
             dispatch(linesDelete(linesToDelete.map((l) => l._id)));
           }

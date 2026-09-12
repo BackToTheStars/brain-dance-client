@@ -74,6 +74,17 @@
       z-index: 0;
     }
   }
+
+  // A follower raised the lines over the cards. Raised, the svg box would take
+  // every pointer over the canvas, so only the drawn lines keep it.
+  &.following-tour.lines-on-top {
+    #lines {
+      z-index: 3;
+      pointer-events: none;
+
+      path { pointer-events: stroke; }
+    }
+  }
 }
 
 // Marker of the guide's cursor, shown to everyone on their tour. It lies inside

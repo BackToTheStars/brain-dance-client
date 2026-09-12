@@ -92,6 +92,12 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
       };
     }
 
+    case types.LINES_QUOTES_INFO_CLEAR: {
+      const quotesInfoByQuoteKey = { ...state.quotesInfoByQuoteKey };
+      for (const key of payload.quoteKeys) delete quotesInfoByQuoteKey[key];
+      return { ...state, quotesInfoByQuoteKey };
+    }
+
     case types.LINES_LOAD_TO_PASTE: {
       return { ...state, linesToPaste: payload.linesToPaste };
     }

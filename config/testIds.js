@@ -219,16 +219,18 @@ export const TID = {
   // и раскрываемый список участников. Курсор и штрихи живут на холсте.
   presence: {
     toggle: 'presence-toggle', // antd Switch «Online» в InfoPanel (атрибут на кнопке role=switch)
-    panel: 'presence-panel', // корень панели присутствия
+    panel: 'presence-panel', // корень панели присутствия (+ data-collapsed="true|false")
+    collapse: 'presence-collapse', // кнопка в заголовке: свернуть панель до иконок и развернуть обратно
     status: 'presence-status', // заголовок панели с data-status; обычный online не выводится текстом
     connection: 'presence-connection', // сообщение о подключении, восстановлении или недоступности связи
-    people: 'presence-people', // раскрываемый список участников (details)
+    people: 'presence-people', // раскрываемый список участников (details), только в развёрнутом виде
     invite: 'presence-invite', // показать/скрыть поле ссылки
     drawClear: 'presence-draw-clear', // Clear & exit: стереть свои штрихи и выйти из рисования
     lead: 'presence-lead', // кнопка «Start a tour» / «End the tour» (+ data-on="true|false")
     cast: (kind) => `presence-cast-${kind}`, // кнопка трансляции: viewport («Bring everyone to me»)
     member: 'presence-member', // строка участника (+ data-sid, data-nickname, data-leader, data-tour, data-following)
-    follow: 'presence-follow', // Join tour в списке ведущих, только вне экскурсии (+ data-tour)
+    follow: 'presence-follow', // Join tour в списке ведущих, только вне экскурсии (+ data-tour);
+    // в свёрнутом виде списка нет, и та же кнопка стоит иконкой на каждого ведущего
     unfollow: 'presence-unfollow', // единственная Leave tour у спутника
     followers: 'presence-followers', // число подписчиков у гида (+ data-count)
     guide: 'presence-guide', // действия ведущего
@@ -240,6 +242,8 @@ export const TID = {
     pencil: 'presence-pencil', // кнопка панели (PanelButton), aria-pressed: выбран карандаш
     eraser: 'presence-eraser', // кнопка панели (PanelButton), aria-pressed: выбран ластик
     group: 'presence-group', // antd Switch Group on minimap, aria-checked
+    linesOnTop: 'presence-lines-on-top', // antd Switch «Lines on top» у спутника, aria-checked:
+    // линии поверх карточек; то же состояние переключает двойной клик по холсту
     drawCapture: 'presence-draw-capture', // слой захвата пера на холсте (+ data-erasing), есть только при включённом «Pencil»
     drawLayer: 'presence-draw-layer', // svg со штрихами внутри #game-box
     stroke: 'presence-stroke', // polyline штриха (+ data-id, data-from)

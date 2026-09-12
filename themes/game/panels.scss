@@ -113,7 +113,9 @@
     border: none;
     border-radius: unset;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 4;
+    // ниже обычных 4 у .panel — открытая форма хода не должна прятаться под
+    // уведомлением (тот же приём, что у карты ниже, .panel-minimap-styles)
+    z-index: 3;
 
     .notification {
       display: flex;
@@ -412,6 +414,10 @@
 
   // Presence has a dedicated drag handle; its body keeps the normal cursor.
   &:has(> .presence-panel) { cursor: auto; }
+
+  // Folded, the presence panel is as wide as its icons. Its own width comes
+  // from an inline style, and only importance takes that off.
+  &:has(> .presence-panel[data-collapsed='true']) { width: auto !important; }
 }
 
 // Paste Turn Panel

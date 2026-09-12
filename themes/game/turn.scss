@@ -336,7 +336,7 @@
       padding-left: var(--turn-widget-paragraph-padding);
       padding-right: var(--turn-widget-paragraph-padding);
 
-      &.active .pdf-scroll {
+      &.active .pdf-page {
         outline: 4px solid blue;
         border-radius: var(--turn-corner-radius);
       }

@@ -102,7 +102,11 @@ const PdfQuotes = ({ turnId, widgetId, scrollEl, activeQuoteId, isEdited }) => {
                 },
               }),
             );
-            dispatch(processQuoteClicked(quote.quoteKey, can));
+            dispatch(
+              processQuoteClicked(quote.quoteKey, can, () =>
+                dispatch(setPanelMode({ mode: MODE_GAME })),
+              ),
+            );
           }}
         />
       ))}

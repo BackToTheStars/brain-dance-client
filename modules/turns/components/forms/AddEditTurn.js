@@ -1,6 +1,7 @@
 import {
   getQuill,
   getQuoteElements,
+  QUOTE_ID_ATTRIBUTE,
 } from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState, useMemo } from 'react';
 import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
@@ -30,7 +31,8 @@ import {
   filterQuotesOrphanedByMedia,
 } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
-import { linesDelete } from '@/modules/lines/redux/actions';
+import { clearQuotesInfo, linesDelete } from '@/modules/lines/redux/actions';
+import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
 import DropdownTemplate from '../inputs/DropdownTemplate';
 import { Button, DatePicker, Input, Modal, Switch } from 'antd';
@@ -62,6 +64,15 @@ const getOrphanedSummary = (orphaned, linesCount) => ({
   linesCount,
 });
 
+// Снятый фон оставляет id на куске: для Quill это два независимых формата. Кусок
+// без фона — не цитата, иначе её не удалить снятием фона.
+const withoutQuoteId = (textItem) => {
+  if (!textItem.attributes?.id) return textItem;
+  const { id, ...rest } = textItem.attributes;
+  const { attributes, ...plain } = textItem;
+  return Object.keys(rest).length ? { ...plain, attributes: rest } : plain;
+};
+
 const getDate = (mixedDate) => {
   const d = new Date(mixedDate);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -75,6 +86,7 @@ const AddEditTurnPopup = () => {
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const turnData = useSelector((state) => state.turns.d[editTurnId]);
   const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
+  const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
   // @fixme
   const turnToEdit = useMemo(
     () =>
@@ -162,10 +174,13 @@ const AddEditTurnPopup = () => {
           let i = 0;
           let incId = Math.floor(new Date().getTime() / 1000);
           for (let quoteEl of quoteEls) {
-            const quoteId = paragraphQuotes[i]
-              ? paragraphQuotes[i].id
-              : (incId += 1);
-            quoteEl.setAttribute('id', quoteId);
+            // По порядку — только ходам старше атрибутора.
+            if (!quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE)) {
+              const quoteId = paragraphQuotes[i]
+                ? paragraphQuotes[i].id
+                : (incId += 1);
+              quoteEl.setAttribute(QUOTE_ID_ATTRIBUTE, quoteId);
+            }
             i += 1;
           }
         }, 300);
@@ -189,9 +204,16 @@ const AddEditTurnPopup = () => {
   // «нажал Save» и записью встаёт модальное окно, а оно отвечает асинхронно:
   // saveHandler только собирает payload, коммитит либо он сам, либо кнопка
   // «Удалить и сохранить».
-  const commitSave = ({ turnObj, lineIdsToDelete, isNew }) => {
+  const commitSave = ({ turnObj, lineIdsToDelete, isNew, quoteKeysDeleted = [] }) => {
     if (lineIdsToDelete.length) {
       dispatch(linesDelete(lineIdsToDelete));
+    }
+    if (quoteKeysDeleted.length) {
+      dispatch(clearQuotesInfo(quoteKeysDeleted));
+      // цитата, снятая этим сохранением, не может остаться активной
+      if (quoteKeysDeleted.includes(activeQuoteKey)) {
+        dispatch(setActiveQuoteKey(null));
+      }
     }
 
     const saveCallbacks = {
@@ -222,8 +244,9 @@ const AddEditTurnPopup = () => {
     let newIncId = Math.floor(new Date().getTime() / 1000);
     const quoteIds = [];
     for (let quoteEl of getQuoteElements()) {
-      if (quoteEl.id) {
-        quoteIds.push(quoteEl.id);
+      const domQuoteId = quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE);
+      if (domQuoteId) {
+        quoteIds.push(domQuoteId);
       } else {
         newIncId += 1;
         quoteIds.push(newIncId);
@@ -232,7 +255,7 @@ const AddEditTurnPopup = () => {
 
     for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
-        resTextArr.push(textItem);
+        resTextArr.push(withoutQuoteId(textItem));
         continue;
       }
 
@@ -385,6 +408,7 @@ const AddEditTurnPopup = () => {
       turnObj,
       isNew: !turnToEdit,
       lineIdsToDelete: linesToDelete.map((line) => line._id),
+      quoteKeysDeleted: quotesDeleted.map(quoteKey),
     };
 
     // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с

@@ -12,8 +12,10 @@ import * as types from './types';
 // `pencil` and `eraser` are my own switches, like `cursorSharing`. `viewports`
 // are the rectangles of the canvas the followers of my tour see (canvas
 // coordinates, by their sid), kept all the while I guide; `groupOnMinimap` is
-// my own switch that shows them on the minimap. Nothing here is persisted —
-// online is off on every load, and marks live only while the tour does.
+// my own switch that shows them on the minimap. `linesOnTop` is my own switch
+// as a follower: the lines layer over the cards instead of under them. Nothing
+// here is persisted — online is off on every load, and marks live only while
+// the tour does.
 const initialPresenceState = {
   status: STATUS_OFF,
   sid: null,
@@ -27,6 +29,7 @@ const initialPresenceState = {
   eraser: false,
   viewports: {},
   groupOnMinimap: false,
+  linesOnTop: false,
 };
 
 const meIn = (members, sid) =>
@@ -107,6 +110,7 @@ export const presenceReducer = (
         eraser: false,
         viewports: {},
         groupOnMinimap: false,
+        linesOnTop: false,
       };
 
     case types.PRESENCE_MEMBERS_SET: {
@@ -127,6 +131,9 @@ export const presenceReducer = (
           state.sid,
         ),
         viewports: viewportsAfterSnapshot(state.viewports, members, state.sid),
+        // The lines belong to the tour I watch: leaving it, or the guide ending
+        // it, puts them back under the cards.
+        linesOnTop: following ? state.linesOnTop : false,
       };
     }
 
@@ -215,6 +222,12 @@ export const presenceReducer = (
       return {
         ...state,
         groupOnMinimap: payload.on,
+      };
+
+    case types.PRESENCE_LINES_ON_TOP_SET:
+      return {
+        ...state,
+        linesOnTop: payload.on,
       };
 
     case types.PRESENCE_TOUR_ENDED_SET:

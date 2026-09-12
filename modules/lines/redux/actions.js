@@ -62,6 +62,13 @@ export const linesDelete = (ids) => (dispatch) => {
   });
 };
 
+// Цитата ушла из хода — её координаты в quotesInfoByQuoteKey мёртвы: без
+// чистки рамка держится в LogicLine/LinesPanel до перезагрузки.
+export const clearQuotesInfo = (quoteKeys) => ({
+  type: types.LINES_QUOTES_INFO_CLEAR,
+  payload: { quoteKeys },
+});
+
 export const lineCreate = (line) => (dispatch) => {
   createLinesRequest({ lines: [line] }).then((data) => {
     dispatch({

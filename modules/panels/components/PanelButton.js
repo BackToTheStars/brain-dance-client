@@ -11,7 +11,7 @@ const PanelButton = ({ children, icon, wide = false, className = '', ...props })
     ].filter(Boolean).join(' ')}
   >
     {icon}
-    <span>{children}</span>
+    <span className="panel-action-button__label">{children}</span>
   </button>
 );
 

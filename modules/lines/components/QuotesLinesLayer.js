@@ -18,9 +18,18 @@ const QuotesLinesLayer = () => {
       e.shiftKey ? utils.moveScene(2 * delta, 0) : utils.moveScene(0, delta);
     };
 
+    // Where this layer lets the pointer through, the canvas itself becomes the
+    // wheel target; the guard keeps a wheel over a card from moving the board.
+    const box = svgLayer.current.parentNode;
+    const scrollMoveOnCanvas = (e) => {
+      if (e.target === box) scrollMove(e);
+    };
+
     svgLayer.current.addEventListener('wheel', scrollMove, { passive: false });
+    box.addEventListener('wheel', scrollMoveOnCanvas, { passive: false });
     return () => {
       svgLayer?.current?.removeEventListener('wheel', scrollMove);
+      box.removeEventListener('wheel', scrollMoveOnCanvas);
     };
   }, [svgLayer?.current]);
 

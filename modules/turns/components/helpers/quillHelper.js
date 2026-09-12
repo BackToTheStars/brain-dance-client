@@ -1,10 +1,21 @@
 import Quill from 'quill';
 const colorModule = Quill.import('attributors/class/color');
 const Delta = Quill.import('delta');
+const Parchment = Quill.import('parchment');
 // @todo: refactoring
 
 Quill.register(colorModule, true);
 Quill.register(Delta, true);
+
+// Имя в дельте — id: так лежат сохранённые ходы. Без регистрации Quill о нём не знает,
+// теряет его на новом блоте (жирный) и склеивает соседние цитаты одного цвета.
+const QUOTE_ID_ATTRIBUTE = 'data-quote-id';
+Quill.register(
+  new Parchment.Attributor('id', QUOTE_ID_ATTRIBUTE, {
+    scope: Parchment.Scope.INLINE,
+  }),
+  true,
+);
 
 const lastRegisteredQuill = {};
 
@@ -81,4 +92,10 @@ const paragraphToString = (paragraph, length = 200) => {
   return text.length > length ? `${text.slice(0, length)}...` : text;
 };
 
-export { getQuill, getQuoteElements, checkIfParagraphExists, paragraphToString };
+export {
+  getQuill,
+  getQuoteElements,
+  checkIfParagraphExists,
+  paragraphToString,
+  QUOTE_ID_ATTRIBUTE,
+};
