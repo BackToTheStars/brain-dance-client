@@ -6,6 +6,7 @@ import { Buttons } from '../Buttons';
 import { TID } from '@/config/testIds';
 import { MODE_WIDGET_PDF_QUOTE_ADD } from '@/config/panel';
 import { getWidgetDataFromState } from '@/modules/turns/components/helpers/store';
+import { editPdfCrop } from '@/modules/turns/redux/actions';
 
 // Аналог PictureMode: цитата добавляется к активной странице документа —
 // её номер уже лежит в editWidgetParams (виджет пишет его при прокрутке).
@@ -28,7 +29,14 @@ const PdfMode = () => {
       },
       show: () => can(RULE_TURNS_CRUD),
     },
-    null,
+    {
+      text: 'Crop Page',
+      testId: TID.panelAction('crop-page'),
+      callback: () => {
+        dispatch(editPdfCrop());
+      },
+      show: () => can(RULE_TURNS_CRUD),
+    },
     null,
     null,
     null,

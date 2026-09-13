@@ -9,6 +9,7 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
   MODE_WIDGET_PDF,
+  MODE_WIDGET_PDF_CROP,
   MODE_WIDGET_PDF_QUOTE_ACTIVE,
   MODE_WIDGET_PDF_QUOTE_ADD,
   MODE_WIDGET_VIDEO,
@@ -28,6 +29,7 @@ import AudioMode from './buttons/audio/AudioMode';
 import PdfMode from './buttons/pdf/PdfMode';
 import PdfQuoteAdd from './buttons/pdf/PdfQuoteAdd';
 import PdfQuoteActive from './buttons/pdf/PdfQuoteActive';
+import PdfCropMode from './buttons/pdf/PdfCropMode';
 
 // Карта строится при рендере, а не при инициализации модуля. Чтение default'ов
 // импортированных режимов на уровне модуля падало в прод-сборке
@@ -42,6 +44,7 @@ const getButtonSettings = () => ({
   [MODE_WIDGET_PDF]: PdfMode,
   [MODE_WIDGET_PDF_QUOTE_ADD]: PdfQuoteAdd,
   [MODE_WIDGET_PDF_QUOTE_ACTIVE]: PdfQuoteActive,
+  [MODE_WIDGET_PDF_CROP]: PdfCropMode,
   [MODE_WIDGET_PARAGRAPH]: ParagraphMode,
   [MODE_OPERATION_PASTE]: TurnPasteMode,
   [MODE_WIDGET_VIDEO]: VideoMode,

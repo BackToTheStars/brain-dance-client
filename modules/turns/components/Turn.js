@@ -12,8 +12,9 @@ import {
   markTurnAsChanged,
   recalcAreaRect,
   updateGeometry,
+  updateSplitHeight,
 } from '../redux/actions';
-import turnSettings from '../settings';
+import turnSettings, { WIDGET_PARAGRAPH, WIDGET_PDF } from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { getScrollbarColor } from './helpers/color';
 import { checkIfParagraphExists } from './helpers/quillHelper';
@@ -34,6 +35,7 @@ import AudioQuotes from './widgets/audio/AudioQuotes';
 import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { HorizontalSplit } from '@/modules/ui/components/common/HorizontalSplit';
 
 // Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
 // предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
@@ -142,8 +144,12 @@ export const Turn = memo(({ id }) => {
   const dispatch = useDispatch();
   const turnGeometryQueue = useRef(getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY)).current;
 
+  const turnWidth = useSelector((state) => state.turns.g[id]?.size?.width);
+  const following = useSelector(selectFollowing);
+
   const [widgets, setWidgets] = useState([]);
   const wrapper = useRef(null);
+  const splitDrag = useRef(null);
 
   const {
     _id,
@@ -163,6 +169,7 @@ export const Turn = memo(({ id }) => {
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
     pictureOnly,
+    splitHeight,
   } = useMemo(() => {
     return turnData;
   }, [turnData]);
@@ -204,6 +211,62 @@ export const Turn = memo(({ id }) => {
     };
   }, [widgets, widgetsCount]);
 
+  // РАЗДЕЛИТЕЛЬ ВЫСОТЫ
+  // Пара резиновых виджетов в карточке одна — pdf над абзацем, только они делят
+  // остаток. У картинки высота от пропорции, делить ей нечего.
+  const splitPair = useMemo(() => {
+    if (resizeDisabled) return null;
+    const top = widgets.find((widget) => widget.type === WIDGET_PDF);
+    const bottom = widgets.find((widget) => widget.type === WIDGET_PARAGRAPH);
+    return top && bottom ? { top, bottom } : null;
+  }, [widgets, resizeDisabled]);
+
+  // Верх стоит на своей высоте, но не выше самого документа: иначе под
+  // последней страницей повисла бы пустота.
+  const splitTop = useMemo(() => {
+    if (!splitPair || !splitHeight) return null;
+    return Math.min(splitHeight, splitPair.top.maxHeightCallback(turnWidth));
+  }, [splitPair, splitHeight, turnWidth]);
+
+  const onSplitDragging = useCallback(
+    (isDragging) => {
+      if (!isDragging || !splitPair) return;
+      const top = wrapper.current?.querySelector('.stb-widget-pdf');
+      const bottom = wrapper.current?.querySelector('.stb-widget-paragraph');
+      if (!top || !bottom) return;
+      // Замеренная высота пары и есть тот остаток, который делит перетаскивание:
+      // высота карточки от него не меняется.
+      const pairHeight = top.offsetHeight + bottom.offsetHeight;
+      const min = splitPair.top.minHeightCallback(turnWidth);
+      splitDrag.current = {
+        start: top.offsetHeight,
+        min,
+        max: Math.max(
+          min,
+          Math.min(
+            splitPair.top.maxHeightCallback(turnWidth),
+            pairHeight - splitPair.bottom.minHeightCallback(turnWidth),
+          ),
+        ),
+      };
+    },
+    [splitPair, turnWidth],
+  );
+
+  const onSplitMove = useCallback(
+    (delta) => {
+      if (!splitDrag.current) return;
+      const { start, min, max } = splitDrag.current;
+      dispatch(
+        updateSplitHeight({
+          _id,
+          splitHeight: Math.min(Math.max(start + delta, min), max),
+        }),
+      );
+    },
+    [_id],
+  );
+
   const wrapperStyles = useMemo(() => {
     const wrapperStyles = {};
 
@@ -212,8 +275,13 @@ export const Turn = memo(({ id }) => {
       // полоса прокрутки абзаца — от того же фона, что и карточка
       wrapperStyles['--turn-scrollbar-color'] = getScrollbarColor(background);
     }
+    if (splitTop) {
+      wrapperStyles['--turn-split-top'] = `${splitTop}px`;
+      wrapperStyles['--turn-split-bottom-min'] =
+        `${splitPair.bottom.minHeightCallback(turnWidth)}px`;
+    }
     return wrapperStyles;
-  }, [background, contentType]);
+  }, [background, contentType, splitTop, splitPair, turnWidth]);
 
   const wrapperClasses = useMemo(() => {
     const wrapperClasses = ['stb-react-turn__inner'];
@@ -222,8 +290,12 @@ export const Turn = memo(({ id }) => {
       wrapperClasses.push('picture-only');
     }
 
+    if (splitTop) {
+      wrapperClasses.push('has-split');
+    }
+
     return wrapperClasses.join(' ');
-  }, [pictureOnly]);
+  }, [pictureOnly, splitTop]);
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -402,6 +474,14 @@ export const Turn = memo(({ id }) => {
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
             turnId={_id}
+          />
+        )}
+        {!!splitPair && !following && (
+          <HorizontalSplit
+            move={onSplitMove}
+            setIsDragging={onSplitDragging}
+            extraClasses="turn-split not-draggable"
+            testId={TID.turnSplit}
           />
         )}
         {doesParagraphExist && (

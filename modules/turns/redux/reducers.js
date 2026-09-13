@@ -123,6 +123,27 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
     //     },
     //   };
 
+    // Высота верхнего виджета лежит в данных хода (сервер отдаёт её только с
+    // телом хода), а сохраняется вместе с геометрией — поэтому изменённым
+    // помечается ход в `g`: именно этот признак читает Save Field.
+    case types.TURN_UPDATE_SPLIT_HEIGHT:
+      return {
+        ...state,
+        d: {
+          ...state.d,
+          [payload._id]: {
+            ...state.d[payload._id],
+            splitHeight: payload.splitHeight,
+          },
+        },
+        g: {
+          ...state.g,
+          [payload._id]: {
+            ...state.g[payload._id],
+            wasChanged: true,
+          },
+        },
+      };
     case types.TURN_WAS_CHANGED:
       return {
         ...state,

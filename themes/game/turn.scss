@@ -467,11 +467,45 @@
         gap: var(--turn-widget-pdf-page-gap);
       }
 
+      // окно настройки обрезки полей: четыре числа поверх документа
+      .pdf-crop-fields {
+        position: absolute;
+        z-index: 3;
+        left: var(--turn-widget-paragraph-padding);
+        bottom: var(--turn-widget-inner-gap);
+        display: flex;
+        gap: 6px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        background-color: rgba(0, 0, 255, 0.6);
+        color: #fff;
+        font-size: 11px;
+        line-height: 1;
+
+        &__item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+
+          input {
+            width: 52px;
+            padding: 2px 4px;
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-size: 11px;
+          }
+        }
+      }
+
       .pdf-page {
         flex: none;
         width: 100%;
         background-color: #fff;
         position: relative;
+        // при обрезке канвас шире и выше бокса — лишнее отсекается здесь
+        overflow: hidden;
 
         canvas {
           display: block;
@@ -502,6 +536,58 @@
           opacity: 0.6;
           font-size: 0.8em;
         }
+      }
+    }
+
+    // РАЗДЕЛИТЕЛЬ ВЫСОТЫ между двумя резиновыми виджетами (pdf над абзацем)
+    // Ноль высоты и минус один зазор: разделитель добавляет в колонку ещё один
+    // gap, и без этой компенсации карточка выросла бы на его величину.
+    .turn-split {
+      height: 0;
+      margin-top: calc(var(--turn-widgets-gap) * -1);
+
+      .horizontal-split__divider {
+        top: 0;
+        height: var(--turn-widgets-gap);
+        background-color: transparent;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: var(--turn-widgets-gap);
+          right: var(--turn-widgets-gap);
+          top: 50%;
+          height: 2px;
+          transform: translateY(-50%);
+          border-radius: 2px;
+          background-color: var(--turn-border-color);
+          opacity: 0.55;
+          transition: 0.3s;
+        }
+      }
+
+      &:hover .horizontal-split__divider::after {
+        height: 4px;
+        opacity: 1;
+      }
+    }
+
+    // Фиксированный верх: остаток целиком уходит нижнему, а когда места не
+    // хватает, нижний упирается в свой минимум первым и только потом ужимается
+    // верх. Стоять обязано после .stb-widget-pdf — специфичность равна.
+    &.has-split {
+      // остальные виджеты держат свою высоту: место уступает только пара
+      >.turn-widget {
+        flex-shrink: 0;
+      }
+
+      .stb-widget-pdf {
+        flex: 0 1 auto;
+        height: var(--turn-split-top);
+      }
+
+      .stb-widget-paragraph {
+        min-height: var(--turn-split-bottom-min);
       }
     }
 

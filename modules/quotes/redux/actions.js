@@ -12,6 +12,17 @@ import { lineCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { useSelector } from 'react-redux';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { TYPE_QUOTE_PDF, TYPE_QUOTE_PICTURE } from '../settings';
+import {
+  getCrop,
+  visibleToFullRect,
+} from '@/modules/turns/components/widgets/pdf/cropGeometry';
+
+const roundRect = ({ x, y, width, height }) => ({
+  x: Math.round(x * 100) / 100,
+  y: Math.round(y * 100) / 100,
+  width: Math.round(width * 100) / 100,
+  height: Math.round(height * 100) / 100,
+});
 
 export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
   dispatch({
@@ -27,14 +38,18 @@ export const setActiveQuoteKey = (quoteKey) => (dispatch) => {
 
 // Общая часть для прямоугольных цитат (картинка и PDF): координаты берутся из
 // выделения (crop) в процентах от бокса виджета/страницы. getExtraFields
-// добавляет специфику типа — у PDF это номер страницы.
+// добавляет специфику типа — у PDF это номер страницы, mapCoords — пересчёт
+// координат выделения в те, в которых цитата хранится.
 const saveRectQuoteByCrop =
-  (type, getExtraFields = () => ({})) =>
+  (type, { getExtraFields = () => ({}), mapCoords = (coords) => coords } = {}) =>
   (dispatch, getState) => {
     const state = getState();
-    const { turnData, turnGeometry, editWidgetParams } =
+    const { turnData, turnGeometry, editWidgetId, editWidgetParams } =
       getWidgetDataFromState(state);
-    const { x, y, width, height } = editWidgetParams.crop;
+    const { x, y, width, height } = mapCoords(
+      editWidgetParams.crop,
+      turnData.dWidgets[editWidgetId],
+    );
     const { activeQuoteId } = editWidgetParams;
 
     let id = activeQuoteId || Math.floor(new Date().getTime() / 1000);
@@ -73,10 +88,14 @@ const saveRectQuoteByCrop =
 export const savePictureQuoteByCrop = () =>
   saveRectQuoteByCrop(TYPE_QUOTE_PICTURE);
 
+// Выделение идёт по видимой области страницы, а цитата хранится в координатах
+// полной: иначе смена обрезки двигала бы уже сохранённые цитаты.
 export const savePdfQuoteByCrop = () =>
-  saveRectQuoteByCrop(TYPE_QUOTE_PDF, (params) => ({
-    page: params.activePage,
-  }));
+  saveRectQuoteByCrop(TYPE_QUOTE_PDF, {
+    getExtraFields: (params) => ({ page: params.activePage }),
+    mapCoords: (coords, widget) =>
+      roundRect(visibleToFullRect(coords, getCrop(widget?.crop))),
+  });
 
 export const processQuoteClicked =
   (currentQuoteKey, can, onDeactivated) => (dispatch, getState) => {

@@ -27,7 +27,8 @@ export const TURN_SIZE_HEIGHT = 600;
 // `TurnHelper.toNewFields`.
 export const TURN_MEDIA_QUOTE_BINDINGS = [
   { field: 'imageUrl', label: 'картинка', quoteType: 'picture' },
-  { field: 'pdfUrl', label: 'pdf', quoteType: 'pdf' },
+  // cropField — обрезка полей теряет смысл на файле с другой геометрией страниц.
+  { field: 'pdfUrl', label: 'pdf', quoteType: 'pdf', cropField: 'pdfCrop' },
   {
     field: 'videoUrl',
     label: 'видео',

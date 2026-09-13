@@ -44,6 +44,7 @@ export const MODE_WIDGET_PDF = 'widget-pdf';
 
 export const MODE_WIDGET_PDF_QUOTE_ADD = 'widget-pdf-quote-add';
 export const MODE_WIDGET_PDF_QUOTE_ACTIVE = 'widget-pdf-quote-active';
+export const MODE_WIDGET_PDF_CROP = 'widget-pdf-crop';
 
 export const MODE_WIDGET_PICTURE_QUOTE_ADD = 'widget-picture-quote-add';
 export const MODE_BUTTON_PICTURE_ADD_AREA = 'widget-picture-add-area';

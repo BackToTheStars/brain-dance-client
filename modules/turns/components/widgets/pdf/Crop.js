@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import ReactCrop from 'react-image-crop';
 import { useDispatch } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
+import { fullToVisibleRect } from './cropGeometry';
 
 // прозрачный gif 1x1, растягивается на весь бокс страницы
 const TRANSPARENT_PIXEL =
@@ -16,7 +17,13 @@ const TRANSPARENT_PIXEL =
 
 const round100 = (num) => Math.round(num * 100) / 100;
 
-const PdfCrop = ({ widgetKey, activeQuoteId, activePage, initialQuote }) => {
+const PdfCrop = ({
+  widgetKey,
+  activeQuoteId,
+  activePage,
+  initialQuote,
+  crop: pageCrop,
+}) => {
   const dispatch = useDispatch();
   const cropQueue = useRef(getQueue(WIDGET_PICTURE_CROP_TIMEOUT_DELAY)).current;
   const [crop, setCrop] = useState();
@@ -25,7 +32,8 @@ const PdfCrop = ({ widgetKey, activeQuoteId, activePage, initialQuote }) => {
   params.current = { activeQuoteId, activePage };
 
   // правка существующей цитаты: показываем её текущую рамку и сразу кладём в
-  // стор, чтобы «Save Area» без перерисовки сохраняла прежнюю геометрию
+  // стор, чтобы «Save Area» без перерисовки сохраняла прежнюю геометрию.
+  // Цитата лежит в координатах полной страницы, рамка — в координатах видимой.
   useEffect(() => {
     if (!initialQuote) {
       setCrop(undefined);
@@ -33,10 +41,7 @@ const PdfCrop = ({ widgetKey, activeQuoteId, activePage, initialQuote }) => {
     }
     const initialCrop = {
       unit: '%',
-      x: initialQuote.x,
-      y: initialQuote.y,
-      width: initialQuote.width,
-      height: initialQuote.height,
+      ...fullToVisibleRect(initialQuote, pageCrop),
     };
     setCrop(initialCrop);
     dispatch(

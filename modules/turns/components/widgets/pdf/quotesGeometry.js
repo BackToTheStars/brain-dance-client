@@ -11,6 +11,7 @@
 // вьюпорта геометрия не вычисляется вовсе — им сразу выдаётся краевой маркер.
 
 import { TYPE_QUOTE_PDF } from '@/modules/quotes/settings';
+import { fullToVisibleRect, getPageBoxHeight } from './cropGeometry';
 
 const MIN_VISIBLE_HEIGHT = 4; // тоньше — уже неотличимо от маркера
 
@@ -32,6 +33,7 @@ export const getPdfQuotesWithCoords = ({
   widgetLeft,
   widgetTop,
   turnId,
+  crop = null,
 }) => {
   if (!pageOffsets.length || !pageWidth || !viewportHeight) return [];
 
@@ -70,9 +72,36 @@ export const getPdfQuotesWithCoords = ({
       continue;
     }
 
-    const quoteTop = pageOffset.top + (pageOffset.height * quote.y) / 100;
-    const quoteHeight = (pageOffset.height * quote.height) / 100;
-    const quoteBottom = quoteTop + quoteHeight;
+    // цитата лежит в координатах полной страницы, а бокс страницы на карточке —
+    // это её видимая область: сюда и приводим
+    const rect = fullToVisibleRect(quote, crop);
+    const pageBottom = pageOffset.top + pageOffset.height;
+    const quoteTop = Math.min(
+      Math.max(pageOffset.top + (pageOffset.height * rect.y) / 100, pageOffset.top),
+      pageBottom,
+    );
+    const quoteBottom = Math.max(
+      Math.min(
+        pageOffset.top + (pageOffset.height * (rect.y + rect.height)) / 100,
+        pageBottom,
+      ),
+      pageOffset.top,
+    );
+
+    // цитату увело под обрез целиком — маркер у того края, за который её увело
+    if (quoteBottom <= quoteTop) {
+      result.push({
+        ...base,
+        ...edgeMarker({
+          position: rect.y + rect.height <= 0 ? 'top' : 'bottom',
+          widgetLeft,
+          widgetTop,
+          viewportWidth,
+          viewportHeight,
+        }),
+      });
+      continue;
+    }
 
     if (quoteBottom <= windowTop) {
       result.push({
@@ -107,11 +136,19 @@ export const getPdfQuotesWithCoords = ({
       continue;
     }
 
+    // по горизонтали обрез отсекает так же, как прокрутка по вертикали:
+    // частично — обрезаем, целиком — маркер нулевой ширины у края страницы
+    const left = Math.max(rect.x, 0);
+    const right = Math.min(rect.x + rect.width, 100);
+    const isCutOff = right <= left;
+
     result.push({
       ...base,
-      left: Math.round(widgetLeft + (pageWidth * quote.x) / 100),
+      left: Math.round(
+        widgetLeft + (pageWidth * (isCutOff ? (rect.x < 0 ? 0 : 100) : left)) / 100,
+      ),
       top: Math.round(widgetTop + visibleTop - scrollTop),
-      width: Math.round((pageWidth * quote.width) / 100),
+      width: isCutOff ? 0 : Math.round((pageWidth * (right - left)) / 100),
       height: Math.round(visibleHeight),
       position: 'default',
     });
@@ -122,10 +159,10 @@ export const getPdfQuotesWithCoords = ({
 
 // Накопительные смещения страниц в системе координат прокручиваемого контента.
 // pageGap дублирует CSS-зазор между страницами (--turn-widget-pdf-page-gap).
-export const getPageOffsets = (pages, pageWidth, pageGap) => {
+export const getPageOffsets = (pages, pageWidth, pageGap, crop = null) => {
   let top = 0;
   return pages.map((page, index) => {
-    const height = Math.round(pageWidth * page.aspect);
+    const height = getPageBoxHeight(pageWidth, page.aspect, crop);
     const offset = { top: index === 0 ? 0 : top, height };
     top = offset.top + height + pageGap;
     return offset;

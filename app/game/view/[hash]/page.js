@@ -56,6 +56,12 @@ const GamePageInner = () => {
     if (exp * 1000 - Date.now() < TOKEN_REFETCH_DELAY) {
       refreshTokenRequest(hash, token, nickname)
         .then((data) => {
+          // отказ приходит телом без info и token: сохранить его — значит испортить запись
+          if (!data?.success) {
+            removeGameInfo(hash);
+            router.push(gameEntryUrl(hash, { focusTurnId, tourId }));
+            return;
+          }
           const { info, token } = data;
           setGameInfoIntoStorage(hash, {
             // info: {

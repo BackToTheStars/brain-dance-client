@@ -168,6 +168,8 @@ export const saveField = ({ onSaved = null } = {}) => (dispatch, getState) => {
         y: snapRound(turn.position.y, GRID_CELL_X),
         width: snapRound(turn.size.width, GRID_CELL_X),
         height: snapRound(turn.size.height, GRID_CELL_Y),
+        // у хода без разделителя ключа нет: сервер отличает отсутствие от нуля
+        splitHeight: state.turns.d[turn._id]?.splitHeight,
       };
     }); // ход был изменён, сохранить только его
 

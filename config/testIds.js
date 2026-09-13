@@ -60,6 +60,7 @@ export const TID = {
   redLine: 'red-line', // отдельная логическая линия
   turnCard: 'turn-card', // карточка Turn (+ data-turn-id)
   quoteRect: 'quote-rect', // кликабельный прямоугольник цитаты (+ data-turn-id, data-quote-key)
+  turnSplit: 'turn-split', // ручка разделителя высоты между виджетами карточки
 
   // Виджет PDF (ход contentType=pdf)
   pdf: {
@@ -71,6 +72,9 @@ export const TID = {
     pagePrev: 'pdf-page-prev',
     pageNext: 'pdf-page-next',
     crop: 'pdf-crop', // слой выделения области на активной странице
+    cropFrame: 'pdf-crop-frame', // рамка «видимая область» в окне настройки обрезки
+    cropSettings: 'pdf-crop-fields', // четыре числа обрезки
+    cropSide: (side) => `pdf-crop-${side}`, // left | right | top | bottom, проценты
   },
 
   // Слой выделения области у картинки (widgets/picture/Crop.js): атрибут на <img>

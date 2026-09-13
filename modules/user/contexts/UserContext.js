@@ -30,7 +30,8 @@ const loadGameInfo = (hash) => {
   // @todo fixme
   // setUserToken(data?.token);
   setRequestSettings(hash, data?.token);
-  return data;
+  // запись без токена ничего не даёт, а как truthy `{}` отключила бы откат на гостя
+  return data?.token ? data : null;
 };
 
 export const getGameInfo = (hash) => {

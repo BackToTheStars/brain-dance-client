@@ -31,6 +31,7 @@ import {
   filterQuotesOrphanedByMedia,
 } from '@/modules/quotes/components/helpers/filters';
 import { filterLinesByQuoteKeys } from '@/modules/lines/components/helpers/line';
+import { TURN_MEDIA_QUOTE_BINDINGS } from '@/config/turn';
 import { clearQuotesInfo, linesDelete } from '@/modules/lines/redux/actions';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
@@ -41,6 +42,7 @@ import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { TID } from '@/config/testIds';
+import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 
 const {
   settings,
@@ -387,6 +389,20 @@ const AddEditTurnPopup = () => {
     for (const item of orphaned) {
       if (item.timelineField) {
         turnObj[item.timelineField] = null;
+      }
+    }
+
+    // Обрезка задана в координатах прежнего документа — на файле с другой
+    // геометрией страниц она бессмысленна. Проверяется отдельно от `orphaned`
+    // (та ветка молчит, когда цитат не было вовсе, а обрезка могла стоять и
+    // без единой цитаты) и не спрашивает подтверждения — это не потеря данных
+    // пользователя, а автоматический сброс того, что уже не имеет смысла.
+    for (const binding of TURN_MEDIA_QUOTE_BINDINGS) {
+      if (!binding.cropField || !turnToEdit) continue;
+      const prevUrl = turnToEdit[binding.field] || '';
+      const nextUrl = preparedForm[binding.field] || '';
+      if (prevUrl && prevUrl !== nextUrl) {
+        turnObj[binding.cropField] = { ...EMPTY_CROP };
       }
     }
 

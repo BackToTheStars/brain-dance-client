@@ -48,6 +48,9 @@ export class TurnHelper {
           // параграфа, поэтому конфликта с p_1 не возникает
           scrollPosition: turn.scrollPosition || 0,
           quotes: turn.quotes.filter((quote) => quote.type === 'pdf'),
+          // обрезка полей: у хода без неё ключа нет вовсе, и виджет считает
+          // это «страница целиком»
+          crop: turn.pdfCrop,
         },
       ],
       [WIDGET_SOURCE]: [
@@ -140,6 +143,10 @@ export class TurnHelper {
         height: turn.height,
       },
 
+      // высота верхнего из двух резиновых виджетов; у хода без разделителя
+      // ключа нет, и остаток делится пополам, как до его появления
+      splitHeight: turn.splitHeight,
+
       quotes: turn.quotes,
       widgetsCount: 0,
       widgets,
@@ -190,6 +197,8 @@ export class TurnHelper {
         : null,
       audioUrl: turn.dWidgets.a_1.url,
       pdfUrl: turn.dWidgets.pdf_1?.url,
+      pdfCrop: turn.dWidgets.pdf_1?.crop,
+      splitHeight: turn.splitHeight,
       sourceUrl: turn.sourceUrl,
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,

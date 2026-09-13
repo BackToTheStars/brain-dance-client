@@ -1,0 +1,13 @@
+// Перетаскиваемый горизонтальный разделитель
+// (modules/ui/components/common/HorizontalSplit.js): сосед .vertical-split для
+// деления высоты. Высоту и место задаёт потребитель — сегодня это разделитель
+// виджетов хода (.turn-split, themes/game/turn.scss).
+.horizontal-split {
+  @apply relative select-none;
+  cursor: row-resize;
+
+  &__divider {
+    @apply absolute left-0 w-full;
+    background-color: var(--border-body-divider);
+  }
+}

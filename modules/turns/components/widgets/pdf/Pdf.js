@@ -2,8 +2,9 @@
 // карточки хода, запоминание позиции скролла и прямоугольные цитаты.
 //
 // Цитаты (4.2) хранятся в координатах документа: номер страницы + проценты от
-// её бокса, цитата не пересекает границу страниц. Пересчёт в координаты
-// карточки и клампинг по видимости — в quotesGeometry.js, рисование рамок —
+// полной страницы (обрезка полей их не сдвигает — cropGeometry.js), цитата не
+// пересекает границу страниц. Пересчёт в координаты карточки и клампинг по
+// видимости — в quotesGeometry.js, рисование рамок —
 // в Quotes.js (общий слой цитат, как у текстовых), выделение области —
 // в Crop.js на активной странице.
 //
@@ -20,6 +21,7 @@
 
 import {
   MODE_WIDGET_PDF,
+  MODE_WIDGET_PDF_CROP,
   MODE_WIDGET_PDF_QUOTE_ACTIVE,
   MODE_WIDGET_PDF_QUOTE_ADD,
 } from '@/config/panel';
@@ -43,6 +45,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import WidgetEditButton from '../buttons/Edit';
 import PdfCrop from './Crop';
+import {
+  EMPTY_CROP,
+  getCrop,
+  getCropScale,
+  getPageBoxHeight,
+} from './cropGeometry';
+import { PdfCropFields, PdfCropFrame } from './CropSettings';
 import PageBar from './PageBar';
 import { getDocumentParams, loadPdfjs } from './pdfLoader';
 import PdfQuotes from './Quotes';
@@ -56,6 +65,7 @@ const EDIT_MODES = [
   MODE_WIDGET_PDF,
   MODE_WIDGET_PDF_QUOTE_ADD,
   MODE_WIDGET_PDF_QUOTE_ACTIVE,
+  MODE_WIDGET_PDF_CROP,
 ];
 
 const Pdf = ({
@@ -73,6 +83,9 @@ const Pdf = ({
   const quotes = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId]?.quotes,
   );
+  const storedCrop = useSelector(
+    (state) => state.turns.d[turnId].dWidgets[widgetId]?.crop,
+  );
   const turnSize = useSelector((state) => state.turns.g[turnId].size);
   const mode = useSelector((state) => state.panels.mode);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
@@ -87,6 +100,13 @@ const Pdf = ({
   const isWidgetEdited =
     editTurnId === turnId && editWidgetId === widgetId && EDIT_MODES.includes(mode);
   const activeQuoteId = isWidgetEdited ? editWidgetParams?.activeQuoteId : null;
+  const isCropSettings = isWidgetEdited && mode === MODE_WIDGET_PDF_CROP;
+
+  const crop = useMemo(() => getCrop(storedCrop), [storedCrop]);
+  // в окне настройки страница показывается целиком: рамка выбирает видимую область
+  const viewCrop = isCropSettings ? null : crop;
+  const cropRef = useRef(null);
+  cropRef.current = viewCrop;
 
   const scrollEl = useRef(null);
   const docRef = useRef(null);
@@ -97,7 +117,7 @@ const Pdf = ({
   const generationsRef = useRef(new Map()); // номер страницы -> номер прохода отрисовки
   const visibleRef = useRef(new Set());
   const aspectsRef = useRef([]); // соотношения height/width страниц
-  const pageWidthRef = useRef(0);
+  const renderWidthRef = useRef(0); // ширина отрисовки — страница целиком, до обрезки
   const chromeRef = useRef(2 * widgetSpacer); // ширина карточки минус ширина страницы
   const appliedScrollRef = useRef(null);
 
@@ -115,10 +135,14 @@ const Pdf = ({
 
   const hasQuotes = !!quotes?.length;
 
+  // канвас несёт страницу целиком, а в боксе видна только полоса между обрезками:
+  // отсюда ширина отрисовки больше ширины бокса
+  const fullPageWidth = pageWidth / getCropScale(viewCrop).x;
+
   // смещения страниц в системе координат прокручиваемого контента
   const pageOffsets = useMemo(
-    () => getPageOffsets(pages, pageWidth, PDF_PAGE_GAP),
-    [pages, pageWidth],
+    () => getPageOffsets(pages, pageWidth, PDF_PAGE_GAP, viewCrop),
+    [pages, pageWidth, viewCrop],
   );
   // обработчик скролла вешается один раз — свежие значения он берёт из ref'ов
   const pageOffsetsRef = useRef([]);
@@ -144,7 +168,7 @@ const Pdf = ({
 
   const renderPage = async (number) => {
     const doc = docRef.current;
-    const width = pageWidthRef.current;
+    const width = renderWidthRef.current;
     if (!doc || !width) return;
     if (renderedRef.current.get(number) === width) return;
 
@@ -292,11 +316,11 @@ const Pdf = ({
   }, []);
 
   useEffect(() => {
-    pageWidthRef.current = pageWidth;
-    if (!pageWidth || !pages.length) return;
+    renderWidthRef.current = fullPageWidth;
+    if (!fullPageWidth || !pages.length) return;
     // renderPage сам пропустит страницы, отрисованные на этой же ширине
     rerenderQueue.add(renderVisiblePages);
-  }, [pageWidth, pages]);
+  }, [fullPageWidth, pages]);
 
   // ЛЕНИВАЯ ОТРИСОВКА ВИДИМЫХ СТРАНИЦ
   useEffect(() => {
@@ -412,6 +436,7 @@ const Pdf = ({
       widgetLeft: Math.round(pageRect.left - turnRect.left),
       widgetTop: Math.round(rect.top - turnRect.top),
       turnId,
+      crop: viewCrop,
     });
 
     quotesQueue.add(() => {
@@ -424,6 +449,7 @@ const Pdf = ({
     scrollTop,
     turnSize.width,
     turnSize.height,
+    viewCrop,
   ]);
 
   // активная страница нужна панели кнопок: цитата добавляется именно к ней.
@@ -444,6 +470,8 @@ const Pdf = ({
   }, [isWidgetEdited, mode, editWidgetParams?.activePage]);
 
   // РАЗМЕРЫ КАРТОЧКИ
+  // Перерегистрация на смене обрезки нужна не ради самих колбэков (они читают
+  // ref), а чтобы карточка пересчитала высоту сразу, а не после перезагрузки.
   useEffect(() => {
     registerHandleResize({
       type: WIDGET_PDF,
@@ -456,23 +484,33 @@ const Pdf = ({
         // ширина страницы при новой ширине хода: разница замерена в DOM (см. ШИРИНА)
         const width = Math.max(newTurnWidth - chromeRef.current, 1);
         return Math.round(
-          aspects.reduce((acc, aspect) => acc + width * aspect, 0) +
-            PDF_PAGE_GAP * (aspects.length - 1),
+          aspects.reduce(
+            (acc, aspect) => acc + getPageBoxHeight(width, aspect, cropRef.current),
+            0,
+          ) + PDF_PAGE_GAP * (aspects.length - 1),
         );
       },
       resizeCallback: () => {},
     });
     return () => unregisterHandleResize({ id: widgetId });
-  }, [pages.length]);
+  }, [pages.length, viewCrop]);
+
+  // вход в окно настройки разворачивает страницы целиком, высоты меняются —
+  // доводим активную страницу до верха, чтобы рамка была на виду
+  useEffect(() => {
+    if (!isCropSettings) return;
+    goToPage(editWidgetParams?.activePage || activePage);
+  }, [isCropSettings]);
 
   const activeQuote = useMemo(
     () => (quotes || []).find((quote) => quote.id === activeQuoteId) || null,
     [quotes, activeQuoteId],
   );
-  const isCropMode = isWidgetEdited && mode === MODE_WIDGET_PDF_QUOTE_ADD;
-  const cropPage = isCropMode
-    ? editWidgetParams?.activePage || activePage
-    : null;
+  const isQuoteAddMode = isWidgetEdited && mode === MODE_WIDGET_PDF_QUOTE_ADD;
+  const overlayPage =
+    isQuoteAddMode || isCropSettings
+      ? editWidgetParams?.activePage || activePage
+      : null;
 
   return (
     <>
@@ -483,7 +521,7 @@ const Pdf = ({
       >
         <div className="pdf-toolbar">
           <PageBar
-            activePage={isWidgetEdited ? cropPage || activePage : activePage}
+            activePage={isWidgetEdited ? overlayPage || activePage : activePage}
             pagesCount={pages.length}
             onGoToPage={goToPage}
             isEditMode={isWidgetEdited}
@@ -524,37 +562,69 @@ const Pdf = ({
             <div
               key={page.number}
               className={`pdf-page ${
-                cropPage === page.number ? 'pdf-page_active' : ''
+                overlayPage === page.number ? 'pdf-page_active' : ''
               }`}
               data-test-id={TID.pdf.page}
               data-page-number={page.number}
-              style={{ height: `${Math.round(pageWidth * page.aspect)}px` }}
+              style={{
+                height: `${getPageBoxHeight(pageWidth, page.aspect, viewCrop)}px`,
+              }}
               ref={(node) => {
                 if (node) pageElsRef.current.set(page.number, node);
                 else pageElsRef.current.delete(page.number);
               }}
             >
-              <canvas />
-              {cropPage === page.number && (
+              <canvas
+                style={
+                  viewCrop
+                    ? {
+                        position: 'absolute',
+                        left: `${-Math.round(viewCrop.left * fullPageWidth)}px`,
+                        top: `${-Math.round(
+                          viewCrop.top * fullPageWidth * page.aspect,
+                        )}px`,
+                        width: `${Math.round(fullPageWidth)}px`,
+                        height: `${Math.round(fullPageWidth * page.aspect)}px`,
+                      }
+                    : undefined
+                }
+              />
+              {overlayPage === page.number && (
                 <div className="pdf-crop-layer" data-test-id={TID.pdf.crop}>
-                  <PdfCrop
-                    widgetKey={widgetKey}
-                    activeQuoteId={activeQuoteId}
-                    activePage={page.number}
-                    initialQuote={activeQuote}
-                  />
+                  {isCropSettings ? (
+                    <PdfCropFrame
+                      widgetKey={widgetKey}
+                      crop={editWidgetParams?.pdfCrop || EMPTY_CROP}
+                      activePage={page.number}
+                    />
+                  ) : (
+                    <PdfCrop
+                      widgetKey={widgetKey}
+                      activeQuoteId={activeQuoteId}
+                      activePage={page.number}
+                      initialQuote={activeQuote}
+                      crop={crop}
+                    />
+                  )}
                 </div>
               )}
             </div>
           ))}
         </div>
+        {isCropSettings && (
+          <PdfCropFields
+            widgetKey={widgetKey}
+            crop={editWidgetParams?.pdfCrop || EMPTY_CROP}
+            activePage={overlayPage}
+          />
+        )}
       </div>
       <PdfQuotes
         turnId={turnId}
         widgetId={widgetId}
         scrollEl={scrollEl}
         activeQuoteId={activeQuoteId}
-        isEdited={isCropMode}
+        isEdited={isQuoteAddMode}
       />
     </>
   );

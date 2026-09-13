@@ -24,8 +24,15 @@ import {
 } from '@/modules/game/game-redux/actions';
 import { linesCreate, linesDelete } from '@/modules/lines/redux/actions';
 import { filterLinesByTurnId } from '@/modules/lines/components/helpers/line';
-import { resetAndExit, togglePanel } from '@/modules/panels/redux/actions';
-import { PANEL_TURNS_PASTE } from '@/config/panel';
+import {
+  changeWidgetParams,
+  resetAndExit,
+  setPanelMode,
+  togglePanel,
+} from '@/modules/panels/redux/actions';
+import { MODE_WIDGET_PDF_CROP, PANEL_TURNS_PASTE } from '@/config/panel';
+import { getWidgetDataFromState } from '../components/helpers/store';
+import { clampCrop, isSameCrop } from '../components/widgets/pdf/cropGeometry';
 import { STATIC_MEDIA_URL } from '@/config/server';
 
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
@@ -116,6 +123,16 @@ export const updateGeometry = (data) => (dispatch, getState) => {
     payload: data,
   });
 };
+
+export const updateSplitHeight =
+  ({ _id, splitHeight }) =>
+  (dispatch, getState) => {
+    if (getState().turns.d[_id]?.splitHeight === splitHeight) return;
+    return dispatch({
+      type: types.TURN_UPDATE_SPLIT_HEIGHT,
+      payload: { _id, splitHeight },
+    });
+  };
 
 export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
   dispatch({
@@ -328,6 +345,56 @@ export const resaveTurn = (turn, callbacks) => (dispatch) => {
     callbacks?.success();
   });
 };
+
+// Окно настройки обрезки полей pdf: черновик засевается тем, что уже в ходе.
+export const editPdfCrop = () => (dispatch, getState) => {
+  const { turnData, editWidgetId, editWidgetParams } = getWidgetDataFromState(
+    getState(),
+  );
+  dispatch(setPanelMode({ mode: MODE_WIDGET_PDF_CROP }));
+  dispatch(
+    changeWidgetParams({
+      widgetKey: `${turnData._id}_${editWidgetId}`,
+      params: {
+        activePage: editWidgetParams?.activePage,
+        pdfCrop: clampCrop(turnData.dWidgets[editWidgetId]?.crop),
+      },
+    }),
+  );
+};
+
+// Обрезка едет с телом хода: отдельной ручки у неё нет, а Save Field отправляет
+// только геометрию и прокрутку. `onSaved` — тем же приёмом, что у `saveField`
+// (см. комментарий там): колбэк передаёт кнопка, а не это действие импортирует
+// каст — цикл через `presence/redux/refresh.js`, который сам импортирует этот файл.
+export const savePdfCrop =
+  ({ onSaved } = {}) =>
+  (dispatch, getState) => {
+    const { turnData, turnGeometry, editWidgetId, editWidgetParams } =
+      getWidgetDataFromState(getState());
+    const crop = clampCrop(editWidgetParams?.pdfCrop);
+    const current = turnData.dWidgets[editWidgetId]?.crop;
+    if (isSameCrop(crop, current)) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      dispatch(
+        resaveTurn(
+          {
+            _id: turnData._id,
+            pdfCrop: crop,
+            x: turnGeometry.position.x,
+            y: turnGeometry.position.y,
+          },
+          {
+            success: () => {
+              if (typeof onSaved === 'function') onSaved();
+              resolve();
+            },
+          },
+        ),
+      );
+    });
+  };
 
 export const cloneTurn = (_id) => (dispatch, getState) => {
   return new Promise((resolve, reject) => {
