@@ -29,7 +29,12 @@
     "gameDialog": {
       "Go_to_the_game": "Go to the game",
       "Skip_this_dialog_next_time": "Skip this dialog next time",
-      "Access_update_failed": "Could not update access. Enter the code again."
+      "Access_update_failed": "Could not update access. Enter the code again.",
+      "Access_update_offline": "Could not reach the server. Try again.",
+      "Game_not_found": "Game not found",
+      "Game_not_found_hint": "If the link carries an access code, open it as a code.",
+      "Open_as_access_code": "Open as access code",
+      "Go_to_lobby": "Go to lobby"
     },
 
     "game": {
@@ -95,6 +100,12 @@
     }
   },
   "UI": {
-    "Loading": "Loading..."
+    "Loading": "Loading...",
+    "accessExpired": {
+      "Title": "Access expired",
+      "Text": "Your access to this game has expired. Go back to the lobby to enter the code again, or keep viewing the game as a visitor.",
+      "Back_to_lobby": "Back to lobby",
+      "Stay_visitor": "Stay as visitor"
+    }
   }
 }

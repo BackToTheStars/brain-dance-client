@@ -10,10 +10,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { lobbyEnterGameForRequest } from '../../redux/actions';
-import { gameViewUrl } from '../../helpers/shareParams';
+import { gameCodeUrl, gameViewUrl } from '../../helpers/shareParams';
 import { refreshTokenRequest } from '@/modules/game/requests';
 import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
+import AccessExpiredModal from '@/modules/user/components/AccessExpiredModal';
 
 const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const dispatch = useDispatch();
@@ -32,6 +33,8 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
   // отказ обновления токена показываем прямо в диалоге, а не alert'ом
   const [accessError, setAccessError] = useState('');
+  const [gameNotFound, setGameNotFound] = useState(false);
+  const [expired, setExpired] = useState(false);
   const myCodes = useMemo(() => {
     if (!myGames) return [];
     const myGame = myGames.find((g) => g.hash === hash);
@@ -54,8 +57,8 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     return roleOptions.filter((option) => roles[option.value]);
   }, [info, myCodes]);
 
-  // Обновление токена может не пройти: подпись подделана, ключ сервера сменился
-  // или сети нет. Тогда сохранённый доступ негоден — снимаем его и остаёмся в
+  // Обновление токена может не пройти: подпись подделана или ключ сервера
+  // сменился. Тогда сохранённый доступ негоден — снимаем его и остаёмся в
   // диалоге, чтобы код можно было ввести заново.
   const handleRefreshFailure = (message) => {
     removeGameInfo(hash);
@@ -85,6 +88,21 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
             : t('gameDialog.Access_update_failed'),
         ),
       );
+  };
+
+  // Истёкший токен не продлить: запись снимается при любом выборе.
+  const backToLobby = () => {
+    removeGameInfo(hash);
+    window.location.assign('/');
+  };
+  const stayVisitor = () => {
+    removeGameInfo(hash);
+    reloadUserInfo();
+    setExpired(false);
+    setRole(String(ROLE_GAME_VISITOR));
+    applyCodeAndGoToGame(
+      myCodes.find((c) => c.role === ROLE_GAME_VISITOR)?.code || hash,
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -135,8 +153,12 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         // случаи, когда требуется только изменить никнейм
         refreshTokenRequest(hash, token, nickname)
           .then((data) => {
-            if (!data?.success) {
-              handleRefreshFailure(data?.message);
+            if (data.expired) {
+              setExpired(true);
+              return;
+            }
+            if (!data.success) {
+              handleRefreshFailure(data.message);
               return;
             }
             const { info, token } = data;
@@ -151,7 +173,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
             reloadUserInfo();
             router.push(viewUrl);
           })
-          .catch(() => handleRefreshFailure());
+          .catch(() => setAccessError(t('gameDialog.Access_update_offline')));
       }
       return;
     }
@@ -199,9 +221,42 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
 
   useEffect(() => {
     // if (!token) return;
-    dispatch(loadShortGame(hash));
+    dispatch(loadShortGame(hash)).catch(() => setGameNotFound(true));
   // }, [token]);
   }, []);
+
+  // В ?hash= старых ссылок лежит код: входим им только по явному нажатию.
+  if (gameNotFound) {
+    return (
+      <div className="flex-center h-screen">
+        <div
+          className="w-[400px] border border-solid border-gray-300 rounded-md p-4 flex flex-col gap-4"
+          data-test-id={TID.gameDialog.notFound}
+        >
+          <h2 className="text-2xl text-center">
+            {t('gameDialog.Game_not_found')}
+          </h2>
+          <div>{t('gameDialog.Game_not_found_hint')}</div>
+          <div className="flex justify-end gap-2">
+            <Button
+              data-test-id={TID.gameDialog.toLobby}
+              onClick={() => window.location.assign('/')}
+            >
+              {t('gameDialog.Go_to_lobby')}
+            </Button>
+            <Button
+              data-test-id={TID.gameDialog.openAsCode}
+              onClick={() =>
+                router.replace(gameCodeUrl(hash, { focusTurnId, tourId }))
+              }
+            >
+              {t('gameDialog.Open_as_access_code')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-center h-screen">
@@ -252,6 +307,11 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
           </form>
         </div>
       </div>
+      <AccessExpiredModal
+        open={expired}
+        onLobby={backToLobby}
+        onStay={stayVisitor}
+      />
     </div>
   );
 };

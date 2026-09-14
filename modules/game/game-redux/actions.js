@@ -1,4 +1,5 @@
 import { getGameRequest, updateGameRequest } from '@/modules/game/requests';
+import { ERROR_GAME_NOT_FOUND } from '@/config/request';
 import * as turnsTypes from '@/modules/turns/redux/types';
 import * as linesTypes from '@/modules/lines/redux/types';
 import * as types from './types';
@@ -37,9 +38,18 @@ export const setGameStage = (stage) => (dispatch, getState) => {
   dispatch({ type: types.GAME_STAGE_SET, payload: stage });
 };
 
+// «Игра не найдена» отдаётся отказом, а не alert: диалог входа показывает его сам.
 export const loadShortGame = (hash) => (dispatch) => {
-  return new Promise((resolve) => {
-    getGameRequest(hash).then((data) => {
+  return new Promise((resolve, reject) => {
+    getGameRequest(hash, {
+      errorCallback: (message, { errorCode } = {}) => {
+        if (errorCode === ERROR_GAME_NOT_FOUND) {
+          reject({ errorCode });
+          return;
+        }
+        alert(message);
+      },
+    }).then((data) => {
       dispatch({
         type: types.GAME_LOAD,
         payload: data.item,

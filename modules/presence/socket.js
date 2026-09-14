@@ -44,6 +44,7 @@ import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { dropBrokenAccess, refreshTokenRequest } from '@/modules/game/requests';
 import {
   getGameInfo,
+  reportAccessExpired,
   setGameInfoIntoStorage,
 } from '@/modules/user/contexts/UserContext';
 import { stopDrawing } from './draw';
@@ -194,6 +195,15 @@ const giveUpAccess = () => {
   dropBrokenAccess(hash);
 };
 
+// The token has expired: the canvas asks whether to go back to the lobby or stay
+// as a visitor. With no canvas listening, the exit is the one above.
+const expireAccess = () => {
+  const { hash, dispatch } = conn;
+  disconnect(CLOSE_NORMAL);
+  dispatch({ type: types.PRESENCE_RESET });
+  if (!reportAccessExpired(hash)) dropBrokenAccess(hash);
+};
+
 const refreshAccessAndRetry = () => {
   const hash = conn.hash;
   const { token, info } = getGameInfo(hash) || {};
@@ -217,7 +227,8 @@ const refreshAccessAndRetry = () => {
     .then((data) => {
       if (!canApplyRefresh()) return;
       if (!data?.success || !data.token) {
-        giveUpAccess();
+        if (data?.expired) expireAccess();
+        else giveUpAccess();
         return;
       }
       setGameInfoIntoStorage(hash, { info: data.info, token: data.token });
@@ -225,7 +236,13 @@ const refreshAccessAndRetry = () => {
       open();
     })
     .catch(() => {
-      if (canApplyRefresh()) giveUpAccess();
+      if (!canApplyRefresh()) return;
+      // No verdict on the token (network, server error): the access stays, the
+      // next rejection asks again.
+      conn.tokenRefreshed = false;
+      conn.attempt += 1;
+      setStatus(STATUS_RECONNECTING);
+      scheduleReconnect(backoffDelay());
     });
 };
 

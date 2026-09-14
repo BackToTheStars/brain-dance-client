@@ -7,13 +7,16 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const GAME_KEY_PREFIX = 'game_';
 
 // game info functions
+// Только запись: запросы страницы остаются на своей игре.
+export const saveGameInfo = (hash, data) =>
+  localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
 export const setGameInfoIntoStorage = (hash, data) => {
   // info (hash, nickname, role)
   // token
   // @todo fixme
   // setUserToken(data?.token);
   setRequestSettings(hash, data?.token);
-  localStorage.setItem(`${GAME_KEY_PREFIX}${hash}`, JSON.stringify(data));
+  saveGameInfo(hash, data);
 };
 export const removeGameInfo = (hash) => {
   // @todo fixme
@@ -42,6 +45,20 @@ export const getGameInfo = (hash) => {
   const data = JSON.parse(localStorage.getItem(`${GAME_KEY_PREFIX}${hash}`));
   return data;
 }
+
+// Сокет присутствия живёт вне React: об истёкшем токене он сообщает сюда, а
+// спрашивает пользователя холст. false — слушать некому.
+const expiredListeners = new Set();
+export const listenAccessExpired = (listener) => {
+  expiredListeners.add(listener);
+  return () => {
+    expiredListeners.delete(listener);
+  };
+};
+export const reportAccessExpired = (hash) => {
+  expiredListeners.forEach((listener) => listener(hash));
+  return expiredListeners.size > 0;
+};
 
 export const logOut = (hash) => {
   removeGameInfo(hash); // стираем token из LocalStorage

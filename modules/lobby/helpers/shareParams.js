@@ -13,11 +13,16 @@ const tail = ({ focusTurnId = null, tourId = null } = {}) => {
   return params.toString();
 };
 
-// Диалог входа: `hash` здесь — либо хеш игры, либо код доступа из ссылки лобби,
-// поэтому параметры добавляются к уже имеющемуся `?hash=`.
+// Диалог входа по адресу игры.
 export const gameEntryUrl = (hash, share) => {
   const query = tail(share);
   return `/game?hash=${hash}${query ? `&${query}` : ''}`;
+};
+
+// Вход по коду доступа: код ходит только в `?code=`, адрес — только в `?hash=`.
+export const gameCodeUrl = (code, share) => {
+  const query = tail(share);
+  return `/game?code=${encodeURIComponent(code)}${query ? `&${query}` : ''}`;
 };
 
 // Сам холст.

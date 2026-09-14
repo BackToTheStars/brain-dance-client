@@ -3,9 +3,14 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Input } from 'antd';
 import { getGameUserTokenRequest } from '../../requests';
-import { setGameInfoIntoStorage, useUserContext } from '@/modules/user/contexts/UserContext';
+import {
+  saveGameInfo,
+  setGameInfoIntoStorage,
+  useUserContext,
+} from '@/modules/user/contexts/UserContext';
 import { reconnectWithNewAccess } from '@/modules/presence/redux/actions';
 import { TID } from '@/config/testIds';
+import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
 
 const CodeEnterForm = ({ hash }) => {
   const dispatch = useDispatch();
@@ -13,14 +18,21 @@ const CodeEnterForm = ({ hash }) => {
   const [accessCode, setAccessCode] = useState('');
   const [userNickname, setUserNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [otherGameHash, setOtherGameHash] = useState('');
 
   const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setOtherGameHash('');
     getGameUserTokenRequest(accessCode, userNickname).then((data) => {
       if (data.success) {
         const { info, token } = data;
+        if (info.hash !== hash) {
+          saveGameInfo(info.hash, { info, token });
+          setOtherGameHash(info.hash);
+          return;
+        }
         setGameInfoIntoStorage(hash, {
           info,
           token,
@@ -84,6 +96,12 @@ const CodeEnterForm = ({ hash }) => {
         </Button>
       </div>
       {!!errorMessage && <div className="text-danger mb-2">{errorMessage}</div>}
+      {!!otherGameHash && (
+        <div className="mb-2" data-test-id={TID.codeEnter.otherGame}>
+          The code is for another game, access saved.{' '}
+          <a href={gameEntryUrl(otherGameHash)}>Open it</a>
+        </div>
+      )}
     </form>
   );
 };

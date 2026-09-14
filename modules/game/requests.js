@@ -1,4 +1,4 @@
-import { s } from '@/config/request';
+import { ERROR_TOKEN_EXPIRED, s } from '@/config/request';
 import { API_URL } from '@/config/server';
 import { removeGameInfo } from '@/modules/user/contexts/UserContext';
 
@@ -79,7 +79,10 @@ export const request = async (
           // доступ снят, пользователь уходит в диалог входа — без alert
         } else {
           if (errorCallback) {
-            errorCallback(message);
+            errorCallback(message, {
+              status: response.status,
+              errorCode: res.errorCode,
+            });
           } else {
             alert(message);
           }
@@ -92,10 +95,14 @@ export const request = async (
   });
 };
 
-export const getGameRequest = (hash) => {
-  return request(`game?hash=${s.hash}`, {
-    tokenFlag: true,
-  });
+export const getGameRequest = (hash, callbacks) => {
+  return request(
+    `game?hash=${s.hash}`,
+    {
+      tokenFlag: true,
+    },
+    callbacks,
+  );
 };
 
 export const updateGameRequest = (data) => {
@@ -121,8 +128,10 @@ export const addCodeRequest = (body) => {
   });
 };
 
-export const refreshTokenRequest = (hash, token, nickname) => {
-  return fetch(`${API_URL}/codes/refresh?hash=${hash}`, {
+// Один разбор ответа на всех: `{ success: true, info, token }` или `{ success: false,
+// expired, errorCode, message }`; без вердикта о токене (нет сети, 5xx) — отклоняется.
+export const refreshTokenRequest = async (hash, token, nickname) => {
+  const response = await fetch(`${API_URL}/codes/refresh?hash=${hash}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -131,7 +140,20 @@ export const refreshTokenRequest = (hash, token, nickname) => {
     body: JSON.stringify({
       nickname,
     }),
-  }).then((res) => res.json());
+  });
+  if (response.status >= 500) {
+    throw new Error(`Token refresh failed: HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  if (response.ok && data?.success && data.token && data.info) {
+    return { success: true, info: data.info, token: data.token };
+  }
+  return {
+    success: false,
+    expired: data?.errorCode === ERROR_TOKEN_EXPIRED,
+    errorCode: data?.errorCode || null,
+    message: data?.message || '',
+  };
 };
 
 // PUBLIC REQUESTS

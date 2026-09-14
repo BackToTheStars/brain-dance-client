@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
 import { lobbyEnterGameByCode } from '../../redux/actions';
 
-// Диалог входа по неизвестному коду на `/game?hash=<код>` (ссылка из лобби).
+// Диалог входа по неизвестному коду на `/game?code=<код>` (ссылка из лобби или бота).
 // До него здесь был тихий автологин с ником 'user', и ник при переходе терялся.
 const CodeEnterDialog = ({ code, focusTurnId, tourId }) => {
   const t = useTranslations('Lobby');

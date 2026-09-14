@@ -28,15 +28,27 @@ export const TID = {
   },
 
   // Pre-game диалог выбора роли/ника (modules/lobby/components/page/GameDialog.js,
-  // страница /game?hash=). Роль-опции antd Select берём через getByRole('option').
+  // страница /game?hash=<адрес>). Роль-опции antd Select берём через getByRole('option').
   gameDialog: {
     nickname: 'game-dialog-nickname',
     role: 'game-dialog-role',
     submit: 'game-dialog-submit',
+    notFound: 'game-dialog-not-found', // «игра не найдена» вместо формы
+    openAsCode: 'game-dialog-open-as-code', // → /game?code=<та же строка>
+    toLobby: 'game-dialog-to-lobby',
   },
 
-  // Диалог входа по коду из ссылки лобби
-  // (modules/lobby/components/page/CodeEnterDialog.js, /game?hash=<код>, код ещё
+  // Окно «срок доступа истёк» (modules/user/components/AccessExpiredModal.js):
+  // холст при открытии и при возвращении на вкладку, сокет присутствия, смена ника
+  // в диалоге входа. Любая кнопка снимает запись game_<адрес>.
+  accessExpired: {
+    root: 'access-expired',
+    lobby: 'access-expired-lobby', // полная навигация на /
+    stay: 'access-expired-stay', // холст дальше посетителем; в диалоге — вход кодом посетителя
+  },
+
+  // Диалог входа по коду из ссылки лобби или бота
+  // (modules/lobby/components/page/CodeEnterDialog.js, /game?code=<код>, код ещё
   // не сохранён — спрашиваем только ник)
   codeHandoff: {
     nickname: 'code-handoff-nickname',
@@ -52,6 +64,7 @@ export const TID = {
     code: 'code-input',
     nickname: 'nickname-input',
     submit: 'code-submit',
+    otherGame: 'code-other-game', // код от другой игры: доступ сохранён ей, ссылка на неё
   },
 
   // Холст и его содержимое
@@ -214,7 +227,7 @@ export const TID = {
     error: 'admin-youtube-error',
     row: 'admin-youtube-row', // строка таблицы (+ data-turn-id)
     game: 'admin-youtube-game', // ссылка «в игре» (+ data-game-hash), новая вкладка,
-    // ведёт на /game?hash=&turn= — то есть на диалог входа, а не сразу на холст
+    // ведёт на /game?hash=<адрес>&turn= — то есть на диалог входа, а не сразу на холст
   },
 
   // Присутствие в игре: переключатель Online в панели Info
