@@ -34,6 +34,7 @@ import {
   RECONNECT_BASE_MS,
   RECONNECT_JITTER,
   RECONNECT_MAX_MS,
+  REFRESH_RETRY_LIMIT,
   STATUS_CONNECTING,
   STATUS_ERROR,
   STATUS_RECONNECTING,
@@ -87,6 +88,8 @@ const conn = {
   autoFollow: false,
   // One token refresh per rejected token; a second rejection drops the access.
   tokenRefreshed: false,
+  // Verdict-less refreshes in a row; reset on welcome, disconnect and wake-up.
+  refreshFailures: 0,
   listening: false,
 };
 
@@ -240,6 +243,11 @@ const refreshAccessAndRetry = () => {
       // No verdict on the token (network, server error): the access stays, the
       // next rejection asks again.
       conn.tokenRefreshed = false;
+      conn.refreshFailures += 1;
+      if (conn.refreshFailures >= REFRESH_RETRY_LIMIT) {
+        setStatus(STATUS_ERROR, 'Could not renew access, will retry when the tab is active');
+        return;
+      }
       conn.attempt += 1;
       setStatus(STATUS_RECONNECTING);
       scheduleReconnect(backoffDelay());
@@ -297,6 +305,7 @@ const restoreTour = () => {
 const handleWelcome = (msg) => {
   conn.attempt = 0;
   conn.tokenRefreshed = false;
+  conn.refreshFailures = 0;
   conn.sid = msg.sid;
   // A connection starts with a clean canvas: the pencil is off and the marks
   // are gone (the slice does that on welcome). A guide coming back from a break
@@ -507,6 +516,7 @@ const open = () => {
 const wakeUp = () => {
   if (!conn.wanted || isOpen() || isConnecting()) return;
   clearTimer();
+  conn.refreshFailures = 0;
   open();
 };
 const onVisibilityChange = () => {
@@ -573,6 +583,7 @@ export const disconnect = (code = CLOSE_NORMAL) => {
   conn.followers = new Set();
   conn.autoFollow = false;
   conn.tokenRefreshed = false;
+  conn.refreshFailures = 0;
 };
 
 // Returns true when the message went out. Ending a tour is remembered here and

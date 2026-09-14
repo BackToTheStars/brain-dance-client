@@ -43,6 +43,13 @@ const GamePageInner = () => {
     setMyGamesLoaded(true);
   }, []);
 
+  // Ни адреса, ни кода — открывать нечего.
+  useEffect(() => {
+    if (myGamesLoaded && !code && !hash) {
+      window.location.assign('/');
+    }
+  }, [myGamesLoaded, code, hash]);
+
   let content = <Loading />;
   if (myGamesLoaded && code) {
     content = (

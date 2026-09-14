@@ -1,13 +1,16 @@
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Alert, Button, Collapse, Radio, Tag } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Button, Collapse, InputNumber, Radio, Tag } from 'antd';
 import {
   getAdminTurnRequest,
+  getTurnVideoFrameRequest,
   probeTurnYoutubeRequest,
   relocateTurnMediaRequest,
   relocateTurnYoutubeRequest,
+  saveTurnVideoPreviewRequest,
 } from '../../requests';
 import { STATIC_MEDIA_URL } from '@/config/server';
+import { TID } from '@/config/testIds';
 
 // Порядок и состав — как TURN_FIELDS на сервере
 // (server/modules/game/services/mediaRelocate.js): перенос идёт по всем пяти полям
@@ -47,6 +50,12 @@ const getUrlHost = (url) => {
 const MEDIA_HOST = getUrlHost(STATIC_MEDIA_URL);
 const isLocalUrl = (url) =>
   !!url && !!MEDIA_HOST && getUrlHost(url) === MEDIA_HOST;
+
+// Только решает, показывать ли блок; проверяет сервер.
+const isOwnVideoUrl = (url) =>
+  isLocalUrl(url) && new URL(url).pathname.startsWith('/videos/');
+
+const DEFAULT_VIDEO_PREVIEW = '/img/video-default.png';
 
 // Сервер классифицирует все пять полей, и пустое приходит как 'local'. Строка
 // «Видео — уже своя» у хода без видео только мешает читать результат, поэтому
@@ -352,6 +361,128 @@ const MediaBlock = ({ turn, setTurn }) => {
   );
 };
 
+const VideoPreviewBlock = ({ turn, setTurn }) => {
+  const videoRef = useRef(null);
+  const [t, setT] = useState(0);
+  const [frame, setFrame] = useState(null);
+  const [showing, setShowing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const seekTo = (value) => {
+    setT(value);
+    if (videoRef.current) videoRef.current.currentTime = value;
+  };
+
+  const showFrame = async () => {
+    setShowing(true);
+    setError(null);
+    try {
+      const data = await getTurnVideoFrameRequest(turn._id, t);
+      setFrame(data.item);
+    } catch (err) {
+      setError(err?.message || String(err));
+    } finally {
+      setShowing(false);
+    }
+  };
+
+  const savePreview = async () => {
+    if (!confirm(`Сохранить кадр на ${t} с как превью видео?`)) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const data = await saveTurnVideoPreviewRequest(turn._id, t);
+      setTurn(data.item.turn);
+    } catch (err) {
+      setError(err?.message || String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="flex flex-col gap-2 border border-solid border-gray-300 rounded-md p-2"
+      data-test-id={TID.adminTurn.videoPreview}
+    >
+      <b>Превью видео</b>
+      <div className="flex gap-3 items-start flex-wrap">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500">текущее превью</span>
+          <img
+            src={turn.videoPreview || DEFAULT_VIDEO_PREVIEW}
+            alt=""
+            width={160}
+            height={90}
+            style={{ objectFit: 'cover' }}
+            data-test-id={TID.adminTurn.videoPreviewCurrent}
+          />
+        </div>
+        <video
+          ref={videoRef}
+          src={turn.videoUrl}
+          controls
+          width={280}
+          onTimeUpdate={(e) => setT(Number(e.currentTarget.currentTime.toFixed(3)))}
+          data-test-id={TID.adminTurn.videoPreviewPlayer}
+        />
+        {!!frame && (
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500">
+              снятый кадр{typeof frame.duration === 'number' && ` (видео ${frame.duration} с)`}
+            </span>
+            <img
+              src={frame.dataUrl}
+              alt=""
+              width={160}
+              height={90}
+              style={{ objectFit: 'cover' }}
+              data-test-id={TID.adminTurn.videoPreviewFrame}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2 items-center">
+        <span>t, с:</span>
+        <InputNumber
+          min={0}
+          step={0.1}
+          value={t}
+          onChange={(value) => seekTo(Number(value) || 0)}
+          data-test-id={TID.adminTurn.videoPreviewSeconds}
+        />
+        <Button
+          disabled={saving}
+          loading={showing}
+          onClick={showFrame}
+          data-test-id={TID.adminTurn.videoPreviewShow}
+        >
+          Показать кадр
+        </Button>
+        <Button
+          disabled={showing}
+          loading={saving}
+          onClick={savePreview}
+          data-test-id={TID.adminTurn.videoPreviewSave}
+        >
+          Сохранить как превью
+        </Button>
+      </div>
+
+      {!!error && (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          data-test-id={TID.adminTurn.videoPreviewError}
+        />
+      )}
+    </div>
+  );
+};
+
 const TurnDetail = () => {
   const [turn, setTurn] = useState();
   const [loadError, setLoadError] = useState(null);
@@ -377,6 +508,9 @@ const TurnDetail = () => {
     <div className="mt-2 flex flex-col gap-2">
       <h3>Turn #{turn._id}</h3>
       <MediaBlock turn={turn} setTurn={setTurn} />
+      {isOwnVideoUrl(turn.videoUrl) && (
+        <VideoPreviewBlock turn={turn} setTurn={setTurn} />
+      )}
       <Collapse
         defaultActiveKey={[]}
         items={[

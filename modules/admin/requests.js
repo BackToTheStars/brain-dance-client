@@ -57,6 +57,8 @@ export const deleteAdminGameRequest = (id) =>
 // считается агрегацией по всем файлам, поэтому запрос идёт только по кнопке, без автообновления.
 export const getAdminMediaStatsRequest = () => adminRequest('/admin/media/stats');
 
+export const getAdminMediaLimitsRequest = () => adminRequest('/admin/media/limits');
+
 // Список файлов media (тот же прокси server → media, операция токена `list`).
 // Фильтры, сортировка и пагинация — серверные: параметры уходят транзитом,
 // разбирает их media, и её 400 доезжает сюда текстом внутри `message`.
@@ -120,6 +122,19 @@ export const relocateTurnYoutubeRequest = (turnId, formatId) =>
   adminRequest('/admin/turns/youtube/relocate', {
     method: 'POST',
     body: { turnId, formatId },
+  });
+
+export const getTurnVideoFrameRequest = (turnId, t) =>
+  adminRequest(`/admin/turns/${turnId}/video-frame`, {
+    method: 'POST',
+    body: { t },
+  });
+
+// Каждый вызов кладёт новый файл; прежний файл превью остаётся.
+export const saveTurnVideoPreviewRequest = (turnId, t) =>
+  adminRequest(`/admin/turns/${turnId}/video-preview`, {
+    method: 'POST',
+    body: { t },
   });
 
 export const getTgChatIdsRequest = () => adminRequest('/admin/tg-logs/chat-ids');

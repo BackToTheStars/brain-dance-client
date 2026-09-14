@@ -1,6 +1,9 @@
 import { Alert, Button, Progress, Table } from 'antd';
-import { useState } from 'react';
-import { getAdminMediaStatsRequest } from '../../requests';
+import { useEffect, useState } from 'react';
+import {
+  getAdminMediaLimitsRequest,
+  getAdminMediaStatsRequest,
+} from '../../requests';
 import { TID } from '@/config/testIds';
 
 // Место на диске сервера и разбивка по типам медиа.
@@ -9,6 +12,76 @@ import { TID } from '@/config/testIds';
 // `<type>.files` и линеен по числу файлов, поэтому ни на монтировании вкладки, ни по
 // таймеру дёргать его нельзя (Tabs.js рендерит только активную вкладку — useEffect
 // здесь сработал бы при каждом переключении). До первого клика — пустое состояние.
+// Лимиты по файлам ничего не считают и грузятся сами при открытии вкладки.
+
+const SOURCE_LABELS = {
+  code: 'код',
+  env: 'переменная окружения',
+  cgroup: 'cgroup',
+  os: 'ОС хоста',
+  mongo: 'диск (статистика media)',
+  unknown: 'неизвестно',
+};
+
+const formatSource = (entry) => {
+  if (!entry) return '—';
+  const label = SOURCE_LABELS[entry.source] || entry.source || '—';
+  if (!entry.env) return label;
+  return entry.ignoredEnv !== undefined
+    ? `${label} (${entry.env}, проигнорировано «${entry.ignoredEnv}»)`
+    : `${label} (${entry.env})`;
+};
+
+// Неизвестное — словом, не числом; нечисловое значение из окружения — как есть.
+const formatLimitRow = (row) => {
+  const entry = row?.entry;
+  if (!entry) return '—';
+  if (row.kind === 'storage') {
+    return entry.free == null || entry.total == null
+      ? 'неизвестно'
+      : `свободно ${formatBytes(entry.free)} из ${formatBytes(entry.total)}`;
+  }
+  if (row.kind === 'telegram') {
+    const size = entry.bytes == null ? 'неизвестно' : formatBytes(entry.bytes);
+    return `${size} (${entry.mode === 'local' ? 'локальный сервер' : 'облако'})`;
+  }
+  if (row.kind === 'ms') {
+    if (entry.ms != null) return `${entry.ms} мс`;
+    return entry.value != null ? String(entry.value) : 'неизвестно';
+  }
+  if (entry.unlimited) return 'без ограничения';
+  if (entry.bytes != null) return formatBytes(entry.bytes);
+  return entry.value != null ? String(entry.value) : 'неизвестно';
+};
+
+// Порядок строк — как в цепочке потолков: nginx → загрузка → память → диск, затем бот.
+const buildLimitRows = (limits) => {
+  if (!limits) return [];
+  const { media, bot } = limits;
+  return [
+    { key: 'nginx', label: 'nginx (client_max_body_size)', entry: media?.nginx, kind: 'bytes' },
+    { key: 'requestBody', label: 'Тело запроса (JSON)', entry: media?.requestBody, kind: 'bytes' },
+    { key: 'upload-images', label: 'Загрузка — images', entry: media?.upload?.images, kind: 'bytes' },
+    { key: 'upload-videos', label: 'Загрузка — videos', entry: media?.upload?.videos, kind: 'bytes' },
+    { key: 'upload-audios', label: 'Загрузка — audios', entry: media?.upload?.audios, kind: 'bytes' },
+    { key: 'upload-pdfs', label: 'Загрузка — pdfs', entry: media?.upload?.pdfs, kind: 'bytes' },
+    { key: 'memory-limit', label: 'Память контейнера media', entry: media?.memory?.limit, kind: 'bytes' },
+    { key: 'memory-host', label: 'Память хоста', entry: media?.memory?.host, kind: 'bytes' },
+    { key: 'storage', label: 'Место на диске', entry: media?.storage, kind: 'storage' },
+    { key: 'bot-daily', label: 'Бот — суточный лимит загрузок', entry: bot?.dailyUpload, kind: 'bytes' },
+    { key: 'bot-lock', label: 'Бот — пауза между файлами', entry: bot?.fileTimeLock, kind: 'ms' },
+    { key: 'bot-pdf', label: 'Бот — PDF', entry: bot?.pdf, kind: 'bytes' },
+    { key: 'bot-xcom', label: 'Бот — видео из x.com', entry: bot?.xcomVideo, kind: 'bytes' },
+    { key: 'bot-import', label: 'Бот — файл импорта', entry: bot?.importFile, kind: 'bytes' },
+    { key: 'bot-telegram', label: 'Бот — Telegram', entry: bot?.telegram, kind: 'telegram' },
+  ];
+};
+
+const limitColumns = [
+  { title: 'Звено', dataIndex: 'label', key: 'label' },
+  { title: 'Значение', key: 'value', render: (text, row) => formatLimitRow(row) },
+  { title: 'Откуда', key: 'source', render: (text, row) => formatSource(row.entry) },
+];
 
 const UNITS = ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ', 'ПБ'];
 
@@ -52,6 +125,28 @@ const StorageTab = () => {
   const [error, setError] = useState(null);
   const [loadedAt, setLoadedAt] = useState(null);
 
+  const [limits, setLimits] = useState(null);
+  const [limitsLoading, setLimitsLoading] = useState(false);
+  const [limitsError, setLimitsError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLimitsLoading(true);
+    getAdminMediaLimitsRequest()
+      .then((res) => {
+        if (!cancelled) setLimits(res.item);
+      })
+      .catch((err) => {
+        if (!cancelled) setLimitsError(err?.message || String(err));
+      })
+      .finally(() => {
+        if (!cancelled) setLimitsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const load = async () => {
     setLoading(true);
     setError(null);
@@ -83,8 +178,38 @@ const StorageTab = () => {
   const usedPercent =
     fs && fs.total ? Math.round((fs.used / fs.total) * 1000) / 10 : 0;
 
+  const limitRows = buildLimitRows(limits);
+
   return (
     <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <b>Лимиты</b>
+        {!!limitsError && (
+          <Alert
+            type="error"
+            showIcon
+            message={limitsError}
+            data-test-id={TID.adminStorage.limitsError}
+          />
+        )}
+        {!!limitRows.length && (
+          <Table
+            columns={limitColumns}
+            dataSource={limitRows}
+            pagination={false}
+            size="small"
+            loading={limitsLoading}
+            data-test-id={TID.adminStorage.limitsTable}
+          />
+        )}
+        {!!limits?.media?.memory?.hint && (
+          <div className="text-gray-500 text-xs">{limits.media.memory.hint}</div>
+        )}
+        {!!limits?.bot?.hint && (
+          <div className="text-gray-500 text-xs">{limits.bot.hint}</div>
+        )}
+      </div>
+
       <div className="flex gap-2 items-center">
         <Button type="primary" loading={loading} onClick={load}>
           Обновить

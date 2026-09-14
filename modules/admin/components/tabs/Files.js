@@ -13,6 +13,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { getAdminMediaFilesRequest } from '../../requests';
+import { getGameUrl } from '@/modules/lobby/utils/url';
 import { TID } from '@/config/testIds';
 
 // Таблица файлов media поверх прокси `GET /admin/media/files`.
@@ -61,6 +62,7 @@ const humanName = (record) =>
 const emptyFilters = {
   type: [],
   name: '',
+  game: '',
   minSize: null,
   maxSize: null,
   dates: null,
@@ -71,6 +73,7 @@ const emptyFilters = {
 const toQuery = (filters, sort, order, page, limit) => ({
   type: filters.type.join(','),
   name: filters.name.trim(),
+  game: filters.game.trim(),
   minSize: filters.minSize,
   maxSize: filters.maxSize,
   from: filters.dates?.[0] ? filters.dates[0].startOf('day').toISOString() : '',
@@ -80,6 +83,22 @@ const toQuery = (filters, sort, order, page, limit) => ({
   page,
   limit,
 });
+
+// Через диалог входа, как колонка «В игре» вкладки YouTube: админ выбирает, кем войти.
+const GameCell = ({ record }) =>
+  record.gameHash ? (
+    <a
+      href={getGameUrl(record.gameHash)}
+      target="_blank"
+      rel="noreferrer"
+      data-test-id={TID.adminFiles.game}
+      data-game-hash={record.gameHash}
+    >
+      {record.gameHash}
+    </a>
+  ) : (
+    <span>—</span>
+  );
 
 const FilesTab = () => {
   const [items, setItems] = useState([]);
@@ -174,6 +193,12 @@ const FilesTab = () => {
           ) : (
             type
           ),
+      },
+      {
+        title: 'Игра',
+        key: 'game',
+        width: 100,
+        render: (text, record) => <GameCell record={record} />,
       },
       {
         title: 'Размер',
@@ -285,6 +310,15 @@ const FilesTab = () => {
           onChange={(e) => setDraft({ ...draft, name: e.target.value })}
           onPressEnter={applyFilters}
           data-test-id={TID.adminFiles.filter('name')}
+        />
+        <Input
+          placeholder="Адрес игры"
+          className="w-[160px]"
+          allowClear
+          value={draft.game}
+          onChange={(e) => setDraft({ ...draft, game: e.target.value })}
+          onPressEnter={applyFilters}
+          data-test-id={TID.adminFiles.filter('game')}
         />
         {/* ширина стилем, а не классом: у InputNumber внутренняя обёртка
             перебивает утилиту, и подпись обрезается до «Размер …» */}

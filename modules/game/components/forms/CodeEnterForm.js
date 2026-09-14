@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Input } from 'antd';
+import { useTranslations } from 'next-intl';
 import { getGameUserTokenRequest } from '../../requests';
 import {
   saveGameInfo,
@@ -14,6 +15,7 @@ import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
 
 const CodeEnterForm = ({ hash }) => {
   const dispatch = useDispatch();
+  const t = useTranslations('Game.codeEnterForm');
   const { reloadUserInfo } = useUserContext();
   const [accessCode, setAccessCode] = useState('');
   const [userNickname, setUserNickname] = useState('');
@@ -42,7 +44,7 @@ const CodeEnterForm = ({ hash }) => {
           reloadUserInfo();
         }, 300)
       } else {
-        setErrorMessage(data?.message || 'Неизвестная ошибка');
+        setErrorMessage(data?.message || t('Unknown_error'));
       }
     });
     //setShowCreateModal(true)
@@ -65,7 +67,7 @@ const CodeEnterForm = ({ hash }) => {
           name="code"
           type="text"
           className="form-control"
-          placeholder="Enter code..."
+          placeholder={t('Code_placeholder')}
           data-test-id={TID.codeEnter.code}
           onChange={(e) => setAccessCode(e.target.value)}
           value={accessCode}
@@ -78,7 +80,7 @@ const CodeEnterForm = ({ hash }) => {
           name="nickname"
           type="text"
           className="form-control"
-          placeholder="Enter nickname..."
+          placeholder={t('Nickname_placeholder')}
           data-test-id={TID.codeEnter.nickname}
           onChange={(e) => setUserNickname(e.target.value)}
           value={userNickname}
@@ -92,14 +94,14 @@ const CodeEnterForm = ({ hash }) => {
           className="enter-game"
           data-test-id={TID.codeEnter.submit}
         >
-          Enter Game
+          {t('Submit')}
         </Button>
       </div>
       {!!errorMessage && <div className="text-danger mb-2">{errorMessage}</div>}
       {!!otherGameHash && (
         <div className="mb-2" data-test-id={TID.codeEnter.otherGame}>
-          The code is for another game, access saved.{' '}
-          <a href={gameEntryUrl(otherGameHash)}>Open it</a>
+          {t('Other_game_notice')}{' '}
+          <a href={gameEntryUrl(otherGameHash)}>{t('Open_it')}</a>
         </div>
       )}
     </form>

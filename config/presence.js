@@ -90,6 +90,9 @@ export const RECONNECT_MAX_MS = 30000;
 export const RECONNECT_JITTER = 0.25;
 // The game already holds the maximum number of connections: retry in a minute.
 export const FULL_RETRY_MS = 60000;
+// Access-refresh attempts with no verdict (network error, 5xx) in a row before
+// giving up and waiting for the tab to become active again.
+export const REFRESH_RETRY_LIMIT = 3;
 
 // Close codes. Standard ones first, then the server's own 4xxx range.
 export const CLOSE_NORMAL = 1000; // the user switched online off

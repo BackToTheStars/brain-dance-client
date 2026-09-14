@@ -80,6 +80,16 @@
     },
     "Payment_methods": "Платёжные способы"
   },
+  "Game": {
+    "codeEnterForm": {
+      "Code_placeholder": "Введите код...",
+      "Nickname_placeholder": "Введите ник...",
+      "Submit": "Войти в игру",
+      "Other_game_notice": "Код от другой игры, доступ сохранён.",
+      "Open_it": "Открыть",
+      "Unknown_error": "Неизвестная ошибка"
+    }
+  },
   "Common": {
     "Modal": {
       "Donate": "Поддержать",

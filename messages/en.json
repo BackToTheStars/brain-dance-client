@@ -87,6 +87,16 @@
     },
     "Payment_methods": "Payment methods"
   },
+  "Game": {
+    "codeEnterForm": {
+      "Code_placeholder": "Enter code...",
+      "Nickname_placeholder": "Enter nickname...",
+      "Submit": "Enter Game",
+      "Other_game_notice": "The code is for another game, access saved.",
+      "Open_it": "Open it",
+      "Unknown_error": "Unknown error"
+    }
+  },
   "Common": {
     "Modal": {
       "Donate": "Donate",

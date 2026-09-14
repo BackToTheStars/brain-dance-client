@@ -186,6 +186,8 @@ export const TID = {
   adminStorage: {
     table: 'admin-storage-table', // обёртка таблицы по типам (есть только после «Обновить»)
     error: 'admin-storage-error',
+    limitsTable: 'admin-storage-limits-table', // таблица действующих потолков (GET /admin/media/limits), грузится сама при открытии вкладки
+    limitsError: 'admin-storage-limits-error',
   },
 
   // Админка, вкладка Games (components/games/Table.js, Details.js)
@@ -215,8 +217,9 @@ export const TID = {
     reload: 'admin-files-reload',
     reset: 'admin-files-reset',
     error: 'admin-files-error',
-    filter: (name) => `admin-files-filter-${name}`, // type, name, min-size, max-size, dates
+    filter: (name) => `admin-files-filter-${name}`, // type, name, min-size, max-size, dates, game
     row: 'admin-files-row', // строка таблицы (+ data-file-id)
+    game: 'admin-files-game', // ссылка «адрес игры» в колонке (+ data-game-hash), парой к adminYoutube.game
   },
 
   // Админка, вкладка YouTube: опись ходов, чьё видео распознано как YouTube
@@ -228,6 +231,18 @@ export const TID = {
     row: 'admin-youtube-row', // строка таблицы (+ data-turn-id)
     game: 'admin-youtube-game', // ссылка «в игре» (+ data-game-hash), новая вкладка,
     // ведёт на /game?hash=<адрес>&turn= — то есть на диалог входа, а не сразу на холст
+  },
+
+  // Страница хода в админке, блок «Превью видео» (только для видео своей media).
+  adminTurn: {
+    videoPreview: 'admin-turn-video-preview', // корень блока
+    videoPreviewCurrent: 'admin-turn-video-preview-current', // текущее превью или заглушка
+    videoPreviewPlayer: 'admin-turn-video-preview-player', // <video controls> по videoUrl хода
+    videoPreviewSeconds: 'admin-turn-video-preview-seconds', // поле t, секунды — связано с позицией плеера
+    videoPreviewFrame: 'admin-turn-video-preview-frame', // снятый кадр, есть только после «Показать кадр»
+    videoPreviewShow: 'admin-turn-video-preview-show', // «Показать кадр»
+    videoPreviewSave: 'admin-turn-video-preview-save', // «Сохранить как превью» (подтверждение — нативный confirm)
+    videoPreviewError: 'admin-turn-video-preview-error',
   },
 
   // Присутствие в игре: переключатель Online в панели Info
