@@ -98,7 +98,7 @@ const AdminTurnsTable = ({ gameId = null }) => {
   return (
     <>
       {!!error && (
-        <Alert className="mb-3" type="error" showIcon message={error} />
+        <Alert className="mb-3" type="error" showIcon title={error} />
       )}
       <Space size="small" className="mb-3">
         <Input

@@ -27,7 +27,7 @@ const AdminHeader = () => {
   useEffect(() => {
     if (timeLeft === 'Token expired') {
       notification.error({
-        message: 'Token expired',
+        title: 'Token expired',
       });
       logout();
       router.push('/admin/login');

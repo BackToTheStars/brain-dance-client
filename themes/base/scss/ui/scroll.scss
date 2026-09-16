@@ -5,12 +5,12 @@
       height: var(--scrollbar-width);
     }
     &::-webkit-scrollbar-thumb {
-      background-color: var(--scrollbar-thumb-color);
+      background-color: var(--scrollbar-thumb-color, var(--bg-button-hover));
       border-radius: var(--scrollbar-radius);
     }
 
     &::-webkit-scrollbar-track {
-      background-color: var(--scrollbar-track-color);
+      background-color: var(--scrollbar-track-color, var(--bg-panel));
       border-radius: var(--scrollbar-radius);
     }
   }

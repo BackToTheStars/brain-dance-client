@@ -9,6 +9,7 @@ import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 import FileUploading from './components/forms/FileUploading';
+import VideoUrlField from './components/forms/VideoUrlField';
 import { uploadMedia } from './redux/actions';
 import { TID } from '@/config/testIds';
 
@@ -368,29 +369,19 @@ const fieldSettings = {
     inputType: 'component',
     special: true,
     widgetSettings: {
-      render: ({ changeHandler, label, prefixClass, value, form }) => {
-        return (
-          <>
-            <Input
-              data-test-id={TID.addTurn.field(prefixClass)}
-              placeholder={`${label}:`}
-              value={value}
-              onChange={(e) => {
-                changeHandler(e.target.value);
-              }}
-            />
-            <FileUploading
-              changeHandler={changeHandler}
-              fileTypeLabel="a video"
-              uploadType="videos"
-              accept={UPLOAD_ACCEPT.videos}
-              uploadFunc={(file, onProgress) =>
-                uploadMedia('videos', file, onProgress)
-              }
-            />
-          </>
-        );
-      },
+      render: (props) => (
+        <VideoUrlField
+          {...props}
+          acceptVideos={UPLOAD_ACCEPT.videos}
+          acceptImages={UPLOAD_ACCEPT.images}
+          uploadVideo={(file, onProgress) =>
+            uploadMedia('videos', file, onProgress)
+          }
+          uploadImage={(file, onProgress) =>
+            uploadMedia('images', file, onProgress)
+          }
+        />
+      ),
     },
   },
   [FIELD_AUDIO]: {
@@ -480,6 +471,7 @@ const fieldsToClone = [
   'dontShowHeader',
   'imageUrl',
   'videoUrl',
+  'videoPreview',
   'audioUrl',
   'pdfUrl',
   'pdfCrop',

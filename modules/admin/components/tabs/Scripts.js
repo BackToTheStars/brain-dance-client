@@ -19,6 +19,19 @@ const formatScriptResult = (result) => {
   return JSON.stringify(result, null, 2);
 };
 
+const confirmMessage = (script, command, params) => {
+  const entries = Object.entries(params);
+  return [
+    `Run ${script.name} → ${command.name}?`,
+    [script.description, command.description].filter(Boolean).join(': '),
+    entries.length
+      ? `Parameters: ${entries.map(([name, value]) => `${name} = ${value}`).join(', ')}`
+      : 'No parameters',
+  ]
+    .filter(Boolean)
+    .join('\n');
+};
+
 const ScriptsTab = () => {
   const [scripts, setScripts] = useState([]);
   const [activeCommand, setActiveCommand] = useState(null);
@@ -43,6 +56,9 @@ const ScriptsTab = () => {
           {record.commands.map((command) => (
             <Button
               key={command.name}
+              data-test-id={TID.adminScripts.command}
+              data-script={record.name}
+              data-command={command.name}
               type={
                 activeCommand?.script?.name === record.name &&
                 activeCommand?.command?.name === command.name
@@ -70,8 +86,6 @@ const ScriptsTab = () => {
   );
 
   const executeScript = () => {
-    setIsLoading(true);
-    setRunError(null);
     const { script, command } = activeCommand;
     const params = {};
     commandParams.forEach((param) => {
@@ -80,14 +94,25 @@ const ScriptsTab = () => {
         params[param.name] = value;
       }
     });
+    if (command.confirm && !confirm(confirmMessage(script, command, params))) {
+      return;
+    }
+    setIsLoading(true);
+    setRunError(null);
+    setScriptResult(null);
     runAdminScriptRequest(script.name, command.name, params)
       .then((res) => {
-        setScriptResult(res.result);
         setIsLoading(false);
+        // A command that throws still answers 200: { success: false, result }.
+        if (res.success === false) {
+          setRunError(formatScriptResult(res.result ?? '') || 'Unknown error');
+          return;
+        }
+        setScriptResult(res.result);
       })
       .catch((err) => {
-        setRunError(err?.message || String(err));
         setIsLoading(false);
+        setRunError(err?.message || String(err));
       });
   };
 
@@ -106,13 +131,14 @@ const ScriptsTab = () => {
       return;
     }
     setScriptResult(null);
+    setRunError(null);
     setParamValues({});
   }, [activeCommand]);
 
   return (
     <div className="flex gap-2" data-test-id={TID.adminScripts.root}>
       <div className="w-1/3 flex flex-col gap-2">
-        {!!listError && <Alert type="error" showIcon message={listError} />}
+        {!!listError && <Alert type="error" showIcon title={listError} />}
         <Table
           className="w-full"
           dataSource={scripts}
@@ -148,6 +174,8 @@ const ScriptsTab = () => {
                       )}
                     </label>
                     <Input
+                      data-test-id={TID.adminScripts.param}
+                      data-param={param.name}
                       value={paramValues[param.name] ?? ''}
                       placeholder={param.name}
                       onChange={(e) =>
@@ -165,19 +193,27 @@ const ScriptsTab = () => {
               {isLoading && <Loading />}
               {!isLoading && (
                 <>
-                  <Button onClick={executeScript} disabled={missingRequired}>
+                  <Button
+                    data-test-id={TID.adminScripts.execute}
+                    onClick={executeScript}
+                    disabled={missingRequired}
+                  >
                     execute
                   </Button>
                   {!!runError && (
                     <Alert
                       className="mt-2"
+                      data-test-id={TID.adminScripts.error}
                       type="error"
                       showIcon
-                      message={runError}
+                      title={runError}
                     />
                   )}
                   {scriptResult !== null && scriptResult !== undefined && (
-                    <pre className="whitespace-pre-wrap">
+                    <pre
+                      className="whitespace-pre-wrap"
+                      data-test-id={TID.adminScripts.result}
+                    >
                       {formatScriptResult(scriptResult)}
                     </pre>
                   )}

@@ -32,7 +32,7 @@ const AdminSigninForm = ({ onSuccessSubmit }) => {
         <Alert
           type="error"
           showIcon
-          message={error}
+          title={error}
           data-test-id={TID.adminLogin.error}
         />
       )}

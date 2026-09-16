@@ -12,6 +12,8 @@ const FileUploading = ({
   uploadFunc = () => {},
   accept,
   uploadType, // images | videos | audios | pdfs — только для data-upload-type
+  onStart = () => {}, // (file) до отправки: поле видео снимает кадр из самого файла
+  onFailed = () => {},
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -23,12 +25,14 @@ const FileUploading = ({
     setError(null);
     setProgress(null);
     setLoading(true);
+    onStart(file);
     dispatch(uploadFunc(file, setProgress))
       .then((data) => {
         changeHandler(data.src);
       })
       .catch((err) => {
         setError(err?.message || 'Upload failed');
+        onFailed(err);
       })
       .finally(() => {
         setLoading(false);

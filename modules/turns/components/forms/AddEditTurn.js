@@ -25,7 +25,8 @@ import {
   EDITOR_FONT_SIZE_STEP,
   PANEL_ADD_EDIT_TURN,
 } from '@/config/panel';
-import { createTurn, resaveTurn } from '../../redux/actions';
+import { createTurn, resaveTurn, uploadMedia } from '../../redux/actions';
+import { dataUrlToFile, frameFileName } from '../helpers/videoFrame';
 import {
   filterQuotesDeleted,
   filterQuotesOrphanedByMedia,
@@ -54,6 +55,7 @@ const {
   FIELD_HEADER,
   FIELD_SOURCE,
   FIELD_DATE,
+  FIELD_VIDEO,
 } = turnSettings;
 
 // Что именно потеряет ход, если сохранить замену файла: цитаты старого
@@ -124,6 +126,7 @@ const AddEditTurnPopup = () => {
   // Подтверждение перед Format: что именно снимется с абзаца (getFormatLoss).
   // null — окна нет, значит и терять было нечего.
   const [formatConfirm, setFormatConfirm] = useState(null);
+  const [savingPreview, setSavingPreview] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -164,6 +167,7 @@ const AddEditTurnPopup = () => {
           }
         }
       }
+      if (turnToEdit.videoPreview) newForm.videoPreview = turnToEdit.videoPreview;
       setForm(newForm);
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
@@ -206,7 +210,35 @@ const AddEditTurnPopup = () => {
   // «нажал Save» и записью встаёт модальное окно, а оно отвечает асинхронно:
   // saveHandler только собирает payload, коммитит либо он сам, либо кнопка
   // «Удалить и сохранить».
-  const commitSave = ({ turnObj, lineIdsToDelete, isNew, quoteKeysDeleted = [] }) => {
+  const commitSave = async ({
+    turnObj: preparedTurn,
+    lineIdsToDelete,
+    isNew,
+    quoteKeysDeleted = [],
+    previewDraft,
+  }) => {
+    let turnObj = preparedTurn;
+    // Кадр живёт в памяти формы и уходит в media один раз — здесь.
+    if (previewDraft) {
+      setSavingPreview(true);
+      try {
+        const file = dataUrlToFile(
+          previewDraft.dataUrl,
+          frameFileName(previewDraft.name, previewDraft.t),
+        );
+        const data = await dispatch(uploadMedia('images', file));
+        turnObj = { ...turnObj, videoPreview: data.src };
+        patchForm({ videoPreview: data.src, videoPreviewDraft: null });
+      } catch (err) {
+        patchForm({
+          videoPreviewError: `Preview upload failed: ${err?.message || err}`,
+        });
+        return;
+      } finally {
+        setSavingPreview(false);
+      }
+    }
+
     if (lineIdsToDelete.length) {
       dispatch(linesDelete(lineIdsToDelete));
     }
@@ -238,33 +270,51 @@ const AddEditTurnPopup = () => {
     e.preventDefault(); // почитать про preventDefault()
     const textArr = quillConstants.getQuillTextArr();
 
-    let incId = Math.floor(new Date().getTime() / 1000);
+    // Соседние куски одного цвета с равным id сводятся в одну цитату, поэтому
+    // свежий id не повторяет занятые.
+    const takenIds = new Set(
+      [
+        ...textArr.map((textItem) => textItem.attributes?.id),
+        ...(turnToEdit?.quotes || []).map((quote) => quote.id),
+      ]
+        .filter((id) => id !== undefined && id !== null)
+        .map(String),
+    );
+    let lastId = Math.floor(new Date().getTime() / 1000);
+    const freshId = () => {
+      do lastId += 1;
+      while (takenIds.has(String(lastId)));
+      return lastId;
+    };
 
     const resTextArr = [];
     let i = 0;
 
-    let newIncId = Math.floor(new Date().getTime() / 1000);
     const quoteIds = [];
     for (let quoteEl of getQuoteElements()) {
-      const domQuoteId = quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE);
-      if (domQuoteId) {
-        quoteIds.push(domQuoteId);
-      } else {
-        newIncId += 1;
-        quoteIds.push(newIncId);
-      }
+      quoteIds.push(quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE) || freshId());
     }
 
+    // Подряд идущие куски без id одного цвета — одна новая цитата, разрезанная
+    // выделением: id у них общий.
+    let newQuote = null;
     for (let textItem of textArr) {
       if (!textItem.attributes || !textItem.attributes.background) {
         resTextArr.push(withoutQuoteId(textItem));
+        newQuote = null;
         continue;
       }
 
       let quoteId = textItem.attributes.id;
+      const { background } = textItem.attributes;
 
-      if (!quoteId) {
-        quoteId = !!turnToEdit && quoteIds[i] ? quoteIds[i] : (incId += 1);
+      if (quoteId) {
+        newQuote = null;
+      } else if (newQuote?.background === background) {
+        quoteId = newQuote.id;
+      } else {
+        quoteId = !!turnToEdit && quoteIds[i] ? quoteIds[i] : freshId();
+        newQuote = { background, id: quoteId };
       }
       i += 1;
       resTextArr.push({
@@ -278,12 +328,7 @@ const AddEditTurnPopup = () => {
 
     const prevQuotes = turnToEdit?.quotes || [];
 
-    const paragraphOps = collapseSplitQuotes(
-      resTextArr,
-      prevQuotes
-        .filter((quote) => quote.type === TYPE_QUOTE_TEXT)
-        .map((quote) => quote.id),
-    );
+    const paragraphOps = collapseSplitQuotes(resTextArr);
 
     const preparedForm = {};
     for (let fieldToShow of fieldsToShow) {
@@ -374,11 +419,19 @@ const AddEditTurnPopup = () => {
         )
       : [];
 
+    // Превью принадлежит видео: без видео (или после его замены) уходит пустым.
+    const videoUrl = preparedForm[FIELD_VIDEO];
+    const previewDraft =
+      videoUrl && form.videoPreviewDraft?.forUrl === videoUrl
+        ? form.videoPreviewDraft
+        : null;
+
     let turnObj = {
       ...preparedForm,
       paragraph: paragraphOps,
       contentType: activeTemplate,
       quotes: [...quotes],
+      videoPreview: (videoUrl && form.videoPreview) || null,
     };
 
     // Таймлайн видео/аудио лежит не в `quotes`, а отдельным полем хода, и его
@@ -425,6 +478,7 @@ const AddEditTurnPopup = () => {
       isNew: !turnToEdit,
       lineIdsToDelete: linesToDelete.map((line) => line._id),
       quoteKeysDeleted: quotesDeleted.map(quoteKey),
+      previewDraft,
     };
 
     // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
@@ -463,6 +517,13 @@ const AddEditTurnPopup = () => {
 
     setForm((prevForm) => ({ ...prevForm, [field]: value }));
   };
+
+  // Несколько полей разом; patch — объект или функция от прежней формы.
+  const patchForm = (patch) =>
+    setForm((prevForm) => ({
+      ...prevForm,
+      ...(typeof patch === 'function' ? patch(prevForm) : patch),
+    }));
 
   if (Component) {
     return (
@@ -623,6 +684,7 @@ const AddEditTurnPopup = () => {
                       value={form[field] || ''}
                       widgetSettings={fieldSettings[field].widgetSettings}
                       form={form}
+                      patchForm={patchForm}
                     />
                   );
                 })}
@@ -670,6 +732,7 @@ const AddEditTurnPopup = () => {
             <button
               className="btn btn-primary btn-accent"
               data-test-id={TID.addTurn.save}
+              disabled={savingPreview}
               onClick={(e) => saveHandler(e)}
             >
               Save

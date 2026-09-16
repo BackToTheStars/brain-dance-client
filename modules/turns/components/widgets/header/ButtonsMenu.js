@@ -18,6 +18,7 @@ import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
 import { TID } from '@/config/testIds';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
@@ -25,6 +26,8 @@ const ButtonsMenu = ({ _id }) => {
   const turnGeometry = useSelector((state) => state.turns.g[_id]);
   const gameHash = useSelector((state) => state.game.game?.hash);
   const editorPanelWidth = useSelector(getEditorPanelWidth);
+  const following = useSelector(selectFollowing);
+  const canEdit = can(RULE_TURNS_CRUD) && !following;
 
   const handleCut = (e) => {
     e.preventDefault();
@@ -105,7 +108,7 @@ const ButtonsMenu = ({ _id }) => {
       >
         <CopyIcon />
       </a>
-      {can(RULE_TURNS_CRUD) && (
+      {canEdit && (
         <a
           key="edit"
           className="edit-btn"
@@ -115,7 +118,7 @@ const ButtonsMenu = ({ _id }) => {
           <EditIcon />
         </a>
       )}
-      {can(RULE_TURNS_CRUD) && (
+      {canEdit && (
         <a
           key="cut"
           className="cut-btn"
@@ -125,7 +128,7 @@ const ButtonsMenu = ({ _id }) => {
           <ScissorIcon />
         </a>
       )}
-      {can(RULE_TURNS_CRUD) && (
+      {canEdit && (
         <a
           key="delete"
           className="delete-btn"

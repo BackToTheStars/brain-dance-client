@@ -174,7 +174,7 @@ const YoutubeBlock = ({ turn, busy, setBusy, onRelocated, onError }) => {
       <Alert
         type="warning"
         showIcon
-        message="Перенос YouTube заморожен"
+        title="Перенос YouTube заморожен"
         description="YouTube требует прохождения антибот-проверки, поэтому запрос почти наверняка ответит ошибкой («Sign in to confirm you're not a bot»). Кнопки оставлены намеренно: это заморозка, а не удаление функции. Прямые файлы (картинка, аудио, pdf, превью) переносятся как обычно."
       />
 
@@ -334,7 +334,7 @@ const MediaBlock = ({ turn, setTurn }) => {
         </div>
       )}
 
-      {!!error && <Alert type="error" showIcon message={error} />}
+      {!!error && <Alert type="error" showIcon title={error} />}
 
       {!!results && (
         <div className="border border-solid border-gray-300 rounded-md p-2">
@@ -475,7 +475,7 @@ const VideoPreviewBlock = ({ turn, setTurn }) => {
         <Alert
           type="error"
           showIcon
-          message={error}
+          title={error}
           data-test-id={TID.adminTurn.videoPreviewError}
         />
       )}
@@ -499,7 +499,7 @@ const TurnDetail = () => {
   if (loadError) {
     return (
       <div className="mt-2">
-        <Alert type="error" showIcon message={loadError} />
+        <Alert type="error" showIcon title={loadError} />
       </div>
     );
   }

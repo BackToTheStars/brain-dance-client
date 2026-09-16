@@ -374,7 +374,7 @@ export const Turn = memo(({ id }) => {
 
   // RESIZABLE
   useEffect(() => {
-    if (resizeDisabled) return;
+    if (resizeDisabled || following) return;
     if (typeof $ === 'undefined') return;
 
     $(wrapper.current).resizable({
@@ -401,7 +401,7 @@ export const Turn = memo(({ id }) => {
     return () => {
       $(wrapper.current).resizable('destroy');
     };
-  }, [resizeDisabled, widgets]);
+  }, [resizeDisabled, widgets, following]);
 
   useEffect(() => {
     if (!wrapper.current) return;

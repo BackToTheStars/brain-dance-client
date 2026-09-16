@@ -188,7 +188,7 @@ const StorageTab = () => {
           <Alert
             type="error"
             showIcon
-            message={limitsError}
+            title={limitsError}
             data-test-id={TID.adminStorage.limitsError}
           />
         )}
@@ -225,7 +225,7 @@ const StorageTab = () => {
         <Alert
           type="error"
           showIcon
-          message={error}
+          title={error}
           data-test-id={TID.adminStorage.error}
         />
       )}

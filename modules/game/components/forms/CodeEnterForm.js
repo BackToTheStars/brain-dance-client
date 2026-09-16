@@ -10,6 +10,7 @@ import {
   useUserContext,
 } from '@/modules/user/contexts/UserContext';
 import { reconnectWithNewAccess } from '@/modules/presence/redux/actions';
+import { addGameCode, loadSettings } from '@/modules/settings/redux/actions';
 import { TID } from '@/config/testIds';
 import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
 
@@ -30,12 +31,23 @@ const CodeEnterForm = ({ hash }) => {
     getGameUserTokenRequest(accessCode, userNickname).then((data) => {
       if (data.success) {
         const { info, token } = data;
+        // На холсте список игр в store не загружен, а addGameCode пишет его в
+        // хранилище целиком — без loadSettings сохранённые игры стёрлись бы.
+        dispatch(loadSettings());
+        dispatch(
+          addGameCode({
+            hash: info.hash,
+            nickname: info.nickname,
+            role: info.role,
+            code: info.code,
+          }),
+        );
         if (info.hash !== hash) {
           saveGameInfo(info.hash, { info, token });
           setOtherGameHash(info.hash);
           return;
         }
-        setGameInfoIntoStorage(hash, {
+        setGameInfoIntoStorage(info.hash, {
           info,
           token,
         });

@@ -246,7 +246,7 @@ const YoutubeTab = () => {
         <Alert
           type="error"
           showIcon
-          message={error}
+          title={error}
           data-test-id={TID.adminYoutube.error}
         />
       )}

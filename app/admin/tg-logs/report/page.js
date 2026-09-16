@@ -58,7 +58,7 @@ function ChatReportPage() {
       <div className="mx-auto w-[1000px]">
         <div style={{ padding: '16px' }}>
           <h2>Chat report for chatId: {chatId}</h2>
-          <Space direction="vertical" style={{ marginBottom: 16 }}>
+          <Space orientation="vertical" style={{ marginBottom: 16 }}>
             <StartDateFilter
               startDate={startDate}
               endDate={endDate}

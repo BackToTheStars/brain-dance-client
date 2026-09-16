@@ -102,7 +102,7 @@ const MediaRelocateTab = () => {
 
   return (
     <div className="flex flex-col gap-3" data-test-id={TID.adminRelocate.root}>
-      {!!listError && <Alert type="error" showIcon message={listError} />}
+      {!!listError && <Alert type="error" showIcon title={listError} />}
       <div className="flex gap-2 items-center">
         <Input
           className="w-64"

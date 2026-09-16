@@ -9,6 +9,7 @@ const FormInput = ({
   value,
   widgetSettings = {},
   form,
+  patchForm,
 }) => {
   const testId = prefixClass ? TID.addTurn.field(prefixClass) : undefined;
   return (
@@ -17,6 +18,7 @@ const FormInput = ({
         {inputType === 'component' &&
           widgetSettings.render({
             form,
+            patchForm,
             changeHandler,
             label,
             prefixClass,

@@ -5,15 +5,7 @@ import TurnPreviewWrapper from './turnPreview/Wrapper';
 import TurnPreviewRoller from './turnPreview/Roller';
 import TurnPreviewAudio from './turnPreview/Audio';
 import TurnImage from './TurnImage';
-
-const getVideoImg = (videoUrl) => {
-  if (videoUrl.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-    const videoId = videoUrl.split('v=')[1] || videoUrl.split('/').at(-1);
-    return `https://img.youtube.com/vi/${videoId}/0.jpg`;
-  } else {
-    return '/img/video-default.png';
-  }
-};
+import { getTurnPreviewSrc } from '../../utils/turnPreview';
 
 const TurnCard = ({ id }) => {
   const turn = useSelector((s) => s.lobby.dTurns[id]);
@@ -27,6 +19,7 @@ const TurnCard = ({ id }) => {
     header,
     imageUrl,
     videoUrl,
+    videoPreview,
     audioUrl,
     paragraph,
     contentType,
@@ -42,11 +35,10 @@ const TurnCard = ({ id }) => {
     text = `${text.slice(0, space === -1 ? 350 : space)} ...`;
   }
 
-  const imageSrc = useMemo(() => {
-    if (imageUrl) return imageUrl;
-    if (videoUrl) return getVideoImg(videoUrl);
-    return null;
-  }, [imageUrl, videoUrl]);
+  const imageSrc = useMemo(
+    () => getTurnPreviewSrc({ imageUrl, videoUrl, videoPreview }),
+    [imageUrl, videoUrl, videoPreview],
+  );
 
   const textStyle = useMemo(() => {
     return {

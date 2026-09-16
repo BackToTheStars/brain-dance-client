@@ -364,7 +364,7 @@ const FilesTab = () => {
         <Alert
           type="error"
           showIcon
-          message={error}
+          title={error}
           data-test-id={TID.adminFiles.error}
         />
       )}

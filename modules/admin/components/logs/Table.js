@@ -71,7 +71,7 @@ const AdminLogsTable = ({ onDetailsClick = () => {} }) => {
   return (
     <>
       {!!error && (
-        <Alert className="mb-3" type="error" showIcon message={error} />
+        <Alert className="mb-3" type="error" showIcon title={error} />
       )}
       <Table
         columns={columnsWithActions}

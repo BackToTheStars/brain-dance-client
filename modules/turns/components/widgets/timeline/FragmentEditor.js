@@ -222,7 +222,7 @@ const FragmentEditor = ({
               tooltip={{
                 formatter: getFormattedDuration,
               }}
-              onAfterChange={(value) => {
+              onChangeComplete={(value) => {
                 setCurrentSelection(value);
               }}
             />
@@ -286,7 +286,7 @@ const FragmentEditor = ({
       <div className="flex-1 overflow-y-auto pt-2 pl-2">
         <Timeline
           onClick={(e) => {
-            if (e.target.classList.contains('ant-timeline-item-head')) {
+            if (e.target.classList.contains('ant-timeline-item-icon')) {
               const fragmentId = e.target
                 .closest('.ant-timeline-item')
                 .querySelector('.editable-fragment, .inactive-fragment')
@@ -316,7 +316,7 @@ const FragmentEditor = ({
             fragment.active
               ? {
                   key: fragment.id,
-                  children: (
+                  content: (
                     <EditableFragment
                       turnId={turnId}
                       withLine={dQuotesWithLines[fragment.id]}
@@ -356,7 +356,7 @@ const FragmentEditor = ({
                 }
               : {
                   key: fragment.id,
-                  children: <InactiveFragment fragment={fragment} />,
+                  content: <InactiveFragment fragment={fragment} />,
                 },
           )}
         />

@@ -683,11 +683,11 @@
         }
 
         .ant-timeline {
-          .ant-timeline-item-tail {
+          .ant-timeline-item-rail {
             background-color: var(--turn-border-color);
           }
 
-          .ant-timeline-item-head {
+          .ant-timeline-item-icon {
             cursor: pointer;
             transition: transform 0.2s;
 
@@ -738,35 +738,35 @@
           padding-bottom: 0px;
         }
 
-        .ant-timeline-item .ant-timeline-item-head {
+        .ant-timeline-item .ant-timeline-item-icon {
           border-color: gray;
         }
 
-        .ant-timeline-item .ant-timeline-item-tail {
+        .ant-timeline-item .ant-timeline-item-rail {
           background-color: gray;
         }
 
-        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-tail {
+        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-rail {
           background-color: var(--fragment-editable-color);
         }
 
-        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-head {
+        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-icon {
           border-color: var(--fragment-editable-color);
         }
 
-        .ant-timeline-item:has(.editable-fragment)+.ant-timeline-item .ant-timeline-item-head {
+        .ant-timeline-item:has(.editable-fragment)+.ant-timeline-item .ant-timeline-item-icon {
           border-color: var(--fragment-editable-color);
         }
 
-        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-tail {
+        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-rail {
           background-color: red;
         }
 
-        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-head {
+        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-icon {
           border-color: red;
         }
 
-        .ant-timeline-item:has(.editable-fragment.selected)+.ant-timeline-item .ant-timeline-item-head {
+        .ant-timeline-item:has(.editable-fragment.selected)+.ant-timeline-item .ant-timeline-item-icon {
           border-color: red;
         }
 

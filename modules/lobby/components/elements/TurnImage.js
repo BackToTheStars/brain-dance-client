@@ -9,7 +9,12 @@ import {
 const FALLBACK_SRC = '/img/video-default.png';
 const NEAR_VIEWPORT = '300px';
 
-const TurnImage = ({ src }) => {
+const TurnImage = ({
+  src,
+  alt = '#',
+  wrapperClassName = 'base-card__widget',
+  imgClassName = 'w-full h-auto rounded',
+}) => {
   const boxRef = useRef(null);
   const releaseRef = useRef(null);
   const timerRef = useRef(null);
@@ -75,7 +80,7 @@ const TurnImage = ({ src }) => {
   return (
     <div
       ref={boxRef}
-      className="base-card__widget"
+      className={wrapperClassName}
       data-test-id={TID.lobbyTurn.image}
       data-image-state={loaded ? 'loaded' : shownSrc ? 'loading' : 'idle'}
       // место под миниатюру держим до загрузки, иначе лента прыгает при подстановке
@@ -84,9 +89,9 @@ const TurnImage = ({ src }) => {
       {!!shownSrc && (
         <img
           src={shownSrc}
-          alt="#"
+          alt={alt}
           loading="lazy"
-          className="w-full h-auto rounded"
+          className={imgClassName}
           onLoad={onSettled}
           onError={onFailed}
         />

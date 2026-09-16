@@ -181,6 +181,7 @@ export class TurnHelper {
       header: turn.dWidgets.h_1.text,
       imageUrl: turn.dWidgets.i_1.url,
       videoUrl: turn.dWidgets.v_1.url,
+      videoPreview: turn.dWidgets.v_1.preview,
       videoQuotes: turn.dWidgets.vq_1
         ? {
             duration: turn.dWidgets.vq_1.duration,

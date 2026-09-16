@@ -56,7 +56,7 @@ const AdminGameDetails = ({ game }) => {
                 className="mt-2"
                 type="error"
                 showIcon
-                message={deleteError}
+                title={deleteError}
                 data-test-id={TID.adminGames.deleteError}
               />
             )}

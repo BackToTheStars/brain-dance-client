@@ -3,15 +3,9 @@ import { useTranslations } from 'next-intl';
 import { ContentButton as Button } from '@/ui/button';
 import { useMainLayoutContext } from '../layout/MainLayoutContext';
 import { getGameUrl } from '../../utils/url';
-
-const getVideoImg = (url) => {
-  if (url.match(/^(http[s]?:\/\/|)(www.|)youtu(.be|be.com)\//)) {
-    const newVideoUrl = url.split('=')[1];
-    return `https://img.youtube.com/vi/${newVideoUrl}/0.jpg`;
-  } else {
-    return '';
-  }
-};
+import { getTurnPreviewSrc } from '../../utils/turnPreview';
+import TurnImage from '../elements/TurnImage';
+import { TID } from '@/config/testIds';
 
 const limitLine = (line) => {
   return {
@@ -31,15 +25,15 @@ const TurnModal = ({ params }) => {
   const turn = useSelector((s) => s.lobby.dTurns[id]);
   const game = useSelector((s) => s.lobby.dGames[turn?.gameId]);
   const t = useTranslations('Lobby.game');
-  const { header, imageUrl, videoUrl, paragraph, date, contentType, width } =
-    turn || {};
+  const { header, paragraph, date } = turn || {};
   const newDate = new Date(date);
   const text = (paragraph && paragraph[0]?.insert) || null;
-  const videoImg = getVideoImg(videoUrl || '');
+  const previewSrc = getTurnPreviewSrc(turn);
   return (
     <div
       style={{ width: `${sliderWidth}px` }}
       className="dark:bg-dark-light bg-light flex flex-col rounded self-start h-auto"
+      data-test-id={TID.lobbyTurn.modal}
     >
       <div className="bg-main-dark rounded-t p-4">
         {!!header && <h2 style={limitLine(2)}>{header}</h2>}
@@ -48,18 +42,12 @@ const TurnModal = ({ params }) => {
         )}
       </div>
       <div className="w-full h-auto">
-        {!!imageUrl && (
-          <img
-            src={imageUrl}
-            className="w-full h-auto object-contain object-center"
+        {!!previewSrc && (
+          <TurnImage
+            src={previewSrc}
             alt={`${header}`}
-          />
-        )}
-        {!!videoImg && (
-          <img
-            src={videoImg}
-            className="w-full h-auto object-contain object-center"
-            alt={`${header}`}
+            wrapperClassName=""
+            imgClassName="w-full h-auto object-contain object-center"
           />
         )}
       </div>

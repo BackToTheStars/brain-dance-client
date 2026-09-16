@@ -157,8 +157,10 @@ export const TID = {
   // Лобби: миниатюра карточки ленты (modules/lobby/components/elements/TurnImage.js).
   // Обёртка держит место под картинку; data-image-state: idle (запроса ещё нет) |
   // loading (адрес подставлен) | loaded. Заглушка — /img/video-default.png
+  // Та же миниатюра стоит в слайдере хода (sliderModals/TurnModal.js), корень — modal.
   lobbyTurn: {
     image: 'turn-card-image',
+    modal: 'turn-modal',
   },
 
   // Лобби: слайдер игры (modules/lobby/components/sliderModals/GameModal.js)
@@ -205,9 +207,17 @@ export const TID = {
     row: 'admin-logs-row', // строка таблицы
   },
 
-  // Админка: вкладки Scripts и Media relocate — только корень вкладки,
-  // действия внутри не размечены намеренно
-  adminScripts: { root: 'admin-scripts-root' },
+  // Админка, вкладка Scripts (tabs/Scripts.js): команда с флагом confirm спрашивает
+  // нативный confirm() до запуска, ответ success: false — Alert type="error"
+  adminScripts: {
+    root: 'admin-scripts-root',
+    command: 'admin-script-command', // кнопка команды (+ data-script, data-command)
+    param: 'admin-script-param', // <input> параметра (+ data-param)
+    execute: 'admin-script-execute',
+    error: 'admin-script-error',
+    result: 'admin-script-result', // <pre> с ответом
+  },
+  // Админка: вкладка Media relocate — только корень, действия внутри не размечены намеренно
   adminRelocate: { root: 'admin-relocate-root' },
 
   // Админка, вкладка Files: таблица файлов media (прокси `/admin/media/files`).
@@ -315,6 +325,20 @@ export const TID = {
     split: 'add-turn-split',
     fontDec: 'add-turn-font-dec',
     fontInc: 'add-turn-font-inc',
+  },
+
+  // Форма хода: блок превью под полем Video URL у видео не с YouTube
+  // (modules/turns/components/forms/VideoPreviewBlock.js). Кадр живёт в памяти и уходит
+  // в media при Save формы; своя картинка загружается сразу, как у поля картинки.
+  videoPreview: {
+    root: 'video-preview', // + data-frames="true|false": есть ли плеер для кадра
+    current: 'video-preview-current', // <img> + data-source="draft|saved|default", data-frame-seconds у кадра
+    player: 'video-preview-player', // <video controls>: файл из дропзоны или видео своей media
+    seconds: 'video-preview-seconds', // InputNumber, секунды кадра
+    take: 'video-preview-take', // «Take frame»
+    capturing: 'video-preview-capturing', // «Taking a frame…»
+    custom: 'video-preview-custom', // обёртка дропзоны своей картинки (upload.dropzone, data-upload-type="images")
+    error: 'video-preview-error',
   },
 
   // Панель вставки хода из буфера (modules/panels/components/PasteTurnPanel.js):
