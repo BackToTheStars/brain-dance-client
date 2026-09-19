@@ -25,20 +25,23 @@ const TurnPreviewRoller = ({ turn }) => {
     <div className="base-card__roller" style={rollerStyle}>
       {game?.name && <div className="mb-2">{game.name}</div>}
       <div className="flex gap-2">
-        <Button
-          size="sm"
-          onClick={() =>
-            dispatch(
-              toggleSliderModal(SLIDER_MODAL_GAME, {
-                hash: game.hash,
-                // контекст хода: «Open game» слайдера игры откроет холст на нём
-                turnId: turn._id,
-              }),
-            )
-          }
-        >
-          {t('Game_info')}
-        </Button>
+        {/* игру без адреса слайдеру нечем найти: он ищет её по адресу */}
+        {!!game?.hash && (
+          <Button
+            size="sm"
+            onClick={() =>
+              dispatch(
+                toggleSliderModal(SLIDER_MODAL_GAME, {
+                  hash: game.hash,
+                  // контекст хода: «Open game» слайдера игры откроет холст на нём
+                  turnId: turn._id,
+                }),
+              )
+            }
+          >
+            {t('Game_info')}
+          </Button>
+        )}
         <Button
           size="sm"
           onClick={() =>

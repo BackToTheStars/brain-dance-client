@@ -315,7 +315,7 @@ const fieldSettings = {
     special: true,
     inputType: 'component',
     widgetSettings: {
-      render: ({ changeHandler, label, prefixClass, value, form }) => {
+      render: ({ changeHandler, label, prefixClass, value, form, edition }) => {
         return (
           <>
             <Input
@@ -328,6 +328,7 @@ const fieldSettings = {
             />
             <FileUploading
               changeHandler={changeHandler}
+              edition={edition}
               fileTypeLabel="an image"
               uploadType="images"
               accept={UPLOAD_ACCEPT.images}
@@ -390,7 +391,7 @@ const fieldSettings = {
     special: true,
     inputType: 'component',
     widgetSettings: {
-      render: ({ changeHandler, label, prefixClass, value, form }) => {
+      render: ({ changeHandler, label, prefixClass, value, form, edition }) => {
         return (
           <>
             <Input
@@ -403,6 +404,7 @@ const fieldSettings = {
             />
             <FileUploading
               changeHandler={changeHandler}
+              edition={edition}
               fileTypeLabel="an audio"
               uploadType="audios"
               accept={UPLOAD_ACCEPT.audios}
@@ -421,7 +423,7 @@ const fieldSettings = {
     special: true,
     inputType: 'component',
     widgetSettings: {
-      render: ({ changeHandler, label, prefixClass, value }) => {
+      render: ({ changeHandler, label, prefixClass, value, edition }) => {
         return (
           <>
             <Input
@@ -436,6 +438,7 @@ const fieldSettings = {
                 браузер читает PDF сам, и внешний файл без заголовков не откроется. */}
             <FileUploading
               changeHandler={changeHandler}
+              edition={edition}
               fileTypeLabel="a pdf"
               uploadType="pdfs"
               accept={UPLOAD_ACCEPT.pdfs}

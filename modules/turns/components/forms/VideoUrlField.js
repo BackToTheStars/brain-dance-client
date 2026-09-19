@@ -29,6 +29,7 @@ const VideoUrlField = ({
   form,
   patchForm,
   changeHandler,
+  edition,
   acceptVideos,
   acceptImages,
   uploadVideo,
@@ -39,6 +40,16 @@ const VideoUrlField = ({
   const [local, setLocal] = useState(null);
   const localRef = useRef(null);
   const [capture, setCapture] = useState(IDLE);
+  // Побеждает последний выбор превью: своя картинка, новый кадр или другое видео
+  // отменяют ещё не пришедший результат предыдущего.
+  const choiceRef = useRef(0);
+  const beginChoice = () => (choiceRef.current += 1);
+  const isChoice = (choice) => choiceRef.current === choice;
+  // Адрес с media относится к тому файлу, который в форме сейчас: пока media
+  // отвечала, ссылку могли ввести руками.
+  const uploadingIdRef = useRef(null);
+  const valueRef = useRef(value);
+  valueRef.current = value;
 
   const replaceLocal = (next) => {
     if (localRef.current) URL.revokeObjectURL(localRef.current.url);
@@ -53,7 +64,18 @@ const VideoUrlField = ({
     [],
   );
 
+  // Форму перевели на другой ход — файл прежней формы к нему не относится.
+  const editionToken = edition ? edition.token() : 0;
+  useEffect(() => {
+    beginChoice();
+    uploadingIdRef.current = null;
+    replaceLocal(null);
+    setCapture(IDLE);
+  }, [editionToken]);
+
   const onUrlInput = (next) => {
+    beginChoice();
+    uploadingIdRef.current = null;
     replaceLocal(null);
     setCapture(IDLE);
     changeHandler(next);
@@ -72,17 +94,19 @@ const VideoUrlField = ({
       src: null,
       savedAtDrop: form.videoPreview || '',
     };
+    const choice = beginChoice();
+    uploadingIdRef.current = next.id;
     replaceLocal(next);
     setCapture({ busy: true, error: null });
     patchForm({ videoPreviewDraft: null, videoPreviewError: null });
     captureVideoFrame(next.url, FRAME_DEFAULT_SECONDS)
       .then((frame) => {
-        if (localRef.current?.id !== next.id) return;
+        if (!isChoice(choice) || localRef.current?.id !== next.id) return;
         patchForm({ videoPreviewDraft: toDraft(frame, localRef.current) });
         setCapture(IDLE);
       })
       .catch((err) => {
-        if (localRef.current?.id !== next.id) return;
+        if (!isChoice(choice) || localRef.current?.id !== next.id) return;
         setCapture({ busy: false, error: err?.code || 'decode' });
       });
   };
@@ -91,19 +115,17 @@ const VideoUrlField = ({
   // старое видео — и старое превью при нём.
   const onUploaded = (src) => {
     const current = localRef.current;
+    if (!current || current.id !== uploadingIdRef.current) return;
+    uploadingIdRef.current = null;
     changeHandler(src);
-    if (current && !current.src) {
-      const updated = { ...current, src };
-      localRef.current = updated;
-      setLocal(updated);
-    }
+    const updated = { ...current, src };
+    localRef.current = updated;
+    setLocal(updated);
     patchForm((prev) => ({
       videoPreview:
-        current && prev.videoPreview !== current.savedAtDrop
-          ? prev.videoPreview
-          : '',
+        prev.videoPreview !== current.savedAtDrop ? prev.videoPreview : '',
       videoPreviewDraft:
-        current && prev.videoPreviewDraft?.localId === current.id
+        prev.videoPreviewDraft?.localId === current.id
           ? { ...prev.videoPreviewDraft, forUrl: src }
           : prev.videoPreviewDraft,
     }));
@@ -111,7 +133,8 @@ const VideoUrlField = ({
 
   const onUploadFailed = () => {
     const current = localRef.current;
-    if (!current || current.src) return;
+    if (!current || current.id !== uploadingIdRef.current) return;
+    uploadingIdRef.current = null;
     replaceLocal(null);
     setCapture(IDLE);
     patchForm((prev) => ({
@@ -129,8 +152,15 @@ const VideoUrlField = ({
       ? value
       : null;
 
-  const onFrame = (frame) => {
-    const source = localIsCurrent ? local : { name: value, src: value };
+  // Кадр снят после ожидания: источник берётся живой, а не тот, что был на клике —
+  // за это время загрузка файла могла дойти и дать ему адрес на media.
+  const onFrame = (frame, choice) => {
+    if (!isChoice(choice)) return;
+    const current = localRef.current;
+    const source =
+      current && (!current.src || current.src === valueRef.current)
+        ? current
+        : { name: valueRef.current, src: valueRef.current };
     setCapture(IDLE);
     patchForm({
       videoPreviewDraft: toDraft(frame, source),
@@ -138,12 +168,14 @@ const VideoUrlField = ({
     });
   };
 
-  const onCustom = (src) =>
+  const onCustom = (src) => {
+    beginChoice();
     patchForm({
       videoPreview: src,
       videoPreviewDraft: null,
       videoPreviewError: null,
     });
+  };
 
   const draft = form.videoPreviewDraft;
   const shownDraft =
@@ -170,6 +202,7 @@ const VideoUrlField = ({
         changeHandler={onUploaded}
         onStart={onUploadStart}
         onFailed={onUploadFailed}
+        edition={edition}
         fileTypeLabel="a video"
         uploadType="videos"
         accept={acceptVideos}
@@ -184,8 +217,10 @@ const VideoUrlField = ({
           saved={saved}
           capture={capture}
           saveError={form.videoPreviewError}
+          beginFrame={beginChoice}
           onFrame={onFrame}
           onCustom={onCustom}
+          edition={edition}
           acceptImages={acceptImages}
           uploadImage={uploadImage}
         />

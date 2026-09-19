@@ -8,6 +8,8 @@ import {
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import { TID } from '@/config/testIds';
 import Panels from '@/modules/panels/components/Panels';
+import { resetAndExit } from '@/modules/panels/redux/actions';
+import { MODE_GAME } from '@/config/panel';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
 import {
@@ -50,6 +52,7 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const viewport = useSelector((state) => state.game.viewport);
   const following = useSelector(selectFollowing);
   const guideSid = useSelector(selectGuideSid);
+  const panelMode = useSelector((state) => state.panels.mode);
   const linesOnTop = useSelector((state) => state.presence.linesOnTop);
   const toShowContent = useMemo(
     () => [GAME_STAGE_ANIMATED_LOADING, GAME_STAGE_READY].includes(stage),
@@ -140,9 +143,13 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   ]);
 
   // A follower only watches: the edit mode goes off with the subscription, and
-  // a double click does not bring it back until I leave the tour.
+  // a double click does not bring it back until I leave the tour. A widget mode
+  // opened before the subscription goes off with it too — its selection layer
+  // would otherwise stay over the page.
   useEffect(() => {
-    if (following) setIsEditMode(false);
+    if (!following) return;
+    setIsEditMode(false);
+    if (panelMode !== MODE_GAME) dispatch(resetAndExit());
   }, [following]);
 
   useEffect(() => {

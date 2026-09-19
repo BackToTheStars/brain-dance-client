@@ -30,6 +30,7 @@ import PdfMode from './buttons/pdf/PdfMode';
 import PdfQuoteAdd from './buttons/pdf/PdfQuoteAdd';
 import PdfQuoteActive from './buttons/pdf/PdfQuoteActive';
 import PdfCropMode from './buttons/pdf/PdfCropMode';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 
 // Карта строится при рендере, а не при инициализации модуля. Чтение default'ов
 // импортированных режимов на уровне модуля падало в прод-сборке
@@ -55,7 +56,13 @@ const getButtonSettings = () => ({
 
 const ButtonsPanel = () => {
   const mode = useSelector((state) => state.panels.mode);
-  const Component = useMemo(() => getButtonSettings()[mode], [mode]);
+  // Спутнику экскурсии действий режима виджета не даём: в режим цитат его может
+  // завести и обычный просмотровый клик по цитате, а править разметку он не должен.
+  const following = useSelector(selectFollowing);
+  const Component = useMemo(
+    () => getButtonSettings()[following ? MODE_GAME : mode],
+    [mode, following],
+  );
   return <Component />;
 };
 

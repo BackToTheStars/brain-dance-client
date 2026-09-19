@@ -1,7 +1,8 @@
 // const { MODE_WIDGET_PARAGRAPH } = require('@/config/panel');
 const { setPanelMode } = require('@/modules/panels/redux/actions');
-const { useDispatch } = require('react-redux');
+const { useDispatch, useSelector } = require('react-redux');
 const { TID } = require('@/config/testIds');
+const { selectFollowing } = require('@/modules/presence/redux/selectors');
 
 const WidgetEditButton = ({
   turnId,
@@ -10,6 +11,10 @@ const WidgetEditButton = ({
   additionalCallback = () => {},
 }) => {
   const dispatch = useDispatch();
+  // Спутник экскурсии только смотрит: разметку он не начинает — так же, как не
+  // получает «править / вырезать / удалить» на панели карточки.
+  const following = useSelector(selectFollowing);
+  if (following) return null;
   return (
     <a
       className="widget-button"

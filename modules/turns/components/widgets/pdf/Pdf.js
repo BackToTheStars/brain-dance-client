@@ -56,8 +56,8 @@ import PageBar from './PageBar';
 import { getDocumentParams, loadPdfjs } from './pdfLoader';
 import PdfQuotes from './Quotes';
 import { getPageOffsets, getPdfQuotesWithCoords } from './quotesGeometry';
+import { getRenderRatio } from './renderBudget';
 
-const MAX_PIXEL_RATIO = 2; // выше — только расход памяти на canvas
 const PDF_WIDGET_MIN_HEIGHT = 60;
 const PDF_UNBOUNDED_HEIGHT = 100000; // пока документ не загружен, высоту не ограничиваем
 const RENDER_MARGIN = '300px 0px'; // насколько заранее рисуем страницы за границей вьюпорта
@@ -193,13 +193,17 @@ const Pdf = ({
     try {
       const page = await doc.getPage(number);
       if (!isCurrent()) return;
-      const ratio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
       const base = page.getViewport({ scale: 1 });
+      const ratio = getRenderRatio(
+        width,
+        base.height / base.width,
+        window.devicePixelRatio,
+      );
       const viewport = page.getViewport({
         scale: (width * ratio) / base.width,
       });
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
+      canvas.width = Math.max(1, Math.floor(viewport.width));
+      canvas.height = Math.max(1, Math.floor(viewport.height));
       const task = page.render({
         canvasContext: canvas.getContext('2d'),
         viewport,

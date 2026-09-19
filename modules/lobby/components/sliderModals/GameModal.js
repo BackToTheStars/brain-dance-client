@@ -303,13 +303,16 @@ const GameModalContent = memo(({ hash, turnId, closeModal = () => {} }) => {
               {t('Delete_game')}
             </Button>
           )}
-          <Button
-            size="sm"
-            data-test-id={TID.gameModal.open}
-            onClick={() => window.location.assign(getGameUrl(hash, turnId))}
-          >
-            {t('Open_game')}
-          </Button>
+          {/* без адреса игры ссылка вышла бы с undefined */}
+          {!!hash && (
+            <Button
+              size="sm"
+              data-test-id={TID.gameModal.open}
+              onClick={() => window.location.assign(getGameUrl(hash, turnId))}
+            >
+              {t('Open_game')}
+            </Button>
+          )}
         </div>
       </div>
     </>

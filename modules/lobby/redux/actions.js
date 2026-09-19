@@ -125,7 +125,8 @@ export const lobbyEnterGameWithConfirm =
   (dispatch) => {
   return new Promise((resolve, reject) => {
     getGameUserTokenRequest(code, nickname).then((data) => {
-      if (data.success) {
+      // Без адреса игры входить некуда: ссылка и запись доступа вышли бы с undefined.
+      if (data.success && data.info?.hash) {
         resolve();
         const { info, token } = data;
         const { hash, nickname, role, code } = info;
@@ -157,7 +158,7 @@ export const lobbyEnterGameByCode =
   (dispatch) => {
   return new Promise((resolve, reject) => {
     getGameUserTokenRequest(code, nickname).then((data) => {
-      if (data?.success) {
+      if (data?.success && data.info?.hash) {
         const { info, token } = data;
         dispatch(
           addGameCode({

@@ -14,6 +14,7 @@ const FileUploading = ({
   uploadType, // images | videos | audios | pdfs — только для data-upload-type
   onStart = () => {}, // (file) до отправки: поле видео снимает кадр из самого файла
   onFailed = () => {},
+  edition = null, // редакция формы; без неё (вне формы хода) ответ всегда актуален
 }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -25,12 +26,17 @@ const FileUploading = ({
     setError(null);
     setProgress(null);
     setLoading(true);
+    // Пока media отвечает, форму могли закрыть или перевести на другой ход: адрес
+    // файла и ошибка принадлежат той форме, которая начала загрузку.
+    const token = edition?.token();
+    const isCurrent = () => !edition || edition.isCurrent(token);
     onStart(file);
     dispatch(uploadFunc(file, setProgress))
       .then((data) => {
-        changeHandler(data.src);
+        if (isCurrent()) changeHandler(data.src);
       })
       .catch((err) => {
+        if (!isCurrent()) return;
         setError(err?.message || 'Upload failed');
         onFailed(err);
       })

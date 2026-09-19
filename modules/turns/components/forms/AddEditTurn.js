@@ -3,7 +3,7 @@ import {
   getQuoteElements,
   QUOTE_ID_ATTRIBUTE,
 } from '@/modules/turns/components/helpers/quillHelper';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,6 +42,7 @@ import dayjs from 'dayjs';
 import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { TurnHelper } from '../../redux/helpers';
+import { createFormEdition } from '../helpers/formEdition';
 import { TID } from '@/config/testIds';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 
@@ -126,7 +127,16 @@ const AddEditTurnPopup = () => {
   // Подтверждение перед Format: что именно снимется с абзаца (getFormatLoss).
   // null — окна нет, значит и терять было нечего.
   const [formatConfirm, setFormatConfirm] = useState(null);
-  const [savingPreview, setSavingPreview] = useState(false);
+  // Редакция, чей кадр сейчас грузится: Save блокируется только у неё.
+  const [savingPreview, setSavingPreview] = useState(0);
+
+  // Начатый формой ответ применяется только к ней самой: у каждого открытого хода
+  // своя редакция, у закрытой панели актуальной редакции нет.
+  const editionRef = useRef(null);
+  if (!editionRef.current) editionRef.current = createFormEdition();
+  const edition = editionRef.current;
+  edition.open(editTurnId);
+  useEffect(() => () => edition.close(), []);
 
   const dispatch = useDispatch();
 
@@ -172,7 +182,10 @@ const AddEditTurnPopup = () => {
       if (turnToEdit.paragraph) {
         const { quill } = quillConstants;
         quill.setContents(turnToEdit.paragraph);
+        const token = edition.token();
         setTimeout(() => {
+          // за эти 300 мс могли открыть другой ход — его цитатам чужие id не ставим
+          if (!edition.isCurrent(token)) return;
           const paragraphQuotes = turnToEdit.quotes
             ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
             : [];
@@ -216,11 +229,15 @@ const AddEditTurnPopup = () => {
     isNew,
     quoteKeysDeleted = [],
     previewDraft,
+    editionToken,
   }) => {
     let turnObj = preparedTurn;
+    // Форму могли закрыть или перевести на другой ход, пока media отвечала: сам ход
+    // сохраняется (его просили сохранить), а форму трогает только своя редакция.
+    const token = editionToken || edition.token();
     // Кадр живёт в памяти формы и уходит в media один раз — здесь.
     if (previewDraft) {
-      setSavingPreview(true);
+      setSavingPreview(token);
       try {
         const file = dataUrlToFile(
           previewDraft.dataUrl,
@@ -228,14 +245,18 @@ const AddEditTurnPopup = () => {
         );
         const data = await dispatch(uploadMedia('images', file));
         turnObj = { ...turnObj, videoPreview: data.src };
-        patchForm({ videoPreview: data.src, videoPreviewDraft: null });
+        if (edition.isCurrent(token)) {
+          patchForm({ videoPreview: data.src, videoPreviewDraft: null });
+        }
       } catch (err) {
-        patchForm({
-          videoPreviewError: `Preview upload failed: ${err?.message || err}`,
-        });
+        if (edition.isCurrent(token)) {
+          patchForm({
+            videoPreviewError: `Preview upload failed: ${err?.message || err}`,
+          });
+        }
         return;
       } finally {
-        setSavingPreview(false);
+        setSavingPreview((prev) => (prev === token ? 0 : prev));
       }
     }
 
@@ -252,8 +273,11 @@ const AddEditTurnPopup = () => {
 
     const saveCallbacks = {
       // @todo: передавать в виджет через props
+      // Закрывается только та форма, которая сохранялась: иначе поздний ответ
+      // открыл бы закрытую панель или закрыл начатую правку другого хода.
       success: () => {
-        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
+        if (!edition.isCurrent(token)) return;
+        dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
         dispatch(toggleMaximizeQuill(false));
       },
     };
@@ -479,6 +503,7 @@ const AddEditTurnPopup = () => {
       lineIdsToDelete: linesToDelete.map((line) => line._id),
       quoteKeysDeleted: quotesDeleted.map(quoteKey),
       previewDraft,
+      editionToken: edition.token(),
     };
 
     // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
@@ -685,6 +710,7 @@ const AddEditTurnPopup = () => {
                       widgetSettings={fieldSettings[field].widgetSettings}
                       form={form}
                       patchForm={patchForm}
+                      edition={edition}
                     />
                   );
                 })}
@@ -732,7 +758,7 @@ const AddEditTurnPopup = () => {
             <button
               className="btn btn-primary btn-accent"
               data-test-id={TID.addTurn.save}
-              disabled={savingPreview}
+              disabled={edition.isCurrent(savingPreview)}
               onClick={(e) => saveHandler(e)}
             >
               Save

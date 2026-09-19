@@ -29,7 +29,9 @@ const CodeEnterForm = ({ hash }) => {
     e.preventDefault();
     setOtherGameHash('');
     getGameUserTokenRequest(accessCode, userNickname).then((data) => {
-      if (data.success) {
+      // Без адреса игры доступ сохранять некуда: запись ушла бы в ключ
+      // game_undefined, а в настройки — игра без адреса.
+      if (data.success && data.info?.hash) {
         const { info, token } = data;
         // На холсте список игр в store не загружен, а addGameCode пишет его в
         // хранилище целиком — без loadSettings сохранённые игры стёрлись бы.

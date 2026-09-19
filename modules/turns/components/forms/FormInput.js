@@ -10,6 +10,7 @@ const FormInput = ({
   widgetSettings = {},
   form,
   patchForm,
+  edition,
 }) => {
   const testId = prefixClass ? TID.addTurn.field(prefixClass) : undefined;
   return (
@@ -23,6 +24,7 @@ const FormInput = ({
             label,
             prefixClass,
             value,
+            edition,
           })}
         {inputType === 'color-picker' && (
           <Tooltip title={label}>

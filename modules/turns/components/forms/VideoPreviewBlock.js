@@ -26,8 +26,10 @@ const VideoPreviewBlock = ({
   saved,
   capture,
   saveError,
+  beginFrame,
   onFrame,
   onCustom,
+  edition,
   acceptImages,
   uploadImage,
 }) => {
@@ -62,11 +64,14 @@ const VideoPreviewBlock = ({
 
   const takeFrame = async () => {
     const video = playerRef.current;
+    // Кадр снимается не мгновенно: поле принимает его, только если за это время
+    // превью не выбрали иначе.
+    const choice = beginFrame();
     setTaking(true);
     setTakeError(null);
     try {
       video.pause();
-      onFrame(await grabVideoFrame(video, seconds));
+      onFrame(await grabVideoFrame(video, seconds), choice);
     } catch (err) {
       setTakeError(err?.code || 'decode');
     } finally {
@@ -155,6 +160,7 @@ const VideoPreviewBlock = ({
       <div data-test-id={TID.videoPreview.custom}>
         <FileUploading
           changeHandler={onCustom}
+          edition={edition}
           fileTypeLabel="a custom preview image"
           uploadType="images"
           accept={acceptImages}

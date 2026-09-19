@@ -40,22 +40,25 @@ const GameRow = ({ game, index, settings = {} }) => {
         }}
       >
         <div className="game-item__title truncate flex-1">{name}</div>
+        {/* Игра без адреса: открывать и пинить нечего — ссылка вышла бы с undefined */}
         <div className="flex gap-2">
-          <Button
-            className="hover-show"
-            size="sm"
-            data-test-id={TID.lobbyGame.open}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // полный переход, а не router.push: клиентская навигация наследует
-              // очередь запросов лобби и ждёт недостижимые миниатюры ленты
-              window.location.assign(getGameUrl(hash));
-            }}
-          >
-            <DoubleRightOutlined />
-          </Button>
-          {settings.isPinned ? (
+          {!!hash && (
+            <Button
+              className="hover-show"
+              size="sm"
+              data-test-id={TID.lobbyGame.open}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // полный переход, а не router.push: клиентская навигация наследует
+                // очередь запросов лобби и ждёт недостижимые миниатюры ленты
+                window.location.assign(getGameUrl(hash));
+              }}
+            >
+              <DoubleRightOutlined />
+            </Button>
+          )}
+          {!hash ? null : settings.isPinned ? (
             <Button
               size="sm"
               onClick={(e) => {
