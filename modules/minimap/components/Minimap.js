@@ -8,6 +8,9 @@ import { utils } from '@/modules/game/components/helpers/game';
 import FollowerRects from '@/modules/presence/components/FollowerRects';
 
 const BUTTONS_SIZE = 38;
+// Свёрнутая панель — иконка 24 px и поля .percent-map-wrap по 5 px: строка кнопок
+// развёрнутой карты выше, и её высота оставляла сверху и справа пустые 9 px.
+const MINIMIZED_SIZE = 34;
 const STANDARD_SQUARE = 60000;
 const INNER_PADDING = 12;
 
@@ -27,8 +30,8 @@ const Minimap = () => {
     if (isMinimized) {
       dispatch(
         changePanelGeometry(PANEL_MINIMAP, {
-          width: BUTTONS_SIZE,
-          height: BUTTONS_SIZE,
+          width: MINIMIZED_SIZE,
+          height: MINIMIZED_SIZE,
         })
       );
     }

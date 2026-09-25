@@ -25,6 +25,9 @@
   --turn-widget-paragraph-scrollbar-size: 6px;
   --turn-widget-paragraph-scrollbar-padding: 8px;
   --turn-widget-paragraph-padding: 6px;
+  // Отступ ползунка редактора формы хода от правого края панели (обычный режим и
+  // Maximize — один контейнер, поэтому одна переменная на оба)
+  --editor-scrollbar-gutter: 5px;
 
   // PDF — зазор дублирует PDF_PAGE_GAP в config/ui.js (участвует в расчёте
   // максимальной высоты хода)

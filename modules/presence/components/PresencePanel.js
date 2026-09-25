@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   AimOutlined,
   ArrowsAltOutlined,
-  BorderOuterOutlined,
   ClearOutlined,
   CopyOutlined,
   DeleteOutlined,
@@ -16,12 +15,11 @@ import {
   NodeIndexOutlined,
   PlayCircleOutlined,
   PoweroffOutlined,
-  ShareAltOutlined,
   ShrinkOutlined,
   StopOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Input, Switch, Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 
 import {
   CAST_VIEWPORT,
@@ -34,6 +32,8 @@ import { TID } from '@/config/testIds';
 import { ROLE_GAME_OWNER, ROLE_GAME_PLAYER, ROLES } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import Button from '@/modules/panels/components/PanelButton';
+import CursorIcon from '@/modules/ui/icons/CursorIcon';
+import MapIcon from '@/modules/ui/icons/MapIcon';
 import {
   readPresencePanelCollapsed,
   savePresencePanelCollapsed,
@@ -51,6 +51,9 @@ import {
 } from '../redux/actions';
 
 const roleName = (role) => ROLES[role]?.name || `Role ${role}`;
+
+// Свои svg — в пикселях: 14 px это тот же 1em, которым antd рисует свои иконки.
+const ICON_SIZE = 14;
 
 // Tour actions first; the people list opens for choosing a guide and folds
 // while on a tour. Only the heading moves the panel, not its controls. Folded,
@@ -161,8 +164,8 @@ const PresencePanel = () => {
         data-test-id={TID.presence.status}
         data-status={status}
       >
-        <span className="flex items-center gap-2 font-bold">
-          <TeamOutlined /> {!collapsed && <span>People &amp; tours</span>}
+        <span className="font-bold">
+          {!collapsed && <span>People &amp; tours</span>}
         </span>
         <span className="flex items-center gap-3">
           <Tooltip title="Drag to move the panel"><DragOutlined /></Tooltip>
@@ -302,35 +305,25 @@ const PresencePanel = () => {
               </div>
             )}
           </div>
-          <div className="presence-panel__group flex flex-col gap-2">
-            <div className="presence-panel__switch flex items-center gap-2">
-              <Switch
-                id={`${id}-cursor`}
-                size="small"
-                checked={cursorSharing}
-                disabled={!online}
-                onChange={(on) => dispatch(setCursorSharing(on))}
-                data-test-id={TID.presence.cursor}
-                {...hint('Share cursor')}
-              />
-              <label htmlFor={`${id}-cursor`}>
-                {collapsed ? <ShareAltOutlined /> : 'Share cursor'}
-              </label>
-            </div>
-            <div className="presence-panel__switch flex items-center gap-2">
-              <Switch
-                id={`${id}-group`}
-                size="small"
-                checked={groupOnMinimap}
-                disabled={!online}
-                onChange={(on) => dispatch(setGroupOnMinimap(on))}
-                data-test-id={TID.presence.group}
-                {...hint('Group on minimap')}
-              />
-              <label htmlFor={`${id}-group`}>
-                {collapsed ? <BorderOuterOutlined /> : 'Group on minimap'}
-              </label>
-            </div>
+          <div className="presence-panel__group flex flex-wrap">
+            <Button
+              wide
+              icon={<CursorIcon size={ICON_SIZE} />}
+              aria-pressed={cursorSharing}
+              disabled={!online}
+              onClick={() => dispatch(setCursorSharing(!cursorSharing))}
+              data-test-id={TID.presence.cursor}
+              {...hint('Share cursor')}
+            >Share cursor</Button>
+            <Button
+              wide
+              icon={<MapIcon size={ICON_SIZE} />}
+              aria-pressed={groupOnMinimap}
+              disabled={!online}
+              onClick={() => dispatch(setGroupOnMinimap(!groupOnMinimap))}
+              data-test-id={TID.presence.group}
+              {...hint('Group on minimap')}
+            >Group on minimap</Button>
           </div>
         </div>
       ) : (
@@ -390,19 +383,14 @@ const PresencePanel = () => {
               >
                 Leave tour
               </Button>
-              <div className="presence-panel__switch flex items-center gap-2">
-                <Switch
-                  id={`${id}-lines`}
-                  size="small"
-                  checked={linesOnTop}
-                  onChange={(on) => dispatch(setLinesOnTop(on))}
-                  data-test-id={TID.presence.linesOnTop}
-                  {...hint('Lines on top')}
-                />
-                <label htmlFor={`${id}-lines`}>
-                  {collapsed ? <NodeIndexOutlined /> : 'Lines on top'}
-                </label>
-              </div>
+              <Button
+                wide
+                icon={<NodeIndexOutlined />}
+                aria-pressed={linesOnTop}
+                onClick={() => dispatch(setLinesOnTop(!linesOnTop))}
+                data-test-id={TID.presence.linesOnTop}
+                {...hint('Lines on top')}
+              >Lines on top</Button>
             </>
           )}
         </div>

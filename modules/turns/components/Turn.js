@@ -36,6 +36,8 @@ import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { HorizontalSplit } from '@/modules/ui/components/common/HorizontalSplit';
+import { RULE_TURNS_CRUD } from '@/config/user';
+import { useUserContext } from '@/modules/user/contexts/UserContext';
 
 // Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
 // предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
@@ -55,6 +57,10 @@ const TurnAdapter = ({ id }) => {
   // it is still scrolled and played, so the draggable is simply not created
   // rather than disabled — jQuery UI's `disable` would take the pointer away.
   const following = useSelector(selectFollowing);
+  // A viewer (no RULE_TURNS_CRUD) gets the same treatment by role.
+  const { can } = useUserContext();
+  const isViewer = !can(RULE_TURNS_CRUD);
+  const restricted = following || isViewer;
   const { wrapperClasses, wrapperStyles } = useMemo(() => {
     const wrapperStyles = {
       left: `${position.x - (gamePosition.x || 0)}px`,
@@ -66,18 +72,18 @@ const TurnAdapter = ({ id }) => {
     // Without a draggable of its own the card would hand the mousedown to the
     // board, and dragging a card would drag the whole canvas.
     const wrapperClasses = ['stb-react-turn', `turn_${id}`, contentType]
-      .concat(following ? 'not-draggable' : [])
+      .concat(restricted ? 'not-draggable' : [])
       .join(' ');
     return {
       wrapperClasses,
       wrapperStyles,
     };
-  }, [gamePosition, position, width, height, following]);
+  }, [gamePosition, position, width, height, restricted]);
 
   // DRAGGABLE
   useEffect(() => {
     if (typeof $ === 'undefined') return;
-    if (following) return;
+    if (restricted) return;
     $(wrapper.current).draggable({
       // grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
@@ -124,7 +130,7 @@ const TurnAdapter = ({ id }) => {
     });
 
     return () => $(wrapper.current).draggable('destroy');
-  }, [gamePosition, following]);
+  }, [gamePosition, restricted]);
 
   return (
     <div
@@ -146,6 +152,10 @@ export const Turn = memo(({ id }) => {
 
   const turnWidth = useSelector((state) => state.turns.g[id]?.size?.width);
   const following = useSelector(selectFollowing);
+  // A viewer (no RULE_TURNS_CRUD) is blocked the same way as a follower: no
+  // resize, no split handle.
+  const { can } = useUserContext();
+  const restricted = following || !can(RULE_TURNS_CRUD);
 
   const [widgets, setWidgets] = useState([]);
   const wrapper = useRef(null);
@@ -374,7 +384,7 @@ export const Turn = memo(({ id }) => {
 
   // RESIZABLE
   useEffect(() => {
-    if (resizeDisabled || following) return;
+    if (resizeDisabled || restricted) return;
     if (typeof $ === 'undefined') return;
 
     $(wrapper.current).resizable({
@@ -401,7 +411,7 @@ export const Turn = memo(({ id }) => {
     return () => {
       $(wrapper.current).resizable('destroy');
     };
-  }, [resizeDisabled, widgets, following]);
+  }, [resizeDisabled, widgets, restricted]);
 
   useEffect(() => {
     if (!wrapper.current) return;
@@ -476,7 +486,7 @@ export const Turn = memo(({ id }) => {
             turnId={_id}
           />
         )}
-        {!!splitPair && !following && (
+        {!!splitPair && !restricted && (
           <HorizontalSplit
             move={onSplitMove}
             setIsDragging={onSplitDragging}

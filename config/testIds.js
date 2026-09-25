@@ -56,7 +56,8 @@ export const TID = {
   },
 
   // Кнопки действий в игре (GameMode): add-turn, save-field, classes, info,
-  // minimap, lobby, paste-turn
+  // minimap, lobby, paste-turn. У save-field есть data-dirty="true|false" — есть ли
+  // что отправить: изменённая геометрия ходов или позиции прокрутки виджетов.
   gameAction: (name) => `game-action-${name}`,
 
   // Вход в игру по коду (per-game страница)
@@ -146,6 +147,8 @@ export const TID = {
     player: 'media-player', // корень (+ data-turn-id, data-widget-id, data-playing="true|false")
     play: 'media-play', // play/pause
     preview: 'media-preview', // видео: значок на превью, по которому монтируется плеер (Video.js)
+    markup: 'media-markup', // карандаш в тулбаре плеера: вход в разметку цитат; его нет у вьювера
+    // и у спутника экскурсии, а у видео появляется только после монтирования плеера
   },
 
   // Лобби: строка игры в списке (modules/lobby/components/ui/GameRow.js)
@@ -227,7 +230,9 @@ export const TID = {
     reload: 'admin-files-reload',
     reset: 'admin-files-reset',
     error: 'admin-files-error',
-    filter: (name) => `admin-files-filter-${name}`, // type, name, min-size, max-size, dates, game
+    filter: (name) => `admin-files-filter-${name}`, // type, name, min-size, max-size, dates,
+    // game-mode (Radio.Group «любая / без игры / адрес»), game (поле адреса, видно только
+    // при game-mode=«адрес»)
     row: 'admin-files-row', // строка таблицы (+ data-file-id)
     game: 'admin-files-game', // ссылка «адрес игры» в колонке (+ data-game-hash), парой к adminYoutube.game
   },
@@ -279,12 +284,12 @@ export const TID = {
     follower: 'presence-follower', // состояние спутника или вход в экскурсию
     tourLink: 'presence-tour-link', // readOnly-поле со ссылкой-приглашением (ссылка — в value)
     tourCopy: 'presence-tour-copy', // кнопка «Copy» рядом с полем ссылки
-    cursor: 'presence-cursor', // antd Switch «Share cursor» у ведущего
+    cursor: 'presence-cursor', // кнопка панели (PanelButton), aria-pressed: делюсь курсором
     guideCursor: 'presence-guide-cursor', // маркер курсора гида на холсте (+ data-sid, data-nickname)
     pencil: 'presence-pencil', // кнопка панели (PanelButton), aria-pressed: выбран карандаш
     eraser: 'presence-eraser', // кнопка панели (PanelButton), aria-pressed: выбран ластик
-    group: 'presence-group', // antd Switch Group on minimap, aria-checked
-    linesOnTop: 'presence-lines-on-top', // antd Switch «Lines on top» у спутника, aria-checked:
+    group: 'presence-group', // кнопка панели (PanelButton), aria-pressed: группа на мини-карте
+    linesOnTop: 'presence-lines-on-top', // кнопка панели (PanelButton) у спутника, aria-pressed:
     // линии поверх карточек; то же состояние переключает двойной клик по холсту
     drawCapture: 'presence-draw-capture', // слой захвата пера на холсте (+ data-erasing), есть только при включённом «Pencil»
     drawLayer: 'presence-draw-layer', // svg со штрихами внутри #game-box

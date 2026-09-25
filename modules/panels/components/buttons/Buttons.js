@@ -11,8 +11,11 @@ export const Buttons = ({ buttons }) => {
         !!button && (!button.show || button.show()) ? (
           <button
             key={index}
-            className="btn btn-primary"
+            className={`btn btn-primary${button.dirty ? ' btn-primary_dirty' : ''}`}
             data-test-id={button.testId}
+            data-dirty={
+              button.dirty === undefined ? undefined : String(button.dirty)
+            }
             onClick={() => button.callback()}
           >
             {button.text}

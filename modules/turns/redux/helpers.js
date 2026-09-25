@@ -12,11 +12,14 @@ import {
 
 export class TurnHelper {
   static toNewFields(turn) {
+    // Пустой после trim заголовок равен явно выключенному хэдеру; одна точка
+    // решения на h_1 и s_1 — иначе дата и ссылка пропадают совсем.
+    const headerEffectivelyHidden = !!turn.dontShowHeader || !turn.header?.trim();
     const widgets = {
       [WIDGET_HEADER]: [
         {
           id: 'h_1',
-          show: !turn.dontShowHeader,
+          show: !headerEffectivelyHidden,
           text: turn.header,
         },
       ],
@@ -56,7 +59,7 @@ export class TurnHelper {
       [WIDGET_SOURCE]: [
         {
           id: 's_1',
-          show: (!!turn.sourceUrl || !!turn.date) && turn.dontShowHeader,
+          show: (!!turn.sourceUrl || !!turn.date) && headerEffectivelyHidden,
           date: turn.date,
           url: turn.sourceUrl,
         },

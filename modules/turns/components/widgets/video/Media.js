@@ -11,15 +11,19 @@ import {
 import { getFormattedDuration } from '../../helpers/formatters/player';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { MODE_WIDGET_VIDEO } from '@/config/panel';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { VolumeControl, SpeedControl } from './Controls';
 import { TID } from '@/config/testIds';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 
 const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
   const { can } = useUserContext();
+  // Спутник экскурсии только смотрит: разметку не начинает — как и у карандаша
+  // виджета, иначе он войдёт в режим, из которого ему нечем выйти.
+  const following = useSelector(selectFollowing);
   const dispatch = useDispatch();
   const fsRef = useRef(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -120,11 +124,10 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
             {getFormattedDuration(duration)}
           </span>
           <div className="flex-1" />
-          {can(RULE_TURNS_CRUD) && duration > 0
-            && false // TODO: пока нет возможности редактировать цитаты медиа (см. docs/backlog.md)
-            && (
+          {can(RULE_TURNS_CRUD) && !following && duration > 0 && (
             <button
               className="icon-button"
+              data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(

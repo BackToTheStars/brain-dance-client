@@ -21,8 +21,9 @@
   }
 }
 
+// min-height, не height: с фиксированной высотой белый фон обрывался на границе
+// экрана, а контент выше неё рисовался поверх тёмного фона body
 .admin-layout {
-  height: 100vh;
   min-height: 100vh;
   background-color: #fff;
   color: #000;

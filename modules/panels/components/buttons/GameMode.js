@@ -2,6 +2,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { saveField } from '@/modules/game/game-redux/actions';
 import { castSaved } from '@/modules/presence/redux/actions';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { selectFieldDirty } from '@/modules/turns/redux/selectors';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ const GameMode = () => {
   // A follower of a tour only watches: no adding, saving or pasting until they
   // leave the tour (the buttons come back by themselves).
   const following = useSelector(selectFollowing);
+  const fieldDirty = useSelector(selectFieldDirty);
 
   const dispatch = useDispatch();
 
@@ -48,6 +50,7 @@ const GameMode = () => {
     {
       text: 'Save Field',
       testId: TID.gameAction('save-field'),
+      dirty: fieldDirty,
       // The guide of a tour tells the followers that the field is saved — one
       // frame, once both requests of the save are through (castSaved is a
       // no-op for everyone else).

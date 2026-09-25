@@ -25,6 +25,7 @@ import {
   setPanels,
 } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
+import { isTurnGeometryUnsaved } from '@/modules/turns/redux/selectors';
 import { snapRound } from '@/modules/turns/components/helpers/grid';
 import { getGameSettings, updateGameSettings } from './storage';
 import {
@@ -151,26 +152,10 @@ export const saveField = ({ onSaved = null } = {}) => (dispatch, getState) => {
   const hash = state.game.game.hash;
   const g = state.turns.g;
   const gamePosition = state.game.position;
-  const isSnapToGrid = true;
   const scrollPositions = Object.values(state.turns.scrollPositions);
 
   const changedTurns = Object.values(g)
-    .filter((turn) => {
-      if (turn.wasChanged) return true;
-      if (isSnapToGrid) {
-        if (
-          turn.position.x % GRID_CELL_X !== 0 ||
-          turn.position.y % GRID_CELL_X !== 0
-        )
-          return true;
-        if (
-          turn.size.width % GRID_CELL_X !== 0 ||
-          turn.size.height % GRID_CELL_Y !== 0
-        )
-          return true;
-      }
-      return false;
-    })
+    .filter(isTurnGeometryUnsaved)
     .map((turn) => {
       return {
         _id: turn._id,

@@ -4,6 +4,7 @@ import {
   DatePicker,
   Input,
   InputNumber,
+  Radio,
   Select,
   Space,
   Table,
@@ -59,9 +60,14 @@ const formatDate = (value) =>
 const humanName = (record) =>
   record.originalname || record.title || record.originalUrl || null;
 
+// «Любая» ничего не передаёт, «без игры» шлёт withoutGame=1, «адрес» — game;
+// вместе сервер их отвергает (400), поэтому клиент собирает только один.
+const GAME_MODE = { ANY: 'any', WITHOUT: 'without', ADDRESS: 'address' };
+
 const emptyFilters = {
   type: [],
   name: '',
+  gameMode: GAME_MODE.ANY,
   game: '',
   minSize: null,
   maxSize: null,
@@ -73,7 +79,8 @@ const emptyFilters = {
 const toQuery = (filters, sort, order, page, limit) => ({
   type: filters.type.join(','),
   name: filters.name.trim(),
-  game: filters.game.trim(),
+  game: filters.gameMode === GAME_MODE.ADDRESS ? filters.game.trim() : '',
+  withoutGame: filters.gameMode === GAME_MODE.WITHOUT ? 1 : '',
   minSize: filters.minSize,
   maxSize: filters.maxSize,
   from: filters.dates?.[0] ? filters.dates[0].startOf('day').toISOString() : '',
@@ -311,15 +318,29 @@ const FilesTab = () => {
           onPressEnter={applyFilters}
           data-test-id={TID.adminFiles.filter('name')}
         />
-        <Input
-          placeholder="Адрес игры"
-          className="w-[160px]"
-          allowClear
-          value={draft.game}
-          onChange={(e) => setDraft({ ...draft, game: e.target.value })}
-          onPressEnter={applyFilters}
-          data-test-id={TID.adminFiles.filter('game')}
-        />
+        <span className="text-gray-500">Игра:</span>
+        <Radio.Group
+          optionType="button"
+          buttonStyle="solid"
+          value={draft.gameMode}
+          onChange={(e) => setDraft({ ...draft, gameMode: e.target.value })}
+          data-test-id={TID.adminFiles.filter('game-mode')}
+        >
+          <Radio.Button value={GAME_MODE.ANY}>любая</Radio.Button>
+          <Radio.Button value={GAME_MODE.WITHOUT}>без игры</Radio.Button>
+          <Radio.Button value={GAME_MODE.ADDRESS}>адрес</Radio.Button>
+        </Radio.Group>
+        {draft.gameMode === GAME_MODE.ADDRESS && (
+          <Input
+            placeholder="6 hex-символов — в таблице показан ссылкой"
+            className="w-[220px]"
+            allowClear
+            value={draft.game}
+            onChange={(e) => setDraft({ ...draft, game: e.target.value })}
+            onPressEnter={applyFilters}
+            data-test-id={TID.adminFiles.filter('game')}
+          />
+        )}
         {/* ширина стилем, а не классом: у InputNumber внутренняя обёртка
             перебивает утилиту, и подпись обрезается до «Размер …» */}
         <InputNumber
@@ -369,31 +390,35 @@ const FilesTab = () => {
         />
       )}
 
-      {/* test-id на обёртке, а не на <Table>: antd раскладывает свои пропсы
+      {/* На отказе сервера — только текст ошибки выше, без пустой таблицы под ним
+          (тот же приём, что у Storage: `{!error && <Table .../>}`).
+          test-id на обёртке, а не на <Table>: antd раскладывает свои пропсы
           по частям таблицы и произвольный data-* до DOM может не донести */}
-      <div data-test-id={TID.adminFiles.table}>
-        <Table
-          columns={columns}
-          dataSource={items}
-          rowKey="_id"
-          size="small"
-          loading={loading}
-          onChange={handleTableChange}
-          onRow={(record) => ({
-            'data-test-id': TID.adminFiles.row,
-            'data-file-id': record._id,
-          })}
-          pagination={{
-            current: page,
-            pageSize: limit,
-            total,
-            // потолок страницы у media — 200, больше она не отдаст
-            pageSizeOptions: [20, 50, 100, 200],
-            showSizeChanger: true,
-            showTotal: (count) => `всего: ${count}`,
-          }}
-        />
-      </div>
+      {!error && (
+        <div data-test-id={TID.adminFiles.table}>
+          <Table
+            columns={columns}
+            dataSource={items}
+            rowKey="_id"
+            size="small"
+            loading={loading}
+            onChange={handleTableChange}
+            onRow={(record) => ({
+              'data-test-id': TID.adminFiles.row,
+              'data-file-id': record._id,
+            })}
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total,
+              // потолок страницы у media — 200, больше она не отдаст
+              pageSizeOptions: [20, 50, 100, 200],
+              showSizeChanger: true,
+              showTotal: (count) => `всего: ${count}`,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -366,6 +366,12 @@ const AddEditTurnPopup = () => {
       }
     }
 
+    // Пустой текст заголовка не должен уходить как «хэдер включён»: иначе
+    // виджет рисует пустую полосу той же высоты, что и с текстом (Turn.js).
+    if (!preparedForm[FIELD_HEADER]?.trim()) {
+      preparedForm[FIELD_DONT_SHOW_HEADER] = true;
+    }
+
     for (let requiredField of requiredFields) {
       if (!preparedForm[requiredField]) {
         return setError({ message: `Need ${requiredField}` });

@@ -39,7 +39,13 @@
   // ползунок был прозрачным.
   .ql-container,
   .ql-editor {
-    @include turn-scrollbar(var(--turn-scrollbar-thumb-on-light));
+    @include turn-scrollbar(var(--editor-scrollbar-thumb-color));
+  }
+
+  // Полоса прокрутки рисуется на .ql-editor (см. выше); margin — единственный способ
+  // отодвинуть её от границы панели, padding-right остаётся текстовым (Quill, 15px)
+  .ql-editor {
+    margin-right: var(--editor-scrollbar-gutter);
   }
 
   .panel-inner {
@@ -190,6 +196,13 @@
     background-color: var(--panel-buttons-bg-color);
     color: var(--panel-buttons-font-color);
   }
+}
+
+// Кнопка панели действий, которой есть что отправить (сегодня — «Save Field»):
+// активный цвет панели вместо приглушённого фона кнопки.
+.btn-primary_dirty {
+  background-color: var(--panel-buttons-hover-bg-color);
+  opacity: 0.9;
 }
 
 // PANEL SETTINGS

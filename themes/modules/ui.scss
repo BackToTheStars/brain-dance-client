@@ -47,7 +47,6 @@
   &__people summary { cursor: pointer; }
   &__collapse { cursor: pointer; }
   label { cursor: pointer; }
-  .ant-switch { flex-shrink: 0; }
 
   // Свёрнутый вид — строка иконок: display: contents снимает группировку
   // развёрнутого вида, и все контролы становятся элементами одной строки.
@@ -65,8 +64,6 @@
     .presence-panel__controls,
     .presence-panel__group,
     .presence-panel__footer { display: contents; }
-
-    .presence-panel__switch { margin: 0 5px; }
 
     .panel-action-button { width: 30px; }
     .panel-action-button__label { display: none; }

@@ -1,3 +1,4 @@
+import { RULE_TURNS_CRUD } from '@/config/user';
 import { TURNS_GEOMETRY_TIMEOUT_DELAY } from '@/config/ui';
 import {
   loadFullGame,
@@ -59,15 +60,21 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
     [stage],
   );
 
-  const { info, reloadUserInfo } = useUserContext();
+  const { info, reloadUserInfo, can } = useUserContext();
   const { nickname } = info;
+  // A viewer (no RULE_TURNS_CRUD) gets the follower's treatment by role
+  // instead of by tour: no edit mode, but the double click still toggles the
+  // lines — its own local switch, since there is no tour to attach it to.
+  const isViewer = !can(RULE_TURNS_CRUD);
+  const [viewerLinesOnTop, setViewerLinesOnTop] = useState(false);
 
   const gameBoxClasses = useMemo(() => {
     // Following exposes card contents without enabling canvas editing; the
     // follower may still raise the lines back over them to read the reasoning.
     if (following) return linesOnTop ? 'following-tour lines-on-top' : 'following-tour';
+    if (isViewer) return viewerLinesOnTop ? 'view-only lines-on-top' : 'view-only';
     return isEditMode ? 'edit-mode' : '';
-  }, [isEditMode, following, linesOnTop]);
+  }, [isEditMode, following, linesOnTop, isViewer, viewerLinesOnTop]);
 
   useEffect(() => {
     if (stage === GAME_STAGE_ANIMATED_LOADING) {
@@ -145,12 +152,13 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   // A follower only watches: the edit mode goes off with the subscription, and
   // a double click does not bring it back until I leave the tour. A widget mode
   // opened before the subscription goes off with it too — its selection layer
-  // would otherwise stay over the page.
+  // would otherwise stay over the page. The same reset covers a role lost
+  // mid-session: logging in again with a lower-rights code takes edit mode away.
   useEffect(() => {
-    if (!following) return;
+    if (!following && !isViewer) return;
     setIsEditMode(false);
     if (panelMode !== MODE_GAME) dispatch(resetAndExit());
-  }, [following]);
+  }, [following, isViewer]);
 
   useEffect(() => {
     if (!window) return;
@@ -196,6 +204,7 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
         ref={gameBox}
         onDoubleClick={() => {
           if (following) dispatch(setLinesOnTop(!linesOnTop));
+          else if (isViewer) setViewerLinesOnTop((on) => !on);
           else setIsEditMode((on) => !on);
         }}
       >

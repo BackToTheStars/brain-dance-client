@@ -14,6 +14,7 @@ import { MODE_WIDGET_AUDIO } from '@/config/panel';
 import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { TID } from '@/config/testIds';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
 
 const Audio = ({
   registerHandleResize,
@@ -23,6 +24,9 @@ const Audio = ({
 }) => {
   const dispatch = useDispatch();
   const { can } = useUserContext();
+  // Спутник экскурсии только смотрит: разметку не начинает — как и у карандаша
+  // виджета, иначе он войдёт в режим, из которого ему нечем выйти.
+  const following = useSelector(selectFollowing);
   const title = useSelector((s) => s.turns.d[turnId].dWidgets.h_1?.text || '');
   const audioUrl = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].url);
   const {
@@ -76,11 +80,10 @@ const Audio = ({
           <span className="truncate">{title}</span>
         </div>
         <div className="audio-info flex gap-2 items-center">
-          {can(RULE_TURNS_CRUD) && duration > 0
-            && false // TODO: пока нет возможности редактировать цитаты медиа (см. docs/backlog.md)
-            && (
+          {can(RULE_TURNS_CRUD) && !following && duration > 0 && (
             <button
               className="icon-button"
+              data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(

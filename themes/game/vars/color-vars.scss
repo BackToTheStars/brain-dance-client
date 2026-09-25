@@ -35,6 +35,9 @@
   --turn-scrollbar-thumb-on-dark: rgba(255, 255, 255, 0.35);
   --turn-scrollbar-thumb-on-light: rgba(0, 0, 0, 0.35);
   --turn-scrollbar-color: var(--turn-scrollbar-thumb-on-dark);
+  // Свой токен, а не --turn-scrollbar-thumb-on-light: тот же 0.35 не читался на
+  // белом фоне формы, а общий берёт ещё и полоса самой карточки.
+  --editor-scrollbar-thumb-color: rgba(0, 0, 0, 0.55);
   --turn-widget-notes-color: #c3c3c3;
   --turn-widget-header-color: #294377;
   --turn-widget-header-title-color: rgb(10, 10, 10);
