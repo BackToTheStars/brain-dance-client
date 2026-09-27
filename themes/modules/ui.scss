@@ -56,7 +56,14 @@
     align-items: center;
     max-width: min(420px, calc(100vw - 20px));
 
-    .presence-panel__header,
+    .presence-panel__header {
+      order: 1;
+      padding-bottom: 0;
+
+      // Пустой в свёрнутом виде заголовок добавлял бы лишний gap.
+      > span:first-child { display: none; }
+    }
+
     [role='status'],
     [role='alert'],
     .presence-panel__wide { flex-basis: 100%; }

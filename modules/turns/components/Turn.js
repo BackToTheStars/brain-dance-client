@@ -100,7 +100,6 @@ const TurnAdapter = ({ id }) => {
                 x: Math.round(ui.position.left + gamePosition.x),
                 y: Math.round(ui.position.top + gamePosition.y),
               },
-              wasChanged: true,
             })
           );
         });

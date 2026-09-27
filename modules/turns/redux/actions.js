@@ -94,11 +94,8 @@ export const loadTurnsData = (turnIds, { isCurrent = () => true } = {}) => (disp
   });
 };
 
-// TURN_UPDATE_GEOMETRY помечает ход как изменённый (wasChanged), а `recalculateSize`
-// в components/Turn.js зовёт updateGeometry при монтировании каждой карточки — даже
-// когда пересчитанные размеры совпали с тем, что уже в сторе. Без этой проверки
-// достаточно открыть игру и проскроллить холст, чтобы Save Field отправил на сервер
-// геометрию всех отрисованных ходов.
+// `recalculateSize` в components/Turn.js зовёт updateGeometry при монтировании каждой
+// карточки — даже когда пересчитанные размеры совпали с тем, что уже в сторе.
 const isGeometryChanged = (current, { position, size }) => {
   if (
     position &&
@@ -210,6 +207,19 @@ export const unCompressParagraph = () => (dispatch, getState) => {
         },
       },
     });
+    // высоту сервер уже записал этим же запросом
+    dispatch({
+      type: types.TURNS_GEOMETRY_SAVED,
+      payload: {
+        turns: [
+          {
+            _id: data.item._id,
+            width: data.item.width,
+            height: data.item.height,
+          },
+        ],
+      },
+    });
     // @todo: use paragraph stage
     const turnEl = document.querySelector(
       `.turn_${data.item._id} .stb-react-turn__inner`,
@@ -225,11 +235,6 @@ export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,
     payload: data,
-  });
-
-export const clearScrollPositions = () => (dispatch) =>
-  dispatch({
-    type: types.TURNS_SCROLL_CLEAR,
   });
 
 export const moveField = (data) => (dispatch, getState) => {

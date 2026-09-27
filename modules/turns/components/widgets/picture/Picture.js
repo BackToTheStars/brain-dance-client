@@ -107,7 +107,7 @@ const Picture = ({
       }
     }
     return () => {
-      unregisterHandleResize({ id: 'picture' });
+      unregisterHandleResize({ id: widgetId });
     };
   }, [imageLoaded, pictureOnly]);
 

@@ -313,8 +313,15 @@ export const TID = {
     typeOption: (name) => `add-turn-type-${name}`, // пункт дропдауна типа (picture/video/audio/comment)
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
     // медиа-URL-инпуты используют field(prefixClass): image-url / video-url / audio-url
+    // + data-save-state: ready | empty | unchanged | checking (ссылка картинки) | preview
+    // (загрузка кадра видео); кроме ready кнопка disabled
     save: 'add-turn-save',
     cancel: 'add-turn-cancel',
+    // Окно «Похоже, это не картинка» перед записью: тело окна с data-reason="type"
+    // (видно по адресу) или "load" (пробная загрузка не удалась) и его кнопки
+    notImage: 'add-turn-not-image',
+    notImageSave: 'add-turn-not-image-save',
+    notImageCancel: 'add-turn-not-image-cancel',
     // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
     // button.ql-link, их берём по классам Quill)
     toolbar: (name) => `add-turn-toolbar-${name}`,
@@ -359,6 +366,10 @@ export const TID = {
   info: {
     form: 'info-form', // корень antd Form
     save: 'info-save', // кнопка Save формы
+    // Auto Save Field — только у роли с правом править ходы: antd Switch (атрибут на
+    // кнопке role=switch) и пауза в секундах (атрибут на <input> antd InputNumber)
+    autoSave: 'info-auto-save',
+    autoSaveDelay: 'info-auto-save-delay',
   },
 };
 

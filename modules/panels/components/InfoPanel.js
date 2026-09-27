@@ -1,4 +1,4 @@
-import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT } from '@/config/user';
+import { ROLES, ROLE_GAME_VISITOR, RULE_GAME_EDIT, RULE_TURNS_CRUD } from '@/config/user';
 import CodeEnterForm from '@/modules/game/components/forms/CodeEnterForm';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,10 +6,15 @@ import { togglePanel } from '../redux/actions';
 import { PANEL_INFO } from '@/config/panel';
 import EditGameForm from './info/EditGameForm';
 import { useState } from 'react';
-import { Button, Switch } from 'antd';
+import { Button, InputNumber, Switch } from 'antd';
 import { TID } from '@/config/testIds';
 import { STATUS_OFF } from '@/config/presence';
 import { setOnline } from '@/modules/presence/redux/actions';
+import { setAutoSaveField } from '@/modules/game/game-redux/actions';
+import {
+  AUTO_SAVE_FIELD_DELAY_MAX,
+  AUTO_SAVE_FIELD_DELAY_MIN,
+} from '@/config/game';
 
 const getUrl = () => window.location.href;
 
@@ -19,6 +24,7 @@ const InfoPanel = () => {
   // Переключатель следует за состоянием соединения, а не хранит своё:
   // включён при любом статусе, кроме «выключено», в том числе при ошибке
   const online = useSelector((state) => state.presence.status !== STATUS_OFF);
+  const autoSave = useSelector((state) => state.game.autoSave);
   const [viewMode, setViewMode] = useState(true);
 
   const { info, can, reloadUserInfo } = useUserContext();
@@ -92,6 +98,37 @@ const InfoPanel = () => {
                 />
               </td>
             </tr>
+            {can(RULE_TURNS_CRUD) && (
+              <tr className="border-b border-gray-300">
+                <td className="py-2 px-4">Auto Save Field:</td>
+                <td className="py-2 px-4">
+                  <Switch
+                    size="small"
+                    checked={autoSave.enabled}
+                    onChange={(enabled) =>
+                      dispatch(setAutoSaveField({ enabled }))
+                    }
+                    data-test-id={TID.info.autoSave}
+                  />{' '}
+                  <InputNumber
+                    size="small"
+                    min={AUTO_SAVE_FIELD_DELAY_MIN / 1000}
+                    max={AUTO_SAVE_FIELD_DELAY_MAX / 1000}
+                    precision={0}
+                    value={autoSave.delay / 1000}
+                    onChange={(seconds) => {
+                      if (Number.isFinite(seconds)) {
+                        dispatch(setAutoSaveField({ delay: seconds * 1000 }));
+                      }
+                    }}
+                    suffix="s"
+                    style={{ width: 80 }}
+                    aria-label="Auto Save Field delay, seconds"
+                    data-test-id={TID.info.autoSaveDelay}
+                  />
+                </td>
+              </tr>
+            )}
             <tr className="border-b border-gray-300">
               <td className="py-2 px-4">Your role:</td>
               <td className="py-2 px-4">

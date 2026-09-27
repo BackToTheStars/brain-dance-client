@@ -83,6 +83,10 @@ const checkIfParagraphExists = (inserts) => {
     .trim(); // @todo: remove after quill fix
 };
 
+// diff, а не строки: порядок ключей в атрибутах после правок бывает другим.
+const isSameContents = (opsA, opsB) =>
+  new Delta(opsA).diff(new Delta(opsB)).length() === 0;
+
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
     .map((item) => item.insert)
@@ -96,6 +100,7 @@ export {
   getQuill,
   getQuoteElements,
   checkIfParagraphExists,
+  isSameContents,
   paragraphToString,
   QUOTE_ID_ATTRIBUTE,
 };

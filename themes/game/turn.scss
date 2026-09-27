@@ -561,7 +561,7 @@
           transform: translateY(-50%);
           border-radius: 2px;
           background-color: var(--turn-border-color);
-          opacity: 0.55;
+          opacity: 0;
           transition: 0.3s;
         }
       }
@@ -981,6 +981,18 @@
   &__link {
     color: var(--turn-header-link-color);
     text-decoration: none;
+    // На минимальной ширине адрес и дата не помещаются: режется адрес, не дата.
+    min-width: 0;
+
+    > svg { flex-shrink: 0; }
+
+    span {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     &:hover {
       opacity: 0.8;
@@ -993,6 +1005,8 @@
     color: var(--turn-widget-header-subtitle-color);
     font-size: var(--turn-widget-header-subtitle-font-size);
     font-weight: 500;
+
+    > div { flex-shrink: 0; }
   }
 
   &__bottom-subtitle {

@@ -1,4 +1,4 @@
-import { GAME_STAGE_INIT } from '@/config/game';
+import { AUTO_SAVE_FIELD_DELAY_DEFAULT, GAME_STAGE_INIT } from '@/config/game';
 import * as types from './types';
 
 const initialGameState = {
@@ -9,6 +9,7 @@ const initialGameState = {
   areaRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
   error: null,
   cancelCallback: () => {},
+  autoSave: { enabled: false, delay: AUTO_SAVE_FIELD_DELAY_DEFAULT },
 };
 
 export const gameReducer = (state = initialGameState, { type, payload }) => {
@@ -64,6 +65,12 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
       return {
         ...state,
         viewport: payload,
+      };
+
+    case types.GAME_AUTO_SAVE_SET:
+      return {
+        ...state,
+        autoSave: payload,
       };
 
     default:

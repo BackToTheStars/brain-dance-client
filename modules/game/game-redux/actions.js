@@ -10,7 +10,6 @@ import {
 } from '@/modules/turns/requests';
 import { addNotification } from '@/modules/ui/redux/actions';
 import {
-  clearScrollPositions,
   loadTurnsGeometry,
   moveField,
   recalcAreaRect,
@@ -25,13 +24,25 @@ import {
   setPanels,
 } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
-import { isTurnGeometryUnsaved } from '@/modules/turns/redux/selectors';
+import {
+  selectUnsavedScrollPositions,
+  selectUnsavedTurnIds,
+} from '@/modules/turns/redux/selectors';
 import { snapRound } from '@/modules/turns/components/helpers/grid';
 import { getGameSettings, updateGameSettings } from './storage';
 import {
   getPersonalizedPanelSettings,
   savePanelsSettings,
 } from '@/modules/panels/redux/storage';
+import {
+  getStore,
+  lsUpdateLayoutSettings,
+} from '@/modules/settings/redux/requests';
+import {
+  AUTO_SAVE_FIELD_DELAY_DEFAULT,
+  AUTO_SAVE_FIELD_DELAY_MAX,
+  AUTO_SAVE_FIELD_DELAY_MIN,
+} from '@/config/game';
 
 export const setGameStage = (stage) => (dispatch, getState) => {
   const state = getState();
@@ -141,64 +152,121 @@ const dropTurnFromUrl = () => {
   );
 };
 
+// request() при ошибке сервера промис не завершает, а зовёт errorCallback.
+const withRejection = (call) =>
+  new Promise((resolve, reject) => {
+    call({ errorCallback: (message) => reject(new Error(message)) }).then(
+      resolve,
+      reject,
+    );
+  });
+
 // `onSaved` is called once both requests of the save are through — the
 // geometry and the scroll positions (when there were any): the guide of a tour
 // tells the followers to fetch the field again, and they have to see what was
 // saved, not what is being saved. The presence module is not imported here on
 // purpose (a cycle with it breaks the production bundle): the button that
 // saves passes the callback in.
-export const saveField = ({ onSaved = null } = {}) => (dispatch, getState) => {
+// `silent` — автосохранение: только ходы и прокрутка, без позиции холста и панелей,
+// без уведомления и выхода из режимов; ошибка — отказом промиса, а не alert.
+export const saveField = ({ onSaved = null, silent = false } = {}) => (dispatch, getState) => {
   const state = getState();
   const hash = state.game.game.hash;
-  const g = state.turns.g;
   const gamePosition = state.game.position;
-  const scrollPositions = Object.values(state.turns.scrollPositions);
+  const scrollPositions = selectUnsavedScrollPositions(state);
 
-  const changedTurns = Object.values(g)
-    .filter(isTurnGeometryUnsaved)
-    .map((turn) => {
-      return {
-        _id: turn._id,
-        x: snapRound(turn.position.x, GRID_CELL_X),
-        y: snapRound(turn.position.y, GRID_CELL_X),
-        width: snapRound(turn.size.width, GRID_CELL_X),
-        height: snapRound(turn.size.height, GRID_CELL_Y),
-        // у хода без разделителя ключа нет: сервер отличает отсутствие от нуля
-        splitHeight: state.turns.d[turn._id]?.splitHeight,
-      };
-    }); // ход был изменён, сохранить только его
-
-  const turnsWithUpdatedGeometry = changedTurns.map((turn) => {
+  const changedTurns = selectUnsavedTurnIds(state).map((id) => {
+    const turn = state.turns.g[id];
     return {
-      _id: turn._id,
-      position: { x: turn.x, y: turn.y },
-      size: { width: turn.width, height: turn.height },
-      wasChanged: false,
+      _id: id,
+      x: snapRound(turn.position.x, GRID_CELL_X),
+      y: snapRound(turn.position.y, GRID_CELL_X),
+      width: snapRound(turn.size.width, GRID_CELL_X),
+      height: snapRound(turn.size.height, GRID_CELL_Y),
+      // у хода без разделителя ключа нет: сервер отличает отсутствие от нуля
+      splitHeight: state.turns.d[id]?.splitHeight,
     };
   });
 
-  const coordinatesSaved = updateCoordinatesRequest(changedTurns).then((data) => {
-    dispatch({
-      type: turnsTypes.TURNS_UPDATE_GEOMETRY,
-      payload: {
-        turns: turnsWithUpdatedGeometry,
-      },
-    });
-    dispatch({ type: turnsTypes.TURNS_SYNC_DONE });
+  // На сетку — до запроса: ответ, пришедший после нового перетаскивания, не
+  // должен возвращать карточку назад.
+  dispatch({
+    type: turnsTypes.TURNS_UPDATE_GEOMETRY,
+    payload: {
+      turns: changedTurns.map(({ _id, x, y, width, height }) => ({
+        _id,
+        position: { x, y },
+        size: { width, height },
+      })),
+    },
+  });
+
+  const send = (call) => (silent ? withRejection(call) : call());
+  const coordinatesSaved = send((options) =>
+    updateCoordinatesRequest(changedTurns, options),
+  ).then(() => {
+    if (changedTurns.length) {
+      dispatch({
+        type: turnsTypes.TURNS_GEOMETRY_SAVED,
+        payload: { turns: changedTurns },
+      });
+    }
+    if (silent) return;
     dispatch(addNotification({ title: 'Info:', text: 'Field has been saved' }));
     dispatch(resetAndExit());
   });
-  updateGameSettings(hash, 'position', gamePosition);
-  dropTurnFromUrl();
-  savePanelsSettings(hash, state.panels.d);
+  if (!silent) {
+    updateGameSettings(hash, 'position', gamePosition);
+    dropTurnFromUrl();
+    savePanelsSettings(hash, state.panels.d);
+  }
   const scrollSaved = scrollPositions.length
-    ? updateScrollPositionsRequest(scrollPositions).then(() => {
-        dispatch(clearScrollPositions());
+    ? send((options) =>
+        updateScrollPositionsRequest(scrollPositions, options),
+      ).then(() => {
+        dispatch({
+          type: turnsTypes.TURNS_SCROLL_SAVED,
+          payload: scrollPositions,
+        });
       })
     : Promise.resolve();
-  if (typeof onSaved === 'function') {
-    Promise.all([coordinatesSaved, scrollSaved]).then(() => onSaved());
-  }
+  const saved = Promise.all([coordinatesSaved, scrollSaved]);
+  if (typeof onSaved === 'function') saved.then(() => onSaved());
+  return saved;
+};
+
+const clampAutoSaveDelay = (value) =>
+  Number.isFinite(value)
+    ? Math.min(
+        Math.max(Math.round(value), AUTO_SAVE_FIELD_DELAY_MIN),
+        AUTO_SAVE_FIELD_DELAY_MAX,
+      )
+    : AUTO_SAVE_FIELD_DELAY_DEFAULT;
+
+// Auto Save Field помнится на пользователя, а не на игру — в
+// userSettings.layoutSettings, рядом с настройками панелей. Только на клиенте.
+export const loadAutoSaveField = () => (dispatch) => {
+  const { autoSaveField, autoSaveFieldDelay } = getStore().layoutSettings || {};
+  dispatch({
+    type: types.GAME_AUTO_SAVE_SET,
+    payload: {
+      enabled: autoSaveField === true,
+      delay: clampAutoSaveDelay(autoSaveFieldDelay),
+    },
+  });
+};
+
+export const setAutoSaveField = (patch) => (dispatch, getState) => {
+  const current = getState().game.autoSave;
+  const next = {
+    enabled: patch.enabled ?? current.enabled,
+    delay: clampAutoSaveDelay(patch.delay ?? current.delay),
+  };
+  lsUpdateLayoutSettings({
+    autoSaveField: next.enabled,
+    autoSaveFieldDelay: next.delay,
+  });
+  dispatch({ type: types.GAME_AUTO_SAVE_SET, payload: next });
 };
 
 // Стор обязан повторять буфер, в том числе когда буфер опустел: по

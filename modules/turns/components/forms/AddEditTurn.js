@@ -1,6 +1,8 @@
 import {
+  checkIfParagraphExists,
   getQuill,
   getQuoteElements,
+  isSameContents,
   QUOTE_ID_ATTRIBUTE,
 } from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -43,6 +45,7 @@ import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { createFormEdition } from '../helpers/formEdition';
+import { isNotImageUrl, probeImage } from '../helpers/imageUrlCheck';
 import { TID } from '@/config/testIds';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 
@@ -54,10 +57,68 @@ const {
   TEMPLATE_PICTURE,
   FIELD_DONT_SHOW_HEADER,
   FIELD_HEADER,
+  FIELD_PICTURE,
+  FIELD_PICTURE_ONLY,
   FIELD_SOURCE,
   FIELD_DATE,
   FIELD_VIDEO,
 } = turnSettings;
+
+// Поля хода так, как их отправит Save: недоступные шаблону — null.
+const prepareFields = (form, template) => {
+  const availableFields = settings[template].availableFields || [];
+  const prepared = {};
+  for (const field of fieldsToShow) {
+    prepared[field] =
+      !fieldSettings[field].special || availableFields.includes(field)
+        ? form[field]
+        : null;
+  }
+  // Пустой текст заголовка не должен уходить как «хэдер включён»: иначе
+  // виджет рисует пустую полосу той же высоты, что и с текстом (Turn.js).
+  if (!prepared[FIELD_HEADER]?.trim()) {
+    prepared[FIELD_DONT_SHOW_HEADER] = true;
+  }
+  return prepared;
+};
+
+// Со снимком сравнивается и превью видео: своя картинка или новый кадр — тоже правка.
+const comparableFields = (form, template) => {
+  const fields = prepareFields(form, template);
+  const videoUrl = fields[FIELD_VIDEO];
+  return {
+    ...fields,
+    videoPreview: videoUrl ? form.videoPreview : null,
+    videoPreviewDraft: !!videoUrl && form.videoPreviewDraft?.forUrl === videoUrl,
+  };
+};
+
+// undefined, null, false и '' — одно и то же «пусто».
+const sameFields = (a, b) =>
+  Object.keys({ ...a, ...b }).every((key) => (a[key] || '') === (b[key] || ''));
+
+// Ход не пуст, если карточке есть что показать — по тем же правилам, по которым
+// Turn.js решает, рисовать ли хэдер, картинку и абзац.
+const hasTurnContent = (template, fields, paragraphHasText) => {
+  const { requiredFields = [], requiredParagraph } = settings[template];
+  if (requiredFields.length) {
+    return requiredFields.every((field) => !!fields[field]?.trim());
+  }
+  if (requiredParagraph) return paragraphHasText;
+  if (fields[FIELD_PICTURE_ONLY]) return !!fields[FIELD_PICTURE]?.trim();
+  return (
+    !fields[FIELD_DONT_SHOW_HEADER] ||
+    !!fields[FIELD_PICTURE]?.trim() ||
+    paragraphHasText
+  );
+};
+
+const SAVE_HINTS = {
+  empty: 'Nothing to save: the turn is empty',
+  unchanged: 'Nothing to save: no changes',
+  checking: 'Checking the image link…',
+  preview: 'Uploading the video preview…',
+};
 
 // Что именно потеряет ход, если сохранить замену файла: цитаты старого
 // файла и логические линии, которые на них держались.
@@ -129,6 +190,18 @@ const AddEditTurnPopup = () => {
   const [formatConfirm, setFormatConfirm] = useState(null);
   // Редакция, чей кадр сейчас грузится: Save блокируется только у неё.
   const [savingPreview, setSavingPreview] = useState(0);
+  // То же для пробной загрузки ссылки картинки перед записью.
+  const [checkingImage, setCheckingImage] = useState(0);
+  // Окно «Похоже, это не картинка»: { url, reason, payload, orphanSummary }.
+  const [notImageConfirm, setNotImageConfirm] = useState(null);
+  const confirmedNotImage = useRef(null);
+  // Quill неуправляемый: копия абзаца для Save обновляется по text-change.
+  const [editorOps, setEditorOps] = useState([]);
+  // Снимок открытого на правку хода { token, template, fields, paragraph }; null —
+  // форма ещё устаивается или ход новый.
+  const [baseline, setBaseline] = useState(null);
+  const formRef = useRef(form);
+  formRef.current = form;
 
   // Начатый формой ответ применяется только к ней самой: у каждого открытого хода
   // своя редакция, у закрытой панели актуальной редакции нет.
@@ -164,6 +237,7 @@ const AddEditTurnPopup = () => {
 
   useEffect(() => {
     if (!quillConstants.quill) return;
+    setBaseline(null);
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
       const newForm = {};
@@ -179,31 +253,40 @@ const AddEditTurnPopup = () => {
       }
       if (turnToEdit.videoPreview) newForm.videoPreview = turnToEdit.videoPreview;
       setForm(newForm);
-      if (turnToEdit.paragraph) {
-        const { quill } = quillConstants;
-        quill.setContents(turnToEdit.paragraph);
-        const token = edition.token();
-        setTimeout(() => {
-          // за эти 300 мс могли открыть другой ход — его цитатам чужие id не ставим
-          if (!edition.isCurrent(token)) return;
-          const paragraphQuotes = turnToEdit.quotes
-            ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
-            : [];
-          const quoteEls = getQuoteElements();
-          let i = 0;
-          let incId = Math.floor(new Date().getTime() / 1000);
-          for (let quoteEl of quoteEls) {
-            // По порядку — только ходам старше атрибутора.
-            if (!quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE)) {
-              const quoteId = paragraphQuotes[i]
-                ? paragraphQuotes[i].id
-                : (incId += 1);
-              quoteEl.setAttribute(QUOTE_ID_ATTRIBUTE, quoteId);
-            }
-            i += 1;
+      const { quill } = quillConstants;
+      quill.setContents(turnToEdit.paragraph || []);
+      const token = edition.token();
+      setTimeout(() => {
+        // за эти 300 мс могли открыть другой ход — его цитатам чужие id не ставим
+        if (!edition.isCurrent(token)) return;
+        const paragraphQuotes = turnToEdit.quotes
+          ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
+          : [];
+        const quoteEls = getQuoteElements();
+        let i = 0;
+        let incId = Math.floor(new Date().getTime() / 1000);
+        for (let quoteEl of quoteEls) {
+          // По порядку — только ходам старше атрибутора.
+          if (!quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE)) {
+            const quoteId = paragraphQuotes[i]
+              ? paragraphQuotes[i].id
+              : (incId += 1);
+            quoteEl.setAttribute(QUOTE_ID_ATTRIBUTE, quoteId);
           }
-        }, 300);
-      }
+          i += 1;
+        }
+        // Проставленные id Quill заберёт из DOM только следующим тиком — забираем
+        // сейчас, иначе они придут после снимка и сойдут за правку.
+        quill.update();
+        const paragraph = quill.getContents().ops;
+        setEditorOps(paragraph);
+        setBaseline({
+          token,
+          template: turnToEdit.contentType,
+          fields: comparableFields(formRef.current, turnToEdit.contentType),
+          paragraph,
+        });
+      }, 300);
     } else {
       setForm({});
       const { quill } = quillConstants;
@@ -218,6 +301,15 @@ const AddEditTurnPopup = () => {
       getQuill('#editor-container-new', '#toolbar-container-new'),
     );
   }, []);
+
+  useEffect(() => {
+    const { quill } = quillConstants;
+    if (!quill) return;
+    const sync = () => setEditorOps(quill.getContents().ops);
+    sync();
+    quill.on('text-change', sync);
+    return () => quill.off('text-change', sync);
+  }, [quillConstants]);
 
   // Само сохранение. Вынесено из saveHandler, потому что при замене файла между
   // «нажал Save» и записью встаёт модальное окно, а оно отвечает асинхронно:
@@ -292,6 +384,7 @@ const AddEditTurnPopup = () => {
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
+    if (edition.isCurrent(checkingImage)) return;
     const textArr = quillConstants.getQuillTextArr();
 
     // Соседние куски одного цвета с равным id сводятся в одну цитату, поэтому
@@ -354,23 +447,7 @@ const AddEditTurnPopup = () => {
 
     const paragraphOps = collapseSplitQuotes(resTextArr);
 
-    const preparedForm = {};
-    for (let fieldToShow of fieldsToShow) {
-      if (
-        !fieldSettings[fieldToShow].special ||
-        availableFields.includes(fieldToShow)
-      ) {
-        preparedForm[fieldToShow] = form[fieldToShow];
-      } else {
-        preparedForm[fieldToShow] = null;
-      }
-    }
-
-    // Пустой текст заголовка не должен уходить как «хэдер включён»: иначе
-    // виджет рисует пустую полосу той же высоты, что и с текстом (Turn.js).
-    if (!preparedForm[FIELD_HEADER]?.trim()) {
-      preparedForm[FIELD_DONT_SHOW_HEADER] = true;
-    }
+    const preparedForm = prepareFields(form, activeTemplate);
 
     for (let requiredField of requiredFields) {
       if (!preparedForm[requiredField]) {
@@ -378,12 +455,7 @@ const AddEditTurnPopup = () => {
       }
     }
 
-    if (
-      requiredParagraph &&
-      (!paragraphOps ||
-        !paragraphOps.length ||
-        (paragraphOps.length === 1 && paragraphOps[0].insert.trim() === ''))
-    ) {
+    if (requiredParagraph && !checkIfParagraphExists(paragraphOps)) {
       return setError({ message: 'Need text body' });
     }
 
@@ -512,18 +584,43 @@ const AddEditTurnPopup = () => {
       editionToken: edition.token(),
     };
 
-    // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
-    // числами и явным «Удалить и сохранить»; отказ не сохраняет ничего, то есть
-    // остаются и прежний файл, и цитаты, и связи.
-    if (orphaned.length) {
-      setOrphanConfirm({
-        payload,
-        summary: getOrphanedSummary(orphaned, orphanedLines.length),
-      });
+    const orphanSummary = orphaned.length
+      ? getOrphanedSummary(orphaned, orphanedLines.length)
+      : null;
+
+    const imageUrl = preparedForm[FIELD_PICTURE];
+    if (imageUrl && imageUrl !== (turnToEdit?.[FIELD_PICTURE] || '')) {
+      checkImageUrl(imageUrl, payload, orphanSummary);
       return;
     }
+    finishSave(payload, orphanSummary);
+  };
 
+  // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
+  // числами и явным «Удалить и сохранить»; отказ не сохраняет ничего, то есть
+  // остаются и прежний файл, и цитаты, и связи.
+  const finishSave = (payload, orphanSummary) => {
+    if (orphanSummary) {
+      setOrphanConfirm({ payload, summary: orphanSummary });
+      return;
+    }
     commitSave(payload);
+  };
+
+  // Новая ссылка картинки: не картинка — окно, таймаут отказом не считается. Если за
+  // время проверки форму закрыли или перевели на другой ход, не сохраняется ничего.
+  const checkImageUrl = (url, payload, orphanSummary) => {
+    const ask = (reason) =>
+      setNotImageConfirm({ url, reason, payload, orphanSummary });
+    if (isNotImageUrl(url)) return ask('type');
+    const token = edition.token();
+    setCheckingImage(token);
+    probeImage(url).then((result) => {
+      setCheckingImage((prev) => (prev === token ? 0 : prev));
+      if (!edition.isCurrent(token)) return;
+      if (result === 'error') ask('load');
+      else finishSave(payload, orphanSummary);
+    });
   };
 
   // Format переклеивает переносы и пробелы, а вместе с ними теряет всю разметку:
@@ -555,6 +652,27 @@ const AddEditTurnPopup = () => {
       ...prevForm,
       ...(typeof patch === 'function' ? patch(prevForm) : patch),
     }));
+
+  const paragraphChanged = useMemo(
+    () => !!baseline && !isSameContents(editorOps, baseline.paragraph),
+    [editorOps, baseline],
+  );
+  const hasContent = hasTurnContent(
+    activeTemplate,
+    prepareFields(form, activeTemplate),
+    checkIfParagraphExists(editorOps),
+  );
+  const changed =
+    !!baseline &&
+    edition.isCurrent(baseline.token) &&
+    (activeTemplate !== baseline.template ||
+      paragraphChanged ||
+      !sameFields(comparableFields(form, activeTemplate), baseline.fields));
+  let saveState = 'ready';
+  if (edition.isCurrent(savingPreview)) saveState = 'preview';
+  else if (edition.isCurrent(checkingImage)) saveState = 'checking';
+  else if (!hasContent) saveState = 'empty';
+  else if (turnToEdit && !changed) saveState = 'unchanged';
 
   if (Component) {
     return (
@@ -764,10 +882,12 @@ const AddEditTurnPopup = () => {
             <button
               className="btn btn-primary btn-accent"
               data-test-id={TID.addTurn.save}
-              disabled={edition.isCurrent(savingPreview)}
+              data-save-state={saveState}
+              disabled={saveState !== 'ready'}
+              title={SAVE_HINTS[saveState]}
               onClick={(e) => saveHandler(e)}
             >
-              Save
+              {saveState === 'checking' ? 'Checking…' : 'Save'}
             </button>
             <button
               className="btn btn-primary"
@@ -844,6 +964,43 @@ const AddEditTurnPopup = () => {
               <b>{orphanConfirm.summary.linesCount}</b>.
             </p>
           </>
+        )}
+      </Modal>
+
+      {/* Окно цитат, если оно нужно, открывается в afterClose — следом, а не поверх. */}
+      <Modal
+        open={!!notImageConfirm}
+        title="Похоже, это не картинка"
+        okText="Сохранить всё равно"
+        cancelText="Отмена"
+        okButtonProps={{ 'data-test-id': TID.addTurn.notImageSave }}
+        cancelButtonProps={{ 'data-test-id': TID.addTurn.notImageCancel }}
+        onCancel={() => setNotImageConfirm(null)}
+        onOk={() => {
+          confirmedNotImage.current = notImageConfirm;
+          setNotImageConfirm(null);
+        }}
+        afterClose={() => {
+          const confirmed = confirmedNotImage.current;
+          confirmedNotImage.current = null;
+          if (confirmed) finishSave(confirmed.payload, confirmed.orphanSummary);
+        }}
+      >
+        {!!notImageConfirm && (
+          <div
+            data-test-id={TID.addTurn.notImage}
+            data-reason={notImageConfirm.reason}
+          >
+            <p>
+              {notImageConfirm.reason === 'type'
+                ? 'Ссылка в поле картинки ведёт на файл другого типа.'
+                : 'Ссылка в поле картинки не открылась как картинка.'}{' '}
+              В ходе на её месте будет значок ошибки.
+            </p>
+            <p className="mb-0" style={{ wordBreak: 'break-all' }}>
+              {notImageConfirm.url}
+            </p>
+          </div>
         )}
       </Modal>
 

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import Turn from './Turn';
+import AutoSaveField from './AutoSaveField';
 import { useEffect } from 'react';
 import { loadTurnsData } from '../redux/actions';
 
@@ -30,6 +31,7 @@ const Turns = () => {
         <Turn key={id} id={id} />
       ))}
       <TurnsLoader />
+      <AutoSaveField />
     </>
   );
 };

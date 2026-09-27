@@ -32,6 +32,13 @@
     background-color: #d27512;
     color: var(--white-color);
   }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: #ff8503;
+    opacity: 0.4;
+    cursor: default;
+  }
 }
 
 .btn-group-sm>.btn,

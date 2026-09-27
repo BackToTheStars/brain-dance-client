@@ -4,7 +4,7 @@ import ReactPlayer from 'react-player';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiPlay, FiPause, FiEdit } from 'react-icons/fi';
 import { WIDGET_AUDIO } from '@/modules/turns/settings';
-import { TURN_SIZE_MIN_WIDTH } from '@/config/turn';
+import { AUDIO_MIN_WIDTH } from '@/config/turn';
 import { getFormattedDuration } from '../../helpers/formatters/player';
 import { SpeedControl, VolumeControl } from './Control';
 import { AUDIO_HEIGHT } from '@/config/ui';
@@ -53,7 +53,7 @@ const Audio = ({
     registerHandleResize({
       type: WIDGET_AUDIO,
       id: widgetId,
-      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
+      minWidthCallback: () => AUDIO_MIN_WIDTH,
       minHeightCallback: () => AUDIO_HEIGHT,
       maxHeightCallback: () => AUDIO_HEIGHT,
     });

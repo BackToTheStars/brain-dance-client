@@ -36,25 +36,33 @@ export const deleteTurnRequest = (id) => {
   });
 };
 
-export const updateCoordinatesRequest = (changedTurns) => {
+export const updateCoordinatesRequest = (changedTurns, options) => {
   if (!changedTurns.length) return Promise.resolve();
-  return request(`turns/coordinates?hash=${s.hash}`, {
-    tokenFlag: true,
-    method: 'PUT',
-    body: {
-      turns: changedTurns,
+  return request(
+    `turns/coordinates?hash=${s.hash}`,
+    {
+      tokenFlag: true,
+      method: 'PUT',
+      body: {
+        turns: changedTurns,
+      },
     },
-  });
+    options,
+  );
 };
 
-export const updateScrollPositionsRequest = (scrollPositions) => {
-  return request(`turns/scroll-positions?hash=${s.hash}`, {
-    tokenFlag: true,
-    method: 'PUT',
-    body: {
-      turns: scrollPositions,
+export const updateScrollPositionsRequest = (scrollPositions, options) => {
+  return request(
+    `turns/scroll-positions?hash=${s.hash}`,
+    {
+      tokenFlag: true,
+      method: 'PUT',
+      body: {
+        turns: scrollPositions,
+      },
     },
-  });
+    options,
+  );
 };
 
 // options прокидываются в request() — вызывающему может понадобиться errorCallback:
