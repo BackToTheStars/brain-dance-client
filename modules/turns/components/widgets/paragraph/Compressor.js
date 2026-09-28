@@ -10,9 +10,9 @@ import {
   useContext,
   useCallback,
 } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getParagraphQuotesWithoutScroll } from '../../helpers/quotesHelper';
+import { relativeRect } from '@/modules/game/components/helpers/zoom';
 import {
   ParagraphCompressorTextWrapper,
   TextAroundQuoteOptimized,
@@ -56,6 +56,7 @@ const Compressor = ({
   widgetsUpdatedTime,
 }) => {
   const pRef = useRef(null);
+  const store = useStore();
   const { can } = useUserContext();
   const turn = useSelector((state) => state.turns.d[turnId]);
   const width = useSelector((state) => state.turns.g[turnId].size.width);
@@ -68,7 +69,7 @@ const Compressor = ({
 
   const { compressedTexts } = useMemo(() => {
     if (!compressedTextPieces?.length) return { compressedTexts: [] };
-    const { top: paragraphTop } = wrapperRef.current.getBoundingClientRect();
+    const zoom = store.getState().game.zoom;
 
     const spans = [...wrapperRef.current.querySelectorAll('span, br')]; // @learn возвращает коллекцию
 
@@ -96,8 +97,7 @@ const Compressor = ({
 
     // const tempTurnTop = 26;
     for (let span of filteredSpans) {
-      const { height, top: absoluteTop } = span.getBoundingClientRect();
-      const top = absoluteTop - paragraphTop;
+      const { height, top } = relativeRect(span, wrapperRef.current, zoom);
       if (height + top > maxHeightPlusTop) {
         maxHeightPlusTop = height + top;
         if (textPieceIndex < textPieces.length - 1) {
@@ -236,7 +236,11 @@ const Compressor = ({
   useEffect(() => {
     if (!wrapperRef.current) return;
 
-    const quotes = getParagraphQuotesWithoutScroll(turnId, wrapperRef);
+    const quotes = getParagraphQuotesWithoutScroll(
+      turnId,
+      wrapperRef,
+      store.getState().game.zoom
+    );
     const textPieces = calculateTextPiecesFromQuotes(
       quotes,
       wrapperRef.current

@@ -1,12 +1,13 @@
 import { utils } from '@/modules/game/components/helpers/game';
 import { useEffect, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import LogicLine from './LogicLine';
 import { TID } from '@/config/testIds';
 
 const QuotesLinesLayer = () => {
   const d = useSelector((state) => state.lines.d);
   const svgLayer = useRef();
+  const store = useStore();
   const viewport = useSelector((state) => state.game.viewport);
   const lines = useMemo(() => Object.values(d), [d]);
 
@@ -14,7 +15,8 @@ const QuotesLinesLayer = () => {
     if (!svgLayer?.current) return;
 
     const scrollMove = (e) => {
-      const delta = Math.round(e.deltaY * 0.3);
+      // canvas px: under the zoom the board follows the wheel 1:1 on screen
+      const delta = Math.round((e.deltaY * 0.3) / store.getState().game.zoom);
       e.shiftKey ? utils.moveScene(2 * delta, 0) : utils.moveScene(0, delta);
     };
 

@@ -35,3 +35,6 @@ export const TURN_QUOTE_BORDER_RADIUS = '5px';
 
 export const GRID_CELL_X = 24;
 export const GRID_CELL_Y = 1;
+
+// Ступени масштаба холста по возрастанию: кнопки в Info берут соседнюю.
+export const ZOOM_STEPS = [0.5, 0.75, 1];

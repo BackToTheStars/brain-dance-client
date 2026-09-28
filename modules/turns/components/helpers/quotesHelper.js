@@ -1,23 +1,26 @@
 import { TURN_BORDER_THICKNESS, widgetSpacer } from '@/config/ui';
 import { TYPE_QUOTE_TEXT } from '@/modules/quotes/settings';
+import { relativeRect } from '@/modules/game/components/helpers/zoom';
 
-export const getParagraphQuotesWithoutScroll = (turnId, paragraphEl) => {
+export const getParagraphQuotesWithoutScroll = (
+  turnId,
+  paragraphEl,
+  zoom = 1,
+) => {
   const quoteEls = [
     ...paragraphEl.current.querySelectorAll('span[data-id]:not([data-id=""])'),
   ];
   // const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
   const paragraphLeftPadding = 6; // @todo: get from size settings
 
-  const paragraphRect = paragraphEl.current.getBoundingClientRect();
   // const turnElRect = paragraphEl.current.parentElement.getBoundingClientRect();
 
   const quotes = [];
 
   for (let quoteEl of quoteEls) {
-    const rect = quoteEl.getBoundingClientRect();
-    let left =
-      Math.round(rect.left - paragraphRect.left) + paragraphLeftPadding; // КРАСНАЯ РАМКА
-    let top = Math.round((rect.top - paragraphRect.top) * 100) / 100 + 2;
+    const rect = relativeRect(quoteEl, paragraphEl.current, zoom);
+    let left = Math.round(rect.left) + paragraphLeftPadding; // КРАСНАЯ РАМКА
+    let top = Math.round(rect.top * 100) / 100 + 2;
     let width = Math.round(rect.width);
     let height = Math.round(rect.height * 100) / 100;
 
@@ -47,11 +50,14 @@ export const getScrolledQuotes = (
   quotes,
   paragraphEl,
   passedScrollPosition,
+  zoom = 1,
 ) => {
-  const paragraphRect = paragraphEl.current.getBoundingClientRect();
-  const turnRect =
-    paragraphEl.current.parentNode.parentNode.getBoundingClientRect();
-  const topGap = paragraphRect.top - turnRect.top;
+  const paragraphRect = relativeRect(
+    paragraphEl.current,
+    paragraphEl.current.parentNode.parentNode,
+    zoom,
+  );
+  const topGap = paragraphRect.top;
 
   return quotes.map((quote) => {
     let { width, height, left, top } = quote.initialCoords;

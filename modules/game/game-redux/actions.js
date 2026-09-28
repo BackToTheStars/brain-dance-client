@@ -23,7 +23,7 @@ import {
   resetAndExit,
   setPanels,
 } from '@/modules/panels/redux/actions';
-import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
+import { GRID_CELL_X, GRID_CELL_Y, ZOOM_STEPS } from '@/config/ui';
 import {
   selectUnsavedScrollPositions,
   selectUnsavedTurnIds,
@@ -334,12 +334,18 @@ export const createCancelCallback = (callback) => (dispatch) => {
   dispatch({ type: types.GAME_CREATE_CANCEL_CALLBACK, payload: callback });
 };
 
-export const updateViewportGeometry = (viewport) => (dispatch, getState) => {
+// `screen` — размер окна браузера; в стор окно ложится в единицах холста.
+export const updateViewportGeometry = (screen) => (dispatch, getState) => {
   const state = getState();
+  if (!screen) return;
+  const { zoom } = state.game;
+  const viewport = {
+    width: screen.width / zoom,
+    height: screen.height / zoom,
+  };
   if (
-    !viewport ||
-    (viewport.width === state.game.viewport.width &&
-      viewport.height === state.game.viewport.height)
+    viewport.width === state.game.viewport.width &&
+    viewport.height === state.game.viewport.height
   ) {
     return;
   }
@@ -356,6 +362,27 @@ export const updateViewportGeometry = (viewport) => (dispatch, getState) => {
     payload: { position: state.game.position, size: viewport },
   });
   dispatch(recalcAreaRect());
+};
+
+// Масштаб — состояние просмотра: не сохраняется, загрузка игры возвращает 1.
+// Центр окна остаётся на месте; позиция ставится напрямую — moveField
+// прилипает к сетке.
+export const setZoom = (zoom) => (dispatch, getState) => {
+  const { zoom: current, position } = getState().game;
+  if (zoom === current || !ZOOM_STEPS.includes(zoom)) return;
+  const screen = { width: window.innerWidth, height: window.innerHeight };
+  const shift = (size) => Math.round((size / 2) * (1 / current - 1 / zoom));
+  dispatch({
+    type: types.GAME_ZOOM_SET,
+    payload: {
+      zoom,
+      position: {
+        x: position.x + shift(screen.width),
+        y: position.y + shift(screen.height),
+      },
+    },
+  });
+  dispatch(updateViewportGeometry(screen));
 };
 
 // Правка игры из панели Info. `PUT /game` отвечает частью игры — name,

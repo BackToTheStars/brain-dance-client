@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import FragmentEditor from '../timeline/FragmentEditor';
 import { getDefaultFragments } from '../../helpers/timeline/fragments';
 import WidgetEditButton from '../buttons/Edit';
@@ -7,6 +7,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { linesDelete, quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { relativeRect } from '@/modules/game/components/helpers/zoom';
 
 const TIMELINE_HEIGHT = 82;
 const ACTIVE_QUOTE_HEIGHT = 50;
@@ -29,6 +30,7 @@ const TimelineQuotes = ({
   const { width } = useSelector((state) => state.turns.g[turnId].size);
   const { can } = useUserContext();
   const dispatch = useDispatch();
+  const store = useStore();
   const quotesWidget = useSelector(
     // videoQuotes or audioQuotes
     (state) => state.turns.d[turnId].dWidgets[widgetId],
@@ -130,9 +132,13 @@ const TimelineQuotes = ({
   useEffect(() => {
     if (!wrapperEl?.current) return;
     const checkQuotes = () => {
-      const rect = wrapperEl?.current.getBoundingClientRect();
       const turnEl = wrapperEl?.current.closest('.stb-react-turn');
-      const widgetTop = rect.top - turnEl.getBoundingClientRect().top;
+      const rect = relativeRect(
+        wrapperEl.current,
+        turnEl,
+        store.getState().game.zoom,
+      );
+      const widgetTop = rect.top;
       let width = Math.round(rect.width);
       let height = Math.round(rect.height);
       if (!width || !height) return;

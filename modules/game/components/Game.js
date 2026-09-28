@@ -51,6 +51,9 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   const stage = useSelector((state) => state.game.stage);
   const position = useSelector((state) => state.game.position);
   const viewport = useSelector((state) => state.game.viewport);
+  const zoom = useSelector((state) => state.game.zoom);
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
   const following = useSelector(selectFollowing);
   const guideSid = useSelector(selectGuideSid);
   const panelMode = useSelector((state) => state.panels.mode);
@@ -134,6 +137,16 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
     return () => window.removeEventListener('resize', invokeUpdateWithQueue);
   }, []);
 
+  // setZoom resizes the window itself; this covers the reset by a game load.
+  useEffect(() => {
+    dispatch(
+      updateViewportGeometry({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }),
+    );
+  }, [zoom]);
+
   // While I follow a tour the guide's minimap shows where I look: a frame on
   // every change of the canvas position or the window size, once when the
   // subscription starts and once more when the guide comes back with a new
@@ -171,8 +184,23 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
 
     if (typeof $ === 'undefined') return;
 
+    // Under the zoom jQuery UI moves the box by screen px: the travel is
+    // rebuilt in canvas px, as for the cards (helpers/zoom.js).
+    let from = null;
+    const follow = (event, ui) => {
+      if (!from) return;
+      ui.position.left = (event.pageX - from.pageX) / from.zoom;
+      ui.position.top = (event.pageY - from.pageY) / from.zoom;
+    };
     $(gameBox.current).draggable({
+      start: (event) => {
+        const zoom = zoomRef.current;
+        from =
+          zoom === 1 ? null : { pageX: event.pageX, pageY: event.pageY, zoom };
+      },
+      drag: follow,
       stop: (event, ui) => {
+        follow(event, ui);
         $(gameBox.current).addClass('remove-line-transition');
         dispatch(
           moveField({
@@ -201,6 +229,7 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
         id="game-box"
         data-test-id={TID.canvas}
         className={gameBoxClasses}
+        style={{ '--game-zoom': zoom }}
         ref={gameBox}
         onDoubleClick={() => {
           if (following) dispatch(setLinesOnTop(!linesOnTop));

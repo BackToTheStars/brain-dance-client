@@ -26,6 +26,7 @@ const GAME_BOX_ID = 'game-box';
 const pen = {
   box: null,
   getPosition: null,
+  getZoom: null,
   onStart: null,
   onPoints: null,
   onEnd: null,
@@ -90,6 +91,9 @@ const finishStroke = () => {
   pen.onEnd(id);
 };
 
+const penPoint = (event) =>
+  canvasPoint(pen.box, pen.getPosition(), event, pen.getZoom());
+
 const handleDown = (event) => {
   if (!pen.box || pen.strokeId) return;
   // Only the capture layer starts a stroke: everything else on the canvas
@@ -97,7 +101,7 @@ const handleDown = (event) => {
   if (!event.target?.classList?.contains(DRAW_CAPTURE_CLASS)) return;
   // No text selection and no native drag under the pen.
   event.preventDefault();
-  const { x, y } = canvasPoint(pen.box, pen.getPosition(), event);
+  const { x, y } = penPoint(event);
   pen.strokeId = newStrokeId();
   pen.pending = [];
   pen.lastX = x;
@@ -108,7 +112,7 @@ const handleDown = (event) => {
 
 const handleMove = (event) => {
   if (!pen.box || !pen.strokeId) return;
-  const { x, y } = canvasPoint(pen.box, pen.getPosition(), event);
+  const { x, y } = penPoint(event);
   if (
     Math.abs(x - pen.lastX) < DRAW_MIN_MOVE_PX &&
     Math.abs(y - pen.lastY) < DRAW_MIN_MOVE_PX
@@ -124,13 +128,20 @@ const handleUp = () => finishStroke();
 
 // Returns false when there is no canvas to listen to yet — the caller then
 // leaves the switch off instead of showing a state that does nothing.
-export const startDrawing = ({ getPosition, onStart, onPoints, onEnd }) => {
+export const startDrawing = ({
+  getPosition,
+  getZoom,
+  onStart,
+  onPoints,
+  onEnd,
+}) => {
   if (typeof document === 'undefined') return false;
   const box = document.getElementById(GAME_BOX_ID);
   if (!box) return false;
   stopDrawing();
   pen.box = box;
   pen.getPosition = getPosition;
+  pen.getZoom = getZoom;
   pen.onStart = onStart;
   pen.onPoints = onPoints;
   pen.onEnd = onEnd;
@@ -157,6 +168,7 @@ export const stopDrawing = () => {
   pen.box.removeEventListener('pointerleave', handleUp);
   pen.box = null;
   pen.getPosition = null;
+  pen.getZoom = null;
   pen.onStart = null;
   pen.onPoints = null;
   pen.onEnd = null;

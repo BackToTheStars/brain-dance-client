@@ -9,7 +9,7 @@ import {
 } from '@/modules/turns/redux/actions';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import {
   getParagraphQuotesWithoutScroll,
@@ -62,6 +62,8 @@ const ParagraphOriginal = ({
   const pendingScrollRef = useRef(null);
   const lastAppliedRef = useRef(null);
   const dispatch = useDispatch();
+  const store = useStore();
+  const zoom = () => store.getState().game.zoom;
 
   const [scrollTop, setScrollTop] = useState(0); // дополнительный локальный стейт для быстрого ререндера цитат
 
@@ -82,6 +84,7 @@ const ParagraphOriginal = ({
       const quotesWithoutScroll = getParagraphQuotesWithoutScroll(
         turnId,
         paragraphEl,
+        zoom(),
       );
       quotesDataRef.current = {
         turnEl: paragraphEl.current.closest('.stb-react-turn'),
@@ -93,6 +96,7 @@ const ParagraphOriginal = ({
           quotesWithoutScroll,
           paragraphEl,
           scrollTop,
+          zoom(),
         ),
       };
     }
@@ -106,7 +110,7 @@ const ParagraphOriginal = ({
       widthChanged = true;
       quotesDataRef.current.width = width;
       quotesDataRef.current.quotesWithoutScroll =
-        getParagraphQuotesWithoutScroll(turnId, paragraphEl);
+        getParagraphQuotesWithoutScroll(turnId, paragraphEl, zoom());
     }
 
     if (
@@ -121,6 +125,7 @@ const ParagraphOriginal = ({
         quotesDataRef.current.quotesWithoutScroll,
         paragraphEl,
         scrollTop,
+        zoom(),
       );
     }
 
@@ -132,11 +137,12 @@ const ParagraphOriginal = ({
     ) {
       needToUpdate = true;
       quotesDataRef.current.quotesWithoutScroll =
-        getParagraphQuotesWithoutScroll(turnId, paragraphEl);
+        getParagraphQuotesWithoutScroll(turnId, paragraphEl, zoom());
       quotesDataRef.current.scrolledQuotes = getScrolledQuotes(
         quotesDataRef.current.quotesWithoutScroll,
         paragraphEl,
         scrollTop,
+        zoom(),
       );
     }
     quotesDataRef.current.quotesSignature = quotesSignature;
@@ -152,11 +158,13 @@ const ParagraphOriginal = ({
             const quotesWithoutScroll = getParagraphQuotesWithoutScroll(
               turnId,
               paragraphEl,
+              zoom(),
             );
             const scrolledQuotes = getScrolledQuotes(
               quotesWithoutScroll,
               paragraphEl,
               scrollTop,
+              zoom(),
             );
             quotesDataRef.current.quotesWithoutScroll = quotesWithoutScroll;
             quotesDataRef.current.scrolledQuotes = scrolledQuotes;

@@ -5,7 +5,9 @@ const initialGameState = {
   stage: GAME_STAGE_INIT,
   game: null,
   position: { x: 0, y: 0 },
+  // viewport — в единицах холста: окно браузера / zoom
   viewport: { width: 1600, height: 1200 },
+  zoom: 1,
   areaRect: { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 },
   error: null,
   cancelCallback: () => {},
@@ -21,6 +23,7 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
         // позицию кладёт только loadFullGame; loadShortGame (диалог входа)
         // отдаёт игру без неё — и не должен обнулять уже вычисленную
         position: payload.position || state.position,
+        zoom: 1,
       };
 
     // Правка игры из панели Info: ответ `PUT /game` — это ЧАСТЬ игры (name,
@@ -65,6 +68,13 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
       return {
         ...state,
         viewport: payload,
+      };
+
+    case types.GAME_ZOOM_SET:
+      return {
+        ...state,
+        zoom: payload.zoom,
+        position: payload.position,
       };
 
     case types.GAME_AUTO_SAVE_SET:

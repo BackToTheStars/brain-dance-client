@@ -77,6 +77,7 @@ const CreateTurnForm = () => {
   const [activeTemplate, setActiveTemplate] = useState(templatesToShow[0]);
   const templateSettings = settings[activeTemplate];
   const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.game.viewport);
 
   const commonFields = {
     colors: {
@@ -84,13 +85,12 @@ const CreateTurnForm = () => {
       font: null,
     },
     position: {
-      // @todo: get vieport size from redux
       x:
         gamePosition.x +
-        Math.round(window.innerWidth / 2 - TURN_SIZE_WIDTH / 2),
+        Math.round(viewport.width / 2 - TURN_SIZE_WIDTH / 2),
       y:
         gamePosition.y +
-        Math.round(window.innerHeight / 2 - TURN_SIZE_HEIGHT / 2),
+        Math.round(viewport.height / 2 - TURN_SIZE_HEIGHT / 2),
     },
     size: {
       width: TURN_SIZE_WIDTH,

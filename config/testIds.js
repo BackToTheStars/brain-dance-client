@@ -370,6 +370,11 @@ export const TID = {
     // кнопке role=switch) и пауза в секундах (атрибут на <input> antd InputNumber)
     autoSave: 'info-auto-save',
     autoSaveDelay: 'info-auto-save-delay',
+    // Zoom — у любой роли: antd Button «−» и «+» (disabled на крайних ступенях)
+    // и текст масштаба между ними («75 %»); масштаб — __APP_STATE__().game.zoom
+    zoomOut: 'info-zoom-out',
+    zoomIn: 'info-zoom-in',
+    zoomValue: 'info-zoom-value',
   },
 };
 

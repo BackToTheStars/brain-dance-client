@@ -10,7 +10,8 @@ import { Button, InputNumber, Switch } from 'antd';
 import { TID } from '@/config/testIds';
 import { STATUS_OFF } from '@/config/presence';
 import { setOnline } from '@/modules/presence/redux/actions';
-import { setAutoSaveField } from '@/modules/game/game-redux/actions';
+import { setAutoSaveField, setZoom } from '@/modules/game/game-redux/actions';
+import { ZOOM_STEPS } from '@/config/ui';
 import {
   AUTO_SAVE_FIELD_DELAY_MAX,
   AUTO_SAVE_FIELD_DELAY_MIN,
@@ -25,6 +26,8 @@ const InfoPanel = () => {
   // включён при любом статусе, кроме «выключено», в том числе при ошибке
   const online = useSelector((state) => state.presence.status !== STATUS_OFF);
   const autoSave = useSelector((state) => state.game.autoSave);
+  const zoom = useSelector((state) => state.game.zoom);
+  const zoomStep = ZOOM_STEPS.indexOf(zoom);
   const [viewMode, setViewMode] = useState(true);
 
   const { info, can, reloadUserInfo } = useUserContext();
@@ -96,6 +99,32 @@ const InfoPanel = () => {
                   }
                   data-test-id={TID.presence.toggle}
                 />
+              </td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <td className="py-2 px-4">Zoom:</td>
+              <td className="py-2 px-4">
+                <Button
+                  size="small"
+                  disabled={zoomStep <= 0}
+                  onClick={() => dispatch(setZoom(ZOOM_STEPS[zoomStep - 1]))}
+                  aria-label="Zoom out"
+                  data-test-id={TID.info.zoomOut}
+                >
+                  −
+                </Button>{' '}
+                <span data-test-id={TID.info.zoomValue}>
+                  {Math.round(zoom * 100)}&nbsp;%
+                </span>{' '}
+                <Button
+                  size="small"
+                  disabled={zoomStep === ZOOM_STEPS.length - 1}
+                  onClick={() => dispatch(setZoom(ZOOM_STEPS[zoomStep + 1]))}
+                  aria-label="Zoom in"
+                  data-test-id={TID.info.zoomIn}
+                >
+                  +
+                </Button>
               </td>
             </tr>
             {can(RULE_TURNS_CRUD) && (

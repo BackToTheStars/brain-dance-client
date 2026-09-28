@@ -283,6 +283,7 @@ export const setCursorSharing = (on) => (dispatch, getState) => {
   }
   const started = startTracking({
     getPosition: () => getState().game.position,
+    getZoom: () => getState().game.zoom,
     onMove: (x, y) => dispatch(castCursor(x, y)),
     onLeave: () => dispatch(castCursorOff()),
   });
@@ -317,6 +318,7 @@ const strokeGrew = (id, points) => (dispatch, getState) => {
 const attachPen = (dispatch, getState) =>
   startDrawing({
     getPosition: () => getState().game.position,
+    getZoom: () => getState().game.zoom,
     onStart: (id, x, y) => dispatch(strokeStarted(id, x, y)),
     onPoints: (id, points) => dispatch(strokeGrew(id, points)),
     onEnd: (id) => castDraw({ op: DRAW_END, id }),

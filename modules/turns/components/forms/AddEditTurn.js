@@ -149,6 +149,7 @@ const getDate = (mixedDate) => {
 
 const AddEditTurnPopup = () => {
   const gamePosition = useSelector((state) => state.game.position);
+  const viewport = useSelector((state) => state.game.viewport);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
   const turnData = useSelector((state) => state.turns.d[editTurnId]);
   const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
@@ -569,10 +570,10 @@ const AddEditTurnPopup = () => {
       turnObj.height = 600;
       turnObj.width = 800;
       turnObj.x =
-        gamePosition.x + Math.round(window.innerWidth / 2 - turnObj.width / 2);
+        gamePosition.x + Math.round(viewport.width / 2 - turnObj.width / 2);
       turnObj.y =
         gamePosition.y +
-        Math.round(window.innerHeight / 2 - turnObj.height / 2);
+        Math.round(viewport.height / 2 - turnObj.height / 2);
     }
 
     const payload = {

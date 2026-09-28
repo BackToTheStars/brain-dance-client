@@ -15,8 +15,9 @@ import { processQuoteClicked } from '@/modules/quotes/redux/actions';
 import { TYPE_QUOTE_PICTURE } from '@/modules/quotes/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { TID } from '@/config/testIds';
+import { relativeRect } from '@/modules/game/components/helpers/zoom';
 
 const PictureQuotes = ({
   turnId,
@@ -27,6 +28,7 @@ const PictureQuotes = ({
   pictureOnly,
 }) => {
   const dispatch = useDispatch();
+  const store = useStore();
   const turnQuotes = useSelector((state) => state.turns.d[turnId]?.quotes);
   const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]);
 
@@ -51,9 +53,9 @@ const PictureQuotes = ({
   }, [quotes, dLines, turnId]);
   useEffect(() => {
     if (!wrapperEl) return;
-    const rect = wrapperEl.getBoundingClientRect();
     const turnEl = wrapperEl.closest('.stb-react-turn');
-    const widgetTop = rect.top - turnEl.getBoundingClientRect().top;
+    const rect = relativeRect(wrapperEl, turnEl, store.getState().game.zoom);
+    const widgetTop = rect.top;
     let width = Math.round(rect.width);
     let height = Math.round(rect.height);
     if (!width || !height) return;

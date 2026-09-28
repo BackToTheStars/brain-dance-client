@@ -41,7 +41,7 @@ import { updateScrollPosition } from '@/modules/turns/redux/actions';
 import { WIDGET_PDF } from '@/modules/turns/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import WidgetEditButton from '../buttons/Edit';
 import PdfCrop from './Crop';
@@ -57,6 +57,7 @@ import { getDocumentParams, loadPdfjs } from './pdfLoader';
 import PdfQuotes from './Quotes';
 import { getPageOffsets, getPdfQuotesWithCoords } from './quotesGeometry';
 import { getRenderRatio } from './renderBudget';
+import { relativeRect } from '@/modules/game/components/helpers/zoom';
 
 const PDF_WIDGET_MIN_HEIGHT = 60;
 const PDF_UNBOUNDED_HEIGHT = 100000; // пока документ не загружен, высоту не ограничиваем
@@ -96,6 +97,7 @@ const Pdf = ({
   );
   const { can } = useUserContext();
   const dispatch = useDispatch();
+  const store = useStore();
 
   const isWidgetEdited =
     editTurnId === turnId && editWidgetId === widgetId && EDIT_MODES.includes(mode);
@@ -424,12 +426,13 @@ const Pdf = ({
     const turnEl = el.closest('.stb-react-turn');
     if (!turnEl) return;
 
-    const rect = el.getBoundingClientRect();
-    const turnRect = turnEl.getBoundingClientRect();
+    const zoom = store.getState().game.zoom;
+    const rect = relativeRect(el, turnEl, zoom);
     // По горизонтали точка отсчёта — столбец страниц, а не скроллер: между ними
     // внутренний отступ скроллера, а рамки цитат и краевые маркеры должны лежать
     // на странице. Все страницы стоят в одном столбце, достаточно первой.
-    const pageRect = pageElsRef.current.get(1)?.getBoundingClientRect() || rect;
+    const firstPage = pageElsRef.current.get(1);
+    const pageRect = firstPage ? relativeRect(firstPage, turnEl, zoom) : rect;
     const withCoords = getPdfQuotesWithCoords({
       quotes: quotes || [],
       pageOffsets,
@@ -437,8 +440,8 @@ const Pdf = ({
       scrollTop: el.scrollTop,
       viewportWidth: pageWidth,
       viewportHeight: el.clientHeight,
-      widgetLeft: Math.round(pageRect.left - turnRect.left),
-      widgetTop: Math.round(rect.top - turnRect.top),
+      widgetLeft: Math.round(pageRect.left),
+      widgetTop: Math.round(rect.top),
       turnId,
       crop: viewCrop,
     });

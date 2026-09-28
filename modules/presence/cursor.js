@@ -11,6 +11,7 @@ const GAME_BOX_ID = 'game-box';
 const tracker = {
   box: null,
   getPosition: null,
+  getZoom: null,
   onMove: null,
   onLeave: null,
 };
@@ -18,18 +19,24 @@ const tracker = {
 // Screen point of an event → point of the canvas. The rectangle is read at
 // event time: dragging the canvas moves the box itself while the stored
 // position only catches up when the drag stops. The pencil uses the same
-// formula, so a stroke and a cursor land on the same card.
-export const canvasPoint = (box, position, event) => {
+// formula, so a stroke and a cursor land on the same card. Under the canvas
+// zoom the rectangle and the pointer are screen px, the canvas is not.
+export const canvasPoint = (box, position, event, zoom = 1) => {
   const rect = box.getBoundingClientRect();
   return {
-    x: Math.round(event.clientX - rect.left + (position?.x || 0)),
-    y: Math.round(event.clientY - rect.top + (position?.y || 0)),
+    x: Math.round((event.clientX - rect.left) / zoom + (position?.x || 0)),
+    y: Math.round((event.clientY - rect.top) / zoom + (position?.y || 0)),
   };
 };
 
 const handleMove = (event) => {
   if (!tracker.box) return;
-  const { x, y } = canvasPoint(tracker.box, tracker.getPosition(), event);
+  const { x, y } = canvasPoint(
+    tracker.box,
+    tracker.getPosition(),
+    event,
+    tracker.getZoom(),
+  );
   tracker.onMove(x, y);
 };
 
@@ -40,13 +47,14 @@ const handleLeave = () => {
 
 // Returns false when there is no canvas to listen to yet — the caller then
 // leaves the switch off instead of showing a state that does nothing.
-export const startTracking = ({ getPosition, onMove, onLeave }) => {
+export const startTracking = ({ getPosition, getZoom, onMove, onLeave }) => {
   if (typeof document === 'undefined') return false;
   const box = document.getElementById(GAME_BOX_ID);
   if (!box) return false;
   stopTracking();
   tracker.box = box;
   tracker.getPosition = getPosition;
+  tracker.getZoom = getZoom;
   tracker.onMove = onMove;
   tracker.onLeave = onLeave;
   box.addEventListener('mousemove', handleMove);
@@ -60,6 +68,7 @@ export const stopTracking = () => {
   tracker.box.removeEventListener('mouseleave', handleLeave);
   tracker.box = null;
   tracker.getPosition = null;
+  tracker.getZoom = null;
   tracker.onMove = null;
   tracker.onLeave = null;
 };

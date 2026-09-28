@@ -6,8 +6,7 @@ import {
   widgetSpacer,
 } from '@/config/ui';
 import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import {
   markTurnAsChanged,
   recalcAreaRect,
@@ -38,6 +37,7 @@ import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { HorizontalSplit } from '@/modules/ui/components/common/HorizontalSplit';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { mouseTravel } from '@/modules/game/components/helpers/zoom';
 
 // Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
 // предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
@@ -48,6 +48,7 @@ const TurnAdapter = ({ id }) => {
   const turnPositionQueue = useRef(getQueue(TURNS_POSITION_TIMEOUT_DELAY)).current;
   const gamePosition = useSelector((state) => state.game.position);
   const dispatch = useDispatch();
+  const store = useStore();
   const wrapper = useRef(null);
   const position = useSelector((state) => state.turns.g[id].position);
   const width = useSelector((state) => state.turns.g[id].size?.width);
@@ -84,14 +85,29 @@ const TurnAdapter = ({ id }) => {
   useEffect(() => {
     if (typeof $ === 'undefined') return;
     if (restricted) return;
+    let origin = null;
+    let travel = null;
+    const follow = (event, ui) => {
+      if (!travel) return;
+      const { x, y } = travel(event);
+      ui.position.left = origin.left + x;
+      ui.position.top = origin.top + y;
+    };
     $(wrapper.current).draggable({
       // grid: [GRID_CELL_X, GRID_CELL_X],
       start: (event, ui) => {
+        const { style } = wrapper.current;
+        origin = {
+          left: parseFloat(style.left) || 0,
+          top: parseFloat(style.top) || 0,
+        };
+        travel = mouseTravel(store.getState().game.zoom, event);
         $('#game-box')
           .addClass('remove-line-transition')
           .addClass('translucent-field');
       },
       drag: (event, ui) => {
+        follow(event, ui);
         turnPositionQueue.add(() => {
           dispatch(
             updateGeometry({
@@ -105,6 +121,7 @@ const TurnAdapter = ({ id }) => {
         });
       },
       stop: (event, ui) => {
+        follow(event, ui);
         turnPositionQueue.clear();
         dispatch(
           updateGeometry({
@@ -147,6 +164,7 @@ const TurnAdapter = ({ id }) => {
 export const Turn = memo(({ id }) => {
   const turnData = useSelector((state) => state.turns.d[id]);
   const dispatch = useDispatch();
+  const store = useStore();
   const turnGeometryQueue = useRef(getQueue(TURNS_GEOMETRY_TIMEOUT_DELAY)).current;
 
   const turnWidth = useSelector((state) => state.turns.g[id]?.size?.width);
@@ -248,6 +266,7 @@ export const Turn = memo(({ id }) => {
       const pairHeight = top.offsetHeight + bottom.offsetHeight;
       const min = splitPair.top.minHeightCallback(turnWidth);
       splitDrag.current = {
+        zoom: store.getState().game.zoom,
         start: top.offsetHeight,
         min,
         max: Math.max(
@@ -265,11 +284,14 @@ export const Turn = memo(({ id }) => {
   const onSplitMove = useCallback(
     (delta) => {
       if (!splitDrag.current) return;
-      const { start, min, max } = splitDrag.current;
+      const { zoom, start, min, max } = splitDrag.current;
       dispatch(
         updateSplitHeight({
           _id,
-          splitHeight: Math.min(Math.max(start + delta, min), max),
+          splitHeight: Math.min(
+            Math.max(start + Math.round(delta / zoom), min),
+            max,
+          ),
         }),
       );
     },
@@ -386,11 +408,32 @@ export const Turn = memo(({ id }) => {
     if (resizeDisabled || restricted) return;
     if (typeof $ === 'undefined') return;
 
+    // The start comes from the element: under zoom ui.originalSize is off.
+    let origin = null;
+    let travel = null;
+    const follow = (event, ui) => {
+      if (!travel) return;
+      const { x, y } = travel(event);
+      ui.size.width = Math.min(
+        TURN_SIZE_MAX_WIDTH,
+        Math.max(
+          TURN_SIZE_MIN_WIDTH,
+          snapRound(origin.width + x, GRID_CELL_X),
+        ),
+      );
+      ui.size.height = snapRound(origin.height + y, GRID_CELL_Y);
+    };
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],
       minWidth: TURN_SIZE_MIN_WIDTH,
       maxWidth: TURN_SIZE_MAX_WIDTH,
+      start: (event) => {
+        const el = wrapper.current;
+        origin = { width: el.clientWidth, height: el.clientHeight };
+        travel = mouseTravel(store.getState().game.zoom, event);
+      },
       resize: (event, ui) => {
+        follow(event, ui);
         recalculateSize(
           snapRound(ui.size.width, GRID_CELL_X),
           snapRound(ui.size.height, GRID_CELL_Y)
@@ -398,6 +441,7 @@ export const Turn = memo(({ id }) => {
         dispatch(markTurnAsChanged({ _id }));
       },
       stop: (event, ui) => {
+        follow(event, ui);
         turnGeometryQueue.clear();
         recalculateSize(
           snapRound(ui.size.width, GRID_CELL_X),

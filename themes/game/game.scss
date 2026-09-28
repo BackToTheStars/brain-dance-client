@@ -29,6 +29,8 @@
 .rec-rectangle {
   user-select: none;
   position: fixed;
+  // inside #game-box: undo its zoom to keep the screen size and place
+  zoom: calc(1 / var(--game-zoom, 1));
   background: rgba(255, 0, 0, .8);
   // transform: translateX(-50%);
   // left: 50%;
@@ -65,9 +67,12 @@
   // }
 }
 
+// --game-zoom comes from Game.js. The box's own size is zoomed too, so it is
+// 1/z of the window for the box to still cover it.
 #game-box {
-  width: 100vw;
-  height: 100vh;
+  zoom: var(--game-zoom, 1);
+  width: calc(100vw / var(--game-zoom, 1));
+  height: calc(100vh / var(--game-zoom, 1));
   &.edit-mode,
   &.following-tour,
   &.view-only {
