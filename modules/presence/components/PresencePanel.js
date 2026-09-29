@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   AimOutlined,
@@ -28,13 +28,16 @@ import {
   STATUS_RECONNECTING,
   TOUR_PARAM,
 } from '@/config/presence';
+import { PANEL_PRESENCE } from '@/config/panel';
 import { TID } from '@/config/testIds';
 import { ROLE_GAME_OWNER, ROLE_GAME_PLAYER, ROLES } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import Button from '@/modules/panels/components/PanelButton';
+import { changePanelGeometry } from '@/modules/panels/redux/actions';
 import CursorIcon from '@/modules/ui/icons/CursorIcon';
 import MapIcon from '@/modules/ui/icons/MapIcon';
 import {
+  fitPanelPlace,
   readPresencePanelCollapsed,
   savePresencePanelCollapsed,
 } from '../panelView';
@@ -51,6 +54,13 @@ import {
 } from '../redux/actions';
 
 const roleName = (role) => ROLES[role]?.name || `Role ${role}`;
+
+const boxSize = (box) => ({ width: box.offsetWidth, height: box.offsetHeight });
+// То же окно, что у containment: 'window' в jQuery UI.
+const screenSize = () => ({
+  width: document.documentElement.clientWidth,
+  height: document.documentElement.clientHeight,
+});
 
 // Свои svg — в пикселях: 14 px это тот же 1em, которым antd рисует свои иконки.
 const ICON_SIZE = 14;
@@ -71,22 +81,74 @@ const PresencePanel = () => {
   const linesOnTop = useSelector((state) => state.presence.linesOnTop);
   const tourEnded = useSelector((state) => state.presence.tourEnded);
   const hash = useSelector((state) => state.game.game?.hash);
+  const place = useSelector((state) => state.panels.d[PANEL_PRESENCE].place);
+  const layoutResets = useSelector((state) => state.panels.layoutResets);
   const { info } = useUserContext();
 
   const ref = useRef();
   const linkRef = useRef();
+  const dragging = useRef(false);
   const id = useId();
   const [peopleOpen, setPeopleOpen] = useState(true);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [collapsed, setCollapsed] = useState(readPresencePanelCollapsed);
+  // left / top обёртки пишет только этот компонент (jQuery UI и эффект ниже), не
+  // React: иначе значение, равное прежнему, не перекрыло бы след перетаскивания.
   useEffect(() => {
     if (!ref.current) return;
     if (typeof $ === 'undefined') return;
-    const el = $(ref.current.parentNode);
-    el.draggable({ handle: '.presence-panel__header', containment: 'window' });
+    const box = ref.current.parentNode;
+    const el = $(box);
+    el.draggable({
+      handle: '.presence-panel__header',
+      containment: 'window',
+      start: () => {
+        dragging.current = true;
+      },
+      stop: (event, ui) => {
+        dragging.current = false;
+        const next = fitPanelPlace(ui.position, boxSize(box), screenSize());
+        el.css(next);
+        dispatch(changePanelGeometry(PANEL_PRESENCE, { place: next }));
+      },
+    });
     return () => el.draggable('destroy');
   }, []);
+
+  // Записанное место, прижатое к окну, — при открытии, сбросе и смене размера
+  // панели или окна; сама запись при этом не меняется.
+  useLayoutEffect(() => {
+    const box = ref.current?.parentNode;
+    if (!box) return;
+    const show = () => {
+      if (dragging.current) return;
+      if (!place) {
+        box.style.left = '';
+        box.style.top = '';
+        return;
+      }
+      const { left, top } = fitPanelPlace(place, boxSize(box), screenSize());
+      box.style.left = `${left}px`;
+      box.style.top = `${top}px`;
+    };
+    show();
+    const observer =
+      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(show);
+    observer?.observe(box);
+    window.addEventListener('resize', show);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', show);
+    };
+  }, [place]);
+
+  // Сброс раскладки в Info: вид перечитывается из хранилища.
+  useEffect(() => {
+    const next = readPresencePanelCollapsed();
+    setCollapsed(next);
+    if (next) setInviteOpen(false);
+  }, [layoutResets]);
 
   const online = status === STATUS_ONLINE;
   const me = members.find((member) => member.sid === sid) || null;

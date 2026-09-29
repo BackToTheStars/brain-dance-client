@@ -52,6 +52,9 @@ import {
 } from '../helpers/mediaUrlCheck';
 import { TID } from '@/config/testIds';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
+import { snapRound } from '../helpers/grid';
+import { GRID_CELL_X } from '@/config/ui';
+import { castSaved } from '@/modules/presence/redux/actions';
 
 const {
   settings,
@@ -271,9 +274,11 @@ const AddEditTurnPopup = () => {
     dispatch(toggleMaximizeQuill(value));
   };
 
+  // Перечитывается и после сброса раскладки в Info — при открытой форме.
+  const layoutResets = useSelector((state) => state.panels.layoutResets);
   useEffect(() => {
     setFontSize(readEditorFontSize());
-  }, []);
+  }, [layoutResets]);
 
   const changeFontSize = (delta) => {
     const next = clampEditorFontSize(fontSize + delta);
@@ -398,9 +403,9 @@ const AddEditTurnPopup = () => {
       }
     }
 
-    if (lineIdsToDelete.length) {
-      dispatch(linesDelete(lineIdsToDelete));
-    }
+    const linesDeleted = lineIdsToDelete.length
+      ? dispatch(linesDelete(lineIdsToDelete))
+      : null;
     if (quoteKeysDeleted.length) {
       dispatch(clearQuotesInfo(quoteKeysDeleted));
       // цитата, снятая этим сохранением, не может остаться активной
@@ -414,6 +419,9 @@ const AddEditTurnPopup = () => {
       // Закрывается только та форма, которая сохранялась: иначе поздний ответ
       // открыл бы закрытую панель или закрыл начатую правку другого хода.
       success: () => {
+        // Спутникам ведущего — и после закрытия формы, но не раньше удаления линий
+        // снятых цитат: иначе их перезапрос застанет эти линии.
+        Promise.resolve(linesDeleted).then(() => dispatch(castSaved()));
         if (!edition.isCurrent(token)) return;
         dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
         dispatch(toggleMaximizeQuill(false));
@@ -613,12 +621,16 @@ const AddEditTurnPopup = () => {
       turnObj.y = turnToEdit.y;
     } else {
       turnObj.height = 600;
-      turnObj.width = 800;
-      turnObj.x =
-        gamePosition.x + Math.round(viewport.width / 2 - turnObj.width / 2);
-      turnObj.y =
-        gamePosition.y +
-        Math.round(viewport.height / 2 - turnObj.height / 2);
+      // Кратна сетке: карточка при монтировании прижимает ширину к ней.
+      turnObj.width = 768;
+      turnObj.x = snapRound(
+        gamePosition.x + (viewport.width - turnObj.width) / 2,
+        GRID_CELL_X,
+      );
+      turnObj.y = snapRound(
+        gamePosition.y + (viewport.height - turnObj.height) / 2,
+        GRID_CELL_X,
+      );
     }
 
     const payload = {

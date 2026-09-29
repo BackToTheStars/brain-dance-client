@@ -21,6 +21,7 @@ import {
 import {
   applyUserPanelSettings,
   resetAndExit,
+  resetUserPanels,
   setPanels,
 } from '@/modules/panels/redux/actions';
 import { GRID_CELL_X, GRID_CELL_Y, ZOOM_STEPS } from '@/config/ui';
@@ -36,6 +37,7 @@ import {
 } from '@/modules/panels/redux/storage';
 import {
   getStore,
+  lsRemoveLayoutSettings,
   lsUpdateLayoutSettings,
 } from '@/modules/settings/redux/requests';
 import {
@@ -110,7 +112,7 @@ export const loadFullGame =
       const personalizedPanels = getPersonalizedPanelSettings(hash, d);
       dispatch(setPanels({ d: personalizedPanels }));
       // поверх настроек игры — то, что помнится на пользователя (ширина панели
-      // редактора хода)
+      // редактора хода, мини-карта, место панели онлайн)
       dispatch(applyUserPanelSettings());
       getGameRequest(hash).then((data) => {
         resolveStartPosition(hash, focusTurnId, getState).then(({ x, y }) => {
@@ -397,6 +399,30 @@ export const setZoom = (zoom) => (dispatch, getState) => {
   });
   lsUpdateLayoutSettings({ zoom });
   dispatch(updateViewportGeometry(screen));
+};
+
+// Ключи layoutSettings, которые сбрасывает Info; ключи лобби (leftSideWidth,
+// sliderWidth) не входят.
+const LAYOUT_RESET_KEYS = [
+  'zoom',
+  'autoSaveField',
+  'autoSaveFieldDelay',
+  'editorPanelWidth',
+  'editorFontSize',
+  'presencePanelCollapsed',
+  'panels',
+];
+
+// Сброс раскладки из Info: сразу и без перезагрузки. Позиция холста, коды, онлайн
+// и экскурсия остаются.
+export const resetLayoutSettings = () => (dispatch, getState) => {
+  dispatch(setZoom(1));
+  lsRemoveLayoutSettings(LAYOUT_RESET_KEYS);
+  const hash = getState().game.game?.hash;
+  if (hash) updateGameSettings(hash, 'panels', {});
+  dispatch(loadAutoSaveField());
+  dispatch(resetUserPanels());
+  dispatch(applyUserPanelSettings());
 };
 
 // Правка игры из панели Info. `PUT /game` отвечает частью игры — name,

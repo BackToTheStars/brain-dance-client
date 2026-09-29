@@ -13,6 +13,9 @@ const initialPanelState = {
   editWidgetId: null,
   editWidgetParams: {},
   mode: MODE_GAME,
+  // Счётчик сбросов раскладки в Info: открытые формы и панели перечитывают по нему
+  // то, что держат в своём состоянии (шрифт редактора, вид панели онлайн).
+  layoutResets: 0,
 };
 
 export const panelReducer = (state = initialPanelState, { type, payload }) => {
@@ -94,6 +97,21 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         ...state,
         d: payload.d,
       };
+
+    case types.PANELS_USER_RESET: {
+      const next = { ...state.d };
+      for (const panel of panels) {
+        if (!panel.userFields || !next[panel.type]) continue;
+        const defaults = {};
+        for (const field of panel.userFields) defaults[field] = panel[field];
+        next[panel.type] = { ...next[panel.type], ...defaults };
+      }
+      return {
+        ...state,
+        d: next,
+        layoutResets: state.layoutResets + 1,
+      };
+    }
     default:
       return state;
   }

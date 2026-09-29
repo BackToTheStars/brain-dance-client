@@ -1,16 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Alert, Button } from 'antd';
+import { Alert, Button, Modal } from 'antd';
 import { useTranslations } from 'next-intl';
 import { API_URL, LOBBY_URL } from '@/config/server';
 import { TID } from '@/config/testIds';
-import { getStore } from '@/modules/settings/redux/requests';
+import {
+  getStore,
+  settingsStorageKey,
+} from '@/modules/settings/redux/requests';
 import {
   accessExportFileName,
   buildAccessExport,
   gamesWithCodes,
 } from '@/modules/settings/utils/accessExport';
+import { siteDataKeys } from '@/modules/settings/utils/siteData';
 
 const SITE_NAME = 'Brain Dance';
 
@@ -28,22 +32,39 @@ const downloadJson = (data, fileName) => {
   URL.revokeObjectURL(href);
 };
 
+const readGames = () => {
+  try {
+    return gamesWithCodes(getStore().games);
+  } catch {
+    // испорченное хранилище читается как пустое
+    return [];
+  }
+};
+
 // Сюда перед переездом лобби поведёт `/` (правило nginx); из интерфейса ссылок нет.
-// Хранилище только читается: ни очистки, ни импорта.
+// Хранилище читается и по подтверждению очищается; импорта здесь нет.
 const LobbyMovedPage = () => {
   const t = useTranslations('LobbyMoved');
   // null — хранилище ещё не прочитано: оно есть только в браузере
   const [games, setGames] = useState(null);
+  // число в тексте окна не меняется, пока оно закрывается после очистки
+  const [confirm, setConfirm] = useState({ open: false, count: 0 });
+  const [cleared, setCleared] = useState(false);
 
   useEffect(() => {
-    let stored = [];
-    try {
-      stored = getStore().games;
-    } catch {
-      // испорченное хранилище читается как пустое
-    }
-    setGames(gamesWithCodes(stored));
+    setGames(readGames());
   }, []);
+
+  const closeConfirm = () =>
+    setConfirm((current) => ({ ...current, open: false }));
+
+  const clearSiteData = () => {
+    const keys = siteDataKeys(Object.keys(localStorage), settingsStorageKey);
+    keys.forEach((key) => localStorage.removeItem(key));
+    setGames(readGames());
+    setCleared(true);
+    closeConfirm();
+  };
 
   const exportAccess = () => {
     const data = buildAccessExport(games, {
@@ -63,6 +84,9 @@ const LobbyMovedPage = () => {
         >
           <h2 className="text-2xl text-center">{t('Title')}</h2>
           <p>{t('Moved')}</p>
+          {cleared && (
+            <p data-test-id={TID.lobbyMoved.cleared}>{t('Cleared')}</p>
+          )}
           {games?.length === 0 && (
             <p data-test-id={TID.lobbyMoved.empty}>{t('Empty')}</p>
           )}
@@ -106,8 +130,41 @@ const LobbyMovedPage = () => {
               {t('Open_new_lobby')}
             </Button>
           )}
+          <Button
+            danger
+            onClick={() =>
+              setConfirm({ open: true, count: games?.length ?? 0 })
+            }
+            data-test-id={TID.lobbyMoved.clear}
+          >
+            {t('Clear')}
+          </Button>
         </div>
       </div>
+      {/* Управляемый Modal, а не Modal.confirm: статические методы antd не видят тему. */}
+      <Modal
+        open={confirm.open}
+        title={t('Clear_title')}
+        okText={t('Clear_ok')}
+        cancelText={t('Clear_cancel')}
+        okButtonProps={{
+          danger: true,
+          'data-test-id': TID.lobbyMoved.clearOk,
+        }}
+        cancelButtonProps={{ 'data-test-id': TID.lobbyMoved.clearCancel }}
+        onOk={clearSiteData}
+        onCancel={closeConfirm}
+      >
+        <p
+          className="mb-0"
+          data-test-id={TID.lobbyMoved.clearConfirm}
+          data-count={confirm.count}
+        >
+          {confirm.count > 0
+            ? t('Clear_confirm', { count: confirm.count })
+            : t('Clear_confirm_empty')}
+        </p>
+      </Modal>
     </div>
   );
 };

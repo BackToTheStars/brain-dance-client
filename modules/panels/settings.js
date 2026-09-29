@@ -97,6 +97,8 @@ export const panels = [
     isDisplayed: false,
     width: () => '630px',
   },
+  // userFields — помнятся на пользователя (userSettings.layoutSettings.panels), пишутся
+  // сразу при изменении; значения здесь — умолчания для сброса в Info.
   {
     type: PANEL_MINIMAP,
     position: [POSITION_BOTTOM_LEFT, PANEL_MINIMAP_STYLES].join(' '),
@@ -105,7 +107,7 @@ export const panels = [
     width: 400, // () => '600px',
     isMinimized: false, // сворачивание в маленькую кнопку
     size: 100,
-    fieldsToSave: ['isDisplayed', 'isMinimized', 'size'],
+    userFields: ['isDisplayed', 'isMinimized', 'size'],
   },
   {
     type: PANEL_LINES,
@@ -135,15 +137,15 @@ export const panels = [
     isDisplayed: false,
     width: () => `50vw`,
   },
-  // Присутствие: действия текущей экскурсии и раскрываемый список участников.
-  // Открывается и закрывается вместе с переключателем Online
-  // в панели Info; ничего не запоминает — online по умолчанию выключен при
-  // каждой загрузке (без fieldsToSave). Одна колонка, ограниченная шириной окна.
+  // Присутствие: открывается и закрывается переключателем Online в панели Info,
+  // после загрузки закрыта. `place: null` — место из CSS.
   {
     type: PANEL_PRESENCE,
     position: POSITION_FLEXIBLE,
     component: PresencePanel,
     isDisplayed: false,
     width: () => 'min(420px, calc(100vw - 20px))',
+    place: null,
+    userFields: ['place'],
   },
 ];

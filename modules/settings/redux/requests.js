@@ -1,4 +1,4 @@
-const settingsStorageKey =
+export const settingsStorageKey =
   process.env.NEXT_PUBLIC_SETTINGS_STORAGE_KEY || 'userSettings';
 const VERSION = '0.0.1';
 
@@ -55,6 +55,13 @@ export const lsUpdateGames = (games) => {
 export const lsUpdateLayoutSettings = (settings) => {
   const { layoutSettings = {} } = getStore();
   updateStore('layoutSettings', { ...layoutSettings, ...settings });
+};
+
+export const lsRemoveLayoutSettings = (keys) => {
+  const { layoutSettings = {} } = getStore();
+  const rest = { ...layoutSettings };
+  for (const key of keys) delete rest[key];
+  updateStore('layoutSettings', rest);
 };
 
 export const lsUpdateTextSettings = (settings) => {

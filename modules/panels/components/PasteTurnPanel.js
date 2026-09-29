@@ -6,6 +6,7 @@ import {
   removeTurnFromBuffer,
 } from '@/modules/turns/redux/actions';
 import { reloadTurnsToPaste } from '@/modules/game/game-redux/actions';
+import { castSaved } from '@/modules/presence/redux/actions';
 import { TID } from '@/config/testIds';
 
 const paragraphToString = (paragraph, length = 200) => {
@@ -57,16 +58,14 @@ const PasteTurnPanel = () => {
                     className="btn btn-primary me-2"
                     data-test-id={TID.pasteTurn.paste}
                     onClick={() => {
-                      // successCallback здесь был, но insertTurnFromBuffer его
-                      // никогда не вызывал — он передаёт в createTurn свой
-                      // обработчик. Ход и так уходит из буфера внутри вставки, а
-                      // стор обновляет loadTurnsAndLinesToPaste, так что убирать
-                      // запись отсюда больше не нужно.
+                      // Ход уходит из буфера внутри вставки, а стор обновляет
+                      // loadTurnsAndLinesToPaste — убирать запись отсюда не нужно.
                       dispatch(
                         insertTurnFromBuffer(timeStamp, {
                           errorCallback: (message) => {
                             console.log(message);
                           },
+                          onSaved: () => dispatch(castSaved()),
                         }),
                       );
                     }}

@@ -177,14 +177,19 @@ export const TID = {
 
   // Страница экспорта доступов перед переездом лобби (app/lobby-moved/page.js); из
   // интерфейса на неё не ведёт ничего. Хранилище читается после монтирования: до
-  // этого нет ни count, ни empty.
+  // этого нет ни count, ни empty. Кнопка очистки есть всегда, и без кодов тоже.
   lobbyMoved: {
     page: 'lobby-moved-page',
     count: 'lobby-moved-count', // число игр с кодами (+ data-count)
     game: 'lobby-moved-game', // строка игры (+ data-hash, data-codes)
     export: 'lobby-moved-export', // скачивает brain-access-<YYYY-MM-DD>.json
-    link: 'lobby-moved-link', // <a href> на новое лобби; без NEXT_PUBLIC_LOBBY_URL её нет
+    link: 'lobby-moved-link', // <a href> на новое лобби; без NEXT_PUBLIC_LOBBY_URL — http://localhost:3023
     empty: 'lobby-moved-empty', // «игр нет» вместо числа, списка и экспорта
+    clear: 'lobby-moved-clear', // «Clear site data» — открывает окно подтверждения
+    clearConfirm: 'lobby-moved-clear-confirm', // тело окна (+ data-count — игр с кодами, 0 без них)
+    clearOk: 'lobby-moved-clear-ok',
+    clearCancel: 'lobby-moved-clear-cancel',
+    cleared: 'lobby-moved-cleared', // строка «данные сайта удалены» после очистки, до перезагрузки
   },
 
   // Админка: форма входа (modules/admin/components/forms/AdminSigninForm.js)
@@ -389,6 +394,9 @@ export const TID = {
     zoomOut: 'info-zoom-out',
     zoomIn: 'info-zoom-in',
     zoomValue: 'info-zoom-value',
+    // Reset — у любой роли, без подтверждения: панель онлайн, мини-карта, ширина и
+    // шрифт редактора, масштаб и Auto Save Field к умолчаниям; позиция холста остаётся
+    resetLayout: 'info-reset-layout',
   },
 };
 

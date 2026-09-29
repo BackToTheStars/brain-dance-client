@@ -1,5 +1,10 @@
 import { toggleMinimizePanel } from '@/modules/panels/redux/actions';
-import { PANEL_MINIMAP } from '@/config/panel';
+import {
+  MINIMAP_SIZE_MAX,
+  MINIMAP_SIZE_MIN,
+  MINIMAP_SIZE_STEP,
+  PANEL_MINIMAP,
+} from '@/config/panel';
 import { useDispatch } from 'react-redux';
 import MapIcon from '@/modules/ui/icons/MapIcon';
 
@@ -9,13 +14,13 @@ const MinimapButtons = ({
   isMinimized,
 }) => {
   const handleMapMinus = () => {
-    if (minimapSizePercents <= 30) return false;
-    setMinimapSizePercents(minimapSizePercents - 10);
+    if (minimapSizePercents <= MINIMAP_SIZE_MIN) return false;
+    setMinimapSizePercents(minimapSizePercents - MINIMAP_SIZE_STEP);
   };
 
   const handleMapPlus = () => {
-    if (minimapSizePercents >= 200) return false;
-    setMinimapSizePercents(minimapSizePercents + 10);
+    if (minimapSizePercents >= MINIMAP_SIZE_MAX) return false;
+    setMinimapSizePercents(minimapSizePercents + MINIMAP_SIZE_STEP);
   };
 
   const dispatch = useDispatch();

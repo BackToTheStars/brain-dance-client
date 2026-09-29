@@ -121,12 +121,19 @@
   "LobbyMoved": {
     "Title": "The lobby has moved",
     "Moved": "The game lobby now has its own address. Your access codes to games are kept only in this browser, and the new lobby cannot see them by itself.",
-    "Export_hint": "Download the file with your codes and upload it in the new lobby (Settings → Import). Nothing is removed here: the codes stay in this browser.",
+    "Export_hint": "Download the file with your codes and upload it in the new lobby (Settings → Import). The codes stay in this browser until you clear the site data.",
     "Games_count": "Games with codes in this browser: {count}",
     "Codes_count": "{count, plural, one {# code} other {# codes}}",
     "Secret_warning": "The file contains your access codes. They are secrets: anyone who has the file can enter your games. Do not publish it or pass it on.",
     "Export": "Download access file",
     "Empty": "There are no saved games in this browser, so there is nothing to move.",
-    "Open_new_lobby": "Open the new lobby"
+    "Open_new_lobby": "Open the new lobby",
+    "Clear": "Clear site data",
+    "Clear_title": "Clear site data?",
+    "Clear_confirm": "Access codes for {count, plural, one {# game} other {# games}}, game sign-ins and canvas settings will be removed from this browser. If you have not downloaded the file, the codes will be lost.",
+    "Clear_confirm_empty": "Game sign-ins and canvas settings will be removed from this browser.",
+    "Clear_ok": "Clear",
+    "Clear_cancel": "Cancel",
+    "Cleared": "Site data has been removed."
   }
 }

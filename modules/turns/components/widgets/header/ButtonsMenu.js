@@ -19,6 +19,7 @@ import { addNotification } from '@/modules/ui/redux/actions';
 import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { castSaved } from '@/modules/presence/redux/actions';
 
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
@@ -28,12 +29,13 @@ const ButtonsMenu = ({ _id }) => {
   const editorPanelWidth = useSelector(getEditorPanelWidth);
   const following = useSelector(selectFollowing);
   const canEdit = can(RULE_TURNS_CRUD) && !following;
+  const onDeleted = () => dispatch(castSaved());
 
   const handleCut = (e) => {
     e.preventDefault();
     if (confirm('Точно вырезать?')) {
       dispatch(cloneTurn(_id)).then(() => {
-        dispatch(deleteTurn(_id));
+        dispatch(deleteTurn(_id, { onDeleted }));
       });
     }
   };
@@ -41,7 +43,7 @@ const ButtonsMenu = ({ _id }) => {
   const handleDelete = (e) => {
     e.preventDefault();
     if (confirm('Точно удалить?')) {
-      dispatch(deleteTurn(_id));
+      dispatch(deleteTurn(_id, { onDeleted }));
     }
   };
 

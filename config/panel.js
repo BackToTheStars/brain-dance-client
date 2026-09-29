@@ -35,6 +35,11 @@ export const EDITOR_FONT_SIZE_MIN = 14;
 export const EDITOR_FONT_SIZE_MAX = 36;
 export const EDITOR_FONT_SIZE_STEP = 2;
 
+// Размер мини-карты в процентах (кнопки «−» / «+»): помнится на пользователя.
+export const MINIMAP_SIZE_MIN = 30;
+export const MINIMAP_SIZE_MAX = 200;
+export const MINIMAP_SIZE_STEP = 10;
+
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
 export const MODE_WIDGET_PARAGRAPH = 'widget-paragraph';

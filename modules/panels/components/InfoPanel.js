@@ -10,7 +10,11 @@ import { Button, InputNumber, Switch } from 'antd';
 import { TID } from '@/config/testIds';
 import { STATUS_OFF } from '@/config/presence';
 import { setOnline } from '@/modules/presence/redux/actions';
-import { setAutoSaveField, setZoom } from '@/modules/game/game-redux/actions';
+import {
+  resetLayoutSettings,
+  setAutoSaveField,
+  setZoom,
+} from '@/modules/game/game-redux/actions';
 import { ZOOM_STEPS } from '@/config/ui';
 import {
   AUTO_SAVE_FIELD_DELAY_MAX,
@@ -124,6 +128,18 @@ const InfoPanel = () => {
                   data-test-id={TID.info.zoomIn}
                 >
                   +
+                </Button>
+              </td>
+            </tr>
+            <tr className="border-b border-gray-300">
+              <td className="py-2 px-4">Layout settings:</td>
+              <td className="py-2 px-4">
+                <Button
+                  size="small"
+                  onClick={() => dispatch(resetLayoutSettings())}
+                  data-test-id={TID.info.resetLayout}
+                >
+                  Reset
                 </Button>
               </td>
             </tr>

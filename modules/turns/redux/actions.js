@@ -309,7 +309,7 @@ export const createTurn = (turn, callbacks) => (dispatch) => {
   });
 };
 
-export const deleteTurn = (_id) => (dispatch, getState) => {
+export const deleteTurn = (_id, { onDeleted } = {}) => (dispatch, getState) => {
   const state = getState();
   const allLines = Object.values(state.lines.d);
   const lines = filterLinesByTurnId(allLines, _id);
@@ -319,6 +319,7 @@ export const deleteTurn = (_id) => (dispatch, getState) => {
         type: types.TURN_DELETE,
         payload: _id,
       });
+      if (typeof onDeleted === 'function') onDeleted();
     });
   });
 };
@@ -471,7 +472,7 @@ export const exitPasteModeIfBufferEmpty = () => (dispatch) => {
 };
 
 export const insertTurnFromBuffer =
-  (timeStamp, { errorCallback }) =>
+  (timeStamp, { errorCallback, onSaved }) =>
   (dispatch, getState) => {
     const state = getState();
     // запасной путь на случай вызова без метки — берём последнюю запись буфера.
@@ -566,9 +567,10 @@ export const insertTurnFromBuffer =
               });
             }
           }
-          if (!!lines.length) {
-            dispatch(linesCreate(lines));
-          }
+          const linesSaved = lines.length
+            ? dispatch(linesCreate(lines))
+            : Promise.resolve();
+          if (typeof onSaved === 'function') linesSaved.then(() => onSaved());
 
           // преобразовать sourceTurnId и targetTurnId и вставить линии
         },
