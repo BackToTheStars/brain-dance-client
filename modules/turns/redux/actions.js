@@ -136,20 +136,7 @@ export const updateWidget = (turnId, widgetId, widget) => (dispatch) => {
     type: types.TURN_UPDATE_WIDGET,
     payload: { turnId, widgetId, widget },
   });
-  dispatch(markTurnAsChanged({ _id: turnId }));
 };
-
-export const markTurnAsChanged =
-  ({ _id }) =>
-  (dispatch, getState) => {
-    const state = getState();
-    const turn = state.turns.d[_id];
-    if (turn.wasChanged) return;
-    return dispatch({
-      type: types.TURN_WAS_CHANGED,
-      payload: { _id },
-    });
-  };
 
 export const compressParagraph = () => (dispatch, getState) => {
   const state = getState();
@@ -508,6 +495,8 @@ export const insertTurnFromBuffer =
       copiedTurn.position.y =
         position.y + Math.floor((viewport.height - copiedTurn.size.height) / 2);
     }
+    copiedTurn.position.x = snapRound(copiedTurn.position.x, GRID_CELL_X);
+    copiedTurn.position.y = snapRound(copiedTurn.position.y, GRID_CELL_X);
 
     if (!copiedTurn) {
       errorCallback('No turn in buffer');

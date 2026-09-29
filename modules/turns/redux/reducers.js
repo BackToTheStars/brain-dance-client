@@ -120,7 +120,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
               ...prevTurn.dWidgets,
               [widgetId]: widget,
             },
-            wasChanged: true,
           },
         },
       };
@@ -183,17 +182,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: {
             ...state.d[payload._id],
             splitHeight: payload.splitHeight,
-          },
-        },
-      };
-    case types.TURN_WAS_CHANGED:
-      return {
-        ...state,
-        d: {
-          ...state.d,
-          [payload._id]: {
-            ...state.d[payload._id],
-            wasChanged: true,
           },
         },
       };

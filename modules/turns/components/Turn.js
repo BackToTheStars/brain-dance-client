@@ -8,7 +8,6 @@ import {
 import { useCallback, useEffect, useRef, useState, memo, useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import {
-  markTurnAsChanged,
   recalcAreaRect,
   updateGeometry,
   updateSplitHeight,
@@ -140,7 +139,6 @@ const TurnAdapter = ({ id }) => {
         $('#game-box')
           .removeClass('remove-line-transition')
           .removeClass('translucent-field');
-        dispatch(markTurnAsChanged({ _id: id }));
       },
       cancel: ".not-draggable",
     });
@@ -438,7 +436,6 @@ export const Turn = memo(({ id }) => {
           snapRound(ui.size.width, GRID_CELL_X),
           snapRound(ui.size.height, GRID_CELL_Y)
         );
-        dispatch(markTurnAsChanged({ _id }));
       },
       stop: (event, ui) => {
         follow(event, ui);
@@ -447,7 +444,6 @@ export const Turn = memo(({ id }) => {
           snapRound(ui.size.width, GRID_CELL_X),
           snapRound(ui.size.height, GRID_CELL_Y)
         );
-        dispatch(markTurnAsChanged({ _id }));
         dispatch(recalcAreaRect());
       },
     });

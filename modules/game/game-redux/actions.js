@@ -102,6 +102,8 @@ const resolveStartPosition = (hash, focusTurnId, getState) => {
 export const loadFullGame =
   (hash, { focusTurnId = null } = {}) =>
   (dispatch, getState) => {
+    // До первого расчёта окна (Game.js) и геометрии ходов: окно зависит от масштаба.
+    dispatch(loadZoom());
     // GET GAME DATA
     return new Promise((resolve, reject) => {
       const d = getState().panels.d;
@@ -165,8 +167,8 @@ const withRejection = (call) =>
 // geometry and the scroll positions (when there were any): the guide of a tour
 // tells the followers to fetch the field again, and they have to see what was
 // saved, not what is being saved. The presence module is not imported here on
-// purpose (a cycle with it breaks the production bundle): the button that
-// saves passes the callback in.
+// purpose (a cycle with it breaks the production bundle): the caller passes
+// the callback in (the Save Field button, Auto Save Field).
 // `silent` — автосохранение: только ходы и прокрутка, без позиции холста и панелей,
 // без уведомления и выхода из режимов; ошибка — отказом промиса, а не alert.
 export const saveField = ({ onSaved = null, silent = false } = {}) => (dispatch, getState) => {
@@ -231,7 +233,9 @@ export const saveField = ({ onSaved = null, silent = false } = {}) => (dispatch,
       })
     : Promise.resolve();
   const saved = Promise.all([coordinatesSaved, scrollSaved]);
-  if (typeof onSaved === 'function') saved.then(() => onSaved());
+  // Отказ тихой записи получает вызывающий из возвращённого промиса; ветка
+  // колбэка без обработчика дала бы необработанный отказ.
+  if (typeof onSaved === 'function') saved.then(() => onSaved(), () => {});
   return saved;
 };
 
@@ -364,7 +368,16 @@ export const updateViewportGeometry = (screen) => (dispatch, getState) => {
   dispatch(recalcAreaRect());
 };
 
-// Масштаб — состояние просмотра: не сохраняется, загрузка игры возвращает 1.
+// Масштаб помнится на пользователя, а не на игру. Позиция не сдвигается:
+// сохранённая позиция — левый верхний угол окна при любом масштабе.
+export const loadZoom = () => (dispatch, getState) => {
+  const { zoom: stored } = getStore().layoutSettings || {};
+  const zoom = ZOOM_STEPS.includes(stored) ? stored : 1;
+  const { zoom: current, position } = getState().game;
+  if (zoom === current) return;
+  dispatch({ type: types.GAME_ZOOM_SET, payload: { zoom, position } });
+};
+
 // Центр окна остаётся на месте; позиция ставится напрямую — moveField
 // прилипает к сетке.
 export const setZoom = (zoom) => (dispatch, getState) => {
@@ -382,6 +395,7 @@ export const setZoom = (zoom) => (dispatch, getState) => {
       },
     },
   });
+  lsUpdateLayoutSettings({ zoom });
   dispatch(updateViewportGeometry(screen));
 };
 

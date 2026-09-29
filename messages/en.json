@@ -117,5 +117,16 @@
       "Back_to_lobby": "Back to lobby",
       "Stay_visitor": "Stay as visitor"
     }
+  },
+  "LobbyMoved": {
+    "Title": "The lobby has moved",
+    "Moved": "The game lobby now has its own address. Your access codes to games are kept only in this browser, and the new lobby cannot see them by itself.",
+    "Export_hint": "Download the file with your codes and upload it in the new lobby (Settings → Import). Nothing is removed here: the codes stay in this browser.",
+    "Games_count": "Games with codes in this browser: {count}",
+    "Codes_count": "{count, plural, one {# code} other {# codes}}",
+    "Secret_warning": "The file contains your access codes. They are secrets: anyone who has the file can enter your games. Do not publish it or pass it on.",
+    "Export": "Download access file",
+    "Empty": "There are no saved games in this browser, so there is nothing to move.",
+    "Open_new_lobby": "Open the new lobby"
   }
 }

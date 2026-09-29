@@ -3,10 +3,7 @@ import {
   TURN_SCROLL_TIMEOUT_DELAY,
 } from '@/config/ui';
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
-import {
-  markTurnAsChanged,
-  updateScrollPosition,
-} from '@/modules/turns/redux/actions';
+import { updateScrollPosition } from '@/modules/turns/redux/actions';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';

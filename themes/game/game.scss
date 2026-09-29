@@ -37,7 +37,8 @@
   left: 10px;
   width: 100px;
   height: 40px;
-  z-index: 4;
+  // under the cards (2): a card header beneath the plate keeps the mouse
+  z-index: 1;
   top: 10px;
   border-radius: 9px;
   display: flex;

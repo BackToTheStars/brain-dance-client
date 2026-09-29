@@ -5,6 +5,7 @@ import {
   loadAutoSaveField,
   saveField,
 } from '@/modules/game/game-redux/actions';
+import { castSaved } from '@/modules/presence/redux/actions';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { addNotification } from '@/modules/ui/redux/actions';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
@@ -58,7 +59,7 @@ const AutoSaveField = () => {
         return;
       }
       saving.current = true;
-      dispatch(saveField({ silent: true }))
+      dispatch(saveField({ silent: true, onSaved: () => dispatch(castSaved()) }))
         .then(
           () => {
             failed.current = false;

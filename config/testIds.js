@@ -175,6 +175,18 @@ export const TID = {
     codeRemove: 'game-modal-code-remove', // «Remove code» в строке (подтверждение — confirm.ok)
   },
 
+  // Страница экспорта доступов перед переездом лобби (app/lobby-moved/page.js); из
+  // интерфейса на неё не ведёт ничего. Хранилище читается после монтирования: до
+  // этого нет ни count, ни empty.
+  lobbyMoved: {
+    page: 'lobby-moved-page',
+    count: 'lobby-moved-count', // число игр с кодами (+ data-count)
+    game: 'lobby-moved-game', // строка игры (+ data-hash, data-codes)
+    export: 'lobby-moved-export', // скачивает brain-access-<YYYY-MM-DD>.json
+    link: 'lobby-moved-link', // <a href> на новое лобби; без NEXT_PUBLIC_LOBBY_URL её нет
+    empty: 'lobby-moved-empty', // «игр нет» вместо числа, списка и экспорта
+  },
+
   // Админка: форма входа (modules/admin/components/forms/AdminSigninForm.js)
   adminLogin: {
     nickname: 'admin-login-nickname',
@@ -312,16 +324,18 @@ export const TID = {
     typeBtn: 'add-turn-type',
     typeOption: (name) => `add-turn-type-${name}`, // пункт дропдауна типа (picture/video/audio/comment)
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
-    // медиа-URL-инпуты используют field(prefixClass): image-url / video-url / audio-url
-    // + data-save-state: ready | empty | unchanged | checking (ссылка картинки) | preview
-    // (загрузка кадра видео); кроме ready кнопка disabled
+    // медиа-URL-инпуты используют field(prefixClass): image-url / video-url /
+    // audio-url / pdf-url
+    // + data-save-state: ready | empty | unchanged | checking (пробная загрузка
+    // ссылки медиа-поля) | preview (загрузка кадра видео); кроме ready — disabled
     save: 'add-turn-save',
     cancel: 'add-turn-cancel',
-    // Окно «Похоже, это не картинка» перед записью: тело окна с data-reason="type"
+    // Окно «Похоже, это не картинка / видео / аудио / PDF» перед записью: тело
+    // окна с data-field (image | video | audio | pdf) и data-reason="type"
     // (видно по адресу) или "load" (пробная загрузка не удалась) и его кнопки
-    notImage: 'add-turn-not-image',
-    notImageSave: 'add-turn-not-image-save',
-    notImageCancel: 'add-turn-not-image-cancel',
+    notMedia: 'add-turn-not-media',
+    notMediaSave: 'add-turn-not-media-save',
+    notMediaCancel: 'add-turn-not-media-cancel',
     // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
     // button.ql-link, их берём по классам Quill)
     toolbar: (name) => `add-turn-toolbar-${name}`,

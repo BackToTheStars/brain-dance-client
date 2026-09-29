@@ -23,7 +23,6 @@ export const gameReducer = (state = initialGameState, { type, payload }) => {
         // позицию кладёт только loadFullGame; loadShortGame (диалог входа)
         // отдаёт игру без неё — и не должен обнулять уже вычисленную
         position: payload.position || state.position,
-        zoom: 1,
       };
 
     // Правка игры из панели Info: ответ `PUT /game` — это ЧАСТЬ игры (name,

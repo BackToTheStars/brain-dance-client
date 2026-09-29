@@ -137,7 +137,8 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
     return () => window.removeEventListener('resize', invokeUpdateWithQueue);
   }, []);
 
-  // setZoom resizes the window itself; this covers the reset by a game load.
+  // setZoom resizes the window itself; this covers the zoom a game load reads
+  // from the user settings.
   useEffect(() => {
     dispatch(
       updateViewportGeometry({

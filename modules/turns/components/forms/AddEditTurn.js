@@ -45,7 +45,11 @@ import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { createFormEdition } from '../helpers/formEdition';
-import { isNotImageUrl, probeImage } from '../helpers/imageUrlCheck';
+import {
+  isNotMediaUrl,
+  needsProbe,
+  probeMedia,
+} from '../helpers/mediaUrlCheck';
 import { TID } from '@/config/testIds';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 
@@ -62,7 +66,44 @@ const {
   FIELD_SOURCE,
   FIELD_DATE,
   FIELD_VIDEO,
+  FIELD_AUDIO,
+  FIELD_PDF,
 } = turnSettings;
+
+// Медиа-поля в порядке проверки ссылок при Save: тип media и data-field окна.
+const MEDIA_URL_FIELDS = [
+  { field: FIELD_PICTURE, type: 'images', name: 'image' },
+  { field: FIELD_VIDEO, type: 'videos', name: 'video' },
+  { field: FIELD_AUDIO, type: 'audios', name: 'audio' },
+  { field: FIELD_PDF, type: 'pdfs', name: 'pdf' },
+];
+
+const NOT_MEDIA_TEXTS = {
+  image: {
+    title: 'Похоже, это не картинка',
+    inField: 'в поле картинки',
+    asType: 'как картинка',
+    result: 'В ходе на её месте будет значок ошибки.',
+  },
+  video: {
+    title: 'Похоже, это не видео',
+    inField: 'в поле видео',
+    asType: 'как видео',
+    result: 'Плеер в ходе её не проиграет.',
+  },
+  audio: {
+    title: 'Похоже, это не аудио',
+    inField: 'в поле аудио',
+    asType: 'как аудио',
+    result: 'Плеер в ходе её не проиграет.',
+  },
+  pdf: {
+    title: 'Похоже, это не PDF',
+    inField: 'в поле PDF',
+    asType: 'как PDF',
+    result: 'В ходе на её месте будет сообщение об ошибке.',
+  },
+};
 
 // Поля хода так, как их отправит Save: недоступные шаблону — null.
 const prepareFields = (form, template) => {
@@ -116,7 +157,7 @@ const hasTurnContent = (template, fields, paragraphHasText) => {
 const SAVE_HINTS = {
   empty: 'Nothing to save: the turn is empty',
   unchanged: 'Nothing to save: no changes',
-  checking: 'Checking the image link…',
+  checking: 'Checking the link…',
   preview: 'Uploading the video preview…',
 };
 
@@ -191,11 +232,15 @@ const AddEditTurnPopup = () => {
   const [formatConfirm, setFormatConfirm] = useState(null);
   // Редакция, чей кадр сейчас грузится: Save блокируется только у неё.
   const [savingPreview, setSavingPreview] = useState(0);
-  // То же для пробной загрузки ссылки картинки перед записью.
-  const [checkingImage, setCheckingImage] = useState(0);
-  // Окно «Похоже, это не картинка»: { url, reason, payload, orphanSummary }.
-  const [notImageConfirm, setNotImageConfirm] = useState(null);
-  const confirmedNotImage = useRef(null);
+  // То же для пробной загрузки ссылки медиа-поля перед записью.
+  const [checkingLink, setCheckingLink] = useState(0);
+  // Окно «Похоже, это не …»: { name, url, reason, rest, payload, orphanSummary },
+  // где rest — ещё не проверенные поля.
+  const [notMediaConfirm, setNotMediaConfirm] = useState(null);
+  const confirmedNotMedia = useRef(null);
+  // Поле последнего окна — отдельно: заголовок не гаснет на анимации закрытия.
+  const [notMediaName, setNotMediaName] = useState('image');
+  const notMediaText = NOT_MEDIA_TEXTS[notMediaName];
   // Quill неуправляемый: копия абзаца для Save обновляется по text-change.
   const [editorOps, setEditorOps] = useState([]);
   // Снимок открытого на правку хода { token, template, fields, paragraph }; null —
@@ -385,7 +430,7 @@ const AddEditTurnPopup = () => {
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
-    if (edition.isCurrent(checkingImage)) return;
+    if (edition.isCurrent(checkingLink)) return;
     const textArr = quillConstants.getQuillTextArr();
 
     // Соседние куски одного цвета с равным id сводятся в одну цитату, поэтому
@@ -589,12 +634,12 @@ const AddEditTurnPopup = () => {
       ? getOrphanedSummary(orphaned, orphanedLines.length)
       : null;
 
-    const imageUrl = preparedForm[FIELD_PICTURE];
-    if (imageUrl && imageUrl !== (turnToEdit?.[FIELD_PICTURE] || '')) {
-      checkImageUrl(imageUrl, payload, orphanSummary);
-      return;
-    }
-    finishSave(payload, orphanSummary);
+    const changedLinks = MEDIA_URL_FIELDS.filter(
+      ({ field }) =>
+        preparedForm[field] &&
+        preparedForm[field] !== (turnToEdit?.[field] || ''),
+    ).map((link) => ({ ...link, url: preparedForm[link.field] }));
+    checkMediaLinks(changedLinks, payload, orphanSummary);
   };
 
   // Цитаты и связи теряются молча только если терять нечего. Иначе — окно с
@@ -608,19 +653,26 @@ const AddEditTurnPopup = () => {
     commitSave(payload);
   };
 
-  // Новая ссылка картинки: не картинка — окно, таймаут отказом не считается. Если за
-  // время проверки форму закрыли или перевели на другой ход, не сохраняется ничего.
-  const checkImageUrl = (url, payload, orphanSummary) => {
-    const ask = (reason) =>
-      setNotImageConfirm({ url, reason, payload, orphanSummary });
-    if (isNotImageUrl(url)) return ask('type');
+  // Новые ссылки медиа-полей по очереди: не тот тип — окно, «Сохранить всё
+  // равно» продолжает с оставшихся; таймаут отказом не считается. Если за время
+  // проверки форму закрыли или перевели на другой ход, не сохраняется ничего.
+  const checkMediaLinks = ([link, ...rest], payload, orphanSummary) => {
+    if (!link) return finishSave(payload, orphanSummary);
+    const { name, type, url } = link;
+    const next = () => checkMediaLinks(rest, payload, orphanSummary);
+    const ask = (reason) => {
+      setNotMediaName(name);
+      setNotMediaConfirm({ name, url, reason, rest, payload, orphanSummary });
+    };
+    if (isNotMediaUrl(url, type)) return ask('type');
+    if (!needsProbe(url, type)) return next();
     const token = edition.token();
-    setCheckingImage(token);
-    probeImage(url).then((result) => {
-      setCheckingImage((prev) => (prev === token ? 0 : prev));
+    setCheckingLink(token);
+    probeMedia(url, type).then((result) => {
+      setCheckingLink((prev) => (prev === token ? 0 : prev));
       if (!edition.isCurrent(token)) return;
       if (result === 'error') ask('load');
-      else finishSave(payload, orphanSummary);
+      else next();
     });
   };
 
@@ -671,7 +723,7 @@ const AddEditTurnPopup = () => {
       !sameFields(comparableFields(form, activeTemplate), baseline.fields));
   let saveState = 'ready';
   if (edition.isCurrent(savingPreview)) saveState = 'preview';
-  else if (edition.isCurrent(checkingImage)) saveState = 'checking';
+  else if (edition.isCurrent(checkingLink)) saveState = 'checking';
   else if (!hasContent) saveState = 'empty';
   else if (turnToEdit && !changed) saveState = 'unchanged';
 
@@ -968,38 +1020,46 @@ const AddEditTurnPopup = () => {
         )}
       </Modal>
 
-      {/* Окно цитат, если оно нужно, открывается в afterClose — следом, а не поверх. */}
+      {/* Следующая проверка или окно цитат — в afterClose: следом, а не поверх. */}
       <Modal
-        open={!!notImageConfirm}
-        title="Похоже, это не картинка"
+        open={!!notMediaConfirm}
+        title={notMediaText.title}
         okText="Сохранить всё равно"
         cancelText="Отмена"
-        okButtonProps={{ 'data-test-id': TID.addTurn.notImageSave }}
-        cancelButtonProps={{ 'data-test-id': TID.addTurn.notImageCancel }}
-        onCancel={() => setNotImageConfirm(null)}
+        okButtonProps={{ 'data-test-id': TID.addTurn.notMediaSave }}
+        cancelButtonProps={{ 'data-test-id': TID.addTurn.notMediaCancel }}
+        onCancel={() => setNotMediaConfirm(null)}
         onOk={() => {
-          confirmedNotImage.current = notImageConfirm;
-          setNotImageConfirm(null);
+          confirmedNotMedia.current = notMediaConfirm;
+          setNotMediaConfirm(null);
         }}
         afterClose={() => {
-          const confirmed = confirmedNotImage.current;
-          confirmedNotImage.current = null;
-          if (confirmed) finishSave(confirmed.payload, confirmed.orphanSummary);
+          const confirmed = confirmedNotMedia.current;
+          confirmedNotMedia.current = null;
+          if (confirmed) {
+            checkMediaLinks(
+              confirmed.rest,
+              confirmed.payload,
+              confirmed.orphanSummary,
+            );
+          }
         }}
       >
-        {!!notImageConfirm && (
+        {!!notMediaConfirm && (
           <div
-            data-test-id={TID.addTurn.notImage}
-            data-reason={notImageConfirm.reason}
+            data-test-id={TID.addTurn.notMedia}
+            data-field={notMediaConfirm.name}
+            data-reason={notMediaConfirm.reason}
           >
             <p>
-              {notImageConfirm.reason === 'type'
-                ? 'Ссылка в поле картинки ведёт на файл другого типа.'
-                : 'Ссылка в поле картинки не открылась как картинка.'}{' '}
-              В ходе на её месте будет значок ошибки.
+              Ссылка {notMediaText.inField}{' '}
+              {notMediaConfirm.reason === 'type'
+                ? 'ведёт на файл другого типа.'
+                : `не открылась ${notMediaText.asType}.`}{' '}
+              {notMediaText.result}
             </p>
             <p className="mb-0" style={{ wordBreak: 'break-all' }}>
-              {notImageConfirm.url}
+              {notMediaConfirm.url}
             </p>
           </div>
         )}

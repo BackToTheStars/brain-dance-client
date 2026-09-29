@@ -8,3 +8,5 @@ export const LOBBY_API_URL =
   process.env.NEXT_PUBLIC_LOBBY_API_URL || 'http://localhost:3000';
 export const STATIC_MEDIA_URL =
   process.env.NEXT_PUBLIC_STATIC_MEDIA_URL || 'http://localhost:3011';
+export const LOBBY_URL =
+  process.env.NEXT_PUBLIC_LOBBY_URL || 'http://localhost:3023';
