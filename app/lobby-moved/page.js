@@ -10,13 +10,16 @@ import {
   settingsStorageKey,
 } from '@/modules/settings/redux/requests';
 import {
+  LOGIN_KEY_PREFIX,
   accessExportFileName,
   buildAccessExport,
-  gamesWithCodes,
+  mergeLoginCodes,
 } from '@/modules/settings/utils/accessExport';
 import { siteDataKeys } from '@/modules/settings/utils/siteData';
 
 const SITE_NAME = 'Brain Dance';
+// Не сразу: часть браузеров начинает скачивание уже после возврата из обработчика.
+const REVOKE_DELAY = 60 * 1000;
 
 const downloadJson = (data, fileName) => {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -29,17 +32,32 @@ const downloadJson = (data, fileName) => {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(href);
+  setTimeout(() => URL.revokeObjectURL(href), REVOKE_DELAY);
 };
 
-const readGames = () => {
+const readStoredGames = () => {
   try {
-    return gamesWithCodes(getStore().games);
+    return getStore().games;
   } catch {
     // испорченное хранилище читается как пустое
     return [];
   }
 };
+
+const readLogins = () => {
+  const logins = [];
+  for (const key of Object.keys(localStorage)) {
+    if (!key.startsWith(LOGIN_KEY_PREFIX)) continue;
+    try {
+      logins.push({ key, record: JSON.parse(localStorage.getItem(key)) });
+    } catch {
+      // испорченная запись входа не мешает остальным
+    }
+  }
+  return logins;
+};
+
+const readGames = () => mergeLoginCodes(readStoredGames(), readLogins());
 
 // Сюда перед переездом лобби поведёт `/` (правило nginx); из интерфейса ссылок нет.
 // Хранилище читается и по подтверждению очищается; импорта здесь нет.

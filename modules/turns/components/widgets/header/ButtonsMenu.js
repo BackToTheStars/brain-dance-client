@@ -27,6 +27,7 @@ const ButtonsMenu = ({ _id }) => {
   const turnGeometry = useSelector((state) => state.turns.g[_id]);
   const gameHash = useSelector((state) => state.game.game?.hash);
   const editorPanelWidth = useSelector(getEditorPanelWidth);
+  const zoom = useSelector((state) => state.game.zoom);
   const following = useSelector(selectFollowing);
   const canEdit = can(RULE_TURNS_CRUD) && !following;
   const onDeleted = () => dispatch(castSaved());
@@ -58,14 +59,14 @@ const ButtonsMenu = ({ _id }) => {
     );
 
     // Панель редактора прижата вправо, поэтому центр вьюпорта уходит вправо на
-    // половину её фактической ширины (state.panels.d, тянется сплитом) — карточка
-    // встаёт в центр свободной области слева от панели.
+    // половину её ширины (state.panels.d — экранные px, в холст делением на масштаб):
+    // карточка встаёт в центр свободной области слева от панели.
     dispatch(
       centerViewportAtPosition({
         x:
           turnGeometry.position.x +
           Math.floor(turnGeometry.size.width / 2) +
-          Math.round(editorPanelWidth / 2),
+          Math.round(editorPanelWidth / 2 / zoom),
         y: turnGeometry.position.y + Math.floor(turnGeometry.size.height / 2),
       }),
     );

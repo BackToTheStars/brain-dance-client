@@ -3,7 +3,8 @@
 #   docker build -t bd-client . \
 #     --build-arg NEXT_PUBLIC_API_URL=https://server.brain-dance.net \
 #     --build-arg NEXT_PUBLIC_LOBBY_API_URL=https://server.brain-dance.net \
-#     --build-arg NEXT_PUBLIC_STATIC_MEDIA_URL=https://media.brain-dance.net
+#     --build-arg NEXT_PUBLIC_STATIC_MEDIA_URL=https://media.brain-dance.net \
+#     --build-arg NEXT_PUBLIC_LOBBY_URL=https://lobby.brain-dance.net
 FROM node:22-alpine AS build
 WORKDIR /app
 

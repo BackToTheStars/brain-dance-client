@@ -83,9 +83,19 @@ const checkIfParagraphExists = (inserts) => {
     .trim(); // @todo: remove after quill fix
 };
 
+const EMBED_CHAR = String.fromCharCode(0);
+const flatText = (delta) =>
+  delta.ops
+    .map((op) => (typeof op.insert === 'string' ? op.insert : EMBED_CHAR))
+    .join('');
+
 // diff, а не строки: порядок ключей в атрибутах после правок бывает другим.
-const isSameContents = (opsA, opsB) =>
-  new Delta(opsA).diff(new Delta(opsB)).length() === 0;
+// Сначала плоский текст: diff разного текста дорог, равного — сверяет одни атрибуты.
+const isSameContents = (opsA, opsB) => {
+  const a = new Delta(opsA);
+  const b = new Delta(opsB);
+  return flatText(a) === flatText(b) && a.diff(b).length() === 0;
+};
 
 const paragraphToString = (paragraph, length = 200) => {
   const text = paragraph
