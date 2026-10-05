@@ -1,3 +1,5 @@
+import { parseStoredObject } from '@/modules/settings/redux/requests';
+
 // GAME SETTINGS
 const GAME_SETTINGS_PREFIX = 'g_settings_';
 
@@ -23,7 +25,7 @@ const createNewGameSettings = (hash) => {
   return defaultGameSettings;
 };
 
-// получение текущих настроек
+// получение текущих настроек; испорченные читаются умолчаниями, их заменит первая запись
 export const getGameSettings = (hash) => {
   const key = getGameSettingsKey(hash);
   const str = localStorage.getItem(key);
@@ -31,7 +33,7 @@ export const getGameSettings = (hash) => {
     return createNewGameSettings(hash);
   }
   // @todo: при необходимости произвести валидацию и обновление
-  return JSON.parse(str);
+  return parseStoredObject(str) || defaultGameSettings;
 };
 
 // сброс настроек

@@ -482,6 +482,12 @@ export const insertTurnFromBuffer =
     const copiedTurnOldFormat = getTurnFromBufferAndRemove(
       timeStamp ? timeStamp : turnsInBuffer.at(-1)?.timeStamp,
     );
+    if (!copiedTurnOldFormat) {
+      dispatch(loadTurnsAndLinesToPaste());
+      dispatch(exitPasteModeIfBufferEmpty());
+      errorCallback?.('No turn in buffer');
+      return false;
+    }
     const copiedTurn = TurnHelper.toNewFields(copiedTurnOldFormat);
     const { pasteNextTurnPosition } = state.turns;
     const position = state.game.position;
@@ -498,11 +504,6 @@ export const insertTurnFromBuffer =
     }
     copiedTurn.position.x = snapRound(copiedTurn.position.x, GRID_CELL_X);
     copiedTurn.position.y = snapRound(copiedTurn.position.y, GRID_CELL_X);
-
-    if (!copiedTurn) {
-      errorCallback('No turn in buffer');
-      return false;
-    }
 
     dispatch(loadTurnsAndLinesToPaste());
     dispatch(exitPasteModeIfBufferEmpty());
@@ -574,7 +575,6 @@ export const insertTurnFromBuffer =
 
           // преобразовать sourceTurnId и targetTurnId и вставить линии
         },
-        errorCallback,
       }),
     );
   };

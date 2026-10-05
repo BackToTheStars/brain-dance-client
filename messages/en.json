@@ -134,6 +134,7 @@
     "Clear_confirm_empty": "Game sign-ins and canvas settings will be removed from this browser.",
     "Clear_ok": "Clear",
     "Clear_cancel": "Cancel",
-    "Cleared": "Site data has been removed."
+    "Cleared": "Site data has been removed.",
+    "Clear_failed": "The browser did not let the site data be removed."
   }
 }

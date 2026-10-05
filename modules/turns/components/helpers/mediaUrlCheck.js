@@ -56,9 +56,8 @@ export const isNotMediaUrl = (url, type) => {
   );
 };
 
-// pdf.js читает документ через fetch: чужой хост без CORS не откроется и с
-// настоящим pdf, отказ не отличить от «не pdf». Своё видео и аудио media
-// приняла по расширению.
+// pdf.js читает через fetch: чужой хост без CORS не откроется и с настоящим pdf.
+// Своё видео и аудио media приняла по расширению.
 export const needsProbe = (url, type) => {
   if (type === 'pdfs' || isYoutubeVideo(url, type)) return false;
   return type === 'images' || ownMediaType(url) !== type;
@@ -72,6 +71,7 @@ const probeImage = (url, timeoutMs) =>
       clearInterval(sizePoll);
       img.onload = null;
       img.onerror = null;
+      if (result === 'timeout') img.removeAttribute('src');
       resolve(result);
     };
     const timer = setTimeout(() => finish('timeout'), timeoutMs);

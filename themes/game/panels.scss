@@ -428,9 +428,9 @@
   // Presence has a dedicated drag handle; its body keeps the normal cursor.
   &:has(> .presence-panel) { cursor: auto; }
 
-  // Folded, the presence panel is as wide as its icons. Its own width comes
-  // from an inline style, and only importance takes that off.
-  &:has(> .presence-panel[data-collapsed='true']) { width: auto !important; }
+  // Folded, the presence panel is as wide as its icons; only importance beats the inline width.
+  // max-content, not auto: auto shrinks the box near the right edge and the icons wrap.
+  &:has(> .presence-panel[data-collapsed='true']) { width: max-content !important; }
 }
 
 // Paste Turn Panel

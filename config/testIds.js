@@ -190,6 +190,7 @@ export const TID = {
     clearOk: 'lobby-moved-clear-ok',
     clearCancel: 'lobby-moved-clear-cancel',
     cleared: 'lobby-moved-cleared', // строка «данные сайта удалены» после очистки, до перезагрузки
+    clearFailed: 'lobby-moved-clear-failed', // Alert вместо cleared, если браузер не дал удалить
   },
 
   // Админка: форма входа (modules/admin/components/forms/AdminSigninForm.js)
@@ -322,6 +323,10 @@ export const TID = {
   // внутри её svg — только пока веду и включён «Show the group on the minimap».
   minimap: {
     follower: 'minimap-follower', // <g> с рамкой и ником спутника (+ data-sid, data-nickname)
+    toggle: 'minimap-toggle', // значок карты: свернуть / развернуть (modules/minimap/components/MinimapButtons.js)
+    minus: 'minimap-minus', // размер −, только в развёрнутом виде
+    plus: 'minimap-plus', // размер +, только в развёрнутом виде
+    size: 'minimap-size', // подпись «100%» (+ data-size — число процентов)
   },
 
   // Форма добавления/редактирования turn
@@ -329,18 +334,20 @@ export const TID = {
     typeBtn: 'add-turn-type',
     typeOption: (name) => `add-turn-type-${name}`, // пункт дропдауна типа (picture/video/audio/comment)
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
-    // медиа-URL-инпуты используют field(prefixClass): image-url / video-url /
-    // audio-url / pdf-url
-    // + data-save-state: ready | empty | unchanged | checking (пробная загрузка
-    // ссылки медиа-поля) | preview (загрузка кадра видео); кроме ready — disabled
+    // медиа-URL: field('image-url' | 'video-url' | 'audio-url' | 'pdf-url'). У save — data-save-state:
+    // ready | empty | unchanged | checking (проба ссылки) | preview (кадр видео); кроме ready — disabled
     save: 'add-turn-save',
     cancel: 'add-turn-cancel',
-    // Окно «Похоже, это не картинка / видео / аудио / PDF» перед записью: тело
-    // окна с data-field (image | video | audio | pdf) и data-reason="type"
-    // (видно по адресу) или "load" (пробная загрузка не удалась) и его кнопки
+    // Окно «Похоже, это не картинка / видео / аудио / PDF»: тело с data-field (image | video | audio | pdf)
+    // и data-reason (type — видно по адресу, load — проба не удалась), и его кнопки
     notMedia: 'add-turn-not-media',
     notMediaSave: 'add-turn-not-media-save',
     notMediaCancel: 'add-turn-not-media-cancel',
+    // Окно «Цитаты будут удалены вместе со связями» перед записью: тело с числами в
+    // data-quotes и data-links и его кнопки. При замене файла вместо него — окно замены файла
+    lostLinks: 'add-turn-lost-links',
+    lostLinksSave: 'add-turn-lost-links-save',
+    lostLinksCancel: 'add-turn-lost-links-cancel',
     // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
     // button.ql-link, их берём по классам Quill)
     toolbar: (name) => `add-turn-toolbar-${name}`,

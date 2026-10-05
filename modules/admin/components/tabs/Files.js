@@ -124,11 +124,15 @@ const FilesTab = () => {
   const [order, setOrder] = useState(DEFAULT_ORDER);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
+  // «Показать» и «Сбросить» повторяют запрос и при тех же фильтрах — например после отказа
+  const [reloads, setReloads] = useState(0);
 
   const query = useMemo(
     () => toQuery(filters, sort, order, page, limit),
     [filters, sort, order, page, limit],
   );
+  const addressMissing =
+    draft.gameMode === GAME_MODE.ADDRESS && !draft.game.trim();
 
   useEffect(() => {
     let cancelled = false;
@@ -153,17 +157,20 @@ const FilesTab = () => {
     return () => {
       cancelled = true;
     };
-  }, [query]);
+  }, [query, reloads]);
 
   const applyFilters = () => {
+    if (addressMissing) return;
     setPage(1);
     setFilters(draft);
+    setReloads((count) => count + 1);
   };
 
   const resetFilters = () => {
     setPage(1);
     setDraft(emptyFilters);
     setFilters(emptyFilters);
+    setReloads((count) => count + 1);
   };
 
   const columns = useMemo(
@@ -332,8 +339,8 @@ const FilesTab = () => {
         </Radio.Group>
         {draft.gameMode === GAME_MODE.ADDRESS && (
           <Input
-            placeholder="6 hex-символов — в таблице показан ссылкой"
-            className="w-[220px]"
+            placeholder="3 или 6 hex-символов — как в колонке «Игра»"
+            className="w-[300px]"
             allowClear
             value={draft.game}
             onChange={(e) => setDraft({ ...draft, game: e.target.value })}
@@ -371,6 +378,7 @@ const FilesTab = () => {
         <Button
           type="primary"
           loading={loading}
+          disabled={addressMissing}
           onClick={applyFilters}
           data-test-id={TID.adminFiles.reload}
         >
@@ -390,10 +398,8 @@ const FilesTab = () => {
         />
       )}
 
-      {/* На отказе сервера — только текст ошибки выше, без пустой таблицы под ним
-          (тот же приём, что у Storage: `{!error && <Table .../>}`).
-          test-id на обёртке, а не на <Table>: antd раскладывает свои пропсы
-          по частям таблицы и произвольный data-* до DOM может не донести */}
+      {/* На отказе сервера — только текст ошибки, без пустой таблицы. test-id на
+          обёртке: antd может не донести произвольный data-* с <Table> до DOM */}
       {!error && (
         <div data-test-id={TID.adminFiles.table}>
           <Table

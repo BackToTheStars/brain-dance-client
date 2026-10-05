@@ -5,7 +5,7 @@ import {
 import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { updateScrollPosition } from '@/modules/turns/redux/actions';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import {
@@ -43,15 +43,13 @@ const ParagraphOriginal = ({
   const paragraph = widget.inserts;
   const fontColor = colors.font;
 
-  // Сигнатура набора цитат: id всех инсертов-цитат (attributes.background + id), из
-  // которых рендерятся span[data-id]. Меняется при добавлении/удалении цитаты —
-  // используется как зависимость замера координат (баг #5: координаты цитат не
-  // попадали в стор для свежесозданных тёрнов/цитат, линии были видны только после
-  // повторного входа).
+  // id инсертов-цитат, из которых рендерятся span[data-id]: пусто — цитат нет
   const quotesSignature = (paragraph || [])
     .filter((ins) => ins?.attributes?.background && ins.attributes.id)
     .map((ins) => ins.attributes.id)
     .join(',');
+  // правка формой меняет слова под цитатами, не меняя размеров карточки
+  const contentKey = useMemo(() => JSON.stringify(paragraph || []), [paragraph]);
 
   const paragraphEl = useRef(null);
   // цель восстановления прокрутки, которую пока не удалось применить (см. ниже),
@@ -126,12 +124,7 @@ const ParagraphOriginal = ({
       );
     }
 
-    // Набор цитат изменился (добавлена/удалена цитата), но размеры — нет: размерный
-    // эффект сам по себе это не ловил. Пере-замеряем спаны.
-    if (
-      !firstRender &&
-      quotesDataRef.current.quotesSignature !== quotesSignature
-    ) {
+    if (!firstRender && quotesDataRef.current.contentKey !== contentKey) {
       needToUpdate = true;
       quotesDataRef.current.quotesWithoutScroll =
         getParagraphQuotesWithoutScroll(turnId, paragraphEl, zoom());
@@ -142,13 +135,20 @@ const ParagraphOriginal = ({
         zoom(),
       );
     }
-    quotesDataRef.current.quotesSignature = quotesSignature;
+    quotesDataRef.current.contentKey = contentKey;
 
     if (needToUpdate) {
       if (!quotesDataRef.current.scrolledQuotes?.length) {
+        if (!quotesSignature) {
+          // последнюю цитату сняли — её рамка уходит вместе с ней
+          if (store.getState().lines.quotesInfo[turnId]?.[widgetId]?.length) {
+            dispatch(quoteCoordsUpdate(turnId, widgetId, []));
+          }
+          return;
+        }
         // Цитаты ожидаются (есть в контенте), но их спаны ещё не разложены в DOM —
         // повторяем замер на следующем кадре. Один rAF; гард от повторного планирования.
-        if (quotesSignature && !quotesDataRef.current.remeasureRaf) {
+        if (!quotesDataRef.current.remeasureRaf) {
           quotesDataRef.current.remeasureRaf = requestAnimationFrame(() => {
             quotesDataRef.current.remeasureRaf = null;
             if (!paragraphEl.current) return;
@@ -194,7 +194,30 @@ const ParagraphOriginal = ({
         });
       }
     }
-  }, [width, height, scrollTop, paragraphEl.current, widgetsUpdatedTime]);
+  }, [width, height, scrollTop, paragraphEl.current, widgetsUpdatedTime, contentKey]);
+
+  // Коробку абзаца меняют и мимо зависимостей эффекта выше — разделитель pdf, заголовок:
+  // рамки и концы линий перемеряются в том же кадре.
+  const remeasureRef = useRef(null);
+  remeasureRef.current = () => {
+    const el = paragraphEl.current;
+    if (!el || !quotesDataRef.current || !quotesSignature) return;
+    const quotesWithoutScroll = getParagraphQuotesWithoutScroll(
+      turnId,
+      paragraphEl,
+      zoom(),
+    );
+    const scrolledQuotes = getScrolledQuotes(
+      quotesWithoutScroll,
+      paragraphEl,
+      el.scrollTop,
+      zoom(),
+    );
+    if (!scrolledQuotes.length) return;
+    quotesDataRef.current.quotesWithoutScroll = quotesWithoutScroll;
+    quotesDataRef.current.scrolledQuotes = scrolledQuotes;
+    dispatch(quoteCoordsUpdate(turnId, widgetId, scrolledQuotes));
+  };
 
   useEffect(() => {
     if (!paragraphEl || !paragraphEl.current) return;
@@ -206,6 +229,8 @@ const ParagraphOriginal = ({
           pendingScrollRef.current = null;
         }
         setScrollTop(paragraphEl.current.scrollTop);
+        // зажатое значение недовосстановленной прокрутки — не правка: не в стор и не в запись
+        if (pendingScrollRef.current != null) return;
 
         paragraphScrollQueue.add(() => {
           dispatch(
@@ -275,6 +300,7 @@ const ParagraphOriginal = ({
       if (pendingScrollRef.current != null) {
         applyScroll(pendingScrollRef.current);
       }
+      remeasureRef.current();
     });
     observer.observe(el);
     return () => observer.disconnect();

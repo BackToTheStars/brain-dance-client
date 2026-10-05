@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import ParagraphOriginal from './ParagraphOriginal';
 import ParagraphQuotes from './ParagraphQuotes';
 import { useSelector } from 'react-redux';
@@ -15,10 +15,16 @@ const Paragraph = ({
     (state) => state.turns.d[turnId]?.dWidgets?.[widgetId],
   );
   const canBeCompressed = paragraphWidget?.quotes?.length > 1;
+  const compressed = paragraphWidget?.compressed && canBeCompressed;
+  // куски сжатого абзаца меряются один раз при монтировании: новый текст — заново
+  const contentKey = useMemo(
+    () => (compressed ? JSON.stringify(paragraphWidget.inserts || []) : ''),
+    [compressed, paragraphWidget?.inserts],
+  );
   return (
     <>
-      {paragraphWidget?.compressed && canBeCompressed ? (
-        <CompressorProvider>
+      {compressed ? (
+        <CompressorProvider key={contentKey}>
           <Compressor
             turnId={turnId}
             widgetId={widgetId}

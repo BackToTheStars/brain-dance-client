@@ -11,25 +11,7 @@ import { MODAL_UPLOAD } from '@/config/lobby/modal';
 import { useDispatch } from 'react-redux';
 import { useTranslations } from 'next-intl';
 import { loadStore } from '@/modules/settings/redux/actions';
-
-const downloadFile = (data = {}) => {
-  // create file in browser
-  const fileName = 'settings';
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const href = URL.createObjectURL(blob);
-
-  // create "a" HTLM element with href to file
-  const link = document.createElement('a');
-  link.href = href;
-  link.download = fileName + '.json';
-  document.body.appendChild(link);
-  link.click();
-
-  // clean up "a" element & remove ObjectURL
-  document.body.removeChild(link);
-  URL.revokeObjectURL(href);
-};
+import { downloadJson } from '@/modules/settings/utils/downloadJson';
 
 const SwitchersBlock = () => {
   const t = useTranslations('Lobby');
@@ -49,7 +31,7 @@ const SwitchersBlock = () => {
           size="sm"
           onClick={(e) => {
             e.preventDefault();
-            downloadFile(getStore());
+            downloadJson(getStore(), 'settings.json');
           }}
         >
           {t('Export')}

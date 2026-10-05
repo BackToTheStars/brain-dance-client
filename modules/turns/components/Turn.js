@@ -173,6 +173,7 @@ export const Turn = memo(({ id }) => {
   const restricted = following || !can(RULE_TURNS_CRUD);
 
   const [widgets, setWidgets] = useState([]);
+  const [splitDragging, setSplitDragging] = useState(false);
   const wrapper = useRef(null);
   const splitDrag = useRef(null);
 
@@ -255,6 +256,7 @@ export const Turn = memo(({ id }) => {
 
   const onSplitDragging = useCallback(
     (isDragging) => {
+      setSplitDragging(isDragging);
       if (!isDragging || !splitPair) return;
       const top = wrapper.current?.querySelector('.stb-widget-pdf');
       const bottom = wrapper.current?.querySelector('.stb-widget-paragraph');
@@ -323,8 +325,12 @@ export const Turn = memo(({ id }) => {
       wrapperClasses.push('has-split');
     }
 
+    if (splitDragging) {
+      wrapperClasses.push('split-dragging');
+    }
+
     return wrapperClasses.join(' ');
-  }, [pictureOnly, splitTop]);
+  }, [pictureOnly, splitTop, splitDragging]);
 
   const registerHandleResize = useCallback(
     (widget) => {
@@ -357,9 +363,8 @@ export const Turn = memo(({ id }) => {
     );
   }, []);
 
-  const recalculateSize = useCallback(
-    (width, passedHeight) => {
-      const height = passedHeight || 200;
+  const fitSize = useCallback(
+    (width, height) => {
       const spacersCount = pictureOnly
         ? 0
         : widgets.length + (!dontShowHeader ? 0 : 1);
@@ -368,14 +373,21 @@ export const Turn = memo(({ id }) => {
         width,
         spacersCount * widgetSpacer
       );
-      const newHeight = Math.round(
-        Math.min(Math.max(height, minHeight), maxHeight)
-        // + widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
-      );
+      return {
+        width: Math.round(Math.min(Math.max(width, minWidth), maxWidth)),
+        height: Math.round(
+          Math.min(Math.max(height, minHeight), maxHeight)
+          // + widgetSpacer * (widgets.length + (!dontShowHeader ? 0 : 1)), // @todo: для компрессора проверить
+        ),
+      };
+    },
+    [widgets, dontShowHeader, pictureOnly]
+  );
 
-      const newWidth = Math.round(
-        Math.min(Math.max(width, minWidth), maxWidth)
-      ); //+ widgetSpacer;
+  const recalculateSize = useCallback(
+    (width, passedHeight) => {
+      const height = passedHeight || 200;
+      const { width: newWidth, height: newHeight } = fitSize(width, height);
 
       turnGeometryQueue.add(() => {
         dispatch(
@@ -398,7 +410,7 @@ export const Turn = memo(({ id }) => {
         }
       }
     },
-    [id, widgets, dontShowHeader, pictureOnly]
+    [id, fitSize]
   );
 
   // RESIZABLE
@@ -409,17 +421,22 @@ export const Turn = memo(({ id }) => {
     // The start comes from the element: under zoom ui.originalSize is off.
     let origin = null;
     let travel = null;
+    // jQuery UI lays ui.size over the size recalculateSize has set: clamp it the same way.
     const follow = (event, ui) => {
       if (!travel) return;
       const { x, y } = travel(event);
-      ui.size.width = Math.min(
-        TURN_SIZE_MAX_WIDTH,
-        Math.max(
-          TURN_SIZE_MIN_WIDTH,
-          snapRound(origin.width + x, GRID_CELL_X),
+      const size = fitSize(
+        Math.min(
+          TURN_SIZE_MAX_WIDTH,
+          Math.max(
+            TURN_SIZE_MIN_WIDTH,
+            snapRound(origin.width + x, GRID_CELL_X),
+          ),
         ),
+        snapRound(origin.height + y, GRID_CELL_Y),
       );
-      ui.size.height = snapRound(origin.height + y, GRID_CELL_Y);
+      ui.size.width = size.width;
+      ui.size.height = size.height;
     };
     $(wrapper.current).resizable({
       grid: [GRID_CELL_X, GRID_CELL_Y],

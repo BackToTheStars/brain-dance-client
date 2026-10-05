@@ -97,20 +97,10 @@ const isSameContents = (opsA, opsB) => {
   return flatText(a) === flatText(b) && a.diff(b).length() === 0;
 };
 
-const paragraphToString = (paragraph, length = 200) => {
-  const text = paragraph
-    .map((item) => item.insert)
-    .join('')
-    .trim();
-
-  return text.length > length ? `${text.slice(0, length)}...` : text;
-};
-
 export {
   getQuill,
   getQuoteElements,
   checkIfParagraphExists,
   isSameContents,
-  paragraphToString,
   QUOTE_ID_ATTRIBUTE,
 };

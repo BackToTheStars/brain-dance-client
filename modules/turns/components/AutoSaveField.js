@@ -59,7 +59,10 @@ const AutoSaveField = () => {
         return;
       }
       saving.current = true;
-      dispatch(saveField({ silent: true, onSaved: () => dispatch(castSaved()) }))
+      // синхронное исключение — тоже отказ: иначе флаг остался бы поднятым до перезагрузки
+      new Promise((resolve) =>
+        resolve(dispatch(saveField({ silent: true, onSaved: () => dispatch(castSaved()) }))),
+      )
         .then(
           () => {
             failed.current = false;

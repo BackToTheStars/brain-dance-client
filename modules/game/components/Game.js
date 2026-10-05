@@ -35,6 +35,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerMoveScene } from './helpers/game';
+import { mouseTravel } from './helpers/zoom';
 import {
   GAME_STAGE_ANIMATED_LOADING,
   GAME_STAGE_INIT,
@@ -65,9 +66,8 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
 
   const { info, reloadUserInfo, can } = useUserContext();
   const { nickname } = info;
-  // A viewer (no RULE_TURNS_CRUD) gets the follower's treatment by role
-  // instead of by tour: no edit mode, but the double click still toggles the
-  // lines — its own local switch, since there is no tour to attach it to.
+  // A viewer (no RULE_TURNS_CRUD) is treated as a follower: no edit mode, and the
+  // double click toggles the lines with a local switch, there being no tour.
   const isViewer = !can(RULE_TURNS_CRUD);
   const [viewerLinesOnTop, setViewerLinesOnTop] = useState(false);
 
@@ -185,19 +185,17 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
 
     if (typeof $ === 'undefined') return;
 
-    // Under the zoom jQuery UI moves the box by screen px: the travel is
-    // rebuilt in canvas px, as for the cards (helpers/zoom.js).
-    let from = null;
+    // Under the zoom the travel is rebuilt in canvas px, as for the cards; the box starts at 0, 0.
+    let travel = null;
     const follow = (event, ui) => {
-      if (!from) return;
-      ui.position.left = (event.pageX - from.pageX) / from.zoom;
-      ui.position.top = (event.pageY - from.pageY) / from.zoom;
+      if (!travel) return;
+      const { x, y } = travel(event);
+      ui.position.left = x;
+      ui.position.top = y;
     };
     $(gameBox.current).draggable({
       start: (event) => {
-        const zoom = zoomRef.current;
-        from =
-          zoom === 1 ? null : { pageX: event.pageX, pageY: event.pageY, zoom };
+        travel = mouseTravel(zoomRef.current, event);
       },
       drag: follow,
       stop: (event, ui) => {

@@ -16,24 +16,9 @@ import {
   mergeLoginCodes,
 } from '@/modules/settings/utils/accessExport';
 import { siteDataKeys } from '@/modules/settings/utils/siteData';
+import { downloadJson } from '@/modules/settings/utils/downloadJson';
 
 const SITE_NAME = 'Brain Dance';
-// Не сразу: часть браузеров начинает скачивание уже после возврата из обработчика.
-const REVOKE_DELAY = 60 * 1000;
-
-const downloadJson = (data, fileName) => {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json',
-  });
-  const href = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = href;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(href), REVOKE_DELAY);
-};
 
 const readStoredGames = () => {
   try {
@@ -68,6 +53,7 @@ const LobbyMovedPage = () => {
   // число в тексте окна не меняется, пока оно закрывается после очистки
   const [confirm, setConfirm] = useState({ open: false, count: 0 });
   const [cleared, setCleared] = useState(false);
+  const [clearFailed, setClearFailed] = useState(false);
 
   useEffect(() => {
     setGames(readGames());
@@ -77,11 +63,18 @@ const LobbyMovedPage = () => {
     setConfirm((current) => ({ ...current, open: false }));
 
   const clearSiteData = () => {
-    const keys = siteDataKeys(Object.keys(localStorage), settingsStorageKey);
-    keys.forEach((key) => localStorage.removeItem(key));
-    setGames(readGames());
-    setCleared(true);
     closeConfirm();
+    try {
+      const keys = siteDataKeys(Object.keys(localStorage), settingsStorageKey);
+      keys.forEach((key) => localStorage.removeItem(key));
+      setGames(readGames());
+    } catch {
+      setCleared(false);
+      setClearFailed(true);
+      return;
+    }
+    setClearFailed(false);
+    setCleared(true);
   };
 
   const exportAccess = () => {
@@ -104,6 +97,14 @@ const LobbyMovedPage = () => {
           <p>{t('Moved')}</p>
           {cleared && (
             <p data-test-id={TID.lobbyMoved.cleared}>{t('Cleared')}</p>
+          )}
+          {clearFailed && (
+            <Alert
+              type="error"
+              showIcon
+              title={t('Clear_failed')}
+              data-test-id={TID.lobbyMoved.clearFailed}
+            />
           )}
           {games?.length === 0 && (
             <p data-test-id={TID.lobbyMoved.empty}>{t('Empty')}</p>
@@ -143,11 +144,9 @@ const LobbyMovedPage = () => {
               </Button>
             </>
           )}
-          {!!LOBBY_URL && (
-            <Button href={LOBBY_URL} data-test-id={TID.lobbyMoved.link}>
-              {t('Open_new_lobby')}
-            </Button>
-          )}
+          <Button href={LOBBY_URL} data-test-id={TID.lobbyMoved.link}>
+            {t('Open_new_lobby')}
+          </Button>
           <Button
             danger
             onClick={() =>

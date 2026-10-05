@@ -3,15 +3,17 @@ export const settingsStorageKey =
 const VERSION = '0.0.1';
 
 /* LOCAL STORAGE */
+const emptyStore = () => ({
+  version: VERSION,
+  games: [],
+  settings: {},
+  layoutSettings: {},
+  textSettings: {},
+});
+
 // создание пустого стора
 const createStore = () => {
-  const store = {
-    version: VERSION,
-    games: [],
-    settings: {},
-    layoutSettings: {},
-    textSettings: {},
-  };
+  const store = emptyStore();
   localStorage.setItem(settingsStorageKey, JSON.stringify(store));
   return store;
 };
@@ -26,13 +28,22 @@ export const isStoreValid = (store) => {
   return [true];
 };
 
-// получение данных о сторе
+// Объект из хранилища; испорченное значение — null, как отсутствующее.
+export const parseStoredObject = (str) => {
+  try {
+    const value = JSON.parse(str);
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+// Испорченный стор читается пустым, но чтение его не затирает (/lobby-moved только читает):
+// заменит первая запись.
 export const getStore = () => {
   const str = localStorage.getItem(settingsStorageKey) || '';
-  if (!str) {
-    return createStore();
-  }
-  return JSON.parse(str);
+  if (!str) return createStore();
+  return parseStoredObject(str) || emptyStore();
 };
 
 // обновление стора

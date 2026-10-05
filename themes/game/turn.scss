@@ -591,6 +591,11 @@
       }
     }
 
+    // пока тянут разделитель, рамка цитаты стоит на словах: переход позиции отставал бы
+    &.split-dragging .quote-rectangle {
+      transition: outline 0.2s;
+    }
+
     // VIDEO
     .video {
       &>div {

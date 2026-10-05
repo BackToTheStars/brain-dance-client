@@ -122,6 +122,7 @@ const Pdf = ({
   const renderWidthRef = useRef(0); // ширина отрисовки — страница целиком, до обрезки
   const chromeRef = useRef(2 * widgetSpacer); // ширина карточки минус ширина страницы
   const appliedScrollRef = useRef(null);
+  const quotesNowRef = useRef(() => {});
 
   const scrollQueue = useRef(getQueue(PDF_SCROLL_TIMEOUT_DELAY)).current;
   const rerenderQueue = useRef(getQueue(PDF_RERENDER_TIMEOUT_DELAY)).current;
@@ -304,6 +305,7 @@ const Pdf = ({
   useEffect(() => {
     const el = scrollEl.current;
     if (!el) return;
+    let viewHeight = el.clientHeight;
     const measure = () => {
       const style = getComputedStyle(el);
       const next = Math.round(
@@ -314,9 +316,17 @@ const Pdf = ({
       const inner = el.closest('.stb-react-turn__inner');
       if (inner) chromeRef.current = inner.clientWidth - next;
       setPageWidth((prev) => (prev === next ? prev : next));
+      return next;
     };
     measure();
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver(() => {
+      const next = measure();
+      if (el.clientHeight === viewHeight) return;
+      viewHeight = el.clientHeight;
+      // Высоту окна меняет и разделитель, мимо зависимостей эффекта цитат: рамки и маркеры
+      // «ниже» пересчитываются в том же кадре.
+      quotesNowRef.current(next);
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -420,11 +430,11 @@ const Pdf = ({
   }, [hasQuotes]);
 
   // ЦИТАТЫ: пересчёт координат в систему карточки (из него же берутся якоря линий)
-  useEffect(() => {
+  const getQuotesWithCoords = () => {
     const el = scrollEl.current;
-    if (!el || !pageOffsets.length) return;
+    if (!el || !pageOffsets.length) return null;
     const turnEl = el.closest('.stb-react-turn');
-    if (!turnEl) return;
+    if (!turnEl) return null;
 
     const zoom = store.getState().game.zoom;
     const rect = relativeRect(el, turnEl, zoom);
@@ -433,7 +443,7 @@ const Pdf = ({
     // на странице. Все страницы стоят в одном столбце, достаточно первой.
     const firstPage = pageElsRef.current.get(1);
     const pageRect = firstPage ? relativeRect(firstPage, turnEl, zoom) : rect;
-    const withCoords = getPdfQuotesWithCoords({
+    return getPdfQuotesWithCoords({
       quotes: quotes || [],
       pageOffsets,
       pageWidth,
@@ -445,7 +455,19 @@ const Pdf = ({
       turnId,
       crop: viewCrop,
     });
+  };
+  quotesNowRef.current = (measuredWidth) => {
+    // при новой ширине смещения страниц ещё старые — пересчёт сделает эффект ниже
+    if (!hasQuotes || measuredWidth !== pageWidth) return;
+    const withCoords = getQuotesWithCoords();
+    if (!withCoords) return;
+    quotesQueue.clear();
+    dispatch(quoteCoordsUpdate(turnId, widgetId, withCoords));
+  };
 
+  useEffect(() => {
+    const withCoords = getQuotesWithCoords();
+    if (!withCoords) return;
     quotesQueue.add(() => {
       dispatch(quoteCoordsUpdate(turnId, widgetId, withCoords));
     });

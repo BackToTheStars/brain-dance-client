@@ -165,14 +165,8 @@ const withRejection = (call) =>
     );
   });
 
-// `onSaved` is called once both requests of the save are through — the
-// geometry and the scroll positions (when there were any): the guide of a tour
-// tells the followers to fetch the field again, and they have to see what was
-// saved, not what is being saved. The presence module is not imported here on
-// purpose (a cycle with it breaks the production bundle): the caller passes
-// the callback in (the Save Field button, Auto Save Field).
-// `silent` — автосохранение: только ходы и прокрутка, без позиции холста и панелей,
-// без уведомления и выхода из режимов; ошибка — отказом промиса, а не alert.
+// `onSaved` — после обоих запросов; его передаёт вызывающий: импорт presence замкнул бы цикл в прод-сборке.
+// `silent` — автосохранение: ходы и прокрутка без позиции холста, панелей и уведомления; ошибка — отказом.
 export const saveField = ({ onSaved = null, silent = false } = {}) => (dispatch, getState) => {
   const state = getState();
   const hash = state.game.game.hash;
@@ -380,20 +374,20 @@ export const loadZoom = () => (dispatch, getState) => {
   dispatch({ type: types.GAME_ZOOM_SET, payload: { zoom, position } });
 };
 
-// Центр окна остаётся на месте; позиция ставится напрямую — moveField
-// прилипает к сетке.
+// Центр окна остаётся на месте с точностью до сетки: позиция прижимается к ней
+// так же, как при загрузке игры, иначе после Save Field и F5 холст сдвигается.
 export const setZoom = (zoom) => (dispatch, getState) => {
   const { zoom: current, position } = getState().game;
   if (zoom === current || !ZOOM_STEPS.includes(zoom)) return;
   const screen = { width: window.innerWidth, height: window.innerHeight };
-  const shift = (size) => Math.round((size / 2) * (1 / current - 1 / zoom));
+  const shift = (size) => (size / 2) * (1 / current - 1 / zoom);
   dispatch({
     type: types.GAME_ZOOM_SET,
     payload: {
       zoom,
       position: {
-        x: position.x + shift(screen.width),
-        y: position.y + shift(screen.height),
+        x: snapRound(position.x + shift(screen.width), GRID_CELL_X),
+        y: snapRound(position.y + shift(screen.height), GRID_CELL_X),
       },
     },
   });
