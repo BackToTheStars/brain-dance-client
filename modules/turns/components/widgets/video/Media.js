@@ -12,18 +12,21 @@ import { getFormattedDuration } from '../../helpers/formatters/player';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { MODE_WIDGET_VIDEO } from '@/config/panel';
-import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
+import { useQuoteMarks } from '../media/quoteMarks';
 import { VolumeControl, SpeedControl } from './Controls';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
+import { openMediaQuotesPanel } from '@/modules/panels/redux/mediaQuotesPanel';
 
 const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
   const { can } = useUserContext();
   // Спутник экскурсии только смотрит: разметку не начинает — как и у карандаша
   // виджета, иначе он войдёт в режим, из которого ему нечем выйти.
   const following = useSelector(selectFollowing);
+  // Панель цитат и форма хода вместе не открываются.
+  const formOpen = useSelector((s) => !!s.panels.d[PANEL_ADD_EDIT_TURN]?.isDisplayed);
   const dispatch = useDispatch();
   const fsRef = useRef(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -46,6 +49,7 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
     onPause,
     onEnded,
   } = useMediaPlayback(widgetId, turnId);
+  const quoteMarks = useQuoteMarks(turnId, 'vq_1', duration);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -103,6 +107,7 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
           tooltip={{
             formatter: (value) => getFormattedDuration(value),
           }}
+          {...quoteMarks}
         />
         {/* Элементы управления */}
         <div className="controls-row">
@@ -124,22 +129,13 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
             {getFormattedDuration(duration)}
           </span>
           <div className="flex-1" />
-          {can(RULE_TURNS_CRUD) && !following && duration > 0 && (
+          {can(RULE_TURNS_CRUD) && !following && !formOpen && duration > 0 && (
             <button
               className="icon-button"
               data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(
-                  setPanelMode({
-                    mode: MODE_WIDGET_VIDEO,
-                    params: {
-                      editTurnId: turnId,
-                      editWidgetId: widgetId,
-                      duration,
-                    },
-                  }),
-                );
+                dispatch(openMediaQuotesPanel({ turnId, kind: 'video' }));
               }}
             >
               <FiEdit />

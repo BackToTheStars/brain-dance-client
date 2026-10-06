@@ -1,6 +1,7 @@
-import { MODE_GAME } from '@/config/panel';
+import { MODE_GAME, PANEL_MEDIA_QUOTES } from '@/config/panel';
 import { panels } from '../settings';
 import * as types from './types';
+import * as turnTypes from '@/modules/turns/redux/types';
 
 const d = {};
 for (let panel of panels) {
@@ -91,6 +92,38 @@ export const panelReducer = (state = initialPanelState, { type, payload }) => {
         editWidgetParams: {},
         mode: MODE_GAME,
       };
+
+    // Режим, смотревший на удалённый ход, иначе читал бы его данные на рендере и ронял холст.
+    // Панель цитат ленты этого хода закрывается без вопроса.
+    case turnTypes.TURN_DELETE: {
+      let next = state;
+      const quotesPanel = state.d[PANEL_MEDIA_QUOTES];
+      if (quotesPanel?.isDisplayed && quotesPanel.editTurnId === payload) {
+        next = {
+          ...next,
+          d: {
+            ...next.d,
+            [PANEL_MEDIA_QUOTES]: {
+              ...quotesPanel,
+              isDisplayed: false,
+              editTurnId: null,
+              widgetId: null,
+              focus: null,
+              dirty: false,
+              closeRequest: null,
+            },
+          },
+        };
+      }
+      if (state.editTurnId !== payload || state.mode === MODE_GAME) return next;
+      return {
+        ...next,
+        editTurnId: null,
+        editWidgetId: null,
+        editWidgetParams: {},
+        mode: MODE_GAME,
+      };
+    }
 
     case types.PANELS_SET:
       return {

@@ -23,23 +23,24 @@ export const TURN_SIZE_HEIGHT = 600;
 // `quoteType` — тип в плоском массиве `turn.quotes` (картинка, pdf). У таймлайнов
 // цитаты лежат отдельным полем хода (`turn.videoQuotes` / `turn.audioQuotes`),
 // поэтому у них `timelineWidgetId` (ключ в `dWidgets`) и `timelineField` — поле,
-// которое надо обнулить, чтобы виджет ушёл целиком (как в deleteVideoQuotesWidget).
+// которое надо обнулить, чтобы лента ушла целиком. `kind` — подпись виджета в окне замены
+// файла, ключ словаря `Game.turnForm.widgets`.
 // Значения строками, а не константами: этот файл ничего не импортирует, кроме
 // `./ui` (см. CLAUDE.md про циклические импорты), и так же строками их пишет
 // `TurnHelper.toNewFields`.
 export const TURN_MEDIA_QUOTE_BINDINGS = [
-  { field: 'imageUrl', label: 'картинка', quoteType: 'picture' },
+  { field: 'imageUrl', kind: 'picture', quoteType: 'picture' },
   // cropField — обрезка полей теряет смысл на файле с другой геометрией страниц.
-  { field: 'pdfUrl', label: 'pdf', quoteType: 'pdf', cropField: 'pdfCrop' },
+  { field: 'pdfUrl', kind: 'pdf', quoteType: 'pdf', cropField: 'pdfCrop' },
   {
     field: 'videoUrl',
-    label: 'видео',
+    kind: 'video',
     timelineWidgetId: 'vq_1',
     timelineField: 'videoQuotes',
   },
   {
     field: 'audioUrl',
-    label: 'аудио',
+    kind: 'audio',
     timelineWidgetId: 'aq_1',
     timelineField: 'audioQuotes',
   },

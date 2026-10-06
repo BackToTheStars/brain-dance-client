@@ -95,6 +95,74 @@
       "Other_game_notice": "The code is for another game, access saved.",
       "Open_it": "Open it",
       "Unknown_error": "Unknown error"
+    },
+    "mediaQuotes": {
+      "lostLinks": {
+        "Title": "Quotes will be deleted together with their links",
+        "Text": "These quotes were removed from the list, and links to other quotes depend on them. The links will be deleted together with the quotes.",
+        "Count": "Quotes to delete: <b>{quotes}</b>, links: <b>{links}</b>.",
+        "Ok": "Delete and save",
+        "Cancel": "Cancel"
+      },
+      "discard": {
+        "Title": "Quotes are not saved",
+        "Text": "The quote edits in the panel are not saved. Close the panel and lose them?",
+        "Ok": "Close without saving",
+        "Cancel": "Cancel"
+      }
+    },
+    "turnForm": {
+      "orphan": {
+        "Title": "Replacing the file — quotes will be deleted",
+        "Text": "Quotes are bound to the content of the file — its pages, areas and seconds. After the replacement they have nothing to point to, so they are deleted together with the links that depended on them.",
+        "Count": "Quotes to delete: <b>{quotes}</b> ({byWidget}), links: <b>{links}</b>.",
+        "Ok": "Delete and save",
+        "Cancel": "Cancel"
+      },
+      "widgets": {
+        "picture": "picture",
+        "pdf": "pdf",
+        "video": "video",
+        "audio": "audio"
+      },
+      "lostLinks": {
+        "Title": "Quotes will be deleted together with their links",
+        "Text": "These quotes were removed from the text, and links to other quotes depend on them. The links will be deleted together with the quotes.",
+        "Count": "Quotes to delete: <b>{quotes}</b>, links: <b>{links}</b>.",
+        "Ok": "Delete and save",
+        "Cancel": "Cancel"
+      },
+      "notMedia": {
+        "Ok": "Save anyway",
+        "Cancel": "Cancel",
+        "image": {
+          "Title": "This does not look like a picture",
+          "Type": "The link in the picture field leads to a file of another type. The turn will show an error icon in its place.",
+          "Load": "The link in the picture field did not open as a picture. The turn will show an error icon in its place."
+        },
+        "video": {
+          "Title": "This does not look like a video",
+          "Type": "The link in the video field leads to a file of another type. The player in the turn will not play it.",
+          "Load": "The link in the video field did not open as a video. The player in the turn will not play it."
+        },
+        "audio": {
+          "Title": "This does not look like audio",
+          "Type": "The link in the audio field leads to a file of another type. The player in the turn will not play it.",
+          "Load": "The link in the audio field did not open as audio. The player in the turn will not play it."
+        },
+        "pdf": {
+          "Title": "This does not look like a PDF",
+          "Type": "The link in the PDF field leads to a file of another type. The turn will show an error message in its place.",
+          "Load": "The link in the PDF field did not open as a PDF. The turn will show an error message in its place."
+        }
+      },
+      "format": {
+        "Title": "Format will remove the paragraph styling",
+        "Text": "Format rejoins line breaks and extra spaces and leaves only the plain text of the paragraph. Quotes will disappear from the turn on save — together with the links that depended on them.",
+        "Count": "To be removed: quotes <b>{quotes}</b>, hyperlinks <b>{links}</b>, bold or italic fragments <b>{marked}</b>.",
+        "Ok": "Format",
+        "Cancel": "Cancel"
+      }
     }
   },
   "Common": {

@@ -7,8 +7,15 @@ import {
   MODE_WIDGET_PICTURE_QUOTE_ADD,
 } from '@/config/panel';
 import * as types from './types';
-import { PANEL_ADD_EDIT_TURN, PANEL_BUTTONS } from '@/config/panel';
-import { readEditorPanelWidth } from '../helpers/editorPanel';
+import {
+  PANEL_ADD_EDIT_TURN,
+  PANEL_BUTTONS,
+  PANEL_MEDIA_QUOTES,
+} from '@/config/panel';
+import {
+  readEditorPanelWidth,
+  readMediaQuotesPanelWidth,
+} from '../helpers/editorPanel';
 import { readUserPanelFields, saveUserPanelFields } from './storage';
 
 export const resetAndExit = () => (dispatch) => {
@@ -110,7 +117,7 @@ export const changeWidgetParams = (payload) => (dispatch) => {
   });
 };
 
-// Ширина редактора нужна сдвигу холста до первого открытия панели. Не через
+// Ширины редактора и панели цитат нужны сдвигу холста до первого открытия панели. Не через
 // changePanelGeometry: прочитанное не должно записываться обратно.
 export const applyUserPanelSettings = () => (dispatch, getState) => {
   const apply = (type, geometryData) =>
@@ -119,6 +126,7 @@ export const applyUserPanelSettings = () => (dispatch, getState) => {
       payload: { type, geometryData },
     });
   apply(PANEL_ADD_EDIT_TURN, { width: readEditorPanelWidth() });
+  apply(PANEL_MEDIA_QUOTES, { width: readMediaQuotesPanelWidth() });
   for (const panel of Object.values(getState().panels.d)) {
     if (!panel.userFields) continue;
     const stored = readUserPanelFields(panel);

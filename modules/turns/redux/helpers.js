@@ -11,6 +11,27 @@ import {
 } from '../settings';
 
 export class TurnHelper {
+  // Одна форма виджета ленты — и при загрузке хода, и после записи ленты.
+  static timelineWidget(widgetId, field) {
+    return {
+      id: widgetId,
+      show: !!field,
+      duration: field?.duration || 0,
+      quotes: field?.quotes || [],
+      connectedTo: field?.connectedTo,
+      type: widgetId === 'aq_1' ? WIDGET_AUDIO_QUOTES : WIDGET_VIDEO_QUOTES,
+    };
+  }
+
+  static timelineField(widget, connectedTo) {
+    if (!widget?.show) return null;
+    return {
+      duration: widget.duration,
+      connectedTo: widget.connectedTo || connectedTo,
+      quotes: widget.quotes ?? [],
+    };
+  }
+
   static toNewFields(turn) {
     // Пустой после trim заголовок равен явно выключенному хэдеру; одна точка
     // решения на h_1 и s_1 — иначе дата и ссылка пропадают совсем.
@@ -74,24 +95,8 @@ export class TurnHelper {
           compressed: !!turn.compressed,
         },
       ],
-      [WIDGET_VIDEO_QUOTES]: [
-        {
-          id: 'vq_1',
-          show: !!turn.videoQuotes,
-          duration: turn.videoQuotes?.duration || 0,
-          // quotes: turn.quotes.filter((quote) => quote.type === 'video'),
-          quotes: turn.videoQuotes?.quotes || [],
-        },
-      ],
-      [WIDGET_AUDIO_QUOTES]: [
-        {
-          id: 'aq_1',
-          show: !!turn.audioQuotes,
-          duration: turn.audioQuotes?.duration || 0,
-          // quotes: turn.quotes.filter((quote) => quote.type === 'video'),
-          quotes: turn.audioQuotes?.quotes || [],
-        },
-      ],
+      [WIDGET_VIDEO_QUOTES]: [TurnHelper.timelineWidget('vq_1', turn.videoQuotes)],
+      [WIDGET_AUDIO_QUOTES]: [TurnHelper.timelineWidget('aq_1', turn.audioQuotes)],
     };
     // {
     //   h_1: {
@@ -185,20 +190,8 @@ export class TurnHelper {
       imageUrl: turn.dWidgets.i_1.url,
       videoUrl: turn.dWidgets.v_1.url,
       videoPreview: turn.dWidgets.v_1.preview,
-      videoQuotes: turn.dWidgets.vq_1
-        ? {
-            duration: turn.dWidgets.vq_1.duration,
-            connectedTo: turn.dWidgets.vq_1.connectedTo,
-            quotes: turn.dWidgets.vq_1.quotes ?? [],
-          }
-        : null,
-      audioQuotes: turn.dWidgets.aq_1
-        ? {
-            duration: turn.dWidgets.aq_1.duration,
-            connectedTo: turn.dWidgets.aq_1.connectedTo,
-            quotes: turn.dWidgets.aq_1.quotes ?? [],
-          }
-        : null,
+      videoQuotes: TurnHelper.timelineField(turn.dWidgets.vq_1, 'v_1'),
+      audioQuotes: TurnHelper.timelineField(turn.dWidgets.aq_1, 'a_1'),
       audioUrl: turn.dWidgets.a_1.url,
       pdfUrl: turn.dWidgets.pdf_1?.url,
       pdfCrop: turn.dWidgets.pdf_1?.crop,

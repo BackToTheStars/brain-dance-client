@@ -6,6 +6,7 @@ import {
   QUOTE_ID_ATTRIBUTE,
 } from '@/modules/turns/components/helpers/quillHelper';
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,6 +69,7 @@ const SAVE_HINTS = {
 };
 
 const AddEditTurnPopup = () => {
+  const t = useTranslations('Game.turnForm');
   const gamePosition = useSelector((state) => state.game.position);
   const viewport = useSelector((state) => state.game.viewport);
   const editTurnId = useSelector((state) => state.panels.editTurnId);
@@ -613,9 +615,9 @@ const AddEditTurnPopup = () => {
           контекст темы, а в состоянии лежит уже собранное сохранение. */}
       <Modal
         open={!!orphanConfirm}
-        title="Заменяется файл — цитаты будут удалены"
-        okText="Удалить и сохранить"
-        cancelText="Отмена"
+        title={t('orphan.Title')}
+        okText={t('orphan.Ok')}
+        cancelText={t('orphan.Cancel')}
         okButtonProps={{ danger: true }}
         onCancel={() => setOrphanConfirm(null)}
         onOk={() => {
@@ -626,15 +628,16 @@ const AddEditTurnPopup = () => {
       >
         {!!orphanConfirm && (
           <>
-            <p>
-              Цитаты привязаны к содержимому файла — к его страницам, областям и
-              секундам. После замены им не на что указывать, поэтому они
-              удаляются вместе со связями, которые на них держались.
-            </p>
+            <p>{t('orphan.Text')}</p>
             <p className="mb-0">
-              Будет удалено цитат: <b>{orphanConfirm.summary.quotesCount}</b> (
-              {orphanConfirm.summary.byWidget}), связей:{' '}
-              <b>{orphanConfirm.summary.linesCount}</b>.
+              {t.rich('orphan.Count', {
+                quotes: orphanConfirm.summary.quotesCount,
+                byWidget: orphanConfirm.summary.byWidget
+                  .map(({ kind, count }) => `${t(`widgets.${kind}`)} — ${count}`)
+                  .join(', '),
+                links: orphanConfirm.summary.linesCount,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
             </p>
           </>
         )}
@@ -642,9 +645,9 @@ const AddEditTurnPopup = () => {
 
       <Modal
         open={!!lostLinksConfirm}
-        title="Цитаты будут удалены вместе со связями"
-        okText="Удалить и сохранить"
-        cancelText="Отмена"
+        title={t('lostLinks.Title')}
+        okText={t('lostLinks.Ok')}
+        cancelText={t('lostLinks.Cancel')}
         okButtonProps={{
           danger: true,
           'data-test-id': TID.addTurn.lostLinksSave,
@@ -663,13 +666,13 @@ const AddEditTurnPopup = () => {
             data-quotes={lostLinksConfirm.summary.quotesCount}
             data-links={lostLinksConfirm.summary.linesCount}
           >
-            <p>
-              Эти цитаты убраны из текста, а на них держатся связи с другими
-              цитатами. Вместе с цитатами связи будут удалены.
-            </p>
+            <p>{t('lostLinks.Text')}</p>
             <p className="mb-0">
-              Будет удалено цитат: <b>{lostLinksConfirm.summary.quotesCount}</b>,
-              связей: <b>{lostLinksConfirm.summary.linesCount}</b>.
+              {t.rich('lostLinks.Count', {
+                quotes: lostLinksConfirm.summary.quotesCount,
+                links: lostLinksConfirm.summary.linesCount,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
             </p>
           </div>
         )}
@@ -678,8 +681,8 @@ const AddEditTurnPopup = () => {
       <Modal
         open={!!notMedia}
         title={notMediaText.title}
-        okText="Сохранить всё равно"
-        cancelText="Отмена"
+        okText={t('notMedia.Ok')}
+        cancelText={t('notMedia.Cancel')}
         okButtonProps={{ 'data-test-id': TID.addTurn.notMediaSave }}
         cancelButtonProps={{ 'data-test-id': TID.addTurn.notMediaCancel }}
         onCancel={cancelNotMedia}
@@ -693,11 +696,7 @@ const AddEditTurnPopup = () => {
             data-reason={notMedia.reason}
           >
             <p>
-              Ссылка {notMediaText.inField}{' '}
-              {notMedia.reason === 'type'
-                ? 'ведёт на файл другого типа.'
-                : `не открылась ${notMediaText.asType}.`}{' '}
-              {notMediaText.result}
+              {notMedia.reason === 'type' ? notMediaText.type : notMediaText.load}
             </p>
             <p className="mb-0" style={{ wordBreak: 'break-all' }}>
               {notMedia.url}
@@ -708,9 +707,9 @@ const AddEditTurnPopup = () => {
 
       <Modal
         open={!!formatConfirm}
-        title="Format снимет оформление абзаца"
-        okText="Отформатировать"
-        cancelText="Отмена"
+        title={t('format.Title')}
+        okText={t('format.Ok')}
+        cancelText={t('format.Cancel')}
         okButtonProps={{
           danger: !!formatConfirm?.quotes,
           'data-test-id': TID.addTurn.formatConfirm,
@@ -723,15 +722,14 @@ const AddEditTurnPopup = () => {
       >
         {!!formatConfirm && (
           <>
-            <p>
-              Format переклеивает переносы и лишние пробелы и оставляет от абзаца
-              голый текст. Цитаты пропадут из хода при сохранении — вместе со
-              связями, которые на них держались.
-            </p>
+            <p>{t('format.Text')}</p>
             <p className="mb-0">
-              Будет снято: цитат <b>{formatConfirm.quotes}</b>, ссылок{' '}
-              <b>{formatConfirm.links}</b>, фрагментов с выделением{' '}
-              <b>{formatConfirm.marked}</b>.
+              {t.rich('format.Count', {
+                quotes: formatConfirm.quotes,
+                links: formatConfirm.links,
+                marked: formatConfirm.marked,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
             </p>
           </>
         )}

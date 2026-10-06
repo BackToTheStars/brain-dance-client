@@ -12,7 +12,12 @@ import {
   updateGeometry,
   updateSplitHeight,
 } from '../redux/actions';
-import turnSettings, { WIDGET_PARAGRAPH, WIDGET_PDF } from '../settings';
+import turnSettings, {
+  WIDGET_AUDIO_QUOTES,
+  WIDGET_PARAGRAPH,
+  WIDGET_PDF,
+  WIDGET_VIDEO_QUOTES,
+} from '../settings';
 import { getQueue } from './helpers/queueHelper';
 import { getScrollbarColor } from './helpers/color';
 import { checkIfParagraphExists } from './helpers/quillHelper';
@@ -28,8 +33,7 @@ import ButtonsMenu from './widgets/header/ButtonsMenu';
 import { TurnStateProvider } from './TurnState';
 import { TURN_SIZE_MAX_WIDTH, TURN_SIZE_MIN_WIDTH } from '@/config/turn';
 import Audio from './widgets/audio/Audio';
-import VideoQuotes from './widgets/video/VideoQuotes';
-import AudioQuotes from './widgets/audio/AudioQuotes';
+import TimelineQuotes from './widgets/timeline/Quotes';
 import { MediaPlaybackProvider } from './widgets/media/PlaybackContext';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
@@ -37,6 +41,8 @@ import { HorizontalSplit } from '@/modules/ui/components/common/HorizontalSplit'
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { mouseTravel } from '@/modules/game/components/helpers/zoom';
+
+const TIMELINE_TYPES = [WIDGET_AUDIO_QUOTES, WIDGET_VIDEO_QUOTES];
 
 // Очереди — на карточку, а не на модуль. Общая очередь отменяла отложенный вызов
 // предыдущей карточки (`getQueue.add` делает clearTimeout), поэтому при первом рендере
@@ -186,8 +192,8 @@ export const Turn = memo(({ id }) => {
       p_1: { inserts: paragraph },
       i_1: { url: imageUrl },
       v_1: { url: videoUrl },
-      vq_1: { duration: videoQuotesDuration },
-      aq_1: { duration: audioQuotesDuration },
+      vq_1: { quotes: videoSegments },
+      aq_1: { quotes: audioSegments },
       a_1: { url: audioUrl },
       // pdf_1 — защитный дефолт на случай отсутствия в dWidgets
       pdf_1: { url: pdfUrl } = {},
@@ -210,13 +216,22 @@ export const Turn = memo(({ id }) => {
     [paragraph, pictureOnly]
   );
 
+  const hasVideoQuotes = useMemo(
+    () => videoSegments.some((segment) => segment.active),
+    [videoSegments]
+  );
+  const hasAudioQuotes = useMemo(
+    () => audioSegments.some((segment) => segment.active),
+    [audioSegments]
+  );
+
   const widgetsCount = useMemo(() => {
     return (
       !dontShowHeader + // header
       !!imageUrl + // Picture
       !!videoUrl + // Video
-      !!videoQuotesDuration + // Video quotes
-      !!audioQuotesDuration + // Audio quotes
+      hasVideoQuotes + // Video quotes
+      hasAudioQuotes + // Audio quotes
       !!audioUrl + // Audio
       !!pdfUrl + // Pdf
       doesParagraphExist
@@ -225,6 +240,8 @@ export const Turn = memo(({ id }) => {
     dontShowHeader,
     imageUrl,
     videoUrl,
+    hasVideoQuotes,
+    hasAudioQuotes,
     audioUrl,
     pdfUrl,
     doesParagraphExist,
@@ -332,8 +349,27 @@ export const Turn = memo(({ id }) => {
     return wrapperClasses.join(' ');
   }, [pictureOnly, splitTop, splitDragging]);
 
+  // Ряды ленты цитат добавляют карточке свою высоту (появление ленты — и зазор между виджетами),
+  // а не отнимают её у абзаца. Учёт — вне updater'а setWidgets: StrictMode зовёт его дважды.
+  const timelineHeights = useRef({});
+  const timelineGrowth = useRef(0);
+  const sized = useRef(false);
+  const trackTimeline = (id, height) => {
+    const prev = timelineHeights.current[id] || 0;
+    if (height) timelineHeights.current[id] = height;
+    else delete timelineHeights.current[id];
+    if (!sized.current) return;
+    let delta = height - prev;
+    if (!prev && height) delta += widgetSpacer;
+    if (prev && !height) delta -= widgetSpacer;
+    timelineGrowth.current += delta;
+  };
+
   const registerHandleResize = useCallback(
     (widget) => {
+      if (TIMELINE_TYPES.includes(widget.type)) {
+        trackTimeline(widget.id, widget.minHeightCallback());
+      }
       setWidgets((widgets) => {
         const newWidgets = [...widgets];
         const index = newWidgets.findIndex(
@@ -358,6 +394,7 @@ export const Turn = memo(({ id }) => {
   const unregisterHandleResize = useCallback((widget) => {
     const widgetId = typeof widget === 'string' ? widget : widget?.id;
     if (!widgetId) return;
+    if (widgetId in timelineHeights.current) trackTimeline(widgetId, 0);
     setWidgets((widgets) =>
       widgets.filter((widgetToReturn) => widgetToReturn.id !== widgetId)
     );
@@ -384,8 +421,10 @@ export const Turn = memo(({ id }) => {
     [widgets, dontShowHeader, pictureOnly]
   );
 
+  // force — размер ставится в стиль и без зажатия: рост от ленты цитат, а в стиле могла остаться
+  // высота прежнего зажатия, которая перекрывает height: 100%.
   const recalculateSize = useCallback(
-    (width, passedHeight) => {
+    (width, passedHeight, force = false) => {
       const height = passedHeight || 200;
       const { width: newWidth, height: newHeight } = fitSize(width, height);
 
@@ -402,7 +441,7 @@ export const Turn = memo(({ id }) => {
       });
 
       if (typeof $ !== 'undefined') {
-        if (newHeight !== height || newWidth !== width) {
+        if (force || newHeight !== height || newWidth !== width) {
           $(wrapper.current).css({
             height: `${newHeight}px`,
             width: `${newWidth}px`,
@@ -472,14 +511,18 @@ export const Turn = memo(({ id }) => {
   useEffect(() => {
     if (!wrapper.current) return;
     if (!widgetsUpdatedTime) return;
+    const growth = timelineGrowth.current;
+    timelineGrowth.current = 0;
+    sized.current = true;
     recalculateSize(
       snapRound(wrapper.current.clientWidth, GRID_CELL_X),
-      snapRound(wrapper.current.clientHeight, GRID_CELL_Y)
+      snapRound(wrapper.current.clientHeight + growth, GRID_CELL_Y),
+      growth !== 0
     );
   }, [widgetsUpdatedTime, updatedAt]);
 
   return (
-    <MediaPlaybackProvider>
+    <MediaPlaybackProvider turnId={_id}>
       <div ref={wrapper} className={wrapperClasses} style={wrapperStyles}>
         {!dontShowHeader ? (
           <Header
@@ -499,12 +542,13 @@ export const Turn = memo(({ id }) => {
             turnId={_id}
           />
         )}
-        {!!videoQuotesDuration && (
-          <VideoQuotes
+        {hasVideoQuotes && (
+          <TimelineQuotes
+            kind="video"
             widgetId={'vq_1'}
-            mediaWidgetId={'v_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
+            widgetsUpdatedTime={widgetsUpdatedTime}
             turnId={_id}
           />
         )}
@@ -516,12 +560,13 @@ export const Turn = memo(({ id }) => {
           turnId={_id}
           />
         )}
-        {!!audioQuotesDuration && (
-          <AudioQuotes
+        {hasAudioQuotes && (
+          <TimelineQuotes
+            kind="audio"
             widgetId={'aq_1'}
-            mediaWidgetId={'a_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
+            widgetsUpdatedTime={widgetsUpdatedTime}
             turnId={_id}
           />
         )}

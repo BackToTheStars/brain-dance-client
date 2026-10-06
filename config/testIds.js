@@ -106,7 +106,7 @@ export const TID = {
 
   // Кнопки режимов панели (modules/panels/components/buttons/<mode>/*.js), вешает
   // buttons/Buttons.js — как gameAction. Имена: add-area, save-area, modify, delete,
-  // cancel, compress, uncompress, quotes-on, delete-quotes (перечень по режимам —
+  // cancel, compress, uncompress (перечень по режимам —
   // в brain-platform/docs/services/client/test-ids.md)
   panelAction: (name) => `panel-action-${name}`,
 
@@ -116,19 +116,60 @@ export const TID = {
     delete: 'lines-panel-delete', // кнопка Delete в строке (нативный confirm)
   },
 
-  // Цитаты таймлайна (видео/аудио) и редактор фрагментов
-  // (widgets/timeline/Fragments.js, FragmentEditor.js). Неактивные промежутки
-  // между цитатами не размечены.
+  // Лента цитат видео / аудио в карточке (widgets/timeline/Quotes.js): строка на цитату,
+  // промежутков нет. Правка цитат — в панели, не в карточке.
   timeline: {
-    quote: 'timeline-quote', // фрагмент-цитата (+ data-turn-id, data-quote-id)
-    quoteText: 'timeline-quote-text', // подпись цитаты — клик по ней активирует цитату
-    field: (name) => `timeline-field-${name}`, // text (подпись), start, end (время чч:мм:сс)
-    pointEdit: (name) => `timeline-point-${name}-edit`, // карандаш, открывающий поле start/end
-    add: 'timeline-add', // «+»: новый фрагмент из текущего выделения
-    play: 'timeline-play', // play/pause в редакторе (тот же togglePlay, что у плеера)
-    edit: 'timeline-edit', // карандаш у фрагмента: правка подписи
-    save: 'timeline-save', // «Ok» — сохранить подпись
-    delete: 'timeline-delete', // корзина — удалить фрагмент (antd Popconfirm → «OK»)
+    quote: 'timeline-quote', // строка (+ data-turn-id, data-quote-id, data-active, data-linked)
+    activate: 'timeline-quote-activate', // значок слева: активировать цитату (aria-pressed)
+    quoteText: 'timeline-quote-text', // текст в одну строку, полный — в title; клика нет
+    duration: 'timeline-quote-duration', // длительность м:сс
+    edit: 'timeline-quote-edit', // ✎ — правка в панели; нет у вьювера и спутника экскурсии; виден по наведению на строку
+    frame: 'timeline-quote-frame', // рамка из записи quotesInfo (+ data-turn-id, data-quote-key, data-framed)
+    play: 'timeline-quote-play', // ▷ / ❚❚ — проиграть цитату с паузой на её конце (+ data-playing, data-loading);
+    // ▷ и ✎ строки — opacity 0 до наведения на строку, ❚❚ играющей цитаты виден всегда
+    loading: 'timeline-loading', // лоадер на списке, пока видео из превью готовится (не дольше 3 с)
+  },
+
+  // Панель правки цитат видео / аудио (modules/panels/components/MediaQuotesPanel.js): открывают
+  // карандаш плеера media-markup и ✎ строки ленты; правки живут в панели до «Save» — одна запись.
+  mediaQuotes: {
+    panel: 'media-quotes-panel', // обёртка .panel (UIPanel)
+    split: 'media-quotes-split', // ручка ширины на левом краю панели (ширина — layoutSettings.mediaQuotesPanelWidth)
+    root: 'media-quotes', // содержимое (+ data-turn-id, data-kind audio|video, data-dirty, data-player ready|preview|offscreen)
+    close: 'media-quotes-close', // ✕ в заголовке — как Cancel
+    play: 'media-quotes-play', // ▷ / ❚❚ плеера карточки (+ data-playing); disabled, пока плеер недоступен
+    time: 'media-quotes-time', // «текущее / длительность»
+    playerHint: 'media-quotes-player-hint', // почему плеер недоступен: карточка снята или видео в превью
+    track: 'media-quotes-track', // дорожка: клик — перемотка (+ data-disabled)
+    trackQuote: 'media-quotes-track-quote', // отрезок цитаты на дорожке (+ data-quote-id, data-selected)
+    playhead: 'media-quotes-playhead', // бегунок на дорожке
+    range: 'media-quotes-range', // обёртка двойного ползунка выбранной цитаты (+ data-quote-id)
+    // подписи времени у ручек (текст подсказки antd, вне панели): начало слева от левой ручки, конец справа
+    // от правой; видны при наведении на строку диапазона, пока ручка тянется, и при фокусе ручки с клавиатуры
+    rangeStart: 'media-quotes-range-start',
+    rangeEnd: 'media-quotes-range-end',
+    row: 'media-quotes-row', // строка цитаты (+ data-quote-id, data-selected, data-start, data-end)
+    select: 'media-quotes-select', // цветной значок: выбрать цитату
+    text: 'media-quotes-text', // текст цитаты (textarea)
+    start: 'media-quotes-start', // поле «Start» (м:сс, ч:мм:сс или секунды; по Enter и уходу из поля)
+    startNow: 'media-quotes-start-now', // ⇤ у начала: текущее время плеера
+    duration: 'media-quotes-duration', // поле «Duration»
+    durationNow: 'media-quotes-duration-now', // ⇤ у длительности: закончить на текущем времени
+    remove: 'media-quotes-delete', // 🗑 — снимает цитату из черновика
+    rowPlay: 'media-quotes-row-play', // ▷ / ❚❚ цитаты черновика, как в карточке (+ data-playing, data-loading)
+    fieldError: 'media-quotes-field-error', // ошибка у поля или строки (+ data-field start|duration|quote, data-code)
+    add: 'media-quotes-add', // «+ Quote from current position» (disabled с подсказкой в title и data-reason)
+    save: 'media-quotes-save', // disabled без изменений
+    cancel: 'media-quotes-cancel',
+    saveError: 'media-quotes-save-error',
+    // Окно потери связей перед записью: тело с data-quotes и data-links, кнопки
+    lostLinks: 'media-quotes-lost-links',
+    lostLinksSave: 'media-quotes-lost-links-save',
+    lostLinksCancel: 'media-quotes-lost-links-cancel',
+    // Вопрос при закрытии с несохранёнными правками (✕, Cancel, Edit хода, другая лента)
+    discard: 'media-quotes-discard',
+    discardOk: 'media-quotes-discard-ok',
+    discardCancel: 'media-quotes-discard-cancel',
   },
 
   // Дропзона загрузки файла (modules/turns/components/forms/FileUploading.js);
@@ -147,8 +188,10 @@ export const TID = {
     player: 'media-player', // корень (+ data-turn-id, data-widget-id, data-playing="true|false")
     play: 'media-play', // play/pause
     preview: 'media-preview', // видео: значок на превью, по которому монтируется плеер (Video.js)
-    markup: 'media-markup', // карандаш в тулбаре плеера: вход в разметку цитат; его нет у вьювера
+    markup: 'media-markup', // карандаш в тулбаре плеера: правка цитат в панели; его нет у вьювера
     // и у спутника экскурсии, а у видео появляется только после монтирования плеера
+    quoteMark: 'media-quote-mark', // треугольник начала цитаты под полоской (+ data-quote-id, data-active,
+    // data-hovered — наведена строка цитаты в карточке); отрезки цитат — фон рельса `.ant-slider-rail`
   },
 
   // Лобби: строка игры в списке (modules/lobby/components/ui/GameRow.js)

@@ -30,7 +30,11 @@ import {
   setPanelMode,
   togglePanel,
 } from '@/modules/panels/redux/actions';
-import { MODE_WIDGET_PDF_CROP, PANEL_TURNS_PASTE } from '@/config/panel';
+import {
+  MODE_WIDGET_PDF_CROP,
+  PANEL_LINES,
+  PANEL_TURNS_PASTE,
+} from '@/config/panel';
 import { getWidgetDataFromState } from '../components/helpers/store';
 import { clampCrop, isSameCrop } from '../components/widgets/pdf/cropGeometry';
 import { STATIC_MEDIA_URL } from '@/config/server';
@@ -319,6 +323,11 @@ export const deleteTurn = (_id, { onDeleted } = {}) => (dispatch, getState) => {
         type: types.TURN_DELETE,
         payload: _id,
       });
+      // режим панели удалённого хода сбрасывает редьюсер панелей; активная цитата — здесь
+      if (getState().quotes.activeQuoteKey?.startsWith(`${_id}_`)) {
+        dispatch({ type: quotesTypes.QUOTE_SET_ACTIVE, payload: null });
+        dispatch(togglePanel({ type: PANEL_LINES, open: false }));
+      }
       if (typeof onDeleted === 'function') onDeleted();
     });
   });
@@ -651,173 +660,3 @@ export const uploadMedia = (type, file, onProgress) => () => {
       .catch(reject);
   });
 };
-
-// PUT videoQuotes/audioQuotes может ответить без quotes (сервер до починки
-// схемы их отбрасывал, старые ходы в базе тоже могут быть без массива) —
-// TimelineQuotes.js итерирует quotes без собственной защиты, поэтому
-// подстановка [] нужна здесь, в одном месте разбора ответа, для всех
-// четырёх действий ниже.
-const withQuotesFallback = (widget) => ({
-  ...widget,
-  quotes: widget?.quotes ?? [],
-});
-
-export const addVideoQuotesWidget =
-  (turnId, editWidgetId, duration) => (dispatch, getState) => {
-    const videoQuotes = {
-      connectedTo: editWidgetId, // v_1
-      duration,
-      quotes: [
-        {
-          id: Math.floor(Date.now() / 1000),
-          text: '',
-          start: 0,
-          active: false,
-        },
-      ],
-    };
-    return updateTurnRequest(turnId, { videoQuotes }).then((data) => {
-      dispatch({
-        type: types.TURN_UPDATE_WIDGET,
-        payload: {
-          turnId: turnId,
-          widgetId: 'vq_1',
-          widget: withQuotesFallback(data.item.videoQuotes),
-        },
-      });
-    });
-  };
-
-export const deleteVideoQuotesWidget =
-  (turnId, widgetId) => (dispatch, getState) => {
-    const state = getState();
-    const quotes = state.turns.d[turnId].dWidgets['vq_1'].quotes;
-    const dLines = state.lines.dByTurnIdAndMarker[turnId];
-    const dLineIdsToRemove = {};
-    for (const quote of quotes) {
-      if (dLines[quote.id]) {
-        for (const line of dLines[quote.id]) {
-          dLineIdsToRemove[line._id] = true;
-        }
-      }
-    }
-    const ids = Object.keys(dLineIdsToRemove);
-
-    const callback = () => {
-      return updateTurnRequest(turnId, { videoQuotes: null }).then((data) => {
-        dispatch({
-          type: types.TURN_UPDATE_WIDGET,
-          payload: {
-            turnId: turnId,
-            widgetId: widgetId,
-            widget: {
-              id: 'vq_1',
-              show: false,
-              duration: 0,
-              quotes: [],
-            },
-          },
-        });
-      });
-    };
-
-    if (ids.length) {
-      return dispatch(linesDelete(ids)).then(() => callback());
-    }
-
-    return callback();
-  };
-
-export const updateVideoQuotesWidget =
-  (turnId, widgetId, widget) => (dispatch) => {
-    return updateTurnRequest(turnId, { videoQuotes: widget }).then((data) => {
-      dispatch({
-        type: types.TURN_UPDATE_WIDGET,
-        payload: {
-          turnId: turnId,
-          widgetId: widgetId,
-          widget: withQuotesFallback(data.item.videoQuotes),
-        },
-      });
-    });
-  };
-
-export const addAudioQuotesWidget =
-  (turnId, editWidgetId, duration) => (dispatch, getState) => {
-    const audioQuotes = {
-      connectedTo: editWidgetId, // a_1
-      duration,
-      quotes: [
-        {
-          id: Math.floor(Date.now() / 1000),
-          text: '',
-          start: 0,
-          active: false,
-        },
-      ],
-    };
-    return updateTurnRequest(turnId, { audioQuotes }).then((data) => {
-      dispatch({
-        type: types.TURN_UPDATE_WIDGET,
-        payload: {
-          turnId: turnId,
-          widgetId: 'aq_1',
-          widget: withQuotesFallback(data.item.audioQuotes),
-        },
-      });
-    });
-  };
-
-export const deleteAudioQuotesWidget =
-  (turnId, widgetId) => (dispatch, getState) => {
-    const state = getState();
-    const quotes = state.turns.d[turnId].dWidgets['aq_1'].quotes;
-    const dLines = state.lines.dByTurnIdAndMarker[turnId];
-    const dLineIdsToRemove = {};
-    for (const quote of quotes) {
-      if (dLines[quote.id]) {
-        for (const line of dLines[quote.id]) {
-          dLineIdsToRemove[line._id] = true;
-        }
-      }
-    }
-    const ids = Object.keys(dLineIdsToRemove);
-
-    const callback = () => {
-      return updateTurnRequest(turnId, { audioQuotes: null }).then((data) => {
-        dispatch({
-          type: types.TURN_UPDATE_WIDGET,
-          payload: {
-            turnId: turnId,
-            widgetId: widgetId,
-            widget: {
-              id: 'aq_1',
-              show: false,
-              duration: 0,
-              quotes: [],
-            },
-          },
-        });
-      });
-    };
-
-    if (ids.length) {
-      return dispatch(linesDelete(ids)).then(() => callback());
-    }
-
-    return callback();
-  };
-
-export const updateAudioQuotesWidget =
-  (turnId, widgetId, widget) => (dispatch) => {
-    return updateTurnRequest(turnId, { audioQuotes: widget }).then((data) => {
-      dispatch({
-        type: types.TURN_UPDATE_WIDGET,
-        payload: {
-          turnId: turnId,
-          widgetId: widgetId,
-          widget: withQuotesFallback(data.item.audioQuotes),
-        },
-      });
-    });
-  };

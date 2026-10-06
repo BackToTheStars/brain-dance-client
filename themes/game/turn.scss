@@ -619,173 +619,137 @@
 
     }
 
+    // Лента цитат видео / аудио: строка на цитату, шаг строки — TIMELINE_ROW_HEIGHT (config/ui.js)
     .timeline-quotes {
-      .bg-fragment {
-        border: none;
-        background-color: transparent;
-        z-index: 0;
+      display: flex;
+      flex-direction: column;
+      padding-left: calc(var(--turn-widgets-gap) + 22px);
 
-        &.active {
-          // border: 2px solid red;
-          background-color: red;
-          // transform: translateY(-2px);
-          // height: 7px;
-          z-index: 1;
-          cursor: pointer;
+      // коробка ленты не позиционирована (от неё рамки цитат); лоадер позиционируется от списка строк
+      .timeline-quotes__rows {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
 
-          &:hover {
-            transform: translateY(-1px);
-            height: 7px;
+      .timeline-quotes__loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, 0.45);
+        font-size: 20px;
+        pointer-events: none;
+      }
+
+      .timeline-quote {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 28px;
+        margin: 2px 0;
+        padding: 0 6px;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        line-height: 20px;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.06);
+        }
+
+        // ▷ и ✎ — по наведению на строку, как карандаш виджета: opacity, а не display, чтобы их можно
+        // было навести и нажать; играющая цитата свой ❚❚ не прячет
+        .timeline-quote__play,
+        .timeline-quote__edit {
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        &:hover {
+          .timeline-quote__play,
+          .timeline-quote__edit {
+            opacity: 1;
           }
+        }
+
+        .timeline-quote__play:focus-visible,
+        .timeline-quote__edit:focus-visible,
+        .timeline-quote__play[data-playing='true'],
+        .timeline-quote__play[data-loading='true'] {
+          opacity: 1;
+        }
+
+        // значок ▷ / ❚❚ меняется под курсором: без этого снятый узел съедал уход мыши со строки,
+        // и подсветка цитаты на полоске плеера залипала
+        button svg {
+          pointer-events: none;
         }
       }
 
-      .fragments-container {
-        &.mode-view {
-          .selected {
-            .fragment-rect {
-              outline: 2px solid red;
-              max-width: calc(100% - 10px);
-              // margin-right: 5px;
-            }
-          }
-        }
-        .fragment-with-line {
-          outline: 2px solid red;
-          max-width: calc(100% - 10px);
-        }
+      .timeline-quote__activate {
+        position: absolute;
+        left: -22px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--fragment-editable-color);
+        cursor: pointer;
 
-        .timeline {
-          padding-left: 7px;
-          padding-right: 7px;
-
-          .ant-slider-handle {
-            z-index: 3;
-          }
-
-          .ant-slider-rail {
-            background-color: rgba(255, 255, 255, 0.3);
-          }
-
-          // позиция воспроизведения парного плеера (v_1 / a_1)
-          .timeline-playhead {
-            position: absolute;
-            top: 0;
-            width: 2px;
-            height: 16px;
-            background-color: var(--fragment-editable-color, red);
-            pointer-events: none;
-            z-index: 2;
-          }
+        &:hover {
+          transform: translateY(-50%) scale(1.3);
         }
 
-        // фрагмент, внутри которого сейчас позиция воспроизведения
-        .editable-fragment.now-playing {
-          .fragment-rect {
-            outline: 1px dashed var(--fragment-editable-color, red);
-            max-width: calc(100% - 10px);
-          }
+        &[aria-pressed='true'] {
+          color: red;
         }
+      }
 
-        .ant-timeline {
-          .ant-timeline-item-rail {
-            background-color: var(--turn-border-color);
-          }
+      .timeline-quote__text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
-          .ant-timeline-item-icon {
-            cursor: pointer;
-            transition: transform 0.2s;
-
-            &:hover {
-              transform: scale(1.5);
-            }
-          }
+        &_empty {
+          color: rgba(255, 255, 255, 0.4);
         }
+      }
 
-        .fragment-rect {
-          // max-width: calc(100% - 20px);
-        }
+      .timeline-quote__play {
+        flex: none;
+        justify-content: center;
+        width: 20px;
+        padding: 0;
+        font-size: 16px;
+      }
 
-        .fragment-rect .text-with-buttons span {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
+      .timeline-quote__edit {
+        flex: none;
+        font-size: 16px;
+      }
 
-        .text-with-buttons {
-          // width: calc(100% - 5px);
+      .timeline-quote__duration {
+        flex: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-variant-numeric: tabular-nums;
+      }
 
-          .icon-button {
-            visibility: hidden;
-          }
-
-          &:hover {
-            .icon-button {
-              visibility: visible;
-            }
-          }
-        }
-
-        .editable-fragment,
-        .inactive-fragment {
-          color: #fff;
-
-          .range-text {
-            color: rgba(255, 255, 255, 0.5);
-          }
-
-          .icon-button {
-            font-size: 16px;
-          }
-        }
-
-        .ant-timeline-item {
-          padding-bottom: 0px;
-        }
-
-        .ant-timeline-item .ant-timeline-item-icon {
-          border-color: gray;
-        }
-
-        .ant-timeline-item .ant-timeline-item-rail {
-          background-color: gray;
-        }
-
-        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-rail {
-          background-color: var(--fragment-editable-color);
-        }
-
-        .ant-timeline-item:has(.editable-fragment) .ant-timeline-item-icon {
-          border-color: var(--fragment-editable-color);
-        }
-
-        .ant-timeline-item:has(.editable-fragment)+.ant-timeline-item .ant-timeline-item-icon {
-          border-color: var(--fragment-editable-color);
-        }
-
-        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-rail {
-          background-color: red;
-        }
-
-        .ant-timeline-item:has(.editable-fragment.selected) .ant-timeline-item-icon {
-          border-color: red;
-        }
-
-        .ant-timeline-item:has(.editable-fragment.selected)+.ant-timeline-item .ant-timeline-item-icon {
-          border-color: red;
-        }
-
-        .ant-timeline-item:has(.inactive-fragment) {
-          padding-bottom: 0px;
-        }
-
-        .ant-timeline-item-content {
-          margin-inline-start: 16px;
-        }
-
-        .ant-timeline-item-last>.ant-timeline-item-content {
-          min-height: auto;
-        }
+      // рамка рисуется из записи quotesInfo, как у pdf; клики проходят к строке
+      .quote-rectangle_timeline {
+        pointer-events: none;
+        transition: outline-color 0.2s;
       }
     }
 
@@ -808,8 +772,11 @@
         width: calc(100% - 26px);
         margin: 10px auto 0 auto;
 
+        // рельс выше трека и по центру него: отрезки цитат (фон рельса) видны и под пройденной частью
         .ant-slider-rail {
           background-color: rgba(255, 255, 255, 0.3);
+          height: 8px;
+          transform: translateY(-2px);
         }
 
         .ant-slider-track {
@@ -818,6 +785,20 @@
 
         .ant-slider-handle {
           border-color: #fff;
+        }
+
+        // метки начал цитат (media/quoteMarks.js): треугольник сразу под рельсом, без точек antd
+        .ant-slider-step {
+          display: none;
+        }
+
+        .ant-slider-mark {
+          top: 11px;
+        }
+
+        .ant-slider-mark-text {
+          display: flex;
+          line-height: 0;
         }
       }
 
@@ -953,14 +934,30 @@
           height: 2px;
         }
 
+        // рельс выше трека и по центру него: отрезки цитат (фон рельса) видны и под пройденной частью
         .ant-slider-rail {
           background-color: var(--bg-button-hover);
           transition: height 0.1s, transform 0.1s;
-          height: 2px;
+          height: 6px;
+          transform: translateY(-2px);
         }
 
         .ant-slider-handle {
           opacity: 0;
+        }
+
+        // метки начал цитат (media/quoteMarks.js): треугольник сразу под рельсом, без точек antd
+        .ant-slider-step {
+          display: none;
+        }
+
+        .ant-slider-mark {
+          top: 9px;
+        }
+
+        .ant-slider-mark-text {
+          display: flex;
+          line-height: 0;
         }
 
         &:hover {
@@ -970,9 +967,8 @@
           }
 
           .ant-slider-rail {
-
-            transform: translateY(-3px);
-            height: 6px;
+            transform: translateY(-5px);
+            height: 10px;
           }
         }
       }

@@ -9,8 +9,8 @@ import { TURN_MEDIA_QUOTE_BINDINGS } from '@/config/turn';
 // «было» из стора и «станет» из формы. Сравниваются именно они, поэтому одно
 // правило накрывает все три случая: файл заменили, файл убрали, сменили тип хода
 // (тогда чужие поля обнуляются в preparedForm).
-// getTimelineQuotes(widgetId) — цитаты таймлайна: они лежат не в `quotes`,
-// а в `turn.videoQuotes` / `turn.audioQuotes`.
+// getTimelineQuotes(widgetId) — отрезки ленты: они лежат не в `quotes`,
+// а в `turn.videoQuotes` / `turn.audioQuotes`; цитаты среди них — с `active`.
 export const filterQuotesOrphanedByMedia = ({
   prevFields,
   nextFields,
@@ -27,7 +27,9 @@ export const filterQuotesOrphanedByMedia = ({
 
     const quotes = binding.quoteType
       ? prevQuotes.filter((quote) => quote.type === binding.quoteType)
-      : getTimelineQuotes(binding.timelineWidgetId) || [];
+      : (getTimelineQuotes(binding.timelineWidgetId) || []).filter(
+          (segment) => segment.active,
+        );
 
     if (!quotes.length) continue;
     orphaned.push({ ...binding, quotes });

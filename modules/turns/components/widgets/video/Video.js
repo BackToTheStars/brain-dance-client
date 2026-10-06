@@ -1,5 +1,5 @@
 import { widgetSpacer } from '@/config/ui';
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { PlayCircleFilled } from '@ant-design/icons';
 import { WIDGET_VIDEO } from '../../../settings';
@@ -8,6 +8,7 @@ import {
   getYoutubePreviewUrl,
 } from '../../helpers/videoUrl';
 import MediaVideo from './Media';
+import { useMediaActivator } from '../media/PlaybackContext';
 import { TID } from '@/config/testIds';
 
 const DEFAULT_PREVIEW = '/img/video-default.png';
@@ -23,6 +24,8 @@ const Video = ({
     (state) => state.turns.d[turnId].dWidgets[widgetId],
   );
   const [previewMode, setPreviewMode] = useState(true);
+  const openPlayer = useCallback(() => setPreviewMode(false), []);
+  useMediaActivator(widgetId, previewMode ? openPlayer : null);
 
   // YouTube — превью с img.youtube.com; всё остальное (медиа-сервер, прямые
   // ссылки) react-player играет по URL как есть, превью — из виджета или дефолт
@@ -93,9 +96,7 @@ const Video = ({
             className="video__play"
             data-test-id={TID.media.preview}
             data-turn-id={turnId}
-            onClick={() => {
-              setPreviewMode(false);
-            }}
+            onClick={openPlayer}
           />
         </div>
       ) : (

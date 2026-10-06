@@ -81,12 +81,11 @@ export const hasTurnContent = (template, fields, paragraphHasText) => {
   );
 };
 
-// Что потеряет ход при замене файла: цитаты старого файла и линии на них.
+// Что потеряет ход при замене файла: цитаты старого файла и линии на них. byWidget — по виджетам,
+// подписи даёт словарь окна.
 const getOrphanedSummary = (orphaned, linesCount) => ({
   quotesCount: orphaned.reduce((sum, item) => sum + item.quotes.length, 0),
-  byWidget: orphaned
-    .map((item) => `${item.label} — ${item.quotes.length}`)
-    .join(', '),
+  byWidget: orphaned.map((item) => ({ kind: item.kind, count: item.quotes.length })),
   linesCount,
 });
 
@@ -246,10 +245,17 @@ export const buildTurnSave = ({
 
   // Осиротевшие цитаты не попали в quotes, и их линии удаляются общим путём.
   const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
+  // Цитаты ленты живут не в quotes хода — их ключи добавляются отдельно.
+  const timelineQuotesDeleted = orphaned
+    .filter((item) => item.timelineField)
+    .flatMap((item) => item.quotes);
 
   const quoteKey = (quote) => `${turnToEdit._id}_${quote.id}`;
+  const keysDeleted = turnToEdit
+    ? [...quotesDeleted, ...timelineQuotesDeleted].map(quoteKey)
+    : [];
   const linesToDelete = turnToEdit
-    ? filterLinesByQuoteKeys(lines, quotesDeleted.map(quoteKey))
+    ? filterLinesByQuoteKeys(lines, keysDeleted)
     : [];
 
   // Окно замены файла считает все связи, которые уйдут с сохранением: на цитатах
@@ -277,11 +283,13 @@ export const buildTurnSave = ({
     videoPreview: (videoUrl && form.videoPreview) || null,
   };
 
-  // Фрагменты таймлайна обязаны покрывать длительность файла, а у нового файла она
-  // другая — виджет снимается целиком, как в deleteVideoQuotesWidget.
-  for (const item of orphaned) {
-    if (item.timelineField) {
-      turnObj[item.timelineField] = null;
+  // Отрезки ленты покрывают длительность прежнего файла — у нового она другая, лента
+  // снимается целиком, и без цитат тоже.
+  for (const binding of TURN_MEDIA_QUOTE_BINDINGS) {
+    if (!binding.timelineField || !turnToEdit) continue;
+    const prevUrl = turnToEdit[binding.field] || '';
+    if (prevUrl && prevUrl !== (preparedForm[binding.field] || '')) {
+      turnObj[binding.timelineField] = null;
     }
   }
 
@@ -318,7 +326,7 @@ export const buildTurnSave = ({
     turnObj,
     isNew: !turnToEdit,
     lineIdsToDelete: linesToDelete.map((line) => line._id),
-    quoteKeysDeleted: quotesDeleted.map(quoteKey),
+    quoteKeysDeleted: keysDeleted,
     previewDraft,
     editionToken,
   };

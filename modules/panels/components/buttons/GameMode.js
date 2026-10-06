@@ -17,6 +17,7 @@ import {
 import { Buttons } from './Buttons';
 import { MODE_OPERATION_PASTE } from '@/config/panel';
 import { TID } from '@/config/testIds';
+import { requestMediaQuotesClose } from '../../redux/mediaQuotesPanel';
 
 const GameMode = () => {
   //
@@ -38,11 +39,15 @@ const GameMode = () => {
       testId: TID.gameAction('add-turn'),
       callback: () => {
         dispatch(
-          togglePanel({
-            type: PANEL_ADD_EDIT_TURN,
-            open: true,
-            params: { editTurnId: null },
-          })
+          requestMediaQuotesClose(() =>
+            dispatch(
+              togglePanel({
+                type: PANEL_ADD_EDIT_TURN,
+                open: true,
+                params: { editTurnId: null },
+              })
+            )
+          )
         );
       },
       show: () => can(RULE_TURNS_CRUD) && !following,

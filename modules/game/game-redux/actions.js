@@ -402,6 +402,7 @@ const LAYOUT_RESET_KEYS = [
   'autoSaveField',
   'autoSaveFieldDelay',
   'editorPanelWidth',
+  'mediaQuotesPanelWidth',
   'editorFontSize',
   'presencePanelCollapsed',
   'panels',

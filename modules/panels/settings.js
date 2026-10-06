@@ -14,6 +14,8 @@ import {
   PANEL_CLASSES,
   PANEL_INFO,
   PANEL_LINES,
+  PANEL_MEDIA_QUOTES,
+  PANEL_MEDIA_QUOTES_STYLES,
   PANEL_MINIMAP,
   PANEL_MINIMAP_STYLES,
   PANEL_NOTIFICATIONS,
@@ -39,6 +41,10 @@ const AddEditTurnPopup = dynamic(
     ssr: false,
   }
 );
+
+const MediaQuotesPanel = dynamic(() => import('./components/MediaQuotesPanel'), {
+  ssr: false,
+});
 
 import SettingsPanel from './components/SettingsPanel';
 import ButtonsPanel from './components/ButtonsPanel';
@@ -82,6 +88,21 @@ export const panels = [
     isDisplayed: false,
     width: EDITOR_PANEL_DEFAULT_WIDTH,
     testId: TID.addTurn.panel,
+  },
+  // Правка цитат ленты видео / аудио: место панели формы хода, своя ширина (свой сплит, помнится
+  // на пользователя), высота по содержимому; с холстом не едет, с формой вместе не открывается.
+  {
+    type: PANEL_MEDIA_QUOTES,
+    position: [POSITION_UPPER_RIGHT, PANEL_MEDIA_QUOTES_STYLES].join(' '),
+    component: MediaQuotesPanel,
+    isDisplayed: false,
+    width: EDITOR_PANEL_DEFAULT_WIDTH,
+    testId: TID.mediaQuotes.panel,
+    editTurnId: null,
+    widgetId: null,
+    focus: null,
+    dirty: false,
+    closeRequest: null,
   },
   {
     type: PANEL_BUTTONS,

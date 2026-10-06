@@ -10,11 +10,12 @@ import { SpeedControl, VolumeControl } from './Control';
 import { AUDIO_HEIGHT } from '@/config/ui';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
-import { MODE_WIDGET_AUDIO } from '@/config/panel';
-import { setPanelMode } from '@/modules/panels/redux/actions';
 import { useMediaPlayback } from '../media/useMediaPlayback';
+import { useQuoteMarks } from '../media/quoteMarks';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
+import { openMediaQuotesPanel } from '@/modules/panels/redux/mediaQuotesPanel';
 
 const Audio = ({
   registerHandleResize,
@@ -27,6 +28,8 @@ const Audio = ({
   // Спутник экскурсии только смотрит: разметку не начинает — как и у карандаша
   // виджета, иначе он войдёт в режим, из которого ему нечем выйти.
   const following = useSelector(selectFollowing);
+  // Панель цитат и форма хода вместе не открываются.
+  const formOpen = useSelector((s) => !!s.panels.d[PANEL_ADD_EDIT_TURN]?.isDisplayed);
   const title = useSelector((s) => s.turns.d[turnId].dWidgets.h_1?.text || '');
   const audioUrl = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].url);
   const {
@@ -48,6 +51,7 @@ const Audio = ({
     onPause,
     onEnded,
   } = useMediaPlayback(widgetId, turnId);
+  const quoteMarks = useQuoteMarks(turnId, 'aq_1', duration);
 
   useEffect(() => {
     registerHandleResize({
@@ -80,22 +84,13 @@ const Audio = ({
           <span className="truncate">{title}</span>
         </div>
         <div className="audio-info flex gap-2 items-center">
-          {can(RULE_TURNS_CRUD) && !following && duration > 0 && (
+          {can(RULE_TURNS_CRUD) && !following && !formOpen && duration > 0 && (
             <button
               className="icon-button"
               data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(
-                  setPanelMode({
-                    mode: MODE_WIDGET_AUDIO,
-                    params: {
-                      editTurnId: turnId,
-                      editWidgetId: widgetId,
-                      duration,
-                    },
-                  }),
-                );
+                dispatch(openMediaQuotesPanel({ turnId, kind: 'audio' }));
               }}
             >
               <FiEdit />
@@ -120,6 +115,7 @@ const Audio = ({
         tooltip={{
           open: false,
         }}
+        {...quoteMarks}
       />
       <ReactPlayer
         ref={playerRef}

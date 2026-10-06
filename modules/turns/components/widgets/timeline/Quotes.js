@@ -1,244 +1,241 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import FragmentEditor from '../timeline/FragmentEditor';
-import { getDefaultFragments } from '../../helpers/timeline/fragments';
-import WidgetEditButton from '../buttons/Edit';
+import { FiEdit } from 'react-icons/fi';
+import { LoadingOutlined } from '@ant-design/icons';
+import { MODE_GAME, PANEL_ADD_EDIT_TURN } from '@/config/panel';
+import { TIMELINE_ROW_HEIGHT, quoteRectangleThickness } from '@/config/ui';
 import { RULE_TURNS_CRUD } from '@/config/user';
+import { TID } from '@/config/testIds';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { setPanelMode } from '@/modules/panels/redux/actions';
+import { openMediaQuotesPanel } from '@/modules/panels/redux/mediaQuotesPanel';
 import { processQuoteClicked } from '@/modules/quotes/redux/actions';
-import { linesDelete, quoteCoordsUpdate } from '@/modules/lines/redux/actions';
+import { quoteCoordsUpdate } from '@/modules/lines/redux/actions';
 import { relativeRect } from '@/modules/game/components/helpers/zoom';
+import { TYPE_QUOTE_AUDIO, TYPE_QUOTE_VIDEO } from '@/modules/quotes/settings';
+import { WIDGET_AUDIO_QUOTES, WIDGET_VIDEO_QUOTES } from '@/modules/turns/settings';
+import { getFormattedDuration } from '../../helpers/formatters/player';
+import { quotesFromSegments } from '../../helpers/timeline/quotes';
+import QuotePlayButton from '../media/QuotePlayButton';
+import { useQuoteLoading } from '../media/quotePlayback';
+import { clearHoveredQuote, setHoveredQuote } from '../media/quoteMarks';
 
-const TIMELINE_HEIGHT = 82;
-const ACTIVE_QUOTE_HEIGHT = 50;
-const INACTIVE_QUOTE_HEIGHT = 25;
+const KINDS = {
+  audio: { widgetType: WIDGET_AUDIO_QUOTES, quoteType: TYPE_QUOTE_AUDIO, playerId: 'a_1' },
+  video: { widgetType: WIDGET_VIDEO_QUOTES, quoteType: TYPE_QUOTE_VIDEO, playerId: 'v_1' },
+};
+
+const Marker = () => (
+  <svg viewBox="0 0 10 9" width="10" height="9" aria-hidden="true">
+    <path d="M5 0 10 9H0Z" fill="currentColor" />
+  </svg>
+);
 
 const TimelineQuotes = ({
+  kind,
   turnId,
   widgetId,
   registerHandleResize,
   unregisterHandleResize,
-  progress = 0,
-  playing,
-  togglePlay,
-  updateQuotesWidget,
-  widgetType,
-  quoteType,
-  managePanelMode,
+  widgetsUpdatedTime,
 }) => {
-  const wrapperEl = useRef(null);
-  const { width } = useSelector((state) => state.turns.g[turnId].size);
-  const { can } = useUserContext();
+  const { widgetType, quoteType, playerId } = KINDS[kind];
   const dispatch = useDispatch();
   const store = useStore();
-  const quotesWidget = useSelector(
-    // videoQuotes or audioQuotes
-    (state) => state.turns.d[turnId].dWidgets[widgetId],
+  const { can } = useUserContext();
+  const following = useSelector(selectFollowing);
+  const formOpen = useSelector((s) => !!s.panels.d[PANEL_ADD_EDIT_TURN]?.isDisplayed);
+  const canEdit = can(RULE_TURNS_CRUD) && !following && !formOpen;
+  const segments = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].quotes);
+  const duration = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].duration);
+  const activeQuoteKey = useSelector((s) => s.quotes.activeQuoteKey);
+  const turnLines = useSelector((s) => s.lines.dByTurnIdAndMarker[turnId]);
+  const records = useSelector((s) => s.lines.quotesInfo[turnId]?.[widgetId]);
+  const loading = useQuoteLoading(turnId, playerId);
+  const boxRef = useRef(null);
+
+  const quotes = useMemo(
+    () => quotesFromSegments(segments, duration),
+    [segments, duration],
   );
-  const turn = useSelector((state) => state.turns.d[turnId]);
-  const [widgetMode, setWidgetMode] = useState('view');
-  // ответ сервера может прийти без quotes (см. actions.js) — виджет должен
-  // остаться пустым, а не уронить итерацию по массиву ниже
-  const { duration, quotes = [] } = quotesWidget;
-  const [fragments, setFragments] = useState(getDefaultFragments(duration));
-  const dLines = useSelector((store) => store.lines.dByTurnIdAndMarker[turnId]);
-
-  const dQuotesWithLines = useMemo(() => {
-    if (!dLines) return {};
-    const d = {};
-    for (const quote of quotes) {
-      if (dLines[quote.id]) {
-        d[quote.id] = true; // @todo: check turnId
-      }
-    }
-    return d;
-  }, [dLines, quotes]);
-  const handleFragmentsChange = (updatedFragments) => {
-    // setFragments(updatedFragments);
-    // Дополнительная логика при изменении фрагментов (если требуется)
-    let end = 0;
-    const quotes = [];
-    if (updatedFragments[0].start !== 0) {
-      console.log(updatedFragments);
-      throw new Error('First quote should start from 0');
-    }
-    if (updatedFragments.at(-1).end !== duration) {
-      console.log(updatedFragments);
-      throw new Error('Last quote should end at duration');
-    }
-    for (const fragment of updatedFragments) {
-      if (fragment.start !== end) {
-        console.log(updatedFragments);
-        throw new Error('');
-      }
-      end = fragment.end;
-      quotes.push({
-        id: fragment.id,
-        start: fragment.start,
-        text: fragment.text,
-        active: fragment.active,
-      });
-    }
-
-    dispatch(
-      updateQuotesWidget(turnId, widgetId, {
-        ...quotesWidget,
-        quotes,
-      }),
-    );
-  };
-
-  const height = useMemo(() => {
-    // return Math.max(75 + 50 * fragments.length, 150);
-    if (widgetMode === 'edit') {
-      const quotesHeight = fragments.reduce((acc, fragment) => {
-        return (
-          acc + (fragment.active ? ACTIVE_QUOTE_HEIGHT : INACTIVE_QUOTE_HEIGHT)
-        );
-      }, 0);
-      return quotesHeight + INACTIVE_QUOTE_HEIGHT + TIMELINE_HEIGHT + 5; // 5 - запас
-    } else {
-      // 'view'
-      const quotesHeight = fragments.reduce((acc, fragment) => {
-        return (
-          acc + (fragment.active ? ACTIVE_QUOTE_HEIGHT : INACTIVE_QUOTE_HEIGHT)
-        );
-      }, 0);
-      return quotesHeight + INACTIVE_QUOTE_HEIGHT + 5; // 5 - запас
-    }
-  }, [widgetMode, fragments]);
-
-  const toggleQuoteClicked = (quoteId) => {
-    dispatch(processQuoteClicked(`${turnId}_${quoteId}`, can));
-  };
+  const quotesRef = useRef(quotes);
+  quotesRef.current = quotes;
+  const quotesKey = useMemo(() => JSON.stringify(quotes), [quotes]);
+  const height = quotes.length * TIMELINE_ROW_HEIGHT;
 
   useEffect(() => {
     registerHandleResize({
       type: widgetType,
       id: widgetId,
-      minWidthCallback: () => {
-        return 20;
-      },
-      minHeightCallback: (newWidth) => {
-        return height;
-      },
-      maxHeightCallback: (newWidth) => {
-        return height;
-      },
+      minWidthCallback: () => 20,
+      minHeightCallback: () => height,
+      maxHeightCallback: () => height,
     });
     return () => unregisterHandleResize({ id: widgetId });
   }, [height]);
 
-  useEffect(() => {
-    if (!wrapperEl?.current) return;
-    const checkQuotes = () => {
-      const turnEl = wrapperEl?.current.closest('.stb-react-turn');
-      const rect = relativeRect(
-        wrapperEl.current,
-        turnEl,
-        store.getState().game.zoom,
-      );
-      const widgetTop = rect.top;
-      let width = Math.round(rect.width);
-      let height = Math.round(rect.height);
-      if (!width || !height) return;
-      if (!quotes.length) return;
-      const extraTop =
-        widgetTop + (widgetMode === 'view' ? 0 : TIMELINE_HEIGHT + 15) + 25;
-      let accTop =
-        extraTop -
-        (quotes[0].active ? ACTIVE_QUOTE_HEIGHT : INACTIVE_QUOTE_HEIGHT);
-      dispatch(
-        quoteCoordsUpdate(
-          turnId,
-          widgetId,
-          quotes.map((quote, i) => {
-            const delta = quote.active
-              ? ACTIVE_QUOTE_HEIGHT
-              : INACTIVE_QUOTE_HEIGHT;
-            return {
-              type: quoteType,
-              initialCoords: {},
-              quoteId: quote.id,
-              quoteKey: `${turnId}_${quote.id}`,
-              turnId,
-              text: quote.text,
-              left: 37,
-              top: (accTop += delta), //extraTop + widgetTop + 2 * i * INACTIVE_QUOTE_HEIGHT,
-              width: width - 60,
-              height: INACTIVE_QUOTE_HEIGHT,
-              // left:
-              //   Math.round((width * quote.x) / 100) +
-              //   (pictureOnly ? 0 : widgetSpacer),
-              // top:
-              //   Math.round((height * quote.y) / 100) +
-              //   (pictureOnly ? 0 : widgetSpacer) +
-              //   2 +
-              //   widgetTop,
-              // width: Math.round((width * quote.width) / 100),
-              // height: Math.round((height * quote.height) / 100),
-            };
-          }),
-        ),
-      );
-    };
-    checkQuotes();
-    let timeout = setTimeout(() => checkQuotes(), 500);
-    return () => clearTimeout(timeout);
-  }, [quotes, wrapperEl, width, height, widgetMode]);
+  useEffect(() => () => clearHoveredQuote(turnId), [turnId]);
 
+  // Запись для линий — прямоугольник строки по вёрстке. Строку сдвигают и свой размер, и виджеты выше.
   useEffect(() => {
-    const fragments = [];
-    for (let i = 0; i < quotes.length; i++) {
-      fragments.push({
-        id: quotes[i].id,
-        start: quotes[i].start,
-        end: quotes[i + 1] ? quotes[i + 1].start : duration,
-        text: quotes[i].text,
-        active: quotes[i].active,
-      });
+    const box = boxRef.current;
+    const turnEl = box?.closest('.stb-react-turn');
+    if (!box || !turnEl) return;
+    let frame = null;
+    const measure = () => {
+      frame = null;
+      const zoom = store.getState().game.zoom;
+      const rows = box.querySelectorAll('.timeline-quote');
+      const measured = [];
+      for (const row of rows) {
+        const quote = quotesRef.current.find(
+          (q) => String(q.id) === row.dataset.quoteId,
+        );
+        if (!quote) continue;
+        const rect = relativeRect(row, turnEl, zoom);
+        if (!rect.width || !rect.height) return;
+        measured.push({
+          type: quoteType,
+          quoteId: quote.id,
+          quoteKey: `${turnId}_${quote.id}`,
+          turnId,
+          text: quote.text,
+          left: Math.round(rect.left),
+          top: Math.round(rect.top),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        });
+      }
+      dispatch(quoteCoordsUpdate(turnId, widgetId, measured));
+    };
+    const schedule = () => {
+      if (frame === null) frame = requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(box);
+    for (let el = box.previousElementSibling; el; el = el.previousElementSibling) {
+      observer.observe(el);
     }
-    setFragments(fragments);
-  }, [quotes, duration]);
+    schedule();
+    return () => {
+      observer.disconnect();
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  }, [quotesKey, widgetsUpdatedTime]);
+
+  const frames = useMemo(() => {
+    const ids = new Set(quotes.map((quote) => String(quote.id)));
+    return (records || []).filter((record) => ids.has(String(record.quoteId)));
+  }, [records, quotes]);
+
+  const isLinked = (quoteId) => !!turnLines?.[quoteId]?.length;
+
+  const activate = (quote) =>
+    dispatch(
+      processQuoteClicked(`${turnId}_${quote.id}`, can, () =>
+        dispatch(setPanelMode({ mode: MODE_GAME })),
+      ),
+    );
 
   return (
     <div
-      ref={wrapperEl}
-      className="timeline-quotes turn-widget relative not-draggable cursor-auto"
-      style={{
-        height: `${height}px`,
-      }}
+      ref={boxRef}
+      className="timeline-quotes turn-widget not-draggable cursor-auto"
+      style={{ height: `${height}px` }}
     >
-      <FragmentEditor
-        widgetMode={widgetMode}
-        progress={progress}
-        playing={playing}
-        togglePlay={togglePlay}
-        duration={duration}
-        turnId={turnId}
-        existingFragments={fragments}
-        onFragmentsChange={handleFragmentsChange}
-        onFragmentDelete={(id) => {
-          const linesToDelete = (dLines && dLines[id]) || [];
-          if (linesToDelete.length) {
-            dispatch(linesDelete(linesToDelete.map((l) => l._id)));
-          }
-        }}
-        toggleQuoteClicked={toggleQuoteClicked}
-        dQuotesWithLines={dQuotesWithLines}
-      />
-      {can(RULE_TURNS_CRUD) && (
-        <WidgetEditButton
-          turnId={turnId}
-          widgetId={widgetId}
-          mode={managePanelMode}
-          additionalCallback={() =>
-            setWidgetMode(widgetMode === 'view' ? 'edit' : 'view')
-          }
-        />
-      )}
+      <div className="timeline-quotes__rows">
+        {quotes.map((quote, i) => {
+          const active = activeQuoteKey === `${turnId}_${quote.id}`;
+          return (
+            <div
+              key={quote.id}
+              className="timeline-quote"
+              data-test-id={TID.timeline.quote}
+              data-turn-id={turnId}
+              data-quote-id={quote.id}
+              data-active={active ? 'true' : 'false'}
+              data-linked={isLinked(quote.id) ? 'true' : 'false'}
+              onMouseEnter={() => setHoveredQuote(turnId, quote.id)}
+              onMouseLeave={() => clearHoveredQuote(turnId)}
+            >
+              <button
+                type="button"
+                className="timeline-quote__activate"
+                data-test-id={TID.timeline.activate}
+                aria-pressed={active}
+                title="Select quote"
+                onClick={() => activate(quote)}
+              >
+                <Marker />
+              </button>
+              <span
+                className={
+                  'timeline-quote__text' + (quote.text ? '' : ' timeline-quote__text_empty')
+                }
+                data-test-id={TID.timeline.quoteText}
+                title={quote.text}
+              >
+                {quote.text || `Quote ${i + 1}`}
+              </span>
+              <QuotePlayButton
+                turnId={turnId}
+                playerId={playerId}
+                quote={quote}
+                className="icon-button timeline-quote__play"
+                testId={TID.timeline.play}
+              />
+              {canEdit && (
+                <button
+                  type="button"
+                  className="icon-button timeline-quote__edit"
+                  data-test-id={TID.timeline.edit}
+                  title="Edit quotes"
+                  onClick={() =>
+                    dispatch(openMediaQuotesPanel({ turnId, kind, quoteId: quote.id }))
+                  }
+                >
+                  <FiEdit />
+                </button>
+              )}
+              <span
+                className="timeline-quote__duration"
+                data-test-id={TID.timeline.duration}
+              >
+                {getFormattedDuration(quote.end - quote.start)}
+              </span>
+            </div>
+          );
+        })}
+        {loading && (
+          <div className="timeline-quotes__loading" data-test-id={TID.timeline.loading}>
+            <LoadingOutlined />
+          </div>
+        )}
+      </div>
+      {frames.map((record) => {
+        const framed =
+          activeQuoteKey === record.quoteKey || isLinked(record.quoteId);
+        return (
+          <div
+            key={record.quoteId}
+            className="quote-rectangle quote-rectangle_timeline"
+            data-test-id={TID.timeline.frame}
+            data-turn-id={turnId}
+            data-quote-key={record.quoteKey}
+            data-framed={framed ? 'true' : 'false'}
+            style={{
+              left: record.left,
+              top: record.top,
+              width: record.width,
+              height: record.height,
+              outline: framed ? `${quoteRectangleThickness}px solid red` : 'none',
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
 
-export default TimelineQuotes;
+export default memo(TimelineQuotes);

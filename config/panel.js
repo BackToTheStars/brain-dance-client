@@ -20,14 +20,20 @@ export const PANEL_LINES = 'panel_lines';
 export const PANEL_TURN_INFO = 'panel_turn_info';
 export const PANEL_TURNS_PASTE = 'panel_turns_paste';
 export const PANEL_PRESENCE = 'panel_presence';
+export const PANEL_MEDIA_QUOTES = 'panel_media_quotes';
 
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';
+export const PANEL_MEDIA_QUOTES_STYLES = 'media-quotes-panel-box';
 
 // Ширина панели редактора: помнится на пользователя. Минимум замерен — ниже 650px
 // подпись дропдауна типа хода вылезает за кнопку.
 export const EDITOR_PANEL_DEFAULT_WIDTH = 900;
 export const EDITOR_PANEL_MIN_WIDTH = 650;
+
+// Панель правки цитат: умолчание — как у формы хода. Минимум замерен: при 470 px строка цитаты
+// (значок, Start, Duration, ⇤, ▷, 🗑) ещё в одну строку, при 460 — переносится.
+export const MEDIA_QUOTES_PANEL_MIN_WIDTH = 480;
 
 // Размер шрифта редактора (A− / A+): помнится на пользователя, в ход не пишется.
 export const EDITOR_FONT_SIZE_DEFAULT = 22;
@@ -43,8 +49,6 @@ export const MINIMAP_SIZE_STEP = 10;
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
 export const MODE_WIDGET_PARAGRAPH = 'widget-paragraph';
-export const MODE_WIDGET_VIDEO = 'widget-video';
-export const MODE_WIDGET_AUDIO = 'widget-audio';
 export const MODE_WIDGET_PDF = 'widget-pdf';
 
 export const MODE_WIDGET_PDF_QUOTE_ADD = 'widget-pdf-quote-add';
@@ -57,6 +61,3 @@ export const MODE_BUTTON_PICTURE_ADD_AREA = 'widget-picture-add-area';
 export const MODE_WIDGET_PICTURE_QUOTE_ACTIVE = 'widget-picture-quote-active';
 export const MODE_BUTTON_PICTURE_MODIFY_AREA = 'widget-picture-modify-area';
 export const MODE_OPERATION_PASTE = 'operation-paste';
-
-export const MODE_WIDGET_VIDEO_QUOTES_MANAGE = 'widget-video-quotes-manage';
-export const MODE_WIDGET_AUDIO_QUOTES_MANAGE = 'widget-audio-quotes-manage';

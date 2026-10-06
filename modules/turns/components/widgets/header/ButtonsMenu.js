@@ -20,6 +20,7 @@ import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { castSaved } from '@/modules/presence/redux/actions';
+import { requestMediaQuotesClose } from '@/modules/panels/redux/mediaQuotesPanel';
 
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
@@ -48,8 +49,7 @@ const ButtonsMenu = ({ _id }) => {
     }
   };
 
-  const handleEdit = (e) => {
-    e.preventDefault();
+  const openForm = () => {
     dispatch(
       togglePanel({
         type: PANEL_ADD_EDIT_TURN,
@@ -70,6 +70,12 @@ const ButtonsMenu = ({ _id }) => {
         y: turnGeometry.position.y + Math.floor(turnGeometry.size.height / 2),
       }),
     );
+  };
+
+  // Открытая панель цитат закрывается как по ✕: с вопросом, если правки не записаны.
+  const handleEdit = (e) => {
+    e.preventDefault();
+    dispatch(requestMediaQuotesClose(openForm));
   };
 
   const handleClone = (e) => {

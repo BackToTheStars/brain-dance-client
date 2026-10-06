@@ -1,40 +1,15 @@
 import { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   isNotMediaUrl,
   needsProbe,
   probeMedia,
 } from '../helpers/mediaUrlCheck';
 
-const NOT_MEDIA_TEXTS = {
-  image: {
-    title: 'Похоже, это не картинка',
-    inField: 'в поле картинки',
-    asType: 'как картинка',
-    result: 'В ходе на её месте будет значок ошибки.',
-  },
-  video: {
-    title: 'Похоже, это не видео',
-    inField: 'в поле видео',
-    asType: 'как видео',
-    result: 'Плеер в ходе её не проиграет.',
-  },
-  audio: {
-    title: 'Похоже, это не аудио',
-    inField: 'в поле аудио',
-    asType: 'как аудио',
-    result: 'Плеер в ходе её не проиграет.',
-  },
-  pdf: {
-    title: 'Похоже, это не PDF',
-    inField: 'в поле PDF',
-    asType: 'как PDF',
-    result: 'В ходе на её месте будет сообщение об ошибке.',
-  },
-};
-
 // Проверка новых ссылок медиа-полей перед Save и окно «Похоже, это не …». Ссылки идут
 // по очереди; прошли все — onChecked(save). Таймаут пробы отказом не считается.
 export const useMediaLinkCheck = ({ edition, onChecked }) => {
+  const t = useTranslations('Game.turnForm.notMedia');
   // Редакция, чья ссылка сейчас проверяется: Save блокируется только у неё.
   const [checkingLink, setCheckingLink] = useState(0);
   // { name, url, reason, rest, save }, где rest — ещё не проверенные поля.
@@ -68,7 +43,12 @@ export const useMediaLinkCheck = ({ edition, onChecked }) => {
     checkMediaLinks,
     checking: edition.isCurrent(checkingLink),
     notMedia,
-    notMediaText: NOT_MEDIA_TEXTS[notMediaName],
+    // type — ссылка по адресу ведёт на файл другого типа, load — не открылась пробой
+    notMediaText: {
+      title: t(`${notMediaName}.Title`),
+      type: t(`${notMediaName}.Type`),
+      load: t(`${notMediaName}.Load`),
+    },
     cancelNotMedia: () => setNotMedia(null),
     confirmNotMedia: () => {
       confirmedNotMedia.current = notMedia;
