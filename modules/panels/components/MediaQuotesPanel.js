@@ -12,6 +12,7 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { usePlaybackChannel } from '@/modules/turns/components/widgets/media/PlaybackContext';
 import QuotePlayButton from '@/modules/turns/components/widgets/media/QuotePlayButton';
+import SkipButtons from '@/modules/turns/components/widgets/media/SkipButtons';
 import { getFormattedDuration } from '@/modules/turns/components/helpers/formatters/player';
 import {
   checkQuotes,
@@ -369,7 +370,10 @@ const MediaQuotesEditor = ({ turnId, widgetId }) => {
   const following = useSelector(selectFollowing);
   const canEdit = can(RULE_TURNS_CRUD) && !following;
   const title = useSelector(
-    (s) => s.turns.d[turnId]?.dWidgets?.h_1?.text || '',
+    (s) =>
+      s.turns.d[turnId]?.dWidgets?.[playerId]?.title ||
+      s.turns.d[turnId]?.dWidgets?.h_1?.text ||
+      '',
   );
   const focus = useSelector((s) => s.panels.d[PANEL_MEDIA_QUOTES].focus);
   const closeRequest = useSelector(
@@ -591,6 +595,15 @@ const MediaQuotesEditor = ({ turnId, widgetId }) => {
         >
           {player.playing ? <FiPause /> : <FiPlay />}
         </button>
+        <SkipButtons
+          className="media-quotes-icon"
+          progress={player.progress}
+          duration={player.duration}
+          seek={player.seek}
+          disabled={!ready}
+          backId={TID.mediaQuotes.skipBack}
+          forwardId={TID.mediaQuotes.skipForward}
+        />
         <span className="media-quotes__time" data-test-id={TID.mediaQuotes.time}>
           {ready ? fmt(progress) : '–:––'} / {fmt(total)}
         </span>

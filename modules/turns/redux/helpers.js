@@ -61,7 +61,12 @@ export class TurnHelper {
         },
       ],
       [WIDGET_AUDIO]: [
-        { id: 'a_1', show: !!turn.audioUrl, url: turn.audioUrl },
+        {
+          id: 'a_1',
+          show: !!turn.audioUrl,
+          url: turn.audioUrl,
+          title: turn.audioTitle,
+        },
       ],
       [WIDGET_PDF]: [
         {
@@ -193,6 +198,7 @@ export class TurnHelper {
       videoQuotes: TurnHelper.timelineField(turn.dWidgets.vq_1, 'v_1'),
       audioQuotes: TurnHelper.timelineField(turn.dWidgets.aq_1, 'a_1'),
       audioUrl: turn.dWidgets.a_1.url,
+      audioTitle: turn.dWidgets.a_1.title,
       pdfUrl: turn.dWidgets.pdf_1?.url,
       pdfCrop: turn.dWidgets.pdf_1?.crop,
       splitHeight: turn.splitHeight,

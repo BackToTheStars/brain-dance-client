@@ -12,6 +12,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { useQuoteMarks } from '../media/quoteMarks';
+import SkipButtons from '../media/SkipButtons';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
@@ -30,7 +31,12 @@ const Audio = ({
   const following = useSelector(selectFollowing);
   // Панель цитат и форма хода вместе не открываются.
   const formOpen = useSelector((s) => !!s.panels.d[PANEL_ADD_EDIT_TURN]?.isDisplayed);
-  const title = useSelector((s) => s.turns.d[turnId].dWidgets.h_1?.text || '');
+  const title = useSelector(
+    (s) =>
+      s.turns.d[turnId].dWidgets[widgetId].title ||
+      s.turns.d[turnId].dWidgets.h_1?.text ||
+      '',
+  );
   const audioUrl = useSelector((s) => s.turns.d[turnId].dWidgets[widgetId].url);
   const {
     playerRef,
@@ -81,12 +87,20 @@ const Audio = ({
           >
             {playing ? <FiPause /> : <FiPlay />}
           </button>
+          <SkipButtons
+            className="icon-button"
+            progress={progress}
+            duration={duration}
+            seek={seek}
+            backId={TID.media.skipBack}
+            forwardId={TID.media.skipForward}
+          />
           <span className="truncate">{title}</span>
         </div>
         <div className="audio-info flex gap-2 items-center">
           {can(RULE_TURNS_CRUD) && !following && !formOpen && duration > 0 && (
             <button
-              className="icon-button"
+              className="icon-button media-markup-button"
               data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();

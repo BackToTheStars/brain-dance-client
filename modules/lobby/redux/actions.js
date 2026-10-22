@@ -151,32 +151,40 @@ export const lobbyEnterGameWithConfirm =
   });
 };
 
+// вход по коду без перехода: код в списке игр и доступ game_<адрес> с ролью из ответа
+// сервера; отказ и обрыв сети — строкой, её показывают как есть
+export const enterGameByCode = (code, nickname) => (dispatch) =>
+  getGameUserTokenRequest(code, nickname).then(
+    (data) => {
+      if (!data?.success || !data.info?.hash) {
+        throw data?.message || 'Неизвестная ошибка';
+      }
+      const { info, token } = data;
+      dispatch(
+        addGameCode({
+          hash: info.hash,
+          nickname: info.nickname,
+          role: info.role,
+          code: info.code,
+        }),
+      );
+      setGameInfoIntoStorage(info.hash, { info, token });
+      return data;
+    },
+    () => {
+      throw 'Request error';
+    },
+  );
+
 // вход по коду из handoff-ссылки лобби: ник уже спросили диалогом, подтверждать
 // нечего — сохраняем доступ и уходим на хеш игры, где ждёт обычный pre-game диалог
 export const lobbyEnterGameByCode =
   (code, nickname, share = {}) =>
-  (dispatch) => {
-  return new Promise((resolve, reject) => {
-    getGameUserTokenRequest(code, nickname).then((data) => {
-      if (data?.success && data.info?.hash) {
-        const { info, token } = data;
-        dispatch(
-          addGameCode({
-            hash: info.hash,
-            nickname: info.nickname,
-            role: info.role,
-            code: info.code,
-          }),
-        );
-        setGameInfoIntoStorage(info.hash, { info, token });
-        resolve(data);
-        location.replace(gameEntryUrl(info.hash, share));
-      } else {
-        reject(data?.message || 'Неизвестная ошибка');
-      }
+  (dispatch) =>
+    enterGameByCode(code, nickname)(dispatch).then((data) => {
+      location.replace(gameEntryUrl(data.info.hash, share));
+      return data;
     });
-  });
-};
 
 export const lobbyEnterGameForRequest = (hash, code, nickname) => (dispatch) => {
   return new Promise((resolve, reject) => {

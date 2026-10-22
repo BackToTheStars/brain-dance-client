@@ -76,17 +76,18 @@ const AddEditTurnPopup = () => {
   const turnData = useSelector((state) => state.turns.d[editTurnId]);
   const turnGeometry = useSelector((state) => state.turns.g[editTurnId]);
   const activeQuoteKey = useSelector((state) => state.quotes.activeQuoteKey);
+  const turnExists = !!turnData && !!turnGeometry;
   // @fixme
-  const turnToEdit = useMemo(
-    () =>
-      turnData && turnGeometry
-        ? TurnHelper.toOldFields({
-            ...turnData,
-            ...turnGeometry,
-          })
-        : null,
-    [turnData, turnGeometry],
-  );
+  const storedTurn = () =>
+    turnExists
+      ? TurnHelper.toOldFields({
+          ...turnData,
+          ...turnGeometry,
+        })
+      : null;
+  // Форма заливается ходом на момент открытия: перетаскивание, пересчёт высоты,
+  // автосохранение и перезапрос по «saved» меняют запись хода, но не набранное.
+  const turnToEdit = useMemo(storedTurn, [editTurnId, turnExists]);
   const [quillConstants, setQuillConstants] = useState({}); // { quill, getQuillTextArr }
   const [activeTemplate, setActiveTemplate] = useState(TEMPLATE_PICTURE);
   const [error, setError] = useState(null);
@@ -333,7 +334,8 @@ const AddEditTurnPopup = () => {
       ),
       form,
       template: activeTemplate,
-      turnToEdit,
+      // Позиция и цитаты других виджетов — какими они в сторе сейчас.
+      turnToEdit: storedTurn(),
       dWidgets: turnData?.dWidgets,
       lines,
       position: gamePosition,
@@ -503,7 +505,11 @@ const AddEditTurnPopup = () => {
                   return (
                     <FormInput
                       changeHandler={(value) => formChangeHandler(field, value)}
-                      label={fieldSettings[field].label}
+                      label={
+                        fieldSettings[field].labelKey
+                          ? t(fieldSettings[field].labelKey)
+                          : fieldSettings[field].label
+                      }
                       prefixClass={fieldSettings[field].prefixClass}
                       inputType={fieldSettings[field].inputType}
                       key={field}

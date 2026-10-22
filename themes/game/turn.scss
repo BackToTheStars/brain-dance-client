@@ -80,7 +80,8 @@
     display: flex;
     align-items: center;
 
-    &.disabled {
+    &.disabled,
+    &:disabled {
       opacity: 0.3;
       pointer-events: none;
     }
@@ -760,6 +761,27 @@
       background: black;
     }
 
+    // по наведению на плеер и по фокусу; opacity, а не display: спеки наводят и кликают
+    .media-markup-button {
+      opacity: 0;
+      transition: opacity 0.3s;
+
+      &:focus-visible {
+        opacity: 1;
+      }
+
+      svg {
+        pointer-events: none;
+      }
+    }
+
+    .video-player-wrapper:hover,
+    .audio-player-wrapper:hover {
+      .media-markup-button {
+        opacity: 1;
+      }
+    }
+
     .video-controls {
       position: absolute;
       bottom: 0;
@@ -893,7 +915,12 @@
       }
 
       .audio-title-wrapper {
-        max-width: calc(100% - 100px);
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .audio-info {
+        flex-shrink: 0;
       }
 
       .audio-time {

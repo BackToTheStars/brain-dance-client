@@ -18,6 +18,7 @@ import {
   PANEL_MEDIA_QUOTES_STYLES,
   PANEL_MINIMAP,
   PANEL_MINIMAP_STYLES,
+  PANEL_NO_SELECT_STYLES,
   PANEL_NOTIFICATIONS,
   PANEL_PRESENCE,
   PANEL_SETTINGS,
@@ -106,14 +107,14 @@ export const panels = [
   },
   {
     type: PANEL_BUTTONS,
-    position: [POSITION_BOTTOM_RIGHT, PANEL_BUTTONS_STYLES].join(' '),
+    position: [POSITION_BOTTOM_RIGHT, PANEL_BUTTONS_STYLES, PANEL_NO_SELECT_STYLES].join(' '),
     component: ButtonsPanel,
     isDisplayed: true,
     width: () => '310px',
   },
   {
     type: PANEL_INFO,
-    position: POSITION_UPPER_CENTER,
+    position: [POSITION_UPPER_CENTER, PANEL_NO_SELECT_STYLES].join(' '),
     component: InfoPanel,
     isDisplayed: false,
     width: () => '630px',
@@ -122,7 +123,7 @@ export const panels = [
   // сразу при изменении; значения здесь — умолчания для сброса в Info.
   {
     type: PANEL_MINIMAP,
-    position: [POSITION_BOTTOM_LEFT, PANEL_MINIMAP_STYLES].join(' '),
+    position: [POSITION_BOTTOM_LEFT, PANEL_MINIMAP_STYLES, PANEL_NO_SELECT_STYLES].join(' '),
     component: Minimap,
     isDisplayed: true,
     width: 400, // () => '600px',
@@ -162,7 +163,7 @@ export const panels = [
   // после загрузки закрыта. `place: null` — место из CSS.
   {
     type: PANEL_PRESENCE,
-    position: POSITION_FLEXIBLE,
+    position: [POSITION_FLEXIBLE, PANEL_NO_SELECT_STYLES].join(' '),
     component: PresencePanel,
     isDisplayed: false,
     width: () => 'min(420px, calc(100vw - 20px))',

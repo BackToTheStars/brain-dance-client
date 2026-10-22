@@ -28,6 +28,7 @@ const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
 const FIELD_PICTURE = 'imageUrl';
 const FIELD_VIDEO = 'videoUrl';
 const FIELD_AUDIO = 'audioUrl';
+const FIELD_AUDIO_TITLE = 'audioTitle';
 const FIELD_PDF = 'pdfUrl';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
@@ -249,7 +250,7 @@ const settings = {
     value: 'audio',
     label: 'Text / audio',
     requiredFields: [FIELD_AUDIO],
-    availableFields: [FIELD_AUDIO],
+    availableFields: [FIELD_AUDIO, FIELD_AUDIO_TITLE],
   },
   [TEMPLATE_PDF]: {
     value: 'pdf',
@@ -417,6 +418,12 @@ const fieldSettings = {
       },
     },
   },
+  [FIELD_AUDIO_TITLE]: {
+    label: 'Audio title',
+    labelKey: 'fields.audioTitle',
+    prefixClass: 'audio-title',
+    special: true,
+  },
   [FIELD_PDF]: {
     label: 'PDF URL',
     prefixClass: 'pdf-url',
@@ -476,6 +483,7 @@ const fieldsToClone = [
   'videoUrl',
   'videoPreview',
   'audioUrl',
+  'audioTitle',
   'pdfUrl',
   'pdfCrop',
   'date',
@@ -514,6 +522,7 @@ const turnSettings = {
   FIELD_PICTURE_ONLY,
   FIELD_VIDEO,
   FIELD_AUDIO,
+  FIELD_AUDIO_TITLE,
   FIELD_PDF,
   FIELD_DATE,
   FIELD_SOURCE,

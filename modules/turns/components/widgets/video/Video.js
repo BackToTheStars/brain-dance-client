@@ -10,6 +10,7 @@ import {
 import MediaVideo from './Media';
 import { useMediaActivator } from '../media/PlaybackContext';
 import { TID } from '@/config/testIds';
+import { VIDEO_MIN_WIDTH } from '@/config/turn';
 
 const DEFAULT_PREVIEW = '/img/video-default.png';
 
@@ -41,9 +42,7 @@ const Video = ({
     registerHandleResize({
       type: WIDGET_VIDEO,
       id: widgetId,
-      minWidthCallback: () => {
-        return 20;
-      },
+      minWidthCallback: () => VIDEO_MIN_WIDTH,
       minHeightCallback: (newWidth) => {
         const newImgHeight =
           Math.floor((9 * (newWidth - 2 * widgetSpacer)) / 16) + widgetSpacer;

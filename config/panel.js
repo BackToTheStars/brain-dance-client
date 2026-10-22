@@ -25,6 +25,7 @@ export const PANEL_MEDIA_QUOTES = 'panel_media_quotes';
 export const PANEL_MINIMAP_STYLES = 'panel-minimap-styles'; // @todo: check if it's needed
 export const PANEL_BUTTONS_STYLES = 'actions';
 export const PANEL_MEDIA_QUOTES_STYLES = 'media-quotes-panel-box';
+export const PANEL_NO_SELECT_STYLES = 'panel-no-select';
 
 // Ширина панели редактора: помнится на пользователя. Минимум замерен — ниже 650px
 // подпись дропдауна типа хода вылезает за кнопку.

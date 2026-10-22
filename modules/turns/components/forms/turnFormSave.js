@@ -21,6 +21,7 @@ const {
   FIELD_PICTURE_ONLY,
   FIELD_VIDEO,
   FIELD_AUDIO,
+  FIELD_AUDIO_TITLE,
   FIELD_PDF,
 } = turnSettings;
 
@@ -282,6 +283,13 @@ export const buildTurnSave = ({
     quotes: [...quotes],
     videoPreview: (videoUrl && form.videoPreview) || null,
   };
+
+  // Пустое название уходит null, только если стирает сохранённое; иначе ключа нет —
+  // ход другого типа поля не получает.
+  const audioTitle = preparedForm[FIELD_AUDIO_TITLE]?.trim();
+  if (audioTitle) turnObj[FIELD_AUDIO_TITLE] = audioTitle;
+  else if (turnToEdit?.[FIELD_AUDIO_TITLE]) turnObj[FIELD_AUDIO_TITLE] = null;
+  else delete turnObj[FIELD_AUDIO_TITLE];
 
   // Отрезки ленты покрывают длительность прежнего файла — у нового она другая, лента
   // снимается целиком, и без цитат тоже.

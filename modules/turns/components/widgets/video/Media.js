@@ -14,6 +14,7 @@ import { RULE_TURNS_CRUD } from '@/config/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { useQuoteMarks } from '../media/quoteMarks';
+import SkipButtons from '../media/SkipButtons';
 import { VolumeControl, SpeedControl } from './Controls';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
@@ -118,6 +119,14 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
           >
             {playing ? <FiPause /> : <FiPlay />}
           </button>
+          <SkipButtons
+            className="icon-button"
+            progress={progress}
+            duration={duration}
+            seek={seek}
+            backId={TID.media.skipBack}
+            forwardId={TID.media.skipForward}
+          />
           <VolumeControl
             volume={volume * 100}
             setVolume={handleVolumeChange}
@@ -131,7 +140,7 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
           <div className="flex-1" />
           {can(RULE_TURNS_CRUD) && !following && !formOpen && duration > 0 && (
             <button
-              className="icon-button"
+              className="icon-button media-markup-button"
               data-test-id={TID.media.markup}
               onClick={(e) => {
                 e.preventDefault();

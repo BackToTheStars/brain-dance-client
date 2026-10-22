@@ -138,6 +138,8 @@ export const TID = {
     root: 'media-quotes', // содержимое (+ data-turn-id, data-kind audio|video, data-dirty, data-player ready|preview|offscreen)
     close: 'media-quotes-close', // ✕ в заголовке — как Cancel
     play: 'media-quotes-play', // ▷ / ❚❚ плеера карточки (+ data-playing); disabled, пока плеер недоступен
+    skipBack: 'media-quotes-skip-back', // −10 с / +10 с плеера карточки через канал; disabled, как ▷
+    skipForward: 'media-quotes-skip-forward',
     time: 'media-quotes-time', // «текущее / длительность»
     playerHint: 'media-quotes-player-hint', // почему плеер недоступен: карточка снята или видео в превью
     track: 'media-quotes-track', // дорожка: клик — перемотка (+ data-disabled)
@@ -187,6 +189,8 @@ export const TID = {
   media: {
     player: 'media-player', // корень (+ data-turn-id, data-widget-id, data-playing="true|false")
     play: 'media-play', // play/pause
+    skipBack: 'media-skip-back', // −10 с рядом с ▷ (disabled, пока длительность не известна)
+    skipForward: 'media-skip-forward', // +10 с, не дальше конца файла
     preview: 'media-preview', // видео: значок на превью, по которому монтируется плеер (Video.js)
     markup: 'media-markup', // карандаш в тулбаре плеера: правка цитат в панели; его нет у вьювера
     // и у спутника экскурсии, а у видео появляется только после монтирования плеера
@@ -377,6 +381,7 @@ export const TID = {
     typeBtn: 'add-turn-type',
     typeOption: (name) => `add-turn-type-${name}`, // пункт дропдауна типа (picture/video/audio/comment)
     field: (name) => `add-turn-${name}`, // header, source, date, + поля FormInput (по prefixClass)
+    // название аудио (только у шаблона audio) — field('audio-title')
     // медиа-URL: field('image-url' | 'video-url' | 'audio-url' | 'pdf-url'). У save — data-save-state:
     // ready | empty | unchanged | checking (проба ссылки) | preview (кадр видео); кроме ready — disabled
     save: 'add-turn-save',

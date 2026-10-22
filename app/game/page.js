@@ -8,8 +8,10 @@ import { useSearchParams } from 'next/navigation';
 import Loading from '@/modules/ui/components/common/Loading';
 import {
   UserProvider,
+  getGameInfo,
   useUserContext,
 } from '@/modules/user/contexts/UserContext';
+import { loginWithSavedCode } from '@/modules/user/savedCodeLogin';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadSettings } from '@/modules/settings/redux/actions';
 import GameDialog from '@/modules/lobby/components/page/GameDialog';
@@ -72,18 +74,26 @@ const GamePageInner = () => {
 };
 
 const CodeEntryPage = ({ code, focusTurnId, tourId }) => {
+  const dispatch = useDispatch();
   const myGames = useSelector((state) => state.settings.games);
   const [unknownCode, setUnknownCode] = useState(false);
   const router = useRouter();
 
   // Решается один раз: вход по коду сам добавляет код в список игр.
   useEffect(() => {
-    // код уже может быть среди сохранённых доступов — тогда просто на адрес игры
+    // код уже может быть среди сохранённых доступов — тогда на адрес игры, а доступ без
+    // токена или с истекающим сначала заменяем входом этим кодом
     const existedGame = myGames.find((g) =>
       g.codes.some((codeObj) => codeObj.code === code),
     );
     if (existedGame) {
-      router.replace(gameEntryUrl(existedGame.hash, { focusTurnId, tourId }));
+      const toDialog = () =>
+        router.replace(gameEntryUrl(existedGame.hash, { focusTurnId, tourId }));
+      const saved = existedGame.codes.find((c) => c.code === code);
+      dispatch(loginWithSavedCode(getGameInfo(existedGame.hash), saved)).then(
+        toDialog,
+        toDialog,
+      );
       return;
     }
     // код неизвестен: спрашиваем ник диалогом, а не логинимся молча под 'user'

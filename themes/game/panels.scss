@@ -95,6 +95,15 @@
     border-radius: 0.25rem;
   }
 
+  &.panel-no-select {
+    user-select: none;
+
+    input,
+    textarea {
+      user-select: text;
+    }
+  }
+
   .panel-buttons .btn {
     user-select: none;
     height: 30px;

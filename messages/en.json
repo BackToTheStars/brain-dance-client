@@ -112,6 +112,9 @@
       }
     },
     "turnForm": {
+      "fields": {
+        "audioTitle": "Audio title"
+      },
       "orphan": {
         "Title": "Replacing the file — quotes will be deleted",
         "Text": "Quotes are bound to the content of the file — its pages, areas and seconds. After the replacement they have nothing to point to, so they are deleted together with the links that depended on them.",

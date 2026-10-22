@@ -15,6 +15,7 @@ import { refreshTokenRequest } from '@/modules/game/requests';
 import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
 import AccessExpiredModal from '@/modules/user/components/AccessExpiredModal';
+import { loginWithSavedCode } from '@/modules/user/savedCodeLogin';
 
 const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const dispatch = useDispatch();
@@ -113,7 +114,8 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     if (choosedRole === info.role) {
       if (nickname === info.nickname) {
         // + установить skipDialog при необходимости
-        let code = myCodes.find((c) => c.role === choosedRole)?.code;
+        const saved = myCodes.find((c) => c.role === choosedRole);
+        let code = saved?.code;
         if (!code && choosedRole === ROLE_GAME_VISITOR) {
           code = hash;
           const prm = new Promise((resolve) => {
@@ -124,6 +126,11 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
           });
           await prm;
         }
+        // истёкший токен не продлить — входим сохранённым кодом; не вышло — холст решит, как раньше
+        const login = await dispatch(
+          loginWithSavedCode({ info, token }, saved),
+        ).catch(() => null);
+        if (login) reloadUserInfo();
         // if (skipDialog) {
         //   setGameInfoIntoStorage(info.hash, {
         //     info: {
