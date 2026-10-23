@@ -835,7 +835,7 @@
           // color: white;
           font-size: 20px;
           // cursor: pointer;
-          margin-right: 10px;
+          margin-right: 8px;
           // display: flex;
           // align-items: center;
         }
@@ -843,14 +843,14 @@
         .volume-control {
           display: flex;
           align-items: center;
-          margin-right: 10px;
+          margin-right: 8px;
 
           .volume-button {
             margin-right: 5px;
           }
 
           .volume-slider {
-            width: 100px;
+            width: 60px;
 
             .ant-slider-rail {
               background-color: rgba(255, 255, 255, 0.3);
@@ -869,12 +869,15 @@
         .video-time {
           color: white;
           font-size: 14px;
-          margin-right: 10px;
+          margin-right: 8px;
+          white-space: nowrap;
+          flex: none;
+          font-variant-numeric: tabular-nums;
         }
 
         .speed-control {
           position: relative;
-          margin-right: 10px;
+          margin-right: 8px;
 
           .icon-button {
             font-size: 14px;

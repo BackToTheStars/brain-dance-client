@@ -11,6 +11,7 @@ import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  closeTurnForm,
   toggleMaximizeQuill,
   togglePanel,
 } from '@/modules/panels/redux/actions';
@@ -129,10 +130,7 @@ const AddEditTurnPopup = () => {
 
   const dispatch = useDispatch();
 
-  const hidePanel = () => {
-    dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN }));
-    dispatch(toggleMaximizeQuill(false));
-  };
+  const hidePanel = () => dispatch(closeTurnForm());
   const dLines = useSelector((state) => state.lines.d);
   const lines = useMemo(() => Object.values(dLines), [dLines]);
 

@@ -53,6 +53,7 @@ const Audio = ({
     seek,
     onTimeUpdate,
     onDurationChange,
+    onLoadStart,
     onPlay,
     onPause,
     onEnded,
@@ -139,6 +140,7 @@ const Audio = ({
         volume={volume}
         onTimeUpdate={onTimeUpdate}
         onDurationChange={onDurationChange}
+        onLoadStart={onLoadStart}
         onPlay={onPlay}
         onPause={onPause}
         onEnded={onEnded}

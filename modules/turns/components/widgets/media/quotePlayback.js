@@ -74,7 +74,18 @@ const schedule = () => {
   queueMicrotask(evaluate);
 };
 
-export const toggleQuotePlayback = ({ turnId, playerId, quoteId, start: from, end }) => {
+// ▷ панели цитат: внутри цитаты — с текущей позиции, вне — с её начала.
+export const quoteStartAt = (start, end, progress) =>
+  progress >= start && progress < end ? progress : start;
+
+export const toggleQuotePlayback = ({
+  turnId,
+  playerId,
+  quoteId,
+  start: from,
+  end,
+  fromCurrent = false,
+}) => {
   const { entry, seen } = observe(turnId, playerId);
   const command = quoteCommand(stop, { turnId, playerId, quoteId }, seen);
   const now = Date.now();
@@ -89,7 +100,12 @@ export const toggleQuotePlayback = ({ turnId, playerId, quoteId, start: from, en
       setStop({ ...stop, phase: 'starting', since: now });
       return;
     case 'start':
-      start(entry, playerId, from, seen.playing);
+      start(
+        entry,
+        playerId,
+        fromCurrent ? quoteStartAt(from, end, seen.progress) : from,
+        seen.playing,
+      );
       setStop({ ...fresh, phase: 'starting' });
       return;
     case 'load':

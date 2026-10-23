@@ -542,6 +542,8 @@
 
   &__time {
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex: none;
   }
 
   &__hint {

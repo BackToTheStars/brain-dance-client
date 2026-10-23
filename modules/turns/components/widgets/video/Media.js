@@ -46,6 +46,7 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
     seek,
     onTimeUpdate,
     onDurationChange,
+    onLoadStart,
     onPlay,
     onPause,
     onEnded,
@@ -89,6 +90,7 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
         volume={volume}
         onTimeUpdate={onTimeUpdate}
         onDurationChange={onDurationChange}
+        onLoadStart={onLoadStart}
         onPlay={onPlay}
         onPause={onPause}
         onEnded={onEnded}

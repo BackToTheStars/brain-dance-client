@@ -17,6 +17,7 @@ import { loadSettings } from '@/modules/settings/redux/actions';
 import GameDialog from '@/modules/lobby/components/page/GameDialog';
 import CodeEnterDialog from '@/modules/lobby/components/page/CodeEnterDialog';
 import { gameEntryUrl } from '@/modules/lobby/helpers/shareParams';
+import { linkRoleDiffers } from '@/modules/lobby/helpers/entryCode';
 
 const GamePage = () => {
   return (
@@ -77,6 +78,8 @@ const CodeEntryPage = ({ code, focusTurnId, tourId }) => {
   const dispatch = useDispatch();
   const myGames = useSelector((state) => state.settings.games);
   const [unknownCode, setUnknownCode] = useState(false);
+  // свежая запись другой роли: диалог здесь же, код остаётся только в ?code=
+  const [linkDialog, setLinkDialog] = useState(null);
   const router = useRouter();
 
   // Решается один раз: вход по коду сам добавляет код в список игр.
@@ -90,15 +93,30 @@ const CodeEntryPage = ({ code, focusTurnId, tourId }) => {
       const toDialog = () =>
         router.replace(gameEntryUrl(existedGame.hash, { focusTurnId, tourId }));
       const saved = existedGame.codes.find((c) => c.code === code);
-      dispatch(loginWithSavedCode(getGameInfo(existedGame.hash), saved)).then(
-        toDialog,
-        toDialog,
-      );
+      const record = getGameInfo(existedGame.hash);
+      dispatch(loginWithSavedCode(record, saved)).then((login) => {
+        if (!login && linkRoleDiffers(record, saved)) {
+          setLinkDialog({ hash: existedGame.hash, linkCode: saved });
+        } else {
+          toDialog();
+        }
+      }, toDialog);
       return;
     }
     // код неизвестен: спрашиваем ник диалогом, а не логинимся молча под 'user'
     setUnknownCode(true);
   }, []);
+
+  if (linkDialog) {
+    return (
+      <UserProvider key={linkDialog.hash} hash={linkDialog.hash}>
+        <GameDialogPage
+          hash={linkDialog.hash}
+          linkCode={linkDialog.linkCode}
+        />
+      </UserProvider>
+    );
+  }
 
   return unknownCode ? (
     <div className="game-dialog">
@@ -109,7 +127,7 @@ const CodeEntryPage = ({ code, focusTurnId, tourId }) => {
   );
 };
 
-const GameDialogPage = ({ hash }) => {
+const GameDialogPage = ({ hash, linkCode = null }) => {
   const myGames = useSelector((state) => state.settings.games);
   const { info, token, reloadUserInfo } = useUserContext();
 
@@ -121,6 +139,7 @@ const GameDialogPage = ({ hash }) => {
         token={token}
         myGames={myGames}
         reloadUserInfo={reloadUserInfo}
+        linkCode={linkCode}
       />
     </div>
   );

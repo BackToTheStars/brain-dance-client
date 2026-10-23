@@ -188,17 +188,19 @@ export const lobbyEnterGameByCode =
 
 export const lobbyEnterGameForRequest = (hash, code, nickname) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    getGameUserTokenRequest(code, nickname).then((data) => {
-      if (data.success) {
-        const { info, token } = data;
-        setGameInfoIntoStorage(hash, {
-          info,
-          token,
-        });
-        resolve(data);
-      } else {
-        reject(data?.message || 'Неизвестная ошибка');
-      }
-    });
+    getGameUserTokenRequest(code, nickname)
+      .then((data) => {
+        if (data.success) {
+          const { info, token } = data;
+          setGameInfoIntoStorage(hash, {
+            info,
+            token,
+          });
+          resolve(data);
+        } else {
+          reject(data?.message || 'Неизвестная ошибка');
+        }
+      })
+      .catch(() => reject('Request error'));
   });
 };

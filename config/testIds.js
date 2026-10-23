@@ -196,6 +196,8 @@ export const TID = {
     // и у спутника экскурсии, а у видео появляется только после монтирования плеера
     quoteMark: 'media-quote-mark', // треугольник начала цитаты под полоской (+ data-quote-id, data-active,
     // data-hovered — наведена строка цитаты в карточке); отрезки цитат — фон рельса `.ant-slider-rail`
+    // уведомление antd: браузер сообщил длительность, отличную от заявленной больше чем на 1 с
+    durationNotice: 'media-duration-notice',
   },
 
   // Лобби: строка игры в списке (modules/lobby/components/ui/GameRow.js)

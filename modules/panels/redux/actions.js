@@ -149,6 +149,13 @@ export const toggleMaximizeQuill = (isMaximized) => (dispatch) => {
   dispatch(togglePanel({ type: PANEL_BUTTONS, open: !isMaximized }));
 };
 
+// Путь Cancel формы хода: набранное не сохраняется.
+export const closeTurnForm = () => (dispatch, getState) => {
+  if (!getState().panels.d[PANEL_ADD_EDIT_TURN]?.isDisplayed) return;
+  dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
+  dispatch(toggleMaximizeQuill(false));
+};
+
 export const setPanels =
   ({ d }) =>
   (dispatch) => {

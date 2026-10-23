@@ -16,8 +16,17 @@ import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
 import AccessExpiredModal from '@/modules/user/components/AccessExpiredModal';
 import { loginWithSavedCode } from '@/modules/user/savedCodeLogin';
+import { codeForRole } from '../../helpers/entryCode';
 
-const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
+// linkCode — известный код из ссылки /game?code=, чья роль отличается от свежей записи.
+const GameDialog = ({
+  hash,
+  info,
+  token,
+  myGames,
+  reloadUserInfo,
+  linkCode = null,
+}) => {
   const dispatch = useDispatch();
   const game = useSelector((state) => state.game.game);
   const t = useTranslations('Lobby');
@@ -31,7 +40,9 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
   const tourId = searchParams.get('tour');
   const viewUrl = gameViewUrl(hash, { focusTurnId, tourId });
 
-  const [role, setRole] = useState(String(info?.role || ROLE_GAME_VISITOR));
+  const [role, setRole] = useState(
+    String(linkCode?.role || info?.role || ROLE_GAME_VISITOR),
+  );
   // отказ обновления токена показываем прямо в диалоге, а не alert'ом
   const [accessError, setAccessError] = useState('');
   const [gameNotFound, setGameNotFound] = useState(false);
@@ -55,8 +66,14 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         roles[code.role] = true;
       }
     }
+    if (linkCode) {
+      roles[linkCode.role] = true;
+    }
     return roleOptions.filter((option) => roles[option.value]);
-  }, [info, myCodes]);
+  }, [info, myCodes, linkCode]);
+
+  const savedCodeFor = (choosedRole) =>
+    codeForRole(choosedRole, linkCode, myCodes);
 
   // Обновление токена может не пройти: подпись подделана или ключ сервера
   // сменился. Тогда сохранённый доступ негоден — снимаем его и остаёмся в
@@ -66,6 +83,23 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     reloadUserInfo();
     setAccessError(message || t('gameDialog.Access_update_failed'));
   };
+
+  const showEntryError = (message) =>
+    setAccessError(
+      typeof message === 'string'
+        ? message
+        : t('gameDialog.Access_update_failed'),
+    );
+
+  // Посетитель без кода входит адресом; отказ сервера или сети — строкой диалога.
+  const enterAsGuest = () =>
+    dispatch(lobbyEnterGameForRequest(hash, hash, 'Guest')).then(
+      () => true,
+      (message) => {
+        showEntryError(message);
+        return false;
+      },
+    );
 
   const applyCodeAndGoToGame = (code) => {
     dispatch(lobbyEnterGameForRequest(hash, code, nickname))
@@ -82,13 +116,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         reloadUserInfo();
         router.push(viewUrl);
       })
-      .catch((message) =>
-        setAccessError(
-          typeof message === 'string'
-            ? message
-            : t('gameDialog.Access_update_failed'),
-        ),
-      );
+      .catch(showEntryError);
   };
 
   // Истёкший токен не продлить: запись снимается при любом выборе.
@@ -114,17 +142,9 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
     if (choosedRole === info.role) {
       if (nickname === info.nickname) {
         // + установить skipDialog при необходимости
-        const saved = myCodes.find((c) => c.role === choosedRole);
-        let code = saved?.code;
-        if (!code && choosedRole === ROLE_GAME_VISITOR) {
-          code = hash;
-          const prm = new Promise((resolve) => {
-            dispatch(lobbyEnterGameForRequest(hash, hash, 'Guest')).then(() => {
-              // reloadGameInfo();
-              resolve();
-            });
-          });
-          await prm;
+        const saved = savedCodeFor(choosedRole);
+        if (!saved && choosedRole === ROLE_GAME_VISITOR) {
+          if (!(await enterAsGuest())) return;
         }
         // истёкший токен не продлить — входим сохранённым кодом; не вышло — холст решит, как раньше
         const login = await dispatch(
@@ -149,7 +169,7 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         // Гость по ссылке: токена нет, /codes/refresh ответит 401 — входим по коду
         // (у посетителя код — это хеш игры).
         const guestCode =
-          myCodes.find((c) => c.role === choosedRole)?.code ||
+          savedCodeFor(choosedRole)?.code ||
           (choosedRole === ROLE_GAME_VISITOR ? hash : null);
         if (!guestCode) {
           setAccessError(t('gameDialog.Access_update_failed'));
@@ -158,10 +178,23 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
         applyCodeAndGoToGame(guestCode);
       } else {
         // случаи, когда требуется только изменить никнейм
+        const renamed = { info: { ...info, nickname }, token };
         refreshTokenRequest(hash, token, nickname)
-          .then((data) => {
+          .then(async (data) => {
             if (data.expired) {
-              setExpired(true);
+              // истёкший токен не продлить — входим сохранённым кодом этой роли с новым ником
+              const saved = savedCodeFor(choosedRole);
+              const login = saved
+                ? await dispatch(loginWithSavedCode(renamed, saved)).catch(
+                    () => null,
+                  )
+                : null;
+              if (!login) {
+                setExpired(true);
+                return;
+              }
+              reloadUserInfo();
+              router.push(viewUrl);
               return;
             }
             if (!data.success) {
@@ -184,23 +217,11 @@ const GameDialog = ({ hash, info, token, myGames, reloadUserInfo }) => {
       }
       return;
     }
-    // случаи, когда требуется применение кода
-    let code = myCodes.find((c) => c.role === choosedRole)?.code;
+    // случаи, когда требуется применение кода: роль из списка входит своим кодом, не токеном записи
+    let code = savedCodeFor(choosedRole)?.code;
     if (!code && choosedRole === ROLE_GAME_VISITOR) {
       code = hash;
-      const prm = new Promise((resolve) => {
-        dispatch(
-          lobbyEnterGameForRequest(
-            hash,
-            hash,
-            'Guest',
-          ),
-        ).then(() => {
-          // reloadGameInfo();
-          resolve();
-        })
-      });
-      await prm;
+      if (!(await enterAsGuest())) return;
     }
 
     // Предупреждение о потере доступа. Вход другим кодом перезаписывает

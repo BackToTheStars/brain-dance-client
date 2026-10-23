@@ -12,6 +12,10 @@ import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { usePlaybackChannel } from '@/modules/turns/components/widgets/media/PlaybackContext';
 import QuotePlayButton from '@/modules/turns/components/widgets/media/QuotePlayButton';
+import {
+  toggleQuotePlayback,
+  useQuotePlayback,
+} from '@/modules/turns/components/widgets/media/quotePlayback';
 import SkipButtons from '@/modules/turns/components/widgets/media/SkipButtons';
 import { getFormattedDuration } from '@/modules/turns/components/helpers/formatters/player';
 import {
@@ -418,6 +422,7 @@ const MediaQuotesEditor = ({ turnId, widgetId }) => {
   const progress = ready ? player.progress : 0;
   const dirty = !sameQuotes(original, draft);
   const selected = draft.find((quote) => sameId(quote.id, selectedId)) || null;
+  const selectedPlayback = useQuotePlayback(turnId, playerId, selected?.id);
   const addReason = ready ? addQuoteReason(draft, progress, total) : 'player';
 
   useEffect(() => {
@@ -555,6 +560,28 @@ const MediaQuotesEditor = ({ turnId, widgetId }) => {
     commit(quotes);
   };
 
+  // С выбранной цитатой ▷ играет её от левой ручки до правой; ❚❚ чужого проигрывания — просто пауза.
+  const playPanel = () => {
+    if (!selected || (player.playing && selectedPlayback !== 'playing')) {
+      player.togglePlay();
+      return;
+    }
+    toggleQuotePlayback({
+      turnId,
+      playerId,
+      quoteId: selected.id,
+      start: selected.start,
+      end: selected.end,
+      fromCurrent: true,
+    });
+  };
+
+  let playTitle = PLAYER_HINTS[playerState];
+  if (ready) {
+    if (player.playing) playTitle = 'Pause';
+    else playTitle = selected ? 'Play the selected quote' : 'Play';
+  }
+
   const cancel = () => dispatch(requestMediaQuotesClose());
 
   return (
@@ -588,10 +615,8 @@ const MediaQuotesEditor = ({ turnId, widgetId }) => {
           data-test-id={TID.mediaQuotes.play}
           data-playing={player.playing ? 'true' : 'false'}
           disabled={!ready}
-          title={
-            ready ? (player.playing ? 'Pause' : 'Play') : PLAYER_HINTS[playerState]
-          }
-          onClick={player.togglePlay}
+          title={playTitle}
+          onClick={playPanel}
         >
           {player.playing ? <FiPause /> : <FiPlay />}
         </button>

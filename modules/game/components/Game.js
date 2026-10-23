@@ -9,7 +9,7 @@ import {
 import QuotesLinesLayer from '@/modules/lines/components/QuotesLinesLayer';
 import { TID } from '@/config/testIds';
 import Panels from '@/modules/panels/components/Panels';
-import { resetAndExit } from '@/modules/panels/redux/actions';
+import { closeTurnForm, resetAndExit } from '@/modules/panels/redux/actions';
 import { MODE_GAME } from '@/config/panel';
 import { getQueue } from '@/modules/turns/components/helpers/queueHelper';
 import Turns from '@/modules/turns/components/Turns';
@@ -166,12 +166,14 @@ const Game = ({ hash, focusTurnId = null, tourId = null }) => {
   // A follower only watches: the edit mode goes off with the subscription, and
   // a double click does not bring it back until I leave the tour. A widget mode
   // opened before the subscription goes off with it too — its selection layer
-  // would otherwise stay over the page. The same reset covers a role lost
+  // would otherwise stay over the page — and so does an open turn form, as by
+  // Cancel: what was typed is lost. The same reset covers a role lost
   // mid-session: logging in again with a lower-rights code takes edit mode away.
   useEffect(() => {
     if (!following && !isViewer) return;
     setIsEditMode(false);
     if (panelMode !== MODE_GAME) dispatch(resetAndExit());
+    if (following) dispatch(closeTurnForm());
   }, [following, isViewer]);
 
   useEffect(() => {

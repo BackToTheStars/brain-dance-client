@@ -109,7 +109,8 @@
         "Text": "The quote edits in the panel are not saved. Close the panel and lose them?",
         "Ok": "Close without saving",
         "Cancel": "Cancel"
-      }
+      },
+      "durationMismatch": "The actual file duration differs from the declared one: {actual} instead of {declared}"
     },
     "turnForm": {
       "fields": {
