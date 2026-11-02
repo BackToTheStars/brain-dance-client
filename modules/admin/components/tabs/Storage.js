@@ -41,23 +41,15 @@ const formatLimitRow = (row) => {
       ? 'неизвестно'
       : `свободно ${formatBytes(entry.free)} из ${formatBytes(entry.total)}`;
   }
-  if (row.kind === 'telegram') {
-    const size = entry.bytes == null ? 'неизвестно' : formatBytes(entry.bytes);
-    return `${size} (${entry.mode === 'local' ? 'локальный сервер' : 'облако'})`;
-  }
-  if (row.kind === 'ms') {
-    if (entry.ms != null) return `${entry.ms} мс`;
-    return entry.value != null ? String(entry.value) : 'неизвестно';
-  }
   if (entry.unlimited) return 'без ограничения';
   if (entry.bytes != null) return formatBytes(entry.bytes);
   return entry.value != null ? String(entry.value) : 'неизвестно';
 };
 
-// Порядок строк — как в цепочке потолков: nginx → загрузка → память → диск, затем бот.
+// Порядок строк — как в цепочке потолков: nginx → загрузка → память → диск.
 const buildLimitRows = (limits) => {
   if (!limits) return [];
-  const { media, bot } = limits;
+  const { media } = limits;
   return [
     { key: 'nginx', label: 'nginx (client_max_body_size)', entry: media?.nginx, kind: 'bytes' },
     { key: 'requestBody', label: 'Тело запроса (JSON)', entry: media?.requestBody, kind: 'bytes' },
@@ -68,12 +60,6 @@ const buildLimitRows = (limits) => {
     { key: 'memory-limit', label: 'Память контейнера media', entry: media?.memory?.limit, kind: 'bytes' },
     { key: 'memory-host', label: 'Память хоста', entry: media?.memory?.host, kind: 'bytes' },
     { key: 'storage', label: 'Место на диске', entry: media?.storage, kind: 'storage' },
-    { key: 'bot-daily', label: 'Бот — суточный лимит загрузок', entry: bot?.dailyUpload, kind: 'bytes' },
-    { key: 'bot-lock', label: 'Бот — пауза между файлами', entry: bot?.fileTimeLock, kind: 'ms' },
-    { key: 'bot-pdf', label: 'Бот — PDF', entry: bot?.pdf, kind: 'bytes' },
-    { key: 'bot-xcom', label: 'Бот — видео из x.com', entry: bot?.xcomVideo, kind: 'bytes' },
-    { key: 'bot-import', label: 'Бот — файл импорта', entry: bot?.importFile, kind: 'bytes' },
-    { key: 'bot-telegram', label: 'Бот — Telegram', entry: bot?.telegram, kind: 'telegram' },
   ];
 };
 
@@ -204,9 +190,6 @@ const StorageTab = () => {
         )}
         {!!limits?.media?.memory?.hint && (
           <div className="text-gray-500 text-xs">{limits.media.memory.hint}</div>
-        )}
-        {!!limits?.bot?.hint && (
-          <div className="text-gray-500 text-xs">{limits.bot.hint}</div>
         )}
       </div>
 

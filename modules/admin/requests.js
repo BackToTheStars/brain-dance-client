@@ -136,15 +136,3 @@ export const saveTurnVideoPreviewRequest = (turnId, t) =>
     method: 'POST',
     body: { t },
   });
-
-export const getTgChatIdsRequest = () => adminRequest('/admin/tg-logs/chat-ids');
-
-// Строка запроса собирается целиком, а не склейкой: раньше при пустом chatId
-// фильтр приписывался через `&` без предшествующего `?` — URL получался битым.
-export const getTgLogsRequest = (chatId, filter = {}) => {
-  const query = new URLSearchParams({
-    ...(chatId ? { chatId } : {}),
-    ...filter,
-  }).toString();
-  return adminRequest(`/admin/tg-logs${query ? `?${query}` : ''}`);
-};
