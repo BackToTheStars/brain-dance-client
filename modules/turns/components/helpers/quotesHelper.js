@@ -7,8 +7,9 @@ export const getParagraphQuotesWithoutScroll = (
   paragraphEl,
   zoom = 1,
 ) => {
+  // span у абзаца, mark у md-статьи; других [data-id] внутри тела нет
   const quoteEls = [
-    ...paragraphEl.current.querySelectorAll('span[data-id]:not([data-id=""])'),
+    ...paragraphEl.current.querySelectorAll('[data-id]:not([data-id=""])'),
   ];
   // const quoteEls = spans.filter((span) => !!span.getAttribute('data-id'));
   const paragraphLeftPadding = 6; // @todo: get from size settings
@@ -52,11 +53,17 @@ export const getScrolledQuotes = (
   passedScrollPosition,
   zoom = 1,
 ) => {
-  const paragraphRect = relativeRect(
+  const bodyRect = relativeRect(
     paragraphEl.current,
     paragraphEl.current.parentNode.parentNode,
     zoom,
   );
+  // Высота тела округляется так же, как координаты цитат выше: иначе цитата в последней
+  // строке вплотную к краю (104,86 против 104,859375) считалась ушедшей за нижний край.
+  const paragraphRect = {
+    ...bodyRect,
+    height: Math.round(bodyRect.height * 100) / 100,
+  };
   const topGap = paragraphRect.top;
 
   return quotes.map((quote) => {

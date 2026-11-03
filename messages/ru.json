@@ -107,7 +107,8 @@
     },
     "turnForm": {
       "fields": {
-        "audioTitle": "Название аудио"
+        "audioTitle": "Название аудио",
+        "markdown": "Markdown"
       },
       "orphan": {
         "Title": "Заменяется файл — цитаты будут удалены",

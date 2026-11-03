@@ -10,6 +10,7 @@ import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 import { snapRound } from '../helpers/grid';
 import { GRID_CELL_X } from '@/config/ui';
+import { ensureQuoteIds, toPlainText } from '../widgets/md/markdown';
 
 const {
   settings,
@@ -23,6 +24,8 @@ const {
   FIELD_AUDIO,
   FIELD_AUDIO_TITLE,
   FIELD_PDF,
+  FIELD_MARKDOWN,
+  TEMPLATE_MD,
 } = turnSettings;
 
 // Медиа-поля в порядке проверки ссылок при Save: тип media и data-field окна.
@@ -191,9 +194,19 @@ export const buildTurnSave = ({
 
   const prevQuotes = turnToEdit?.quotes || [];
 
-  const paragraphOps = collapseSplitQuotes(resTextArr);
+  // Статья md: выделения исходника получают id и становятся текстовыми цитатами хода,
+  // абзац — производный плоский текст; редактор Quill не читается.
+  const isMd = template === TEMPLATE_MD;
+  const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
 
-  const preparedForm = prepareFields(form, template);
+  const paragraphOps = isMd
+    ? [{ insert: `${toPlainText(md.source)}\n` }]
+    : collapseSplitQuotes(resTextArr);
+
+  const preparedForm = prepareFields(
+    isMd ? { ...form, [FIELD_MARKDOWN]: md.source } : form,
+    template,
+  );
 
   for (let requiredField of requiredFields) {
     if (!preparedForm[requiredField]) {
@@ -205,7 +218,7 @@ export const buildTurnSave = ({
     return { error: { message: 'Need text body' } };
   }
 
-  const quotes = [];
+  const quotes = isMd ? [...md.quotes] : [];
 
   for (let textItem of paragraphOps) {
     if (textItem.attributes && textItem.attributes.id) {

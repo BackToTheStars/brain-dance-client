@@ -2,6 +2,135 @@
   --fragment-editable-color: #1677ff;
 }
 
+// Типографика статьи md — в карточке и в предпросмотре формы; размеры от шрифта контейнера
+// (Tailwind preflight снимает списки и размеры заголовков, поэтому они заданы явно).
+.md-content {
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  p,
+  ul,
+  ol,
+  blockquote,
+  pre,
+  table {
+    margin: 0 0 0.6em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0.8em 0 0.4em;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 1.6em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1em;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.5em;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  blockquote {
+    padding-left: 0.8em;
+    border-left: 3px solid currentColor;
+    opacity: 0.85;
+  }
+
+  code {
+    font-family: monospace;
+    font-size: 0.9em;
+    padding: 0 0.25em;
+    border-radius: 3px;
+    background: rgba(127, 127, 127, 0.2);
+  }
+
+  pre {
+    padding: 0.5em 0.7em;
+    border-radius: var(--turn-quote-radius);
+    background: rgba(127, 127, 127, 0.15);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+
+    code {
+      padding: 0;
+      background: none;
+    }
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.4;
+    margin: 0.8em 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid rgba(127, 127, 127, 0.5);
+    padding: 0.2em 0.5em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  // выделение = текстовая цитата: оформлено как цитата абзаца — фон, рамка цветом,
+  // скругление; цвета — переменные контейнера (widgets/md/markColors.js), буквы те же
+  mark {
+    border-radius: var(--turn-quote-radius);
+    outline: solid 2px transparent;
+
+    @each $letter in y, g, p, b, s, o {
+      &[data-color='#{$letter}'] {
+        background: var(--md-mark-#{$letter});
+        outline-color: var(--md-mark-#{$letter});
+        color: var(--md-mark-#{$letter}-text);
+      }
+    }
+  }
+}
+
 .translucent-field {
   .stb-react-turn {
     opacity: 0.4;
@@ -227,6 +356,29 @@
         span {
           word-wrap: break-word;
         }
+      }
+    }
+
+    // MD ARTICLE — та же коробка, что у абзаца: отступы, шрифт, полоса прокрутки;
+    // замер цитат (quotesHelper) считает тот же левый отступ 6px
+    .stb-widget-md {
+      flex: 1;
+      overflow: hidden;
+      display: block;
+      margin: 0;
+      padding-right: var(--turn-widget-paragraph-padding);
+      padding-left: var(--turn-widget-paragraph-padding);
+      color: #dbdbdb;
+      font-size: var(--turn-widget-paragraph-font-size);
+      line-height: var(--turn-widget-paragraph-line-height);
+
+      .md-body {
+        padding-left: var(--turn-widget-paragraph-scrollbar-padding);
+        padding-right: var(--turn-widget-paragraph-scrollbar-padding);
+        max-height: 100%;
+        overflow-y: scroll;
+        overflow-wrap: break-word;
+        @include turn-scrollbar(var(--turn-scrollbar-color));
       }
     }
 

@@ -25,6 +25,7 @@ import { getTurnMinMaxHeight } from './helpers/sizeHelper';
 import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
+import MdArticle from './widgets/md/MdArticle';
 import Pdf from './widgets/pdf/Pdf';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/video/Video';
@@ -197,6 +198,7 @@ export const Turn = memo(({ id }) => {
       a_1: { url: audioUrl },
       // pdf_1 — защитный дефолт на случай отсутствия в dWidgets
       pdf_1: { url: pdfUrl } = {},
+      md_1: { show: mdShow } = {},
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
@@ -211,9 +213,12 @@ export const Turn = memo(({ id }) => {
     [pictureOnly, headerShow]
   );
 
+  // У md-хода абзац — производный плоский текст статьи, вторым виджетом он не рисуется.
+  const isMd = contentType === turnSettings.TEMPLATE_MD;
+  const hasMd = isMd && !!mdShow;
   const doesParagraphExist = useMemo(
-    () => !pictureOnly && checkIfParagraphExists(paragraph),
-    [paragraph, pictureOnly]
+    () => !pictureOnly && !isMd && checkIfParagraphExists(paragraph),
+    [paragraph, pictureOnly, isMd]
   );
 
   const hasVideoQuotes = useMemo(
@@ -234,6 +239,7 @@ export const Turn = memo(({ id }) => {
       hasAudioQuotes + // Audio quotes
       !!audioUrl + // Audio
       !!pdfUrl + // Pdf
+      hasMd + // Md article
       doesParagraphExist
     ); // Paragraph
   }, [
@@ -244,6 +250,7 @@ export const Turn = memo(({ id }) => {
     hasAudioQuotes,
     audioUrl,
     pdfUrl,
+    hasMd,
     doesParagraphExist,
   ]);
 
@@ -593,6 +600,15 @@ export const Turn = memo(({ id }) => {
             setIsDragging={onSplitDragging}
             extraClasses="turn-split not-draggable"
             testId={TID.turnSplit}
+          />
+        )}
+        {hasMd && (
+          <MdArticle
+            widgetsUpdatedTime={widgetsUpdatedTime}
+            turnId={_id}
+            widgetId={'md_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
           />
         )}
         {doesParagraphExist && (

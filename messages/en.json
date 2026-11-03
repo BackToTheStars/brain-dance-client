@@ -114,7 +114,8 @@
     },
     "turnForm": {
       "fields": {
-        "audioTitle": "Audio title"
+        "audioTitle": "Audio title",
+        "markdown": "Markdown"
       },
       "orphan": {
         "Title": "Replacing the file — quotes will be deleted",

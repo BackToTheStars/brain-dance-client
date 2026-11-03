@@ -21,7 +21,7 @@ const SettingsPanel = () => {
         <tbody>
           {panels.map((panel) => {
             return (
-              <tr key={panel.id}>
+              <tr key={panel.type}>
                 <td>{panel.type}</td>
                 <td>
                   {panel.isDisplayed ? (

@@ -2,6 +2,7 @@ import {
   WIDGET_AUDIO,
   WIDGET_AUDIO_QUOTES,
   WIDGET_HEADER,
+  WIDGET_MD,
   WIDGET_PARAGRAPH,
   WIDGET_PDF,
   WIDGET_PICTURE,
@@ -36,6 +37,9 @@ export class TurnHelper {
     // Пустой после trim заголовок равен явно выключенному хэдеру; одна точка
     // решения на h_1 и s_1 — иначе дата и ссылка пропадают совсем.
     const headerEffectivelyHidden = !!turn.dontShowHeader || !turn.header?.trim();
+    // Текстовые цитаты у md-хода принадлежат статье, у остальных — абзацу.
+    const isMd = turn.contentType === 'md';
+    const textQuotes = turn.quotes.filter((quote) => quote.type === 'text');
     const widgets = {
       [WIDGET_HEADER]: [
         {
@@ -93,11 +97,21 @@ export class TurnHelper {
       [WIDGET_PARAGRAPH]: [
         {
           id: 'p_1',
-          show: !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
+          show: !isMd && !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
           inserts: turn.paragraph,
           scrollPosition: turn.scrollPosition || 0,
-          quotes: turn.quotes.filter((quote) => quote.type === 'text'),
+          quotes: isMd ? [] : textQuotes,
           compressed: !!turn.compressed,
+        },
+      ],
+      [WIDGET_MD]: [
+        {
+          id: 'md_1',
+          show: isMd && !!turn.markdown?.trim(),
+          source: turn.markdown,
+          // у md-хода абзац не рисуется, поле scrollPosition одно на ход — конфликта с p_1 нет
+          scrollPosition: turn.scrollPosition || 0,
+          quotes: isMd ? textQuotes : [],
         },
       ],
       [WIDGET_VIDEO_QUOTES]: [TurnHelper.timelineWidget('vq_1', turn.videoQuotes)],
@@ -179,6 +193,7 @@ export class TurnHelper {
       // лишним дублем без схемы под start/active (см. videoQuotes/audioQuotes)
       quotes: [
         ...turn.dWidgets.p_1.quotes,
+        ...(turn.dWidgets.md_1?.quotes || []),
         ...turn.dWidgets.i_1.quotes,
         ...(turn.dWidgets.pdf_1?.quotes || []),
       ],
@@ -205,7 +220,11 @@ export class TurnHelper {
       sourceUrl: turn.sourceUrl,
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
-      scrollPosition: turn.dWidgets.p_1.scrollPosition || 0,
+      markdown: turn.dWidgets.md_1?.source,
+      scrollPosition:
+        (turn.contentType === 'md'
+          ? turn.dWidgets.md_1?.scrollPosition
+          : turn.dWidgets.p_1.scrollPosition) || 0,
       compressed: turn.p_1?.compressed || false,
       updatedAt: turn.updatedAt,
       uncompressedHeight: turn.uncompressedHeight || turn.height,

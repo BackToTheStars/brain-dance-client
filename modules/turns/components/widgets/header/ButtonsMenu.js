@@ -1,9 +1,5 @@
 import { memo } from 'react';
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { togglePanel } from '@/modules/panels/redux/actions';
-import {
-  PANEL_ADD_EDIT_TURN,
-} from '@/config/panel';
 import { cloneTurn, deleteTurn } from '../../../redux/actions';
 import {
   CopyIcon,
@@ -14,9 +10,8 @@ import {
 } from '../../icons/Turn';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { addNotification } from '@/modules/ui/redux/actions';
-import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
+import { useOpenTurnForm } from '../../helpers/useOpenTurnForm';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { castSaved } from '@/modules/presence/redux/actions';
@@ -25,10 +20,8 @@ import { requestMediaQuotesClose } from '@/modules/panels/redux/mediaQuotesPanel
 const ButtonsMenu = ({ _id }) => {
   const { can } = useUserContext();
   const dispatch = useDispatch();
-  const turnGeometry = useSelector((state) => state.turns.g[_id]);
   const gameHash = useSelector((state) => state.game.game?.hash);
-  const editorPanelWidth = useSelector(getEditorPanelWidth);
-  const zoom = useSelector((state) => state.game.zoom);
+  const openForm = useOpenTurnForm(_id);
   const following = useSelector(selectFollowing);
   const canEdit = can(RULE_TURNS_CRUD) && !following;
   const onDeleted = () => dispatch(castSaved());
@@ -47,29 +40,6 @@ const ButtonsMenu = ({ _id }) => {
     if (confirm('Точно удалить?')) {
       dispatch(deleteTurn(_id, { onDeleted }));
     }
-  };
-
-  const openForm = () => {
-    dispatch(
-      togglePanel({
-        type: PANEL_ADD_EDIT_TURN,
-        open: true,
-        params: { editTurnId: _id },
-      }),
-    );
-
-    // Панель редактора прижата вправо, поэтому центр вьюпорта уходит вправо на
-    // половину её ширины (state.panels.d — экранные px, в холст делением на масштаб):
-    // карточка встаёт в центр свободной области слева от панели.
-    dispatch(
-      centerViewportAtPosition({
-        x:
-          turnGeometry.position.x +
-          Math.floor(turnGeometry.size.width / 2) +
-          Math.round(editorPanelWidth / 2 / zoom),
-        y: turnGeometry.position.y + Math.floor(turnGeometry.size.height / 2),
-      }),
-    );
   };
 
   // Открытая панель цитат закрывается как по ✕: с вопросом, если правки не записаны.

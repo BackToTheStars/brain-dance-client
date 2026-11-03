@@ -8,6 +8,7 @@ import PictureAddForm from './components/widgets/picture/EditForm';
 import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
+import MdEditor from './components/widgets/md/MdEditor';
 import FileUploading from './components/forms/FileUploading';
 import VideoUrlField from './components/forms/VideoUrlField';
 import { uploadMedia } from './redux/actions';
@@ -22,6 +23,7 @@ const TEMPLATE_AUDIO = 'audio';
 const TEMPLATE_CAROUSEL = 'carousel';
 const TEMPLATE_NEWS = 'news';
 const TEMPLATE_PICTURE_ONLY = 'picture-only';
+const TEMPLATE_MD = 'md';
 
 const FIELD_HEADER = 'header';
 const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
@@ -30,6 +32,7 @@ const FIELD_VIDEO = 'videoUrl';
 const FIELD_AUDIO = 'audioUrl';
 const FIELD_AUDIO_TITLE = 'audioTitle';
 const FIELD_PDF = 'pdfUrl';
+const FIELD_MARKDOWN = 'markdown';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
@@ -77,6 +80,7 @@ export const WIDGET_AUDIO = 'audio';
 export const WIDGET_AUDIO_QUOTES = 'audio-quotes';
 export const WIDGET_SOURCE = 'source';
 export const WIDGET_PDF = 'pdf';
+export const WIDGET_MD = 'md';
 
 export const widgetSettings = {
   [WIDGET_HEADER]: {
@@ -265,6 +269,14 @@ const settings = {
 
     availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
   },
+  // Статья в Markdown: исходник в поле markdown, абзац — производный плоский текст,
+  // выделения ==…== — текстовые цитаты. Оформление карточки — как у «Text / picture».
+  [TEMPLATE_MD]: {
+    value: 'md',
+    label: 'Markdown',
+    requiredFields: [FIELD_MARKDOWN],
+    availableFields: [FIELD_MARKDOWN],
+  },
 };
 
 const templatesToShow = [
@@ -274,6 +286,7 @@ const templatesToShow = [
   TEMPLATE_AUDIO,
   TEMPLATE_PDF,
   TEMPLATE_COMMENT,
+  TEMPLATE_MD,
   // TEMPLATE_CAROUSEL,
   // TEMPLATE_PICTURE_ONLY,
 ];
@@ -458,6 +471,18 @@ const fieldSettings = {
       },
     },
   },
+  // editorSlot — поле стоит на месте редактора Quill (во всю высоту панели), а не в списке.
+  [FIELD_MARKDOWN]: {
+    label: 'Markdown',
+    labelKey: 'fields.markdown',
+    prefixClass: 'markdown',
+    special: true,
+    inputType: 'component',
+    editorSlot: true,
+    widgetSettings: {
+      render: (props) => <MdEditor {...props} />,
+    },
+  },
   [FIELD_DATE]: {
     label: 'Date',
     prefixClass: 'date',
@@ -493,6 +518,7 @@ const fieldsToClone = [
 
   'contentType',
   'paragraph',
+  'markdown',
   'quotes',
   // цитаты таймлайна живут не в quotes, а тут; без них в списке fieldRemover
   // стирал весь vq_1/aq_1 виджет у копии хода целиком (не только массив)
@@ -515,6 +541,7 @@ const turnSettings = {
   TEMPLATE_AUDIO,
   TEMPLATE_CAROUSEL,
   TEMPLATE_NEWS,
+  TEMPLATE_MD,
 
   FIELD_HEADER,
   FIELD_DONT_SHOW_HEADER,
@@ -524,6 +551,7 @@ const turnSettings = {
   FIELD_AUDIO,
   FIELD_AUDIO_TITLE,
   FIELD_PDF,
+  FIELD_MARKDOWN,
   FIELD_DATE,
   FIELD_SOURCE,
 

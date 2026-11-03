@@ -91,6 +91,16 @@ export const TID = {
     cropSide: (side) => `pdf-crop-${side}`, // left | right | top | bottom, проценты
   },
 
+  // Ход md (contentType=md): статья в карточке (widgets/md/MdArticle.js) и редактор исходника
+  // в форме хода (widgets/md/MdEditor.js); поле исходника — addTurn.field('markdown')
+  md: {
+    body: 'md-body', // прокручиваемое тело статьи (+ data-turn-id); выделения — mark[data-id][data-color]
+    preview: 'md-preview', // кнопка «Preview» — показать рендер исходника на месте textarea
+    source: 'md-source', // та же кнопка в режиме предпросмотра — вернуться к исходнику
+    previewPane: 'md-preview-pane', // отрисованный предпросмотр в форме
+    toolbar: (name) => `md-toolbar-${name}`, // обёртка выделенного: bold, italic, link, mark-<буква y g p b s o>
+  },
+
   // Слой выделения области у картинки (widgets/picture/Crop.js): атрибут на <img>
   // внутри ReactCrop — сам ReactCrop чужие пропсы до DOM не доносит, а обёртка
   // меняла бы вёрстку; протяжка по картинке и есть выделение. Парно pdf.crop.

@@ -95,6 +95,11 @@ const AddEditTurnPopup = () => {
   const templateSettings = settings[activeTemplate];
 
   const availableFields = templateSettings.availableFields || [];
+  // Поле на месте редактора (исходник md): Quill при нём скрыт стилем, не размонтирован —
+  // его единственный экземпляр живёт в quillConstants.
+  const editorSlotField = availableFields.find(
+    (field) => fieldSettings[field]?.editorSlot,
+  );
   const Component = templateSettings.component || null;
   const [form, setForm] = useState({
     check: true,
@@ -491,6 +496,7 @@ const AddEditTurnPopup = () => {
               {headRows(true)}
               {fieldsToShow
                 .filter((field) => {
+                  if (fieldSettings[field].editorSlot) return false;
                   if (
                     !fieldSettings[field].special &&
                     !fieldSettings[field].separate
@@ -526,7 +532,9 @@ const AddEditTurnPopup = () => {
           </>
         )}
         <div
-          className="flex-1 quill-wrapper panel-cell mt-0"
+          className={`flex-1 quill-wrapper panel-cell mt-0 ${
+            editorSlotField ? 'editor-hidden' : ''
+          }`}
           style={{ '--editor-font-size': `${fontSize}px` }}
           data-font-size={fontSize}
         >
@@ -558,6 +566,24 @@ const AddEditTurnPopup = () => {
           </div>
           <div id="editor-container-new" />
         </div>
+        {!!editorSlotField && (
+          <div
+            className="flex-1 editor-slot panel-cell mt-0"
+            style={{ '--editor-font-size': `${fontSize}px` }}
+          >
+            {fieldSettings[editorSlotField].widgetSettings.render({
+              form,
+              patchForm,
+              edition,
+              changeHandler: (value) => formChangeHandler(editorSlotField, value),
+              label: fieldSettings[editorSlotField].labelKey
+                ? t(fieldSettings[editorSlotField].labelKey)
+                : fieldSettings[editorSlotField].label,
+              prefixClass: fieldSettings[editorSlotField].prefixClass,
+              value: form[editorSlotField] || '',
+            })}
+          </div>
+        )}
         <div className="panel-cell">
           <div className="panel-flex panel-buttons">
             <button
@@ -578,13 +604,15 @@ const AddEditTurnPopup = () => {
               Cancel
             </button>
 
-            <button
-              className="btn btn-primary"
-              data-test-id={TID.addTurn.format}
-              onClick={() => formatHandler()}
-            >
-              Format
-            </button>
+            {!editorSlotField && (
+              <button
+                className="btn btn-primary"
+                data-test-id={TID.addTurn.format}
+                onClick={() => formatHandler()}
+              >
+                Format
+              </button>
+            )}
 
             <PanelButton
               data-test-id={TID.addTurn.fontDec}

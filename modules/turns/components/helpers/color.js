@@ -23,6 +23,16 @@ colorSet.comment = {
   [YELLOW]: '#ffff00',
 };
 
+// 'rgb(255, 255, 0)' → '#ffff00' для getNeedBlackText; другой формат возвращается как есть.
+export const rgbToHex = (color) => {
+  const match = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(color || '');
+  if (!match) return color;
+  return `#${match
+    .slice(1)
+    .map((channel) => Number(channel).toString(16).padStart(2, '0'))
+    .join('')}`;
+};
+
 const contrastSettings = {};
 export const getNeedBlackText = (backgroundColor) => {
   if (contrastSettings[backgroundColor])
