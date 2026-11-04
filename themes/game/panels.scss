@@ -54,6 +54,43 @@
     display: none;
   }
 
+  // Статья в визуальном режиме: блочные контролы тулбара Quill видны только у неё
+  .quill-wrapper:not(.quill-md) .md-only {
+    display: none;
+  }
+
+  // Подпись над редактором — какое поле правится; в тулбаре Quill прижата вправо
+  .editor-field-caption {
+    float: right;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    font-size: 12px;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  // перебивает .ql-snow.ql-toolbar button (float, ширина 28px)
+  .editor-field-caption .editor-field-caption__toggle {
+    float: none;
+    width: auto;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-size: 12px;
+    line-height: 20px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
   .editor-slot {
     display: flex;
     flex-direction: column;
@@ -101,6 +138,19 @@
       font-family: monospace;
       font-size: var(--editor-font-size, 22px);
       @include turn-scrollbar(var(--editor-scrollbar-thumb-color));
+    }
+
+    &__notice {
+      padding: 4px 8px;
+      border-bottom: 1px solid #ccc;
+      background-color: #fff8e1;
+      color: #6b4400;
+      font-size: 12px;
+    }
+
+    &__placeholder {
+      padding: 12px 15px;
+      color: #888;
     }
 
     &__preview {

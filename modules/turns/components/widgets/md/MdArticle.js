@@ -9,7 +9,8 @@ import { memo, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { useQuotedBody } from '../useQuotedBody';
-import { MARK_COLOR_VARS } from './markColors';
+import { MARK_COLOR_REMAP } from './markColorRemap';
+import { markColorVars } from './markColors';
 import { parseMarks } from './markdown';
 import MdEditButton from './MdEditButton';
 import { useMdHtml } from './mdRenderer';
@@ -39,6 +40,8 @@ const MdArticle = ({
   );
 
   const bodyEl = useRef(null);
+  // тип md своих вариантов в colorSet не имеет — цвета как у цитат абзаца на обычной карточке
+  const markVars = useMemo(() => markColorVars({ remap: MARK_COLOR_REMAP }), []);
 
   useQuotedBody({
     turnId,
@@ -58,7 +61,7 @@ const MdArticle = ({
 
   return (
     <>
-      <div className="turn-widget stb-widget-md" style={MARK_COLOR_VARS}>
+      <div className="turn-widget stb-widget-md" style={markVars}>
         <div
           className="md-body md-content"
           ref={bodyEl}

@@ -11,10 +11,11 @@ export const loadMdRenderer = () => {
   if (!rendererPromise) {
     rendererPromise = Promise.all([import('markdown-it'), import('dompurify')]).then(
       ([markdownIt, purify]) => {
-        renderer = createRenderer({
+        // фабрика markdown-it нужна и мосту формы (свой экземпляр парсера)
+        renderer = {
+          ...createRenderer({ markdownIt: markdownIt.default, purify: purify.default }),
           markdownIt: markdownIt.default,
-          purify: purify.default,
-        });
+        };
         return renderer;
       },
     );
@@ -23,7 +24,7 @@ export const loadMdRenderer = () => {
 };
 
 // { html, ready }: html — пустая строка, ready — false, пока рендер не загружен.
-export const useMdHtml = (source) => {
+export const useMdHtml = (source, { showQuoteIds = false } = {}) => {
   const [loaded, setLoaded] = useState(renderer);
   useEffect(() => {
     if (loaded) return;
@@ -34,7 +35,7 @@ export const useMdHtml = (source) => {
     };
   }, []);
   return useMemo(
-    () => ({ html: loaded ? loaded.render(source) : '', ready: !!loaded }),
-    [loaded, source],
+    () => ({ html: loaded ? loaded.render(source, { showQuoteIds }) : '', ready: !!loaded }),
+    [loaded, source, showQuoteIds],
   );
 };

@@ -10,3 +10,5 @@ export const STATIC_MEDIA_URL =
   process.env.NEXT_PUBLIC_STATIC_MEDIA_URL || 'http://localhost:3011';
 export const LOBBY_URL =
   process.env.NEXT_PUBLIC_LOBBY_URL || 'http://localhost:3023';
+// цвета показа выделений: «r:o,y:g» — ячейке цвет другой ячейки; пусто — цвета по умолчанию
+export const MARK_COLORS = process.env.NEXT_PUBLIC_MARK_COLORS || '';

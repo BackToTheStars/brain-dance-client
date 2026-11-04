@@ -4,39 +4,53 @@
 import { TID } from '@/config/testIds';
 import { Input } from 'antd';
 import { useRef, useState } from 'react';
-import { MARK_COLOR_VARS } from './markColors';
-import { MD_COLORS } from './markdown';
+import { markColorVars } from './markColors';
+import { MD_COLOR_EMOJI } from './markdown';
 import { useMdHtml } from './mdRenderer';
 
 const PLACEHOLDER =
-  'Markdown: **bold**, *italic*, [link](https://…), # heading, - list, ==g highlight== (y g p b s o)';
+  'Markdown: **bold**, *italic*, [link](https://…), # heading, - list, ==🟢 highlight== (🟡 🟢 🟣 🔵 ⚪ 🟠 🔴)';
+
+const COLOR_NAMES = {
+  y: 'yellow',
+  g: 'green',
+  p: 'pink',
+  b: 'blue',
+  s: 'gray',
+  o: 'orange',
+  r: 'red',
+};
 
 const WRAPS = [
   { name: 'bold', title: 'Bold', label: 'B', before: '**', after: '**' },
   { name: 'italic', title: 'Italic', label: 'I', before: '*', after: '*' },
   { name: 'link', title: 'Link', label: '🔗', before: '[', after: '](https://)' },
-  ...Object.keys(MD_COLORS).map((letter) => ({
-    name: `mark-${letter}`,
-    title: `Highlight ${letter}`,
-    color: letter,
-    before: `==${letter} `,
+  ...Object.entries(MD_COLOR_EMOJI).map(([key, emoji]) => ({
+    name: `mark-${key}`,
+    title: `Highlight ${COLOR_NAMES[key] || key}`,
+    label: emoji,
+    before: `==${emoji} `,
     after: '==',
   })),
 ];
 
+// Форма показывает фоны палитры, как Quill абзаца; ^id — серым верхним индексом.
+const PREVIEW_MARK_VARS = markColorVars({ palette: true });
+
 const Preview = ({ source }) => {
-  const { html } = useMdHtml(source);
+  const { html } = useMdHtml(source, { showQuoteIds: true });
   return (
     <div
       className="md-editor__preview md-content"
       data-test-id={TID.md.previewPane}
-      style={MARK_COLOR_VARS}
+      style={PREVIEW_MARK_VARS}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
 };
 
-const MdEditor = ({ changeHandler, prefixClass, value }) => {
+// aside — подпись поля и переключатель режима формы, notice — строка под панелью кнопок.
+const MdEditor = ({ changeHandler, prefixClass, value, aside = null, notice = null }) => {
   const [preview, setPreview] = useState(false);
   const textAreaRef = useRef(null);
   const source = value || '';
@@ -66,7 +80,6 @@ const MdEditor = ({ changeHandler, prefixClass, value }) => {
               className="md-editor__tool"
               title={item.title}
               data-test-id={TID.md.toolbar(item.name)}
-              style={item.color ? { background: MD_COLORS[item.color] } : undefined}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => wrap(item)}
             >
@@ -74,6 +87,7 @@ const MdEditor = ({ changeHandler, prefixClass, value }) => {
             </button>
           ))}
         <div className="flex-1" />
+        {aside}
         <button
           type="button"
           className="btn btn-primary md-editor__toggle"
@@ -83,6 +97,7 @@ const MdEditor = ({ changeHandler, prefixClass, value }) => {
           {preview ? 'Source' : 'Preview'}
         </button>
       </div>
+      {notice}
       {preview ? (
         <Preview source={source} />
       ) : (

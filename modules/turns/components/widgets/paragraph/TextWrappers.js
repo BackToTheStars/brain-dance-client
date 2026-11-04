@@ -7,7 +7,8 @@ import React, {
   useMemo,
   useContext,
 } from 'react';
-import { colorSet, getNeedBlackText } from '../../helpers/color';
+import { quoteDisplayColor } from '../md/markColors';
+import { MARK_COLOR_REMAP } from '../md/markColorRemap';
 import { attributesToStyle } from '../../helpers/attributesHelper';
 import { CompressorContext } from './Compressor';
 
@@ -52,23 +53,23 @@ const processTextForLinks = (text, keyPrefix) => {
   return parts;
 };
 
-/** Модифицирует атрибуты элементов для цитат */
-const modifyQuoteBackgrounds = (arrText, turnType) => {
-  const colors = colorSet?.[turnType] || colorSet.turn;
-  return arrText.map((textItem) => {
+/** Модифицирует атрибуты элементов для цитат: цвет показа — через ячейки цвета (markColors) */
+const modifyQuoteBackgrounds = (arrText, turnType, colorRemap) =>
+  arrText.map((textItem) => {
     if (!textItem?.attributes?.background) return textItem;
-    const rectColor =
-      colors[textItem.attributes.background] || textItem.attributes.background;
+    const { background, text } = quoteDisplayColor(textItem.attributes.background, {
+      turnType,
+      remap: colorRemap,
+    });
     const attributes = {
       ...textItem.attributes,
-      background: rectColor,
+      background,
       borderRadius: TURN_QUOTE_BORDER_RADIUS,
-      outline: `solid 2px ${rectColor}`,
+      outline: `solid 2px ${background}`,
+      color: text,
     };
-    attributes.color = getNeedBlackText(rectColor) ? '#000' : '#fff';
     return { ...textItem, attributes };
   });
-};
 
 /** Рендерит слова с уникальными ключами, используя префикс */
 const renderText = (text, prefix = '') =>
@@ -85,8 +86,9 @@ export const ParagraphOriginalTexts = ({
   turnId,
   turnType,
   compressed = false,
+  colorRemap = MARK_COLOR_REMAP,
 }) => {
-  const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType);
+  const modifiedArrText = modifyQuoteBackgrounds(arrText, turnType, colorRemap);
   return (
     <>
       {modifiedArrText.map((textItem, i) => {

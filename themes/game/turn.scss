@@ -116,18 +116,25 @@
   }
 
   // выделение = текстовая цитата: оформлено как цитата абзаца — фон, рамка цветом,
-  // скругление; цвета — переменные контейнера (widgets/md/markColors.js), буквы те же
+  // скругление; цвета — переменные контейнера (widgets/md/markColors.js), ключи ячеек те же
   mark {
     border-radius: var(--turn-quote-radius);
     outline: solid 2px transparent;
 
-    @each $letter in y, g, p, b, s, o {
+    @each $letter in y, g, p, b, s, o, r {
       &[data-color='#{$letter}'] {
         background: var(--md-mark-#{$letter});
         outline-color: var(--md-mark-#{$letter});
         color: var(--md-mark-#{$letter}-text);
       }
     }
+  }
+
+  // ^id выделения — только в предпросмотре формы
+  mark + sup {
+    color: #8c8c8c;
+    font-size: 0.6em;
+    margin-left: 0.15em;
   }
 }
 

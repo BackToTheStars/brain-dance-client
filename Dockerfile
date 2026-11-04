@@ -5,6 +5,8 @@
 #     --build-arg NEXT_PUBLIC_LOBBY_API_URL=https://server.brain-dance.net \
 #     --build-arg NEXT_PUBLIC_STATIC_MEDIA_URL=https://media.brain-dance.net \
 #     --build-arg NEXT_PUBLIC_LOBBY_URL=https://lobby.brain-dance.net
+# Необязательный NEXT_PUBLIC_MARK_COLORS (например r:o) — цвета показа выделений на карточках,
+# см. brain-platform/docs/env-vars.md.
 FROM node:22-alpine AS build
 WORKDIR /app
 
@@ -21,11 +23,13 @@ ARG NEXT_PUBLIC_LOBBY_API_URL
 ARG NEXT_PUBLIC_STATIC_MEDIA_URL
 ARG NEXT_PUBLIC_E2E
 ARG NEXT_PUBLIC_LOBBY_URL
+ARG NEXT_PUBLIC_MARK_COLORS
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_LOBBY_API_URL=$NEXT_PUBLIC_LOBBY_API_URL \
     NEXT_PUBLIC_STATIC_MEDIA_URL=$NEXT_PUBLIC_STATIC_MEDIA_URL \
     NEXT_PUBLIC_E2E=$NEXT_PUBLIC_E2E \
-    NEXT_PUBLIC_LOBBY_URL=$NEXT_PUBLIC_LOBBY_URL
+    NEXT_PUBLIC_LOBBY_URL=$NEXT_PUBLIC_LOBBY_URL \
+    NEXT_PUBLIC_MARK_COLORS=$NEXT_PUBLIC_MARK_COLORS
 
 RUN npm run build
 

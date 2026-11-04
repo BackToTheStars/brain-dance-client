@@ -51,6 +51,7 @@ export const ParagraphAddForm = ({
                   'rgb(156, 245, 255)',
                   'rgb(210, 211, 212)',
                   'rgb(255, 213, 150)',
+                  'rgb(255, 99, 99)',
                 ].map((val, i) => (
                   <option value={val} key={i} />
                 ))}

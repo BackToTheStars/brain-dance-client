@@ -4,6 +4,7 @@ const PINK = '#fdc9ff';
 const LIGHT_BLUE = '#9cf5ff';
 const GREEN = '#8aff24';
 const YELLOW = '#ffff00';
+const RED = '#ff6363';
 
 export const colorSet = {};
 colorSet.turn = {
@@ -13,6 +14,7 @@ colorSet.turn = {
   [LIGHT_BLUE]: '#1f717a',
   [GREEN]: '#3f6e17',
   [YELLOW]: '#87862b',
+  [RED]: '#871d1d',
 };
 colorSet.comment = {
   [ORANGE]: '#edb193',
@@ -21,6 +23,7 @@ colorSet.comment = {
   [LIGHT_BLUE]: '#9cf5ff',
   [GREEN]: '#8aff24',
   [YELLOW]: '#ffff00',
+  [RED]: '#ff6363',
 };
 
 // 'rgb(255, 255, 0)' → '#ffff00' для getNeedBlackText; другой формат возвращается как есть.

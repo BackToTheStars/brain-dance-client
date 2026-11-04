@@ -47,6 +47,7 @@ import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { createFormEdition } from '../helpers/formEdition';
 import { useMediaLinkCheck } from './useMediaLinkCheck';
+import { useMdBridge } from './useMdBridge';
 import { TID } from '@/config/testIds';
 import { castSaved } from '@/modules/presence/redux/actions';
 
@@ -60,6 +61,8 @@ const {
   FIELD_HEADER,
   FIELD_SOURCE,
   FIELD_DATE,
+  FIELD_MARKDOWN,
+  TEMPLATE_MD,
 } = turnSettings;
 
 const SAVE_HINTS = {
@@ -159,6 +162,7 @@ const AddEditTurnPopup = () => {
   useEffect(() => {
     if (!quillConstants.quill) return;
     setBaseline(null);
+    mdBridge.reset();
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
       const newForm = {};
@@ -183,7 +187,11 @@ const AddEditTurnPopup = () => {
         const paragraphQuotes = turnToEdit.quotes
           ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
           : [];
-        const quoteEls = getQuoteElements();
+        // выделения статьи в Quill — не цитаты абзаца, их id из исходника
+        const quoteEls =
+          turnToEdit.contentType === TEMPLATE_MD || mdBridge.isShowing()
+            ? []
+            : getQuoteElements();
         let i = 0;
         let incId = Math.floor(new Date().getTime() / 1000);
         for (let quoteEl of quoteEls) {
@@ -199,16 +207,19 @@ const AddEditTurnPopup = () => {
         // Проставленные id Quill заберёт из DOM только следующим тиком — забираем
         // сейчас, иначе они придут после снимка и сойдут за правку.
         quill.update();
-        const paragraph = quill.getContents().ops;
-        setEditorOps(paragraph);
+        const contents = quill.getContents().ops;
+        setEditorOps(contents);
         setBaseline({
           token,
           template: turnToEdit.contentType,
           fields: comparableFields(formRef.current, turnToEdit.contentType),
-          paragraph,
+          paragraph: mdBridge.paragraphOps(contents),
         });
       }, 300);
     } else {
+      // Add Turn при открытой правке: новый ход — с типа по умолчанию, как у только что
+      // открытой формы, а не с типа правленного хода (иначе абзац набирался бы в статью)
+      setActiveTemplate(TEMPLATE_PICTURE);
       setForm({});
       const { quill } = quillConstants;
       if (!!quill) {
@@ -231,6 +242,14 @@ const AddEditTurnPopup = () => {
     quill.on('text-change', sync);
     return () => quill.off('text-change', sync);
   }, [quillConstants]);
+
+  const isMd = !!TEMPLATE_MD && activeTemplate === TEMPLATE_MD;
+  const mdBridge = useMdBridge({
+    quill: quillConstants.quill,
+    isMd,
+    markdown: form[FIELD_MARKDOWN],
+    setMarkdown: (value) => formChangeHandler(FIELD_MARKDOWN, value),
+  });
 
   // Сама запись. Между Save и ней могут встать окна, отвечающие позже, поэтому её
   // зовёт последний шаг: finishSave или «Удалить и сохранить».
@@ -380,14 +399,17 @@ const AddEditTurnPopup = () => {
       ...(typeof patch === 'function' ? patch(prevForm) : patch),
     }));
 
+  // Абзац сравнивается и тогда, когда Quill занят статьёй: смена типа туда-обратно без
+  // правок — «нечего сохранять».
+  const paragraphNow = mdBridge.paragraphOps(editorOps);
   const paragraphChanged = useMemo(
-    () => !!baseline && !isSameContents(editorOps, baseline.paragraph),
-    [editorOps, baseline],
+    () => !!baseline && !isSameContents(paragraphNow, baseline.paragraph),
+    [paragraphNow, baseline],
   );
   const hasContent = hasTurnContent(
     activeTemplate,
     prepareFields(form, activeTemplate),
-    checkIfParagraphExists(editorOps),
+    checkIfParagraphExists(paragraphNow),
   );
   const changed =
     !!baseline &&
@@ -533,11 +555,13 @@ const AddEditTurnPopup = () => {
         )}
         <div
           className={`flex-1 quill-wrapper panel-cell mt-0 ${
-            editorSlotField ? 'editor-hidden' : ''
-          }`}
+            editorSlotField && !mdBridge.showing ? 'editor-hidden' : ''
+          } ${mdBridge.showing ? 'quill-md' : ''}`}
           style={{ '--editor-font-size': `${fontSize}px` }}
           data-font-size={fontSize}
         >
+          {/* Контролы статьи есть всегда и скрыты CSS вне неё: Quill привязывает
+              обработчики к тулбару один раз, при создании. */}
           <div id="toolbar-container-new">
             <span className="ql-formats">
               <select className="ql-background">
@@ -549,6 +573,7 @@ const AddEditTurnPopup = () => {
                   'rgb(156, 245, 255)',
                   'rgb(210, 211, 212)',
                   'rgb(255, 213, 150)',
+                  'rgb(255, 99, 99)',
                 ].map((val, i) => (
                   <option value={val} key={i} />
                 ))}
@@ -563,25 +588,135 @@ const AddEditTurnPopup = () => {
               />
               <button className="ql-link" />
             </span>
+            <span className="ql-formats md-only">
+              <select
+                className="ql-header"
+                defaultValue=""
+                data-test-id={TID.addTurn.toolbar('header')}
+              >
+                <option value="1" />
+                <option value="2" />
+                <option value="3" />
+                <option value="" />
+              </select>
+              <button
+                className="ql-list"
+                value="bullet"
+                data-test-id={TID.addTurn.toolbar('list-bullet')}
+              />
+              <button
+                className="ql-list"
+                value="ordered"
+                data-test-id={TID.addTurn.toolbar('list-ordered')}
+              />
+              <button
+                className="ql-blockquote"
+                data-test-id={TID.addTurn.toolbar('blockquote')}
+              />
+              <button
+                className="ql-code-block"
+                data-test-id={TID.addTurn.toolbar('code-block')}
+              />
+              <button
+                className="ql-strike"
+                data-test-id={TID.addTurn.toolbar('strike')}
+              />
+            </span>
+            {mdBridge.showing ? (
+              <span
+                className="editor-field-caption"
+                data-test-id={TID.addTurn.fieldCaption}
+                data-field="markdown"
+                data-mode="visual"
+              >
+                {t('editor.markdownVisual')}
+                <button
+                  type="button"
+                  className="editor-field-caption__toggle"
+                  data-test-id={TID.md.toSource}
+                  onClick={mdBridge.toSource}
+                >
+                  {t('editor.toSource')}
+                </button>
+              </span>
+            ) : (
+              !editorSlotField && (
+                <span
+                  className="editor-field-caption"
+                  data-test-id={TID.addTurn.fieldCaption}
+                  data-field="paragraph"
+                >
+                  {t('editor.paragraph')}
+                </span>
+              )
+            )}
           </div>
           <div id="editor-container-new" />
         </div>
-        {!!editorSlotField && (
+        {!!editorSlotField && !mdBridge.showing && (
           <div
             className="flex-1 editor-slot panel-cell mt-0"
             style={{ '--editor-font-size': `${fontSize}px` }}
           >
-            {fieldSettings[editorSlotField].widgetSettings.render({
-              form,
-              patchForm,
-              edition,
-              changeHandler: (value) => formChangeHandler(editorSlotField, value),
-              label: fieldSettings[editorSlotField].labelKey
-                ? t(fieldSettings[editorSlotField].labelKey)
-                : fieldSettings[editorSlotField].label,
-              prefixClass: fieldSettings[editorSlotField].prefixClass,
-              value: form[editorSlotField] || '',
-            })}
+            {mdBridge.loading ? (
+              <div className="md-editor md-editor--loading" data-test-id={TID.md.loading}>
+                <div className="md-editor__bar">
+                  <div className="flex-1" />
+                  <span
+                    className="editor-field-caption"
+                    data-test-id={TID.addTurn.fieldCaption}
+                    data-field="markdown"
+                    data-mode="visual"
+                  >
+                    {t('editor.markdownVisual')}
+                  </span>
+                </div>
+                <div className="md-editor__placeholder">{t('editor.loading')}</div>
+              </div>
+            ) : (
+              fieldSettings[editorSlotField].widgetSettings.render({
+                form,
+                patchForm,
+                edition,
+                changeHandler: (value) => formChangeHandler(editorSlotField, value),
+                label: fieldSettings[editorSlotField].labelKey
+                  ? t(fieldSettings[editorSlotField].labelKey)
+                  : fieldSettings[editorSlotField].label,
+                prefixClass: fieldSettings[editorSlotField].prefixClass,
+                value: form[editorSlotField] || '',
+                aside: (
+                  <span
+                    className="editor-field-caption"
+                    data-test-id={TID.addTurn.fieldCaption}
+                    data-field="markdown"
+                    data-mode="source"
+                  >
+                    {t('editor.markdownSource')}
+                    <button
+                      type="button"
+                      className="editor-field-caption__toggle"
+                      data-test-id={TID.md.toVisual}
+                      disabled={!mdBridge.canVisual}
+                      onClick={mdBridge.toVisual}
+                    >
+                      {t('editor.toVisual')}
+                    </button>
+                  </span>
+                ),
+                notice: mdBridge.unsupported.length ? (
+                  <div
+                    className="md-editor__notice"
+                    data-test-id={TID.md.unsupported}
+                    data-reasons={mdBridge.unsupported.join(',')}
+                  >
+                    {t('editor.unsupportedTitle')}{' '}
+                    {mdBridge.unsupported
+                      .map((reason) => t(`editor.unsupported.${reason}`))
+                      .join(', ')}
+                  </div>
+                ) : null,
+              })
+            )}
           </div>
         )}
         <div className="panel-cell">

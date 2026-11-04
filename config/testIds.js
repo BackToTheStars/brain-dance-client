@@ -98,7 +98,12 @@ export const TID = {
     preview: 'md-preview', // кнопка «Preview» — показать рендер исходника на месте textarea
     source: 'md-source', // та же кнопка в режиме предпросмотра — вернуться к исходнику
     previewPane: 'md-preview-pane', // отрисованный предпросмотр в форме
-    toolbar: (name) => `md-toolbar-${name}`, // обёртка выделенного: bold, italic, link, mark-<буква y g p b s o>
+    toolbar: (name) => `md-toolbar-${name}`, // обёртка выделенного: bold, italic, link, mark-<ячейка y g p b s o r>
+    // Режимы формы статьи (forms/useMdBridge.js): Visual — статья в Quill формы, Source — textarea
+    toSource: 'md-to-source', // кнопка «Source» в подписи поля над Quill
+    toVisual: 'md-to-visual', // кнопка «Visual» в подписи поля над textarea; disabled, пока есть неподдерживаемое
+    unsupported: 'md-unsupported', // строка под панелью Source: чего мост не знает (+ data-reasons через запятую)
+    loading: 'md-visual-loading', // заглушка на месте редактора, пока статья не залита в Quill (в т. ч. грузится markdown-it)
   },
 
   // Слой выделения области у картинки (widgets/picture/Crop.js): атрибут на <img>
@@ -409,8 +414,11 @@ export const TID = {
     lostLinksSave: 'add-turn-lost-links-save',
     lostLinksCancel: 'add-turn-lost-links-cancel',
     // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
-    // button.ql-link, их берём по классам Quill)
+    // button.ql-link, их берём по классам Quill); только у статьи в Visual — strike, list-bullet,
+    // list-ordered, blockquote, code-block и header (скрытый select: Quill рисует свой .ql-picker)
     toolbar: (name) => `add-turn-toolbar-${name}`,
+    // Подпись над редактором: data-field = paragraph | markdown, у статьи data-mode = visual | source
+    fieldCaption: 'add-turn-field-caption',
     // «Format» и подтверждение перед ним: кнопка чистит текст и снимает всё
     // оформление, поэтому при цитатах, ссылках и выделении сначала спрашивает
     format: 'add-turn-format',
