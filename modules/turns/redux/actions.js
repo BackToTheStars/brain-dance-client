@@ -8,6 +8,7 @@ import {
   getTurnsByIdsRequest,
   getTurnsGeometryRequest,
   updateTurnRequest,
+  updateTurnRowsRequest,
 } from '../requests';
 import {
   dataCopy,
@@ -347,6 +348,34 @@ export const resaveTurn = (turn, callbacks) => (dispatch) => {
     callbacks?.success();
   });
 };
+
+// Правка хода перевода: сначала ряды операциями (если менялись), потом остальные поля прежним
+// PUT без rows. Ответ рядов их не несёт — в стор идут ряды из ответа полей, если сервер их отдал,
+// иначе ряды формы. Отказ любого запроса — callbacks.error, без alert.
+export const resaveTranslationTurn =
+  ({ turn, rows, rowsOps }, callbacks) =>
+  (dispatch) => {
+    const options = { errorCallback: (message) => callbacks?.error?.(message) };
+    const rowsSaved = rowsOps
+      ? updateTurnRowsRequest(turn._id, rowsOps, options)
+      : Promise.resolve();
+    rowsSaved
+      .then(() => updateTurnRequest(turn._id, turn, options))
+      .then((data) => {
+        const preparedTurn = {
+          ...data.item,
+          rows: Array.isArray(data.item.rows) ? data.item.rows : rows,
+          x: turn.x,
+          y: turn.y,
+        };
+        dispatch({
+          type: types.TURN_RESAVE,
+          payload: TurnHelper.toNewFields(preparedTurn),
+        });
+        callbacks?.success();
+      })
+      .catch((err) => callbacks?.error?.(String(err)));
+  };
 
 // Окно настройки обрезки полей pdf: черновик засевается тем, что уже в ходе.
 export const editPdfCrop = () => (dispatch, getState) => {

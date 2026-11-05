@@ -21,12 +21,29 @@ export const createTurnRequest = (body) => {
   });
 };
 
-export const updateTurnRequest = (id, body) => {
-  return request(`turns/${id}?hash=${s.hash}`, {
-    method: 'PUT',
-    tokenFlag: true,
-    body: body,
-  });
+export const updateTurnRequest = (id, body, options) => {
+  return request(
+    `turns/${id}?hash=${s.hash}`,
+    {
+      method: 'PUT',
+      tokenFlag: true,
+      body: body,
+    },
+    options,
+  );
+};
+
+// Ряды хода перевода операциями: { upsert, remove, order? }; ответ { success, rowsVersion } без рядов.
+export const updateTurnRowsRequest = (id, ops, options) => {
+  return request(
+    `turns/${id}/rows?hash=${s.hash}`,
+    {
+      method: 'PUT',
+      tokenFlag: true,
+      body: ops,
+    },
+    options,
+  );
 };
 
 export const deleteTurnRequest = (id) => {

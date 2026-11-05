@@ -11,6 +11,14 @@ import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 import { snapRound } from '../helpers/grid';
 import { GRID_CELL_X } from '@/config/ui';
 import { ensureQuoteIds, toPlainText } from '../widgets/md/markdown';
+import {
+  diffRows,
+  dropEmptyRows,
+  hasRowsContent,
+  normalizeLanguages,
+  normalizeRows,
+  rowsToPreviewText,
+} from '../widgets/translation/rows';
 
 const {
   settings,
@@ -25,7 +33,10 @@ const {
   FIELD_AUDIO_TITLE,
   FIELD_PDF,
   FIELD_MARKDOWN,
+  FIELD_ROWS,
+  FIELD_LANGUAGES,
   TEMPLATE_MD,
+  TEMPLATE_TRANSLATION,
 } = turnSettings;
 
 // Медиа-поля в порядке проверки ссылок при Save: тип media и data-field окна.
@@ -58,6 +69,11 @@ export const prepareFields = (form, template) => {
 export const comparableFields = (form, template) => {
   const fields = prepareFields(form, template);
   const videoUrl = fields[FIELD_VIDEO];
+  // Ряды и языки перевода — объекты: сравниваются по значению в том виде, в каком уйдут в ход.
+  if (template === TEMPLATE_TRANSLATION) {
+    fields[FIELD_ROWS] = JSON.stringify(dropEmptyRows(form[FIELD_ROWS]));
+    fields[FIELD_LANGUAGES] = JSON.stringify(normalizeLanguages(form[FIELD_LANGUAGES]));
+  }
   return {
     ...fields,
     videoPreview: videoUrl ? form.videoPreview : null,
@@ -73,6 +89,7 @@ export const sameFields = (a, b) =>
 // Turn.js решает, рисовать ли хэдер, картинку и абзац.
 export const hasTurnContent = (template, fields, paragraphHasText) => {
   const { requiredFields = [], requiredParagraph } = settings[template];
+  if (template === TEMPLATE_TRANSLATION) return hasRowsContent(fields[FIELD_ROWS]);
   if (requiredFields.length) {
     return requiredFields.every((field) => !!fields[field]?.trim());
   }
@@ -121,12 +138,14 @@ const withoutQuoteId = (textItem) => {
 
 // Сборка сохранения формы хода. Ничего не читает и не пишет вовне: абзац редактора,
 // id узлов цитат и время приходят параметрами. { error } — сохранять нельзя.
+// baseRows — ряды хода перевода на момент открытия формы: правка шлёт серверу только разницу с ними.
 export const buildTurnSave = ({
   textArr,
   quoteElementIds,
   form,
   template,
   turnToEdit,
+  baseRows,
   dWidgets,
   lines,
   position,
@@ -199,19 +218,34 @@ export const buildTurnSave = ({
   const isMd = template === TEMPLATE_MD;
   const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
 
+  // Перевод: ряды формы без пустых, абзац — начало плоского текста левой колонки, цитат нет.
+  const isTranslation = template === TEMPLATE_TRANSLATION;
+  const rows = isTranslation ? dropEmptyRows(form[FIELD_ROWS]) : null;
+
   const paragraphOps = isMd
     ? [{ insert: `${toPlainText(md.source)}\n` }]
-    : collapseSplitQuotes(resTextArr);
+    : isTranslation
+      ? [{ insert: `${rowsToPreviewText(rows)}\n` }]
+      : collapseSplitQuotes(resTextArr);
 
-  const preparedForm = prepareFields(
-    isMd ? { ...form, [FIELD_MARKDOWN]: md.source } : form,
-    template,
-  );
+  let formToPrepare = form;
+  if (isMd) formToPrepare = { ...form, [FIELD_MARKDOWN]: md.source };
+  if (isTranslation) {
+    formToPrepare = {
+      ...form,
+      [FIELD_ROWS]: rows,
+      [FIELD_LANGUAGES]: normalizeLanguages(form[FIELD_LANGUAGES]),
+    };
+  }
+  const preparedForm = prepareFields(formToPrepare, template);
 
   for (let requiredField of requiredFields) {
     if (!preparedForm[requiredField]) {
       return { error: { message: `Need ${requiredField}` } };
     }
+  }
+  if (isTranslation && !hasRowsContent(rows)) {
+    return { error: { message: `Need ${FIELD_ROWS}` } };
   }
 
   if (requiredParagraph && !paragraphExists(paragraphOps)) {
@@ -325,6 +359,15 @@ export const buildTurnSave = ({
     }
   }
 
+  // Ряды в теле хода — только при создании перевода: правка шлёт их отдельным запросом
+  // операциями, а ход другого типа ключей rows / languages не несёт вовсе.
+  if (!isTranslation) {
+    delete turnObj[FIELD_ROWS];
+    delete turnObj[FIELD_LANGUAGES];
+  } else if (turnToEdit) {
+    delete turnObj[FIELD_ROWS];
+  }
+
   if (!!turnToEdit) {
     turnObj._id = turnToEdit._id;
     turnObj.x = turnToEdit.x;
@@ -351,6 +394,11 @@ export const buildTurnSave = ({
     previewDraft,
     editionToken,
   };
+  // Правка перевода: операции над рядами от открытия формы (null — ряды не менялись) и ряды
+  // целиком для стора — ответ сервера их не несёт.
+  if (isTranslation && turnToEdit) {
+    payload.translation = { rows, rowsOps: diffRows(normalizeRows(baseRows), rows) };
+  }
 
   const orphanSummary = orphaned.length
     ? getOrphanedSummary(orphaned, lostLines.size)

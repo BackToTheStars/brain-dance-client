@@ -5,6 +5,8 @@ export const TURN_SIZE_MIN_WIDTH = GRID_CELL_X * 8;
 export const AUDIO_MIN_WIDTH = GRID_CELL_X * 12;
 // Ряд контролов видео с кнопками ±10 с влезает от ~452 px.
 export const VIDEO_MIN_WIDTH = GRID_CELL_X * 19;
+// Две читаемые колонки перевода.
+export const TRANSLATION_MIN_WIDTH = GRID_CELL_X * 24;
 // Потолок ширины хода: 250 клеток по 24 px = 6000 px. Живёт только здесь и
 // только в клиенте: серверной валидации ширины хода нет вовсе, ограничивает он
 // ровно одно место — maxWidth у jQuery-UI resizable в

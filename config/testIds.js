@@ -106,6 +106,32 @@ export const TID = {
     loading: 'md-visual-loading', // заглушка на месте редактора, пока статья не залита в Quill (в т. ч. грузится markdown-it)
   },
 
+  // Ход «Перевод текста» (contentType=translation): таблица рядов в карточке
+  // (widgets/translation/TranslationTable.js); выделения в ячейках — mark[data-color] без data-id
+  translation: {
+    body: 'translation-body', // прокручиваемое тело таблицы (+ data-turn-id)
+    row: 'translation-row', // ряд (+ data-row-id = id ряда)
+    cell: 'translation-cell', // ячейка ряда (+ data-side = left | right)
+    languages: 'translation-languages', // строка языков над колонками; её ячейки — data-side без тест-id
+    // Редактор рядов в форме хода (widgets/translation/TranslationEditor.js), стоит на месте Quill;
+    // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
+    editor: {
+      language: 'translation-editor-language', // поле языка колонки (+ data-side = left | right)
+      row: 'translation-editor-row', // ряд редактора (+ data-row-id)
+      cell: 'translation-editor-cell', // textarea ячейки (+ data-side); ряд — по data-row-id родителя
+      addRowAfter: 'translation-editor-add-row-after', // «+» в полосе действий ряда (+ data-row-id): новый ряд под ним
+      deleteRow: 'translation-editor-delete-row', // 🗑 в полосе действий (+ data-row-id); у ряда с текстом — окно
+      addRow: 'translation-editor-add-row', // «+ Row» под списком
+      preview: 'translation-editor-preview', // кнопка «Preview» — таблица той же сеткой, что карточка
+      source: 'translation-editor-source', // та же кнопка в предпросмотре («Source») — назад к рядам
+      previewPane: 'translation-editor-preview-pane', // отрисованный предпросмотр (внутри — translation.row / cell)
+      // Окно «в ряду есть текст»: тело (+ data-row-id) и кнопки
+      deleteConfirm: 'translation-editor-delete-confirm',
+      deleteOk: 'translation-editor-delete-ok',
+      deleteCancel: 'translation-editor-delete-cancel',
+    },
+  },
+
   // Слой выделения области у картинки (widgets/picture/Crop.js): атрибут на <img>
   // внутри ReactCrop — сам ReactCrop чужие пропсы до DOM не доносит, а обёртка
   // меняла бы вёрстку; протяжка по картинке и есть выделение. Парно pdf.crop.

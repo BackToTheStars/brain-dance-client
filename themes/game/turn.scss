@@ -389,6 +389,62 @@
       }
     }
 
+    // TRANSLATION — коробка статьи; тело прокручивается одно, ряд — две равные колонки
+    // (minmax(0, 1fr): длинное слово колонку не раздвигает), высота ряда по большей ячейке
+    .stb-widget-translation {
+      flex: 1;
+      overflow: hidden;
+      display: block;
+      margin: 0;
+      padding-right: var(--turn-widget-paragraph-padding);
+      padding-left: var(--turn-widget-paragraph-padding);
+      color: #dbdbdb;
+      font-size: var(--turn-widget-paragraph-font-size);
+      line-height: var(--turn-widget-paragraph-line-height);
+
+      .translation-body {
+        padding-left: var(--turn-widget-paragraph-scrollbar-padding);
+        padding-right: var(--turn-widget-paragraph-scrollbar-padding);
+        max-height: 100%;
+        overflow-y: scroll;
+        overflow-wrap: break-word;
+        // ряды есть до ленивого рендера ячеек: якорь прокрутки Chrome увёл бы
+        // восстановленную позицию вслед за выросшим рядом
+        overflow-anchor: none;
+        @include turn-scrollbar(var(--turn-scrollbar-color));
+      }
+
+      .translation-languages,
+      .translation-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .translation-row + .translation-row {
+        border-top: 1px solid var(--turn-border-color);
+      }
+
+      .translation-cell {
+        min-width: 0;
+        padding: 0.3em 0.5em;
+
+        & + .translation-cell {
+          border-left: 1px solid var(--turn-border-color);
+        }
+      }
+
+      .translation-languages {
+        font-size: 0.85em;
+        color: #9a9a9a;
+        border-bottom: 1px solid var(--turn-border-color);
+
+        .translation-cell {
+          padding-top: 0;
+          padding-bottom: 0.2em;
+        }
+      }
+    }
+
     // TMP
     .compressed-paragraph-widget {
       // right: calc(-40px - 100%);

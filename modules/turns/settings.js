@@ -9,6 +9,7 @@ import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
 import MdEditor from './components/widgets/md/MdEditor';
+import TranslationEditor from './components/widgets/translation/TranslationEditor';
 import FileUploading from './components/forms/FileUploading';
 import VideoUrlField from './components/forms/VideoUrlField';
 import { uploadMedia } from './redux/actions';
@@ -24,6 +25,7 @@ const TEMPLATE_CAROUSEL = 'carousel';
 const TEMPLATE_NEWS = 'news';
 const TEMPLATE_PICTURE_ONLY = 'picture-only';
 const TEMPLATE_MD = 'md';
+const TEMPLATE_TRANSLATION = 'translation';
 
 const FIELD_HEADER = 'header';
 const FIELD_DONT_SHOW_HEADER = 'dontShowHeader';
@@ -33,6 +35,8 @@ const FIELD_AUDIO = 'audioUrl';
 const FIELD_AUDIO_TITLE = 'audioTitle';
 const FIELD_PDF = 'pdfUrl';
 const FIELD_MARKDOWN = 'markdown';
+const FIELD_ROWS = 'rows';
+const FIELD_LANGUAGES = 'languages';
 const FIELD_DATE = 'date';
 const FIELD_SOURCE = 'sourceUrl';
 const FIELD_BACKGROUND_COLOR = 'backgroundColor';
@@ -81,6 +85,7 @@ export const WIDGET_AUDIO_QUOTES = 'audio-quotes';
 export const WIDGET_SOURCE = 'source';
 export const WIDGET_PDF = 'pdf';
 export const WIDGET_MD = 'md';
+export const WIDGET_TRANSLATION = 'translation';
 
 export const widgetSettings = {
   [WIDGET_HEADER]: {
@@ -277,6 +282,14 @@ const settings = {
     requiredFields: [FIELD_MARKDOWN],
     availableFields: [FIELD_MARKDOWN],
   },
+  // Перевод текста: ряды md-ячеек в полях rows и languages, абзац — производный плоский текст
+  // левой колонки; выделения в ячейках — только оформление. Цветов, как у md-хода, нет.
+  [TEMPLATE_TRANSLATION]: {
+    value: 'translation',
+    label: 'Translation',
+    requiredFields: [FIELD_ROWS],
+    availableFields: [FIELD_ROWS, FIELD_LANGUAGES],
+  },
 };
 
 const templatesToShow = [
@@ -287,6 +300,7 @@ const templatesToShow = [
   TEMPLATE_PDF,
   TEMPLATE_COMMENT,
   TEMPLATE_MD,
+  TEMPLATE_TRANSLATION,
   // TEMPLATE_CAROUSEL,
   // TEMPLATE_PICTURE_ONLY,
 ];
@@ -483,6 +497,24 @@ const fieldSettings = {
       render: (props) => <MdEditor {...props} />,
     },
   },
+  [FIELD_ROWS]: {
+    label: 'Translation',
+    labelKey: 'fields.translation',
+    prefixClass: 'translation',
+    special: true,
+    inputType: 'component',
+    editorSlot: true,
+    widgetSettings: {
+      render: (props) => <TranslationEditor {...props} />,
+    },
+  },
+  // hidden — в списке полей не рисуется: языки правит редактор рядов через patchForm.
+  [FIELD_LANGUAGES]: {
+    label: 'Languages',
+    prefixClass: 'languages',
+    special: true,
+    hidden: true,
+  },
   [FIELD_DATE]: {
     label: 'Date',
     prefixClass: 'date',
@@ -519,6 +551,8 @@ const fieldsToClone = [
   'contentType',
   'paragraph',
   'markdown',
+  'rows',
+  'languages',
   'quotes',
   // цитаты таймлайна живут не в quotes, а тут; без них в списке fieldRemover
   // стирал весь vq_1/aq_1 виджет у копии хода целиком (не только массив)
@@ -542,6 +576,7 @@ const turnSettings = {
   TEMPLATE_CAROUSEL,
   TEMPLATE_NEWS,
   TEMPLATE_MD,
+  TEMPLATE_TRANSLATION,
 
   FIELD_HEADER,
   FIELD_DONT_SHOW_HEADER,
@@ -552,6 +587,8 @@ const turnSettings = {
   FIELD_AUDIO_TITLE,
   FIELD_PDF,
   FIELD_MARKDOWN,
+  FIELD_ROWS,
+  FIELD_LANGUAGES,
   FIELD_DATE,
   FIELD_SOURCE,
 

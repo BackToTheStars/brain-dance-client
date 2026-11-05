@@ -108,7 +108,8 @@
     "turnForm": {
       "fields": {
         "audioTitle": "Название аудио",
-        "markdown": "Markdown"
+        "markdown": "Markdown",
+        "translation": "Перевод"
       },
       "editor": {
         "paragraph": "Абзац",
@@ -184,6 +185,14 @@
         "Count": "Будет снято: цитат <b>{quotes}</b>, ссылок <b>{links}</b>, фрагментов с выделением <b>{marked}</b>.",
         "Ok": "Отформатировать",
         "Cancel": "Отмена"
+      },
+      "translation": {
+        "deleteRow": {
+          "Title": "Удалить ряд",
+          "Text": "В ряду есть текст. Всё равно удалить?",
+          "Ok": "Удалить",
+          "Cancel": "Отмена"
+        }
       }
     }
   },

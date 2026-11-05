@@ -115,7 +115,8 @@
     "turnForm": {
       "fields": {
         "audioTitle": "Audio title",
-        "markdown": "Markdown"
+        "markdown": "Markdown",
+        "translation": "Translation"
       },
       "editor": {
         "paragraph": "Paragraph",
@@ -191,6 +192,14 @@
         "Count": "To be removed: quotes <b>{quotes}</b>, hyperlinks <b>{links}</b>, bold or italic fragments <b>{marked}</b>.",
         "Ok": "Format",
         "Cancel": "Cancel"
+      },
+      "translation": {
+        "deleteRow": {
+          "Title": "Delete the row",
+          "Text": "The row has text in it. Delete it anyway?",
+          "Ok": "Delete",
+          "Cancel": "Cancel"
+        }
       }
     }
   },

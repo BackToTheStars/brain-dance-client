@@ -7,9 +7,15 @@ import {
   WIDGET_PDF,
   WIDGET_PICTURE,
   WIDGET_SOURCE,
+  WIDGET_TRANSLATION,
   WIDGET_VIDEO,
   WIDGET_VIDEO_QUOTES,
 } from '../settings';
+import {
+  hasRowsContent,
+  normalizeLanguages,
+  normalizeRows,
+} from '../components/widgets/translation/rows';
 
 export class TurnHelper {
   // Одна форма виджета ленты — и при загрузке хода, и после записи ленты.
@@ -39,6 +45,8 @@ export class TurnHelper {
     const headerEffectivelyHidden = !!turn.dontShowHeader || !turn.header?.trim();
     // Текстовые цитаты у md-хода принадлежат статье, у остальных — абзацу.
     const isMd = turn.contentType === 'md';
+    // У перевода абзац — производный плоский текст левой колонки, вторым виджетом не рисуется.
+    const isTranslation = turn.contentType === 'translation';
     const textQuotes = turn.quotes.filter((quote) => quote.type === 'text');
     const widgets = {
       [WIDGET_HEADER]: [
@@ -97,7 +105,7 @@ export class TurnHelper {
       [WIDGET_PARAGRAPH]: [
         {
           id: 'p_1',
-          show: !isMd && !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
+          show: !isMd && !isTranslation && !!turn.paragraph && !!turn.paragraph.length, // && !turn.compressed,
           inserts: turn.paragraph,
           scrollPosition: turn.scrollPosition || 0,
           quotes: isMd ? [] : textQuotes,
@@ -112,6 +120,16 @@ export class TurnHelper {
           // у md-хода абзац не рисуется, поле scrollPosition одно на ход — конфликта с p_1 нет
           scrollPosition: turn.scrollPosition || 0,
           quotes: isMd ? textQuotes : [],
+        },
+      ],
+      [WIDGET_TRANSLATION]: [
+        {
+          id: 'tr_1',
+          show: isTranslation && hasRowsContent(turn.rows),
+          rows: normalizeRows(turn.rows),
+          languages: normalizeLanguages(turn.languages),
+          // поле scrollPosition одно на ход — абзац у перевода не рисуется
+          scrollPosition: turn.scrollPosition || 0,
         },
       ],
       [WIDGET_VIDEO_QUOTES]: [TurnHelper.timelineWidget('vq_1', turn.videoQuotes)],
@@ -221,10 +239,19 @@ export class TurnHelper {
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       markdown: turn.dWidgets.md_1?.source,
+      // ряды и языки — только у перевода: у остальных ходов ключей нет, и в запрос они не идут
+      ...(turn.contentType === 'translation'
+        ? {
+            rows: turn.dWidgets.tr_1?.rows || [],
+            languages: turn.dWidgets.tr_1?.languages,
+          }
+        : {}),
       scrollPosition:
         (turn.contentType === 'md'
           ? turn.dWidgets.md_1?.scrollPosition
-          : turn.dWidgets.p_1.scrollPosition) || 0,
+          : turn.contentType === 'translation'
+            ? turn.dWidgets.tr_1?.scrollPosition
+            : turn.dWidgets.p_1.scrollPosition) || 0,
       compressed: turn.p_1?.compressed || false,
       updatedAt: turn.updatedAt,
       uncompressedHeight: turn.uncompressedHeight || turn.height,

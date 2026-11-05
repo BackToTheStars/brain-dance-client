@@ -26,6 +26,7 @@ import Header from './widgets/Header';
 import DateAndSourceUrl from './widgets/header/DateAndSourceUrl';
 import Paragraph from './widgets/paragraph/Paragraph';
 import MdArticle from './widgets/md/MdArticle';
+import TranslationTable from './widgets/translation/TranslationTable';
 import Pdf from './widgets/pdf/Pdf';
 import Picture from './widgets/picture/Picture';
 import Video from './widgets/video/Video';
@@ -199,6 +200,7 @@ export const Turn = memo(({ id }) => {
       // pdf_1 — защитный дефолт на случай отсутствия в dWidgets
       pdf_1: { url: pdfUrl } = {},
       md_1: { show: mdShow } = {},
+      tr_1: { show: translationShow } = {},
       h_1: { show: headerShow },
       s_1: { url: sourceUrl, date, show: sourceShow },
     },
@@ -213,12 +215,15 @@ export const Turn = memo(({ id }) => {
     [pictureOnly, headerShow]
   );
 
-  // У md-хода абзац — производный плоский текст статьи, вторым виджетом он не рисуется.
+  // У md-хода и перевода абзац — производный плоский текст, вторым виджетом он не рисуется.
   const isMd = contentType === turnSettings.TEMPLATE_MD;
   const hasMd = isMd && !!mdShow;
+  const isTranslation = contentType === turnSettings.TEMPLATE_TRANSLATION;
+  const hasTranslation = isTranslation && !!translationShow;
   const doesParagraphExist = useMemo(
-    () => !pictureOnly && !isMd && checkIfParagraphExists(paragraph),
-    [paragraph, pictureOnly, isMd]
+    () =>
+      !pictureOnly && !isMd && !isTranslation && checkIfParagraphExists(paragraph),
+    [paragraph, pictureOnly, isMd, isTranslation]
   );
 
   const hasVideoQuotes = useMemo(
@@ -240,6 +245,7 @@ export const Turn = memo(({ id }) => {
       !!audioUrl + // Audio
       !!pdfUrl + // Pdf
       hasMd + // Md article
+      hasTranslation + // Translation rows
       doesParagraphExist
     ); // Paragraph
   }, [
@@ -251,6 +257,7 @@ export const Turn = memo(({ id }) => {
     audioUrl,
     pdfUrl,
     hasMd,
+    hasTranslation,
     doesParagraphExist,
   ]);
 
@@ -607,6 +614,15 @@ export const Turn = memo(({ id }) => {
             widgetsUpdatedTime={widgetsUpdatedTime}
             turnId={_id}
             widgetId={'md_1'}
+            registerHandleResize={registerHandleResize}
+            unregisterHandleResize={unregisterHandleResize}
+          />
+        )}
+        {hasTranslation && (
+          <TranslationTable
+            widgetsUpdatedTime={widgetsUpdatedTime}
+            turnId={_id}
+            widgetId={'tr_1'}
             registerHandleResize={registerHandleResize}
             unregisterHandleResize={unregisterHandleResize}
           />

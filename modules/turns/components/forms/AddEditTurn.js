@@ -29,7 +29,12 @@ import {
   EDITOR_FONT_SIZE_STEP,
   PANEL_ADD_EDIT_TURN,
 } from '@/config/panel';
-import { createTurn, resaveTurn, uploadMedia } from '../../redux/actions';
+import {
+  createTurn,
+  resaveTranslationTurn,
+  resaveTurn,
+  uploadMedia,
+} from '../../redux/actions';
 import { dataUrlToFile, frameFileName } from '../helpers/videoFrame';
 import {
   buildTurnSave,
@@ -260,6 +265,7 @@ const AddEditTurnPopup = () => {
     quoteKeysDeleted = [],
     previewDraft,
     editionToken,
+    translation,
   }) => {
     let turnObj = preparedTurn;
     // Форму могли закрыть или перевести на другой ход, пока media отвечала: сам ход
@@ -312,14 +318,22 @@ const AddEditTurnPopup = () => {
         dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
         dispatch(toggleMaximizeQuill(false));
       },
+      // Отказ сервера на правке перевода — в форму, она остаётся открытой.
+      error: (message) => {
+        if (edition.isCurrent(token)) setError({ message });
+      },
     };
 
     // @fixme
-    dispatch(
-      isNew
-        ? createTurn(turnObj, saveCallbacks)
-        : resaveTurn(turnObj, saveCallbacks),
-    );
+    if (isNew) {
+      dispatch(createTurn(turnObj, saveCallbacks));
+    } else if (translation) {
+      dispatch(
+        resaveTranslationTurn({ turn: turnObj, ...translation }, saveCallbacks),
+      );
+    } else {
+      dispatch(resaveTurn(turnObj, saveCallbacks));
+    }
   };
 
   // Цитаты и связи теряются молча, только если терять нечего; отказ в окне не
@@ -358,6 +372,8 @@ const AddEditTurnPopup = () => {
       template: activeTemplate,
       // Позиция и цитаты других виджетов — какими они в сторе сейчас.
       turnToEdit: storedTurn(),
+      // Ряды перевода — на момент открытия: чужие правки, пришедшие в стор позже, не затираются.
+      baseRows: turnToEdit?.rows,
       dWidgets: turnData?.dWidgets,
       lines,
       position: gamePosition,
@@ -518,7 +534,9 @@ const AddEditTurnPopup = () => {
               {headRows(true)}
               {fieldsToShow
                 .filter((field) => {
-                  if (fieldSettings[field].editorSlot) return false;
+                  if (fieldSettings[field].editorSlot || fieldSettings[field].hidden) {
+                    return false;
+                  }
                   if (
                     !fieldSettings[field].special &&
                     !fieldSettings[field].separate
@@ -684,25 +702,36 @@ const AddEditTurnPopup = () => {
                   : fieldSettings[editorSlotField].label,
                 prefixClass: fieldSettings[editorSlotField].prefixClass,
                 value: form[editorSlotField] || '',
-                aside: (
-                  <span
-                    className="editor-field-caption"
-                    data-test-id={TID.addTurn.fieldCaption}
-                    data-field="markdown"
-                    data-mode="source"
-                  >
-                    {t('editor.markdownSource')}
-                    <button
-                      type="button"
-                      className="editor-field-caption__toggle"
-                      data-test-id={TID.md.toVisual}
-                      disabled={!mdBridge.canVisual}
-                      onClick={mdBridge.toVisual}
+                aside:
+                  editorSlotField === FIELD_MARKDOWN ? (
+                    <span
+                      className="editor-field-caption"
+                      data-test-id={TID.addTurn.fieldCaption}
+                      data-field="markdown"
+                      data-mode="source"
                     >
-                      {t('editor.toVisual')}
-                    </button>
-                  </span>
-                ),
+                      {t('editor.markdownSource')}
+                      <button
+                        type="button"
+                        className="editor-field-caption__toggle"
+                        data-test-id={TID.md.toVisual}
+                        disabled={!mdBridge.canVisual}
+                        onClick={mdBridge.toVisual}
+                      >
+                        {t('editor.toVisual')}
+                      </button>
+                    </span>
+                  ) : (
+                    <span
+                      className="editor-field-caption"
+                      data-test-id={TID.addTurn.fieldCaption}
+                      data-field={fieldSettings[editorSlotField].prefixClass}
+                    >
+                      {fieldSettings[editorSlotField].labelKey
+                        ? t(fieldSettings[editorSlotField].labelKey)
+                        : fieldSettings[editorSlotField].label}
+                    </span>
+                  ),
                 notice: mdBridge.unsupported.length ? (
                   <div
                     className="md-editor__notice"

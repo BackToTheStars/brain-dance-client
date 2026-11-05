@@ -23,8 +23,8 @@ export const loadMdRenderer = () => {
   return rendererPromise;
 };
 
-// { html, ready }: html — пустая строка, ready — false, пока рендер не загружен.
-export const useMdHtml = (source, { showQuoteIds = false } = {}) => {
+// Загруженный рендер или null; загрузку запускает сам.
+export const useMdRenderer = () => {
   const [loaded, setLoaded] = useState(renderer);
   useEffect(() => {
     if (loaded) return;
@@ -34,8 +34,17 @@ export const useMdHtml = (source, { showQuoteIds = false } = {}) => {
       alive = false;
     };
   }, []);
+  return loaded;
+};
+
+// { html, ready }: html — пустая строка, ready — false, пока рендер не загружен.
+export const useMdHtml = (source, { showQuoteIds = false, markIds = true } = {}) => {
+  const loaded = useMdRenderer();
   return useMemo(
-    () => ({ html: loaded ? loaded.render(source, { showQuoteIds }) : '', ready: !!loaded }),
-    [loaded, source, showQuoteIds],
+    () => ({
+      html: loaded ? loaded.render(source, { showQuoteIds, markIds }) : '',
+      ready: !!loaded,
+    }),
+    [loaded, source, showQuoteIds, markIds],
   );
 };

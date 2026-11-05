@@ -361,12 +361,14 @@ export const markRule = (state, silent) => {
   const match = MARK_AT.exec(src.slice(0, posMax));
   if (!match) return false;
   const [whole, marker, emoji, body, id] = match;
+  // markIds: false — выделение только оформление: без data-id и без mark_id, хвост ^id съедается
+  const withId = id !== undefined && state.env?.markIds !== false;
 
   if (!silent) {
     const bodyStart = start + 2 + (marker ? marker.length : 0);
     const token = state.push('mark_open', 'mark', 1);
     token.attrs = [['data-color', EMOJI_TO_COLOR[emoji] || MD_DEFAULT_COLOR]];
-    if (id !== undefined) token.attrs.unshift(['data-id', id]);
+    if (withId) token.attrs.unshift(['data-id', id]);
     state.pos = bodyStart;
     state.posMax = bodyStart + body.length;
     // инлайновый linkify читает src дальше posMax и съел бы закрывающее == у адреса в теле;
@@ -376,15 +378,16 @@ export const markRule = (state, silent) => {
     state.linkLevel -= 1;
     state.posMax = posMax;
     state.push('mark_close', 'mark', -1);
-    if (id !== undefined) state.push('mark_id', '', 0).content = id;
+    if (withId) state.push('mark_id', '', 0).content = id;
   }
   state.pos = start + whole.length;
   return true;
 };
 
 // markdownIt — фабрика markdown-it (default export), purify — объект с sanitize(html, cfg)
-// (DOMPurify, привязанный к window). Возвращает { render(source, { showQuoteIds }) → html, md }:
-// showQuoteIds — ^id выделений серым верхним индексом (предпросмотр формы), карточка — без.
+// (DOMPurify, привязанный к window). Возвращает { render(source, { showQuoteIds, markIds }) → html, md }:
+// showQuoteIds — ^id выделений серым верхним индексом (предпросмотр формы), карточка — без;
+// markIds: false — выделения без data-id (ячейки перевода: цвет есть, цитат и линий нет).
 export const createRenderer = ({ markdownIt, purify, config = MD_RENDER_CONFIG }) => {
   const md = markdownIt(config.preset, config.options);
   if (config.disable?.length) md.disable(config.disable);
@@ -407,7 +410,7 @@ export const createRenderer = ({ markdownIt, purify, config = MD_RENDER_CONFIG }
   };
   return {
     md,
-    render: (source, { showQuoteIds = false } = {}) =>
-      purify.sanitize(md.render(source || '', { showQuoteIds }), purifyConfig),
+    render: (source, { showQuoteIds = false, markIds = true } = {}) =>
+      purify.sanitize(md.render(source || '', { showQuoteIds, markIds }), purifyConfig),
   };
 };

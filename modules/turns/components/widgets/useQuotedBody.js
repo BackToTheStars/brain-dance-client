@@ -25,7 +25,8 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 // quotesSignature — id цитат содержимого, пусто — цитат нет; contentKey — строка,
 // меняющаяся вместе с содержимым; scrollPosition — записанная позиция из виджета;
 // ready — содержимое разложено в DOM: до этого виджет для ресайза не регистрируется
-// (пустое тело давало бы scrollHeight 0, и карточка зажималась бы к минимуму).
+// (пустое тело давало бы scrollHeight 0, и карточка зажималась бы к минимуму);
+// minWidth — минимальная ширина карточки от этого виджета.
 export const useQuotedBody = ({
   turnId,
   widgetId,
@@ -38,6 +39,7 @@ export const useQuotedBody = ({
   registerHandleResize,
   unregisterHandleResize,
   ready = true,
+  minWidth = TURN_SIZE_MIN_WIDTH,
 }) => {
   const quotesDataRef = useRef(null);
   const size = useSelector((state) => state.turns.g[turnId].size);
@@ -242,7 +244,7 @@ export const useQuotedBody = ({
     const resizeInfo = {
       id: widgetId,
       type: resizeType,
-      minWidthCallback: () => TURN_SIZE_MIN_WIDTH,
+      minWidthCallback: () => minWidth,
       minHeightCallback: () => 40,
       getDesiredHeight: ({ newHeight }) => {
         return newHeight;
@@ -289,4 +291,10 @@ export const useQuotedBody = ({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // содержимое доехало позже позиции (ленивый рендер ячеек): коробка тела не
+  // меняется, наблюдатель молчит — довосстановить зажатую цель здесь
+  useEffect(() => {
+    if (pendingScrollRef.current != null) applyScroll(pendingScrollRef.current);
+  }, [contentKey]);
 };

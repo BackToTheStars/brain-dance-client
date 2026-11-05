@@ -9,11 +9,10 @@ import { memo, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { useQuotedBody } from '../useQuotedBody';
-import { MARK_COLOR_REMAP } from './markColorRemap';
-import { markColorVars } from './markColors';
 import { parseMarks } from './markdown';
 import MdEditButton from './MdEditButton';
-import { useMdHtml } from './mdRenderer';
+import MdHtml, { useMdMarkVars } from './MdHtml';
+import { useMdRenderer } from './mdRenderer';
 
 const MdArticle = ({
   turnId,
@@ -27,7 +26,7 @@ const MdArticle = ({
     (state) => state.turns.d[turnId].dWidgets[widgetId],
   );
   const source = widget.source || '';
-  const { html, ready } = useMdHtml(source);
+  const ready = !!useMdRenderer();
 
   // id выделений исходника: пусто — цитат нет
   const quotesSignature = useMemo(
@@ -40,8 +39,7 @@ const MdArticle = ({
   );
 
   const bodyEl = useRef(null);
-  // тип md своих вариантов в colorSet не имеет — цвета как у цитат абзаца на обычной карточке
-  const markVars = useMemo(() => markColorVars({ remap: MARK_COLOR_REMAP }), []);
+  const markVars = useMdMarkVars();
 
   useQuotedBody({
     turnId,
@@ -50,8 +48,8 @@ const MdArticle = ({
     bodyRef: bodyEl,
     widgetsUpdatedTime,
     quotesSignature,
-    // HTML меняется с исходником и один раз — когда загрузился рендер
-    contentKey: html,
+    // содержимое меняется с исходником и один раз — когда загрузился рендер
+    contentKey: ready ? source : '',
     scrollPosition: widget.scrollPosition,
     registerHandleResize,
     unregisterHandleResize,
@@ -62,12 +60,12 @@ const MdArticle = ({
   return (
     <>
       <div className="turn-widget stb-widget-md" style={markVars}>
-        <div
-          className="md-body md-content"
-          ref={bodyEl}
+        <MdHtml
+          source={source}
+          bodyRef={bodyEl}
+          className="md-body"
           data-test-id={TID.md.body}
           data-turn-id={turnId}
-          dangerouslySetInnerHTML={{ __html: html }}
         />
         {can(RULE_TURNS_CRUD) && (
           <MdEditButton turnId={turnId} widgetId={widgetId} />
