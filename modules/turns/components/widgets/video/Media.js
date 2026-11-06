@@ -15,7 +15,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useMediaPlayback } from '../media/useMediaPlayback';
 import { useQuoteMarks } from '../media/quoteMarks';
 import SkipButtons from '../media/SkipButtons';
-import { VolumeControl, SpeedControl } from './Controls';
+import { VolumeControl } from './Controls';
+import { SpeedControl } from '../media/SpeedControl';
 import { TID } from '@/config/testIds';
 import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
@@ -152,7 +153,13 @@ const MediaVideo = ({ videoUrl, turnId, widgetId }) => {
               <FiEdit />
             </button>
           )}
-          <SpeedControl speed={speed} setSpeed={setSpeed} />
+          <SpeedControl
+            speed={speed}
+            setSpeed={setSpeed}
+            max={2}
+            up
+            buttonClassName="icon-button"
+          />
           <button
             className="icon-button fullscreen-button"
             onClick={toggleFullscreen}

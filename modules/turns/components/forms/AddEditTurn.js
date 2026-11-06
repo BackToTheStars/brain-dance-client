@@ -130,6 +130,9 @@ const AddEditTurnPopup = () => {
   // Снимок открытого на правку хода { token, template, fields, paragraph }; null —
   // форма ещё устаивается или ход новый.
   const [baseline, setBaseline] = useState(null);
+  // Ряды перевода, записанные сохранением, чей PUT хода не прошёл: { token, rows } — база следующего
+  // diff; от рядов открытия повтор после новых правок оставил бы на сервере снятые ряды и прежние ячейки.
+  const [savedRows, setSavedRows] = useState(null);
   const formRef = useRef(form);
   formRef.current = form;
 
@@ -140,6 +143,7 @@ const AddEditTurnPopup = () => {
   const edition = editionRef.current;
   edition.open(editTurnId);
   useEffect(() => () => edition.close(), []);
+  const rowsSaved = !!savedRows && edition.isCurrent(savedRows.token);
 
   const dispatch = useDispatch();
 
@@ -318,6 +322,9 @@ const AddEditTurnPopup = () => {
         dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
         dispatch(toggleMaximizeQuill(false));
       },
+      rowsSaved: () => {
+        if (edition.isCurrent(token)) setSavedRows({ token, rows: translation.rows });
+      },
       // Отказ сервера на правке перевода — в форму, она остаётся открытой.
       error: (message) => {
         if (edition.isCurrent(token)) setError({ message });
@@ -373,7 +380,7 @@ const AddEditTurnPopup = () => {
       // Позиция и цитаты других виджетов — какими они в сторе сейчас.
       turnToEdit: storedTurn(),
       // Ряды перевода — на момент открытия: чужие правки, пришедшие в стор позже, не затираются.
-      baseRows: turnToEdit?.rows,
+      baseRows: rowsSaved ? savedRows.rows : turnToEdit?.rows,
       dWidgets: turnData?.dWidgets,
       lines,
       position: gamePosition,
@@ -432,6 +439,7 @@ const AddEditTurnPopup = () => {
     edition.isCurrent(baseline.token) &&
     (activeTemplate !== baseline.template ||
       paragraphChanged ||
+      rowsSaved ||
       !sameFields(comparableFields(form, activeTemplate), baseline.fields));
   let saveState = 'ready';
   if (edition.isCurrent(savingPreview)) saveState = 'preview';
@@ -814,7 +822,11 @@ const AddEditTurnPopup = () => {
         title={t('orphan.Title')}
         okText={t('orphan.Ok')}
         cancelText={t('orphan.Cancel')}
-        okButtonProps={{ danger: true }}
+        okButtonProps={{
+          danger: true,
+          'data-test-id': TID.addTurn.orphanSave,
+        }}
+        cancelButtonProps={{ 'data-test-id': TID.addTurn.orphanCancel }}
         onCancel={() => setOrphanConfirm(null)}
         onOk={() => {
           const { payload } = orphanConfirm;
@@ -823,7 +835,11 @@ const AddEditTurnPopup = () => {
         }}
       >
         {!!orphanConfirm && (
-          <>
+          <div
+            data-test-id={TID.addTurn.orphan}
+            data-quotes={orphanConfirm.summary.quotesCount}
+            data-links={orphanConfirm.summary.linesCount}
+          >
             <p>{t('orphan.Text')}</p>
             <p className="mb-0">
               {t.rich('orphan.Count', {
@@ -835,7 +851,7 @@ const AddEditTurnPopup = () => {
                 b: (chunks) => <b>{chunks}</b>,
               })}
             </p>
-          </>
+          </div>
         )}
       </Modal>
 

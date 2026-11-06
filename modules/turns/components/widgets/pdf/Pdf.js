@@ -41,6 +41,7 @@ import { updateScrollPosition } from '@/modules/turns/redux/actions';
 import { WIDGET_PDF } from '@/modules/turns/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getQueue } from '../../helpers/queueHelper';
 import WidgetEditButton from '../buttons/Edit';
@@ -75,6 +76,7 @@ const Pdf = ({
   registerHandleResize,
   unregisterHandleResize,
 }) => {
+  const t = useTranslations('Game.pdf');
   const url = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId]?.url,
   );
@@ -574,18 +576,13 @@ const Pdf = ({
             className="pdf-message pdf-message_error"
             data-test-id={TID.pdf.error}
           >
-            <div>Не удалось загрузить PDF: {error.message}</div>
-            {error.isNetwork && (
-              <div>
-                Файл недоступен или хост не отдаёт CORS-заголовки — браузер не
-                даёт прочитать такой документ по внешней ссылке.
-              </div>
-            )}
+            <div>{t('loadFailed', { message: error.message })}</div>
+            {error.isNetwork && <div>{t('corsHint')}</div>}
             <div className="pdf-message__url">{url}</div>
           </div>
         )}
           {!error && !pages.length && (
-            <div className="pdf-message">Загрузка PDF…</div>
+            <div className="pdf-message">{t('loading')}</div>
           )}
           {pages.map((page) => (
             <div

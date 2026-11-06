@@ -138,7 +138,7 @@ export const TID = {
   pictureCrop: 'picture-crop',
 
   // Кнопки заголовка хода (widgets/header/ButtonsMenu.js): share, clone, edit,
-  // cut, delete. Карточка несёт data-turn-id — тест целится через неё.
+  // front, back (порядок наложения), cut, delete. Карточка несёт data-turn-id — тест целится через неё.
   turnAction: (name) => `turn-action-${name}`,
 
   // Кнопка правки виджета — карандаш в тулбаре любого виджета
@@ -232,6 +232,10 @@ export const TID = {
     play: 'media-play', // play/pause
     skipBack: 'media-skip-back', // −10 с рядом с ▷ (disabled, пока длительность не известна)
     skipForward: 'media-skip-forward', // +10 с, не дальше конца файла
+    speed: 'media-speed', // кнопка скорости (media/SpeedControl.js): щелчок 1 ↔ 2, текст «1.0x»
+    speedSlider: 'media-speed-slider', // обёртка вертикального ползунка скорости, есть только при наведении
+    speedUp: 'media-speed-up', // «+» над ползунком скорости: +0,1
+    speedDown: 'media-speed-down', // «−» под ползунком скорости: −0,1
     preview: 'media-preview', // видео: значок на превью, по которому монтируется плеер (Video.js)
     markup: 'media-markup', // карандаш в тулбаре плеера: правка цитат в панели; его нет у вьювера
     // и у спутника экскурсии, а у видео появляется только после монтирования плеера
@@ -439,6 +443,10 @@ export const TID = {
     lostLinks: 'add-turn-lost-links',
     lostLinksSave: 'add-turn-lost-links-save',
     lostLinksCancel: 'add-turn-lost-links-cancel',
+    // Окно замены файла с цитатами: тело с data-quotes и data-links и его кнопки
+    orphan: 'add-turn-orphan',
+    orphanSave: 'add-turn-orphan-save',
+    orphanCancel: 'add-turn-orphan-cancel',
     // Кнопки тулбара Quill: bold, italic (цвет фона — select.ql-background, ссылка —
     // button.ql-link, их берём по классам Quill); только у статьи в Visual — strike, list-bullet,
     // list-ordered, blockquote, code-block и header (скрытый select: Quill рисует свой .ql-picker)

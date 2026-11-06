@@ -1,6 +1,7 @@
 import { isTurnInsideRenderArea } from '../components/helpers/sizeHelper';
 import turnSettings, { TURN_READY } from '../settings';
 import * as types from './types';
+import { sortIdsByZ, turnZ } from './stacking';
 
 // `saved` / `savedScroll` — геометрия и прокрутка, какими они лежат на сервере. Не в `g`
 // и `d`: открытая форма хода перезаполняется при любой смене записи своего хода там.
@@ -16,11 +17,12 @@ const initialTurnsState = {
   scrollPositions: {},
 };
 
-const toSaved = ({ position, size, splitHeight }) => ({
+const toSaved = ({ position, size, splitHeight, z }) => ({
   x: position?.x,
   y: position?.y,
   width: size?.width,
   height: size?.height,
+  z: turnZ({ z }),
   splitHeight,
 });
 
@@ -51,7 +53,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
   switch (type) {
     case types.TURNS_LOAD_GEOMETRY: {
       const g = payload.turns.reduce((a, turn) => {
-        a[turn._id] = turn;
+        a[turn._id] = { ...turn, z: turnZ(turn) };
         return a;
       }, {});
       const turnsToRender = [];
@@ -70,20 +72,25 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         g,
         saved,
-        turnsToRender,
+        turnsToRender: sortIdsByZ(turnsToRender, g),
       };
     }
-    case types.TURN_UPDATE_GEOMETRY:
-      return {
-        ...state,
-        g: {
-          ...state.g,
-          [payload._id]: {
-            ...state.g[payload._id],
-            ...payload,
-          },
+    case types.TURN_UPDATE_GEOMETRY: {
+      const g = {
+        ...state.g,
+        [payload._id]: {
+          ...state.g[payload._id],
+          ...payload,
         },
       };
+      return {
+        ...state,
+        g,
+        ...('z' in payload
+          ? { turnsToRender: sortIdsByZ(state.turnsToRender, g) }
+          : {}),
+      };
+    }
     // Неизменный ход не переписывается: на его запись подписана форма хода.
     case types.TURNS_UPDATE_GEOMETRY: {
       const g = { ...state.g };
@@ -134,7 +141,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         d: {
           ...state.d,
-          ...payload.turns.reduce((a, { position, size, ...turn }) => {
+          ...payload.turns.reduce((a, { position, size, z, ...turn }) => {
             a[turn._id] = {
               ...state.d[turn._id],
               ...turn,
@@ -227,29 +234,33 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       }
       return {
         ...state,
-        turnsToRender,
+        turnsToRender: sortIdsByZ(turnsToRender, g),
       };
     }
 
     // Созданный и перезаписанный формой ход приходит ответом сервера: это и есть
     // его сохранённая геометрия.
     case types.TURN_CREATE: {
+      const g = {
+        ...state.g,
+        [payload._id]: { ...payload, z: turnZ(payload) }, // @todo: geometry fields
+      };
       return {
         ...state,
         // d: {
         //   ...state.d,
         //   [payload._id]: payload, // @todo: data fields
         // },
-        g: {
-          ...state.g,
-          [payload._id]: payload, // @todo: geometry fields
-        },
+        g,
         saved: { ...state.saved, [payload._id]: toSaved(payload) },
-        turnsToRender: [...state.turnsToRender, payload._id],
+        turnsToRender: sortIdsByZ([...state.turnsToRender, payload._id], g),
       };
     }
 
+    // Форма z не пишет: несохранённый z остаётся правкой Save Field.
     case types.TURN_RESAVE: {
+      const current = state.g[payload._id];
+      const z = current ? turnZ(current) : turnZ(payload);
       return {
         ...state,
         d: {
@@ -258,7 +269,7 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
         g: {
           ...state.g,
-          [payload._id]: payload,
+          [payload._id]: { ...payload, z },
         },
         saved: { ...state.saved, [payload._id]: toSaved(payload) },
         savedScroll: withoutTurnKeys(state.savedScroll, [payload._id]),

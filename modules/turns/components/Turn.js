@@ -51,7 +51,7 @@ const TIMELINE_TYPES = [WIDGET_AUDIO_QUOTES, WIDGET_VIDEO_QUOTES];
 // обновления геометрии почти всех ходов терялись: DOM внутренней карточки уже был
 // пересчитан по контенту, а в сторе (и во внешнем контейнере, к которому привязан блок
 // источника) оставалась высота с бэкенда.
-const TurnAdapter = ({ id }) => {
+const TurnAdapter = ({ id, layer = 0 }) => {
   const turnPositionQueue = useRef(getQueue(TURNS_POSITION_TIMEOUT_DELAY)).current;
   const gamePosition = useSelector((state) => state.game.position);
   const dispatch = useDispatch();
@@ -75,6 +75,7 @@ const TurnAdapter = ({ id }) => {
       top: `${position.y - (gamePosition.y || 0)}px`,
       width: `${width}px`,
       height: `${height}px`,
+      '--turn-layer': layer,
     };
 
     // Without a draggable of its own the card would hand the mousedown to the
@@ -86,7 +87,7 @@ const TurnAdapter = ({ id }) => {
       wrapperClasses,
       wrapperStyles,
     };
-  }, [gamePosition, position, width, height, restricted]);
+  }, [gamePosition, position, width, height, restricted, layer]);
 
   // DRAGGABLE
   useEffect(() => {

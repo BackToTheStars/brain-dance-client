@@ -5,7 +5,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
   useSyncExternalStore,
 } from 'react';
 
@@ -29,7 +28,6 @@ export const getPlaybackChannel = (turnId) => channels.get(turnId);
 
 export const MediaPlaybackProvider = ({ turnId, children }) => {
   // { [widgetId]: { playing, progress, duration } } — progress/duration в секундах
-  const [states, setStates] = useState({});
   // Реестр читает состояние сразу после публикации, в том же сбросе эффектов, что и новое управление
   // плеера: иначе стоп-точка цитаты увидела бы свежий togglePlay при устаревшем playing.
   const statesRef = useRef({});
@@ -47,7 +45,6 @@ export const MediaPlaybackProvider = ({ turnId, children }) => {
       return;
     }
     statesRef.current = { ...prev, [widgetId]: { ...prevState, ...patch } };
-    setStates(statesRef.current);
     emit();
   }, []);
 
@@ -104,8 +101,8 @@ export const MediaPlaybackProvider = ({ turnId, children }) => {
   }, [turnId]);
 
   const value = useMemo(
-    () => ({ states, publishState, registerControls, getControls, registerActivator }),
-    [states, publishState, registerControls, getControls, registerActivator],
+    () => ({ publishState, registerControls, registerActivator }),
+    [publishState, registerControls, registerActivator],
   );
 
   return (
@@ -144,31 +141,6 @@ export const useMediaActivator = (widgetId, activate) => {
     if (!ctx || !activate) return undefined;
     return ctx.registerActivator(widgetId, activate);
   }, [ctx, widgetId, activate]);
-};
-
-// Для потребителей (таймлайн цитат): состояние и управление медиа-виджетом
-export const useMediaPlaybackState = (widgetId) => {
-  const ctx = useContext(PlaybackContext);
-  const state = (ctx && ctx.states[widgetId]) || {};
-
-  const togglePlay = useCallback(() => {
-    if (ctx) ctx.getControls(widgetId).togglePlay?.();
-  }, [ctx, widgetId]);
-
-  const seek = useCallback(
-    (seconds) => {
-      if (ctx) ctx.getControls(widgetId).seek?.(seconds);
-    },
-    [ctx, widgetId],
-  );
-
-  return {
-    playing: !!state.playing,
-    progress: state.progress || 0,
-    duration: state.duration || 0,
-    togglePlay,
-    seek,
-  };
 };
 
 const NO_STATE = {};

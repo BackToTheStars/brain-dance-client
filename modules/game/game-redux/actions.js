@@ -29,6 +29,7 @@ import {
   selectUnsavedScrollPositions,
   selectUnsavedTurnIds,
 } from '@/modules/turns/redux/selectors';
+import { turnZ } from '@/modules/turns/redux/stacking';
 import { snapRound } from '@/modules/turns/components/helpers/grid';
 import { getGameSettings, updateGameSettings } from './storage';
 import {
@@ -181,6 +182,7 @@ export const saveField = ({ onSaved = null, silent = false } = {}) => (dispatch,
       y: snapRound(turn.position.y, GRID_CELL_X),
       width: snapRound(turn.size.width, GRID_CELL_X),
       height: snapRound(turn.size.height, GRID_CELL_Y),
+      z: turnZ(turn),
       // у хода без разделителя ключа нет: сервер отличает отсутствие от нуля
       splitHeight: state.turns.d[id]?.splitHeight,
     };

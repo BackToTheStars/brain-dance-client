@@ -96,3 +96,38 @@ export const EditIcon = () => {
     )
 
 }
+
+// Сплошной квадрат — ход, который двигают: спереди или сзади контурного.
+export const BringToFrontIcon = () => {
+    return (
+        <svg
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M0.6 1.4H8.6V5.2H7V3H2.2V7.8H4.6V9.4H0.6Z" fill="white" />
+            <path d="M5.4 6H13.4V14H5.4Z" fill="white" />
+        </svg>
+    )
+}
+
+export const SendToBackIcon = () => {
+    return (
+        <svg
+            width={TURN_ICON_WIDTH}
+            height={TURN_ICON_HEIGHT}
+            viewBox="0 0 14 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M0.6 1.4H8.6V5.2H4.6V9.4H0.6Z" fill="white" />
+            <path
+                fillRule="evenodd"
+                d="M5.4 6H13.4V14H5.4ZM7 7.6V12.4H11.8V7.6Z"
+                fill="white"
+            />
+        </svg>
+    )
+}

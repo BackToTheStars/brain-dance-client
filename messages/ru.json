@@ -81,6 +81,12 @@
     "Payment_methods": "Платёжные способы"
   },
   "Game": {
+    "turnActions": {
+      "confirmCut": "Точно вырезать?",
+      "confirmDelete": "Точно удалить?",
+      "bringToFront": "На передний план",
+      "sendToBack": "На задний план"
+    },
     "codeEnterForm": {
       "Code_placeholder": "Введите код...",
       "Nickname_placeholder": "Введите ник...",
@@ -194,6 +200,18 @@
           "Cancel": "Отмена"
         }
       }
+    },
+    "pdf": {
+      "loadFailed": "Не удалось загрузить PDF: {message}",
+      "corsHint": "Файл недоступен или хост не отдаёт CORS-заголовки — браузер не даёт прочитать такой документ по внешней ссылке.",
+      "loading": "Загрузка PDF…"
+    },
+    "upload": {
+      "failed": "Ошибка загрузки",
+      "status": "Ошибка загрузки ({status})",
+      "network": "Ошибка сети при загрузке файла",
+      "aborted": "Загрузка отменена",
+      "wrongType": "Неверный тип файла"
     }
   },
   "Common": {

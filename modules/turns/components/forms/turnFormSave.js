@@ -65,13 +65,22 @@ export const prepareFields = (form, template) => {
   return prepared;
 };
 
+// Форма сравнивается со снимком на каждом рендере, а массив рядов меняется только правкой ряда:
+// сотни рядов — сотни КБ строки, поэтому строка считается раз на массив.
+const rowsKeys = new WeakMap();
+const rowsKey = (rows) => {
+  if (!Array.isArray(rows)) return JSON.stringify(dropEmptyRows(rows));
+  if (!rowsKeys.has(rows)) rowsKeys.set(rows, JSON.stringify(dropEmptyRows(rows)));
+  return rowsKeys.get(rows);
+};
+
 // Со снимком сравнивается и превью видео: своя картинка или новый кадр — тоже правка.
 export const comparableFields = (form, template) => {
   const fields = prepareFields(form, template);
   const videoUrl = fields[FIELD_VIDEO];
   // Ряды и языки перевода — объекты: сравниваются по значению в том виде, в каком уйдут в ход.
   if (template === TEMPLATE_TRANSLATION) {
-    fields[FIELD_ROWS] = JSON.stringify(dropEmptyRows(form[FIELD_ROWS]));
+    fields[FIELD_ROWS] = rowsKey(form[FIELD_ROWS]);
     fields[FIELD_LANGUAGES] = JSON.stringify(normalizeLanguages(form[FIELD_LANGUAGES]));
   }
   return {

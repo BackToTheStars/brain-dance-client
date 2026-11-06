@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useDropzone } from 'react-dropzone';
 import { useCallback, useState } from 'react';
 import { Progress, Spin } from 'antd';
+import { useTranslations } from 'next-intl';
 import { TID } from '@/config/testIds';
 
 // accept — формат react-dropzone: { 'application/pdf': ['.pdf'] }; без него принимается
@@ -17,6 +18,7 @@ const FileUploading = ({
   edition = null, // редакция формы; без неё (вне формы хода) ответ всегда актуален
 }) => {
   const dispatch = useDispatch();
+  const t = useTranslations('Game.upload');
   const [loading, setLoading] = useState(false);
   // null — отправка ещё не началась; 0..100 — доля ушедшего тела запроса
   const [progress, setProgress] = useState(null);
@@ -37,7 +39,11 @@ const FileUploading = ({
       })
       .catch((err) => {
         if (!isCurrent()) return;
-        setError(err?.message || 'Upload failed');
+        setError(
+          err?.uploadError
+            ? t(err.uploadError, { status: err.status })
+            : err?.message || t('failed'),
+        );
         onFailed(err);
       })
       .finally(() => {
@@ -50,7 +56,7 @@ const FileUploading = ({
     (acceptedFiles, rejections) => {
       if (!acceptedFiles.length) {
         // файл не прошёл фильтр accept — без сообщения выглядит как «ничего не произошло»
-        setError(rejections?.length ? 'Wrong file type' : null);
+        setError(rejections?.length ? t('wrongType') : null);
         return;
       }
       submitData({ file: acceptedFiles[0] });

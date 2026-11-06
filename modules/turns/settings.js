@@ -178,8 +178,7 @@ const settings = {
     label: 'Mixed',
     availableWidgets: {},
     optionalWidgets: [],
-    description:
-      'Экспериментальный шаблон, содержит любые виджеты в любых количествах',
+    description: 'Experimental template: any widgets in any quantity',
   },
 
   [TEMPLATE_CAROUSEL]: {
@@ -196,7 +195,7 @@ const settings = {
       [WIDGET_VIDEO]: { max: 3 },
     },
     description:
-      'Ход, в котором есть карусели, одна или несколько, и каждая содержит фото или видео',
+      'A turn with one or more carousels, each holding photos or videos',
     validation: (widgetBlocks) => {
       // const count = widgetBlocks.filter((widgetBlock) => [WIDGET_PICTURE, WIDGET_VIDEO].includes(widgetBlock.type)).length
       // @learn reduce & accumulator
@@ -216,7 +215,7 @@ const settings = {
     availableWidgets: { [WIDGET_PICTURE]: { max: 1, min: 1 } },
     // availableWidgets: [WIDGET_PICTURE],
     optionalWidgets: [],
-    description: 'Только картинка, без ничего',
+    description: 'Just a picture, nothing else',
   },
   [TEMPLATE_PICTURE]: {
     value: 'picture',

@@ -218,11 +218,9 @@ const GameDialog = ({
       return;
     }
     // случаи, когда требуется применение кода: роль из списка входит своим кодом, не токеном записи
+    // Посетитель без кода входит адресом — только после подтверждения: вход перезаписывает game_<hash>.
     let code = savedCodeFor(choosedRole)?.code;
-    if (!code && choosedRole === ROLE_GAME_VISITOR) {
-      code = hash;
-      if (!(await enterAsGuest())) return;
-    }
+    if (!code && choosedRole === ROLE_GAME_VISITOR) code = hash;
 
     // Предупреждение о потере доступа. Вход другим кодом перезаписывает
     // game_<hash>, и если текущая роль выше всех сохранённых кодов, вернуть её

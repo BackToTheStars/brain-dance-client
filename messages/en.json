@@ -88,6 +88,12 @@
     "Payment_methods": "Payment methods"
   },
   "Game": {
+    "turnActions": {
+      "confirmCut": "Cut this turn?",
+      "confirmDelete": "Delete this turn?",
+      "bringToFront": "Bring to front",
+      "sendToBack": "Send to back"
+    },
     "codeEnterForm": {
       "Code_placeholder": "Enter code...",
       "Nickname_placeholder": "Enter nickname...",
@@ -201,6 +207,18 @@
           "Cancel": "Cancel"
         }
       }
+    },
+    "pdf": {
+      "loadFailed": "Failed to load the PDF: {message}",
+      "corsHint": "The file is unavailable or its host sends no CORS headers — the browser cannot read such a document by an external link.",
+      "loading": "Loading PDF…"
+    },
+    "upload": {
+      "failed": "Upload failed",
+      "status": "Upload failed ({status})",
+      "network": "Network error while uploading the file",
+      "aborted": "Upload cancelled",
+      "wrongType": "Wrong file type"
     }
   },
   "Common": {

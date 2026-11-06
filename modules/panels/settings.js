@@ -140,7 +140,7 @@ export const panels = [
   },
   {
     type: PANEL_NOTIFICATIONS,
-    position: POSITION_NOTIFICATIONS,
+    position: [POSITION_NOTIFICATIONS, PANEL_NO_SELECT_STYLES].join(' '),
     component: Notifications,
     isDisplayed: true,
     // width: () => `calc(min(25vw, 360px))`,

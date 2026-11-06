@@ -1,12 +1,20 @@
 import { memo } from 'react';
+import { useTranslations } from 'next-intl';
 import { RULE_TURNS_CRUD } from '@/config/user';
-import { cloneTurn, deleteTurn } from '../../../redux/actions';
 import {
+  bringTurnToFront,
+  cloneTurn,
+  deleteTurn,
+  sendTurnToBack,
+} from '../../../redux/actions';
+import {
+  BringToFrontIcon,
   CopyIcon,
   DeleteIcon,
   EditIcon,
   LinkIcon,
   ScissorIcon,
+  SendToBackIcon,
 } from '../../icons/Turn';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +26,7 @@ import { castSaved } from '@/modules/presence/redux/actions';
 import { requestMediaQuotesClose } from '@/modules/panels/redux/mediaQuotesPanel';
 
 const ButtonsMenu = ({ _id }) => {
+  const t = useTranslations('Game.turnActions');
   const { can } = useUserContext();
   const dispatch = useDispatch();
   const gameHash = useSelector((state) => state.game.game?.hash);
@@ -28,7 +37,7 @@ const ButtonsMenu = ({ _id }) => {
 
   const handleCut = (e) => {
     e.preventDefault();
-    if (confirm('Точно вырезать?')) {
+    if (confirm(t('confirmCut'))) {
       dispatch(cloneTurn(_id)).then(() => {
         dispatch(deleteTurn(_id, { onDeleted }));
       });
@@ -37,7 +46,7 @@ const ButtonsMenu = ({ _id }) => {
 
   const handleDelete = (e) => {
     e.preventDefault();
-    if (confirm('Точно удалить?')) {
+    if (confirm(t('confirmDelete'))) {
       dispatch(deleteTurn(_id, { onDeleted }));
     }
   };
@@ -46,6 +55,16 @@ const ButtonsMenu = ({ _id }) => {
   const handleEdit = (e) => {
     e.preventDefault();
     dispatch(requestMediaQuotesClose(openForm));
+  };
+
+  const handleFront = (e) => {
+    e.preventDefault();
+    dispatch(bringTurnToFront(_id));
+  };
+
+  const handleBack = (e) => {
+    e.preventDefault();
+    dispatch(sendTurnToBack(_id));
   };
 
   const handleClone = (e) => {
@@ -95,6 +114,28 @@ const ButtonsMenu = ({ _id }) => {
           onClick={handleEdit}
         >
           <EditIcon />
+        </a>
+      )}
+      {canEdit && (
+        <a
+          key="front"
+          className="front-btn"
+          title={t('bringToFront')}
+          data-test-id={TID.turnAction('front')}
+          onClick={handleFront}
+        >
+          <BringToFrontIcon />
+        </a>
+      )}
+      {canEdit && (
+        <a
+          key="back"
+          className="back-btn"
+          title={t('sendToBack')}
+          data-test-id={TID.turnAction('back')}
+          onClick={handleBack}
+        >
+          <SendToBackIcon />
         </a>
       )}
       {canEdit && (

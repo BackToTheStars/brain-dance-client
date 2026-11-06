@@ -38,7 +38,7 @@ export const request = async (
   { body = null, tokenFlag = false, method = 'GET' } = {},
   { errorMessage, errorCallback, successCallback } = {},
 ) => {
-  let defaultMessage = errorMessage || `Произошла ошибка, метод ${method}`;
+  let defaultMessage = errorMessage || `Request failed, method ${method}`;
   const params = {
     method,
     headers: {

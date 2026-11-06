@@ -144,7 +144,8 @@
 
     &.ui-draggable-dragging {
       opacity: 1;
-      z-index: 4;
+      // над всеми карточками слоя
+      z-index: 100000;
     }
   }
 
@@ -153,11 +154,20 @@
   }
 }
 
+// Свой контекст наложения карточек: z-index по порядку z хода (Turns.js) не выходит из слоя —
+// он по-прежнему над плашкой EDIT (1) и под линиями вне режима правки (3).
+.turns-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+
 .stb-react-turn {
   font-family: var(--turn-font-family);
   position: absolute;
   overflow: visible;
-  z-index: 2;
+  z-index: var(--turn-layer, 0);
   cursor: move;
   user-select: none;
 
@@ -1279,6 +1289,46 @@
   z-index: 100;
   padding-top: 5px;
   padding-bottom: 10px;
+
+  // ползунок скорости выше: шаг 0,1 — около 5,5 px у аудио (0,5–2,5) и 7,5 px у видео (0,5–2)
+  &.speed-slider {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    .slider-container {
+      height: auto;
+      flex: 1;
+    }
+  }
+
+  .speed-step {
+    width: 20px;
+    height: 18px;
+    padding: 0;
+    line-height: 16px;
+    font-size: 14px;
+    border: 1px solid var(--turn-border-color);
+    border-radius: 4px;
+    background-color: var(--turn-widget-header-color);
+    color: inherit;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  // над кнопкой: панель видео прижата к низу плеера, а он обрезает выпадающее вниз
+  &.vertical-mini-slider_up {
+    top: auto;
+    bottom: 80%;
+    padding-top: 10px;
+    padding-bottom: 5px;
+  }
 
   .slider-container {
     border: 1px solid var(--turn-border-color);

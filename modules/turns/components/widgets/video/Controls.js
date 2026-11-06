@@ -29,30 +29,31 @@ export const VolumeControl = ({ volume, setVolume, muted, setMuted }) => {
   );
 };
 
-export const SpeedControl = ({ speed, setSpeed }) => {
-  const [open, setOpen] = useState(false);
-  const speeds = [0.5, 1, 1.5, 2];
-
-  return (
-    <div className="speed-control">
-      <button className="icon-button" onClick={() => setOpen(!open)}>
-        {speed}x
-      </button>
-      {open && (
-        <div className="speed-menu">
-          {speeds.map((s) => (
-            <div
-              key={s}
-              onClick={() => {
-                setSpeed(s);
-                setOpen(false);
-              }}
-            >
-              {s}x
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+// Прежнее меню скорости видео оставлено: к нему, возможно, вернутся (стили .speed-menu на месте).
+// export const SpeedControl = ({ speed, setSpeed }) => {
+//   const [open, setOpen] = useState(false);
+//   const speeds = [0.5, 1, 1.5, 2];
+//
+//   return (
+//     <div className="speed-control">
+//       <button className="icon-button" onClick={() => setOpen(!open)}>
+//         {speed}x
+//       </button>
+//       {open && (
+//         <div className="speed-menu">
+//           {speeds.map((s) => (
+//             <div
+//               key={s}
+//               onClick={() => {
+//                 setSpeed(s);
+//                 setOpen(false);
+//               }}
+//             >
+//               {s}x
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };

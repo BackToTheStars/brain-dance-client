@@ -1,6 +1,7 @@
 // Что Save Field отправит из ходов: геометрия и прокрутка (позиция холста и панели — не в признаке).
-// Импортирует только размеры сетки: так он не замыкает цикл с game и presence.
+// Импортирует только размеры сетки и stacking.js без импортов: так он не замыкает цикл с game и presence.
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
+import { turnZ } from './stacking';
 
 const isOffGrid = (turn) =>
   turn.position.x % GRID_CELL_X !== 0 ||
@@ -18,7 +19,8 @@ export const isTurnUnsaved = (state, id) => {
     turn.position.x !== saved.x ||
     turn.position.y !== saved.y ||
     turn.size.width !== saved.width ||
-    turn.size.height !== saved.height
+    turn.size.height !== saved.height ||
+    turnZ(turn) !== turnZ(saved)
   ) {
     return true;
   }
@@ -65,7 +67,7 @@ export const selectUnsavedSignature = (state) => {
   const { g, d } = state.turns;
   const parts = selectUnsavedTurnIds(state).map((id) => {
     const { position, size } = g[id];
-    return `${id}:${position.x},${position.y},${size.width},${size.height},${d[id]?.splitHeight ?? ''}`;
+    return `${id}:${position.x},${position.y},${size.width},${size.height},${turnZ(g[id])},${d[id]?.splitHeight ?? ''}`;
   });
   for (const { turnId, widgetId, scrollPosition } of selectUnsavedScrollPositions(state)) {
     parts.push(`${turnId}_${widgetId}:${scrollPosition}`);

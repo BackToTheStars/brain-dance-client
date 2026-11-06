@@ -43,6 +43,7 @@ import { STATIC_MEDIA_URL } from '@/config/server';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
+import { backZ, frontZ, newTurnZ, turnZ } from './stacking';
 import { getBoundingAreaRect } from '@/modules/minimap/components/helpers/screen';
 import {
   isBorderCoincides,
@@ -101,7 +102,8 @@ export const loadTurnsData = (turnIds, { isCurrent = () => true } = {}) => (disp
 
 // `recalculateSize` в components/Turn.js зовёт updateGeometry при монтировании каждой
 // карточки — даже когда пересчитанные размеры совпали с тем, что уже в сторе.
-const isGeometryChanged = (current, { position, size }) => {
+const isGeometryChanged = (current, { position, size, z }) => {
+  if (z !== undefined && z !== turnZ(current)) return true;
   if (
     position &&
     (position.x !== current.position?.x || position.y !== current.position?.y)
@@ -124,6 +126,17 @@ export const updateGeometry = (data) => (dispatch, getState) => {
     type: types.TURN_UPDATE_GEOMETRY,
     payload: data,
   });
+};
+
+// Смена z — правка геометрии, как перетаскивание: её записывает Save Field.
+export const bringTurnToFront = (_id) => (dispatch, getState) => {
+  const z = frontZ(getState().turns.g, _id);
+  if (z !== null) dispatch(updateGeometry({ _id, z }));
+};
+
+export const sendTurnToBack = (_id) => (dispatch, getState) => {
+  const z = backZ(getState().turns.g, _id);
+  if (z !== null) dispatch(updateGeometry({ _id, z }));
 };
 
 export const updateSplitHeight =
@@ -304,8 +317,10 @@ export const recalcAreaRect = () => (dispatch, getState) => {
   });
 };
 
-export const createTurn = (turn, callbacks) => (dispatch) => {
-  createTurnRequest(turn).then((data) => {
+// Новый ход — форма и Paste Turn — ложится над всеми ходами игры.
+export const createTurn = (turn, callbacks) => (dispatch, getState) => {
+  const z = newTurnZ(getState().turns.g);
+  createTurnRequest({ ...turn, z }).then((data) => {
     dispatch({
       type: types.TURN_CREATE,
       payload: TurnHelper.toNewFields(data.item),
@@ -357,7 +372,9 @@ export const resaveTranslationTurn =
   (dispatch) => {
     const options = { errorCallback: (message) => callbacks?.error?.(message) };
     const rowsSaved = rowsOps
-      ? updateTurnRowsRequest(turn._id, rowsOps, options)
+      ? updateTurnRowsRequest(turn._id, rowsOps, options).then(() =>
+          callbacks?.rowsSaved?.(),
+        )
       : Promise.resolve();
     rowsSaved
       .then(() => updateTurnRequest(turn._id, turn, options))
@@ -639,6 +656,10 @@ export const resetTurnNextPastePosition = () => (dispatch, getState) => {
 // Ошибку обязательно доводим до вызывающего (FileUploading показывает её и снимает индикатор):
 // media отдаёт `{ message }` на 400/413, а request() при ошибке сервера промис не завершает —
 // поэтому здесь и errorCallback, и проверка ответа статики.
+// uploadError — ключ словаря у FileUploading; message — английский текст для остальных вызывающих.
+const uploadError = (key, message, status) =>
+  Object.assign(new Error(message), { uploadError: key, status });
+
 export const uploadMedia = (type, file, onProgress) => () => {
   return new Promise((resolve, reject) => {
     getTokenRequest('upload', {
@@ -675,14 +696,17 @@ export const uploadMedia = (type, file, onProgress) => () => {
           const ok = xhr.status >= 200 && xhr.status < 300;
           if (!ok || !result.src) {
             reject(
-              new Error(result.message || `Ошибка загрузки (${xhr.status})`),
+              result.message
+                ? new Error(result.message)
+                : uploadError('status', `Upload failed (${xhr.status})`, xhr.status),
             );
             return;
           }
           resolve(result);
         };
-        xhr.onerror = () => reject(new Error('Ошибка сети при загрузке файла'));
-        xhr.onabort = () => reject(new Error('Загрузка отменена'));
+        xhr.onerror = () =>
+          reject(uploadError('network', 'Network error while uploading the file'));
+        xhr.onabort = () => reject(uploadError('aborted', 'Upload cancelled'));
 
         xhr.send(formdata);
       })
