@@ -2,6 +2,7 @@ import { isTurnInsideRenderArea } from '../components/helpers/sizeHelper';
 import turnSettings, { TURN_READY } from '../settings';
 import * as types from './types';
 import { sortIdsByZ, turnZ } from './stacking';
+import { applyOpsToStoreTurn } from './turnOps';
 
 // `saved` / `savedScroll` — геометрия и прокрутка, какими они лежат на сервере. Не в `g`
 // и `d`: открытая форма хода перезаполняется при любой смене записи своего хода там.
@@ -273,6 +274,17 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         },
         saved: { ...state.saved, [payload._id]: toSaved(payload) },
         savedScroll: withoutTurnKeys(state.savedScroll, [payload._id]),
+      };
+    }
+
+    // Операции, которые сервер уже записал: меняются только затронутые ряды и поля.
+    case types.TURN_APPLY_OPS: {
+      const { turnId, ops, ...extra } = payload;
+      const turn = state.d[turnId];
+      if (!turn) return state;
+      return {
+        ...state,
+        d: { ...state.d, [turnId]: applyOpsToStoreTurn(turn, ops, extra) },
       };
     }
 

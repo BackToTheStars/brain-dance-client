@@ -424,6 +424,12 @@
         @include turn-scrollbar(var(--turn-scrollbar-color));
       }
 
+      .translation-loading {
+        padding: var(--turn-widget-inner-gap);
+        color: var(--turn-widget-notes-color);
+        font-size: var(--turn-widget-header-subtitle-font-size);
+      }
+
       .translation-languages,
       .translation-row {
         display: grid;

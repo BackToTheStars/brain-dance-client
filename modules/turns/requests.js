@@ -7,10 +7,14 @@ export const getTurnsGeometryRequest = (hash) => {
   });
 };
 
-export const getTurnsByIdsRequest = (ids) => {
-  return request(`turns/ids?hash=${s.hash}&ids=${ids.join(',')}`, {
-    tokenFlag: true,
-  });
+export const getTurnsByIdsRequest = (ids, options) => {
+  return request(
+    `turns/ids?hash=${s.hash}&ids=${ids.join(',')}`,
+    {
+      tokenFlag: true,
+    },
+    options,
+  );
 };
 
 export const createTurnRequest = (body) => {
@@ -33,14 +37,14 @@ export const updateTurnRequest = (id, body, options) => {
   );
 };
 
-// Ряды хода перевода операциями: { upsert, remove, order? }; ответ { success, rowsVersion } без рядов.
-export const updateTurnRowsRequest = (id, ops, options) => {
+// Операции над частью хода (ряды перевода, поля); ответ { success, version } без самого хода.
+export const turnOpsRequest = (id, ops, options) => {
   return request(
-    `turns/${id}/rows?hash=${s.hash}`,
+    `turns/${id}/ops?hash=${s.hash}`,
     {
-      method: 'PUT',
+      method: 'POST',
       tokenFlag: true,
-      body: ops,
+      body: { ops },
     },
     options,
   );

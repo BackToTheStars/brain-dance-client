@@ -168,7 +168,11 @@ export class TurnHelper {
       originalId: turn.originalId,
       date: turn.date,
       sourceUrl: turn.sourceUrl,
+      // как на сервере: показ заголовка в h_1 зависит ещё и от пустого текста
+      dontShowHeader: !!turn.dontShowHeader,
       updatedAt: turn.updatedAt,
+      // счётчик записей операциями; у хода без поля — 0. В тела запросов не идёт.
+      opsVersion: turn.opsVersion || 0,
 
       // COMPRESSED PARAGRAPH
       compressed: turn.compressed,
@@ -240,8 +244,9 @@ export class TurnHelper {
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       markdown: turn.dWidgets.md_1?.source,
-      // ряды и языки — только у перевода: у остальных ходов ключей нет, и в запрос они не идут
-      ...(turn.contentType === 'translation'
+      // ряды и языки — у перевода и у хода, чьи ряды пережили смену типа (форма вернёт их при
+      // обратной смене); у остальных ходов ключей нет
+      ...(turn.contentType === 'translation' || turn.dWidgets.tr_1?.rows?.length
         ? {
             rows: turn.dWidgets.tr_1?.rows || [],
             languages: turn.dWidgets.tr_1?.languages,

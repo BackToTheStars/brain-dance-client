@@ -2,12 +2,14 @@
 // две равные колонки (высота по большей ячейке), над рядами — языки колонок, если заданы.
 // Ячейка — md без id выделений: цвет есть, цитат и линий нет. Прокрутка с памятью и
 // регистрация ресайза — useQuotedBody с пустой подписью цитат, как у статьи без выделений.
+// Пока рендер md не загружен, в теле вместо сетки пустых рядов — строка загрузки.
 
 import { TID } from '@/config/testIds';
 import { TRANSLATION_MIN_WIDTH } from '@/config/turn';
 import { RULE_TURNS_CRUD } from '@/config/user';
 import { WIDGET_TRANSLATION } from '@/modules/turns/settings';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
+import { useTranslations } from 'next-intl';
 import { memo, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import MdEditButton from '../md/MdEditButton';
@@ -23,6 +25,7 @@ const TranslationTable = ({
   unregisterHandleResize,
   widgetsUpdatedTime,
 }) => {
+  const t = useTranslations('Game.translation');
   const { can } = useUserContext();
   const widget = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId],
@@ -62,7 +65,16 @@ const TranslationTable = ({
         data-test-id={TID.translation.body}
         data-turn-id={turnId}
       >
-        <TranslationGrid rows={rows} languages={languages} />
+        {ready ? (
+          <TranslationGrid rows={rows} languages={languages} />
+        ) : (
+          <div
+            className="translation-loading"
+            data-test-id={TID.translation.loading}
+          >
+            {t('loading')}
+          </div>
+        )}
       </div>
       {can(RULE_TURNS_CRUD) && (
         <MdEditButton turnId={turnId} widgetId={widgetId} />

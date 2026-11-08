@@ -12,12 +12,10 @@ import { snapRound } from '../helpers/grid';
 import { GRID_CELL_X } from '@/config/ui';
 import { ensureQuoteIds, toPlainText } from '../widgets/md/markdown';
 import {
-  diffRows,
   dropEmptyRows,
   hasRowsContent,
   normalizeLanguages,
-  normalizeRows,
-  rowsToPreviewText,
+  rowsToPreviewParagraph,
 } from '../widgets/translation/rows';
 
 const {
@@ -65,22 +63,14 @@ export const prepareFields = (form, template) => {
   return prepared;
 };
 
-// Форма сравнивается со снимком на каждом рендере, а массив рядов меняется только правкой ряда:
-// сотни рядов — сотни КБ строки, поэтому строка считается раз на массив.
-const rowsKeys = new WeakMap();
-const rowsKey = (rows) => {
-  if (!Array.isArray(rows)) return JSON.stringify(dropEmptyRows(rows));
-  if (!rowsKeys.has(rows)) rowsKeys.set(rows, JSON.stringify(dropEmptyRows(rows)));
-  return rowsKeys.get(rows);
-};
-
 // Со снимком сравнивается и превью видео: своя картинка или новый кадр — тоже правка.
 export const comparableFields = (form, template) => {
   const fields = prepareFields(form, template);
   const videoUrl = fields[FIELD_VIDEO];
-  // Ряды и языки перевода — объекты: сравниваются по значению в том виде, в каком уйдут в ход.
+  // Языки перевода сравниваются по значению; ряды здесь не сравниваются вовсе — их
+  // несохранённое считает черновик рядов (widgets/translation/draft.js), без прохода по тексту.
   if (template === TEMPLATE_TRANSLATION) {
-    fields[FIELD_ROWS] = rowsKey(form[FIELD_ROWS]);
+    fields[FIELD_ROWS] = null;
     fields[FIELD_LANGUAGES] = JSON.stringify(normalizeLanguages(form[FIELD_LANGUAGES]));
   }
   return {
@@ -145,16 +135,39 @@ const withoutQuoteId = (textItem) => {
   return Object.keys(rest).length ? { ...plain, attributes: rest } : plain;
 };
 
+// Поля формы, которые несёт запрос операций (имена те же, что в его контракте), и вид значения.
+const OPS_FIELDS = {
+  header: (value) => (value || '').trim(),
+  dontShowHeader: (value) => !!value,
+  date: (value) => value || null,
+  sourceUrl: (value) => value || null,
+};
+
+// fields.set с полями, изменёнными относительно снимка формы; без снимка — со всеми.
+const fieldsOps = (form, template, baseFields) => {
+  const now = comparableFields(form, template);
+  const differs = (key) => !baseFields || (now[key] || '') !== (baseFields[key] || '');
+  const fields = {};
+  for (const key of Object.keys(OPS_FIELDS)) {
+    if (differs(key)) fields[key] = OPS_FIELDS[key](now[key]);
+  }
+  // языки сервер пишет парой целиком
+  if (differs(FIELD_LANGUAGES)) fields.languages = normalizeLanguages(form[FIELD_LANGUAGES]);
+  return Object.keys(fields).length ? [{ op: 'fields.set', fields }] : [];
+};
+
 // Сборка сохранения формы хода. Ничего не читает и не пишет вовне: абзац редактора,
 // id узлов цитат и время приходят параметрами. { error } — сохранять нельзя.
-// baseRows — ряды хода перевода на момент открытия формы: правка шлёт серверу только разницу с ними.
+// rowsOps — операции несохранённых рядов перевода (их считает черновик рядов); baseFields — снимок
+// полей формы на момент открытия (comparableFields): в запрос операций идут только изменённые.
 export const buildTurnSave = ({
   textArr,
   quoteElementIds,
   form,
   template,
   turnToEdit,
-  baseRows,
+  rowsOps = [],
+  baseFields,
   dWidgets,
   lines,
   position,
@@ -227,14 +240,14 @@ export const buildTurnSave = ({
   const isMd = template === TEMPLATE_MD;
   const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
 
-  // Перевод: ряды формы без пустых, абзац — начало плоского текста левой колонки, цитат нет.
+  // Перевод: ряды формы без пустых, абзац — плоский текст первой непустой ячейки, цитат нет.
   const isTranslation = template === TEMPLATE_TRANSLATION;
   const rows = isTranslation ? dropEmptyRows(form[FIELD_ROWS]) : null;
 
   const paragraphOps = isMd
     ? [{ insert: `${toPlainText(md.source)}\n` }]
     : isTranslation
-      ? [{ insert: `${rowsToPreviewText(rows)}\n` }]
+      ? rowsToPreviewParagraph(rows)
       : collapseSplitQuotes(resTextArr);
 
   let formToPrepare = form;
@@ -369,7 +382,8 @@ export const buildTurnSave = ({
   }
 
   // Ряды в теле хода — только при создании перевода: правка шлёт их отдельным запросом
-  // операциями, а ход другого типа ключей rows / languages не несёт вовсе.
+  // операциями (тело PUT с rows сервер отвергает), а ход другого типа ключей rows / languages
+  // не несёт вовсе.
   if (!isTranslation) {
     delete turnObj[FIELD_ROWS];
     delete turnObj[FIELD_LANGUAGES];
@@ -403,10 +417,14 @@ export const buildTurnSave = ({
     previewDraft,
     editionToken,
   };
-  // Правка перевода: операции над рядами от открытия формы (null — ряды не менялись) и ряды
-  // целиком для стора — ответ сервера их не несёт.
+  // Правка перевода. Тип прежний — ряды и изменённые поля одним запросом операций, записи хода
+  // нет (put: false). Смена типа на перевод — операции рядов, за ними запись хода без рядов.
   if (isTranslation && turnToEdit) {
-    payload.translation = { rows, rowsOps: diffRows(normalizeRows(baseRows), rows) };
+    const retyped = turnToEdit.contentType !== template;
+    payload.translation = {
+      ops: retyped ? rowsOps : [...rowsOps, ...fieldsOps(form, template, baseFields)],
+      put: retyped,
+    };
   }
 
   const orphanSummary = orphaned.length

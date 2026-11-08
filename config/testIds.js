@@ -113,19 +113,25 @@ export const TID = {
     row: 'translation-row', // ряд (+ data-row-id = id ряда)
     cell: 'translation-cell', // ячейка ряда (+ data-side = left | right)
     languages: 'translation-languages', // строка языков над колонками; её ячейки — data-side без тест-id
+    loading: 'translation-loading', // строка в теле вместо рядов, пока не загружен рендер md
     // Редактор рядов в форме хода (widgets/translation/TranslationEditor.js), стоит на месте Quill;
     // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
     editor: {
       language: 'translation-editor-language', // поле языка колонки (+ data-side = left | right)
-      row: 'translation-editor-row', // ряд редактора (+ data-row-id)
-      cell: 'translation-editor-cell', // textarea ячейки (+ data-side); ряд — по data-row-id родителя
+      // ряд редактора (+ data-row-id, data-row-state = saved | dirty | new; data-busy="true", пока идёт его запрос)
+      row: 'translation-editor-row',
+      // textarea ячейки (+ data-side; data-dirty="true" у несохранённой); ряд — по data-row-id родителя
+      cell: 'translation-editor-cell',
+      saveRow: 'translation-editor-save-row', // 💾 в полосе действий (+ data-row-id): операции одного ряда одним запросом
       addRowAfter: 'translation-editor-add-row-after', // «+» в полосе действий ряда (+ data-row-id): новый ряд под ним
-      deleteRow: 'translation-editor-delete-row', // 🗑 в полосе действий (+ data-row-id); у ряда с текстом — окно
+      // 🗑 в полосе действий (+ data-row-id); у ряда с текстом — окно; data-last-row="true" и disabled —
+      // единственный сохранённый ряд с текстом (подсказка — title)
+      deleteRow: 'translation-editor-delete-row',
       addRow: 'translation-editor-add-row', // «+ Row» под списком
       preview: 'translation-editor-preview', // кнопка «Preview» — таблица той же сеткой, что карточка
       source: 'translation-editor-source', // та же кнопка в предпросмотре («Source») — назад к рядам
       previewPane: 'translation-editor-preview-pane', // отрисованный предпросмотр (внутри — translation.row / cell)
-      // Окно «в ряду есть текст»: тело (+ data-row-id) и кнопки
+      // Окно «в ряду есть текст»: тело (+ data-row-id; data-saved="true" — ряд удалится на сервере сразу) и кнопки
       deleteConfirm: 'translation-editor-delete-confirm',
       deleteOk: 'translation-editor-delete-ok',
       deleteCancel: 'translation-editor-delete-cancel',

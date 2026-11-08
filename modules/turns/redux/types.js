@@ -8,6 +8,7 @@ export const TURNS_LOAD_TO_PASTE = 'TURNS_LOAD_TO_PASTE';
 
 export const TURN_CREATE = 'TURN_CREATE';
 export const TURN_RESAVE = 'TURN_RESAVE';
+export const TURN_APPLY_OPS = 'TURN_APPLY_OPS';
 export const TURN_DELETE = 'TURN_DELETE';
 
 export const TURN_UPDATE_WIDGET = 'TURN_UPDATE_WIDGET';

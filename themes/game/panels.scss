@@ -198,12 +198,38 @@
       resize: none;
       font-family: monospace;
       font-size: var(--editor-font-size, 22px);
+
+      // несохранённая ячейка
+      &[data-dirty='true'] {
+        border-color: var(--fragment-editable-color);
+        background-color: color-mix(in srgb, var(--fragment-editable-color) 10%, transparent);
+      }
+    }
+
+    // новый ряд, которого ещё нет в ходе, — полоса слева
+    &__row[data-row-state='new'] {
+      box-shadow: -4px 0 0 var(--fragment-editable-color);
     }
 
     &__actions {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
       padding-top: 2px;
+
+      .md-editor__tool:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+
+    // «сохранить ряд» — во всю ширину полосы, над «+» и удалением
+    &__save {
+      flex: 0 0 100%;
+
+      &:not(:disabled) {
+        border-color: var(--fragment-editable-color);
+      }
     }
 
     &__add {

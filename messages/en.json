@@ -200,9 +200,13 @@
         "Cancel": "Cancel"
       },
       "translation": {
+        "saveRow": "Save the row",
+        "saveRowOff": "Rows are saved one by one once the turn itself is saved as a translation",
+        "lastRow": "This is the only saved row with text, and a turn cannot be left without one. Save another row with text first.",
         "deleteRow": {
           "Title": "Delete the row",
           "Text": "The row has text in it. Delete it anyway?",
+          "TextSaved": "The row is saved in the turn. It will be deleted right away, and Cancel of the form will not bring it back. Delete it?",
           "Ok": "Delete",
           "Cancel": "Cancel"
         }
@@ -212,6 +216,9 @@
       "loadFailed": "Failed to load the PDF: {message}",
       "corsHint": "The file is unavailable or its host sends no CORS headers — the browser cannot read such a document by an external link.",
       "loading": "Loading PDF…"
+    },
+    "translation": {
+      "loading": "Loading the translation…"
     },
     "upload": {
       "failed": "Upload failed",

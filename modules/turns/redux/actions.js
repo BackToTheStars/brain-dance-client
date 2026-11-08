@@ -8,7 +8,6 @@ import {
   getTurnsByIdsRequest,
   getTurnsGeometryRequest,
   updateTurnRequest,
-  updateTurnRowsRequest,
 } from '../requests';
 import {
   dataCopy,
@@ -43,6 +42,7 @@ import { STATIC_MEDIA_URL } from '@/config/server';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
+import { rowsToPreviewParagraph } from '../components/widgets/translation/rows';
 import { backZ, frontZ, newTurnZ, turnZ } from './stacking';
 import { getBoundingAreaRect } from '@/modules/minimap/components/helpers/screen';
 import {
@@ -349,10 +349,16 @@ export const deleteTurn = (_id, { onDeleted } = {}) => (dispatch, getState) => {
   });
 };
 
-export const resaveTurn = (turn, callbacks) => (dispatch) => {
-  updateTurnRequest(turn._id, turn).then((data) => {
+// Ответ PUT хода рядов не несёт — в сторе остаются прежние. options — как у request(): с
+// errorCallback отказ сервера и обрыв сети идут в него, без alert.
+export const resaveTurn = (turn, callbacks, options) => (dispatch, getState) => {
+  const saved = updateTurnRequest(turn._id, turn, options).then((data) => {
+    const stored = getState().turns.d[turn._id];
     const preparedTurn = {
       ...data.item,
+      rows: Array.isArray(data.item.rows)
+        ? data.item.rows
+        : stored?.dWidgets?.tr_1?.rows || [],
       x: turn.x,
       y: turn.y,
     };
@@ -362,37 +368,10 @@ export const resaveTurn = (turn, callbacks) => (dispatch) => {
     });
     callbacks?.success();
   });
+  if (options?.errorCallback) {
+    saved.catch((err) => options.errorCallback(String(err)));
+  }
 };
-
-// Правка хода перевода: сначала ряды операциями (если менялись), потом остальные поля прежним
-// PUT без rows. Ответ рядов их не несёт — в стор идут ряды из ответа полей, если сервер их отдал,
-// иначе ряды формы. Отказ любого запроса — callbacks.error, без alert.
-export const resaveTranslationTurn =
-  ({ turn, rows, rowsOps }, callbacks) =>
-  (dispatch) => {
-    const options = { errorCallback: (message) => callbacks?.error?.(message) };
-    const rowsSaved = rowsOps
-      ? updateTurnRowsRequest(turn._id, rowsOps, options).then(() =>
-          callbacks?.rowsSaved?.(),
-        )
-      : Promise.resolve();
-    rowsSaved
-      .then(() => updateTurnRequest(turn._id, turn, options))
-      .then((data) => {
-        const preparedTurn = {
-          ...data.item,
-          rows: Array.isArray(data.item.rows) ? data.item.rows : rows,
-          x: turn.x,
-          y: turn.y,
-        };
-        dispatch({
-          type: types.TURN_RESAVE,
-          payload: TurnHelper.toNewFields(preparedTurn),
-        });
-        callbacks?.success();
-      })
-      .catch((err) => callbacks?.error?.(String(err)));
-  };
 
 // Окно настройки обрезки полей pdf: черновик засевается тем, что уже в ходе.
 export const editPdfCrop = () => (dispatch, getState) => {
@@ -563,8 +542,13 @@ export const insertTurnFromBuffer =
     dispatch(loadTurnsAndLinesToPaste());
     dispatch(exitPasteModeIfBufferEmpty());
     // // @todo: get lines, connected with copied turn and display them
+    const body = TurnHelper.toOldFields(copiedTurn);
+    // абзац перевода производный: считается от рядов копии тем же правилом, что в форме
+    if (body.contentType === 'translation') {
+      body.paragraph = rowsToPreviewParagraph(body.rows);
+    }
     dispatch(
-      createTurn(TurnHelper.toOldFields(copiedTurn), {
+      createTurn(body, {
         success: (turn) => {
           dispatch({
             type: types.TURN_NEXT_PASTE_POSITION,

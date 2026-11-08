@@ -293,8 +293,12 @@ export const useQuotedBody = ({
   }, []);
 
   // содержимое доехало позже позиции (ленивый рендер ячеек): коробка тела не
-  // меняется, наблюдатель молчит — довосстановить зажатую цель здесь
+  // меняется, наблюдатель молчит — довосстановить зажатую цель здесь. Один раз:
+  // дальнейшая правка содержимого прокрутку не двигает
+  const contentArrivedRef = useRef(false);
   useEffect(() => {
+    if (!contentKey || contentArrivedRef.current) return;
+    contentArrivedRef.current = true;
     if (pendingScrollRef.current != null) applyScroll(pendingScrollRef.current);
   }, [contentKey]);
 };

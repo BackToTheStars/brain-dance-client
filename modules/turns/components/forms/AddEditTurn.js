@@ -29,12 +29,9 @@ import {
   EDITOR_FONT_SIZE_STEP,
   PANEL_ADD_EDIT_TURN,
 } from '@/config/panel';
-import {
-  createTurn,
-  resaveTranslationTurn,
-  resaveTurn,
-  uploadMedia,
-} from '../../redux/actions';
+import { createTurn, resaveTurn, uploadMedia } from '../../redux/actions';
+import { saveTurnOps } from '../../redux/turnOpsSave';
+import { baseSaved, formDraftOps, formHasDraft } from '../widgets/translation/draft';
 import { dataUrlToFile, frameFileName } from '../helpers/videoFrame';
 import {
   buildTurnSave,
@@ -130,9 +127,6 @@ const AddEditTurnPopup = () => {
   // Снимок открытого на правку хода { token, template, fields, paragraph }; null —
   // форма ещё устаивается или ход новый.
   const [baseline, setBaseline] = useState(null);
-  // Ряды перевода, записанные сохранением, чей PUT хода не прошёл: { token, rows } — база следующего
-  // diff; от рядов открытия повтор после новых правок оставил бы на сервере снятые ряды и прежние ячейки.
-  const [savedRows, setSavedRows] = useState(null);
   const formRef = useRef(form);
   formRef.current = form;
 
@@ -143,7 +137,6 @@ const AddEditTurnPopup = () => {
   const edition = editionRef.current;
   edition.open(editTurnId);
   useEffect(() => () => edition.close(), []);
-  const rowsSaved = !!savedRows && edition.isCurrent(savedRows.token);
 
   const dispatch = useDispatch();
 
@@ -322,9 +315,6 @@ const AddEditTurnPopup = () => {
         dispatch(togglePanel({ type: PANEL_ADD_EDIT_TURN, open: false }));
         dispatch(toggleMaximizeQuill(false));
       },
-      rowsSaved: () => {
-        if (edition.isCurrent(token)) setSavedRows({ token, rows: translation.rows });
-      },
       // Отказ сервера на правке перевода — в форму, она остаётся открытой.
       error: (message) => {
         if (edition.isCurrent(token)) setError({ message });
@@ -335,9 +325,16 @@ const AddEditTurnPopup = () => {
     if (isNew) {
       dispatch(createTurn(turnObj, saveCallbacks));
     } else if (translation) {
-      dispatch(
-        resaveTranslationTurn({ turn: turnObj, ...translation }, saveCallbacks),
-      );
+      // Ряды и поля перевода — одним запросом операций; запись хода за ним — только при смене типа.
+      const { ops, put } = translation;
+      const sent = ops.length
+        ? await dispatch(saveTurnOps({ turnId: turnObj._id, ops, cast: false }))
+        : {};
+      if (sent.error) return saveCallbacks.error(sent.error);
+      if (ops.length && edition.isCurrent(token)) patchForm(baseSaved(ops));
+      if (!put) return saveCallbacks.success();
+      const options = { errorCallback: saveCallbacks.error };
+      dispatch(resaveTurn(turnObj, saveCallbacks, options));
     } else {
       dispatch(resaveTurn(turnObj, saveCallbacks));
     }
@@ -379,8 +376,8 @@ const AddEditTurnPopup = () => {
       template: activeTemplate,
       // Позиция и цитаты других виджетов — какими они в сторе сейчас.
       turnToEdit: storedTurn(),
-      // Ряды перевода — на момент открытия: чужие правки, пришедшие в стор позже, не затираются.
-      baseRows: rowsSaved ? savedRows.rows : turnToEdit?.rows,
+      rowsOps: formDraftOps(form),
+      baseFields: baseline?.fields,
       dWidgets: turnData?.dWidgets,
       lines,
       position: gamePosition,
@@ -439,7 +436,7 @@ const AddEditTurnPopup = () => {
     edition.isCurrent(baseline.token) &&
     (activeTemplate !== baseline.template ||
       paragraphChanged ||
-      rowsSaved ||
+      formHasDraft(form, activeTemplate) ||
       !sameFields(comparableFields(form, activeTemplate), baseline.fields));
   let saveState = 'ready';
   if (edition.isCurrent(savingPreview)) saveState = 'preview';
@@ -704,6 +701,8 @@ const AddEditTurnPopup = () => {
                 form,
                 patchForm,
                 edition,
+                setError,
+                saveTurnOps,
                 changeHandler: (value) => formChangeHandler(editorSlotField, value),
                 label: fieldSettings[editorSlotField].labelKey
                   ? t(fieldSettings[editorSlotField].labelKey)
