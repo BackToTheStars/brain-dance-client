@@ -73,6 +73,18 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
 
     case types.LINES_QUOTE_COORDS_UPDATE: {
       const { turnId, quotesWithCoords, widgetId } = payload;
+      // по ключу — последняя запись с ним; в словарь переписываются только изменившиеся
+      // объекты (прежние приходят теми же — см. quoteCoordsUpdate)
+      const last = {};
+      for (const quote of quotesWithCoords) last[quote.quoteKey] = quote;
+      let quotesInfoByQuoteKey = state.quotesInfoByQuoteKey;
+      for (const key of Object.keys(last)) {
+        if (quotesInfoByQuoteKey[key] === last[key]) continue;
+        if (quotesInfoByQuoteKey === state.quotesInfoByQuoteKey) {
+          quotesInfoByQuoteKey = { ...state.quotesInfoByQuoteKey };
+        }
+        quotesInfoByQuoteKey[key] = last[key];
+      }
       return {
         ...state,
         quotesInfo: {
@@ -82,13 +94,7 @@ export const linesReducer = (state = initialLinesState, { type, payload }) => {
             [widgetId]: quotesWithCoords,
           },
         },
-        quotesInfoByQuoteKey: {
-          ...state.quotesInfoByQuoteKey,
-          ...quotesWithCoords.reduce((acc, quote) => {
-            acc[quote.quoteKey] = quote;
-            return acc;
-          }, {}),
-        },
+        quotesInfoByQuoteKey,
       };
     }
 

@@ -1,7 +1,5 @@
-// Прокручиваемое тело с текстовыми цитатами — общее у абзаца и md-статьи: замер рамок
-// [data-id] и концов линий, перемер при ресайзе, разделителе и смене содержимого,
-// прокрутка с записью позиции и её восстановлением, регистрация ресайза виджета.
-// Код перенесён из ParagraphOriginal без изменения поведения.
+// Прокручиваемое тело с текстовыми цитатами — общее у абзаца, md-статьи и перевода: замер рамок
+// [data-id] и концов линий, перемер при ресайзе и смене содержимого, запись и восстановление прокрутки.
 
 import {
   PARAGRAPH_SCROLL_TIMEOUT_DELAY,
@@ -26,7 +24,9 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 // меняющаяся вместе с содержимым; scrollPosition — записанная позиция из виджета;
 // ready — содержимое разложено в DOM: до этого виджет для ресайза не регистрируется
 // (пустое тело давало бы scrollHeight 0, и карточка зажималась бы к минимуму);
-// minWidth — минимальная ширина карточки от этого виджета.
+// minWidth — минимальная ширина карточки от этого виджета; ownScrollRef — ref с последним
+// scrollTop, выставленным самим содержимым (сдвиг заглушек ленивой сетки): такая прокрутка не
+// пользовательская — не отменяет восстановление и не пишется в позицию.
 export const useQuotedBody = ({
   turnId,
   widgetId,
@@ -40,6 +40,7 @@ export const useQuotedBody = ({
   unregisterHandleResize,
   ready = true,
   minWidth = TURN_SIZE_MIN_WIDTH,
+  ownScrollRef = null,
 }) => {
   const quotesDataRef = useRef(null);
   const size = useSelector((state) => state.turns.g[turnId].size);
@@ -210,8 +211,14 @@ export const useQuotedBody = ({
 
     const scrollHandler = () => {
       if (!!bodyRef.current) {
+        const current = Math.round(bodyRef.current.scrollTop);
+        if (ownScrollRef && current === ownScrollRef.current) {
+          ownScrollRef.current = null;
+          setScrollTop(bodyRef.current.scrollTop);
+          return;
+        }
         // прокрутил пользователь, а не мы — отменяем отложенное восстановление
-        if (Math.round(bodyRef.current.scrollTop) !== lastAppliedRef.current) {
+        if (current !== lastAppliedRef.current) {
           pendingScrollRef.current = null;
         }
         setScrollTop(bodyRef.current.scrollTop);

@@ -31,13 +31,16 @@ export const filterLinesByTurnId = (lines, turnId) =>
     (line) => line.sourceTurnId === turnId || line.targetTurnId === turnId
   );
 
+// Ключи концов линий собираются один раз: цитат у хода бывает тысяча, линий — десятки.
 export const getActiveQuotesDictionary = (quotes, lines) => {
+  const linked = new Set();
+  for (const line of lines) {
+    linked.add(`${line.sourceTurnId}_${line.sourceMarker}`);
+    linked.add(`${line.targetTurnId}_${line.targetMarker}`);
+  }
   const d = {};
-  for (let quote of quotes) {
-    d[quote._id] = false;
-    if (findLineByQuoteKey(lines, `${quote.turnId}_${quote.quoteId}`)) {
-      d[quote.quoteId] = true;
-    }
+  for (const quote of quotes) {
+    if (linked.has(`${quote.turnId}_${quote.quoteId}`)) d[quote.quoteId] = true;
   }
   return d;
 };

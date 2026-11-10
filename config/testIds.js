@@ -107,24 +107,30 @@ export const TID = {
   },
 
   // Ход «Перевод текста» (contentType=translation): таблица рядов в карточке
-  // (widgets/translation/TranslationTable.js); выделения в ячейках — mark[data-color] без data-id
+  // (widgets/translation/TranslationTable.js); выделения в ячейках — mark[data-color] без data-id.
+  // Ряды вне окна прокрутки (с запасом в экран сверху и снизу) — пустые заглушки с тем же тест-id
+  // и data-row-id плюс data-placeholder="true", без ячеек; то же в предпросмотре формы
   translation: {
     body: 'translation-body', // прокручиваемое тело таблицы (+ data-turn-id)
-    row: 'translation-row', // ряд (+ data-row-id = id ряда)
-    cell: 'translation-cell', // ячейка ряда (+ data-side = left | right)
+    row: 'translation-row', // ряд (+ data-row-id = id ряда; data-placeholder="true" у заглушки вне окна)
+    cell: 'translation-cell', // ячейка ряда (+ data-side = left | right); только у отрисованных рядов
     languages: 'translation-languages', // строка языков над колонками; её ячейки — data-side без тест-id
     loading: 'translation-loading', // строка в теле вместо рядов, пока не загружен рендер md
     // Редактор рядов в форме хода (widgets/translation/TranslationEditor.js), стоит на месте Quill;
     // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
     editor: {
       language: 'translation-editor-language', // поле языка колонки (+ data-side = left | right)
-      // ряд редактора (+ data-row-id, data-row-state = saved | dirty | new; data-busy="true", пока идёт его запрос)
+      // ряд редактора (+ data-row-id, data-row-state = saved | dirty | new; data-busy="true", пока идёт его запрос).
+      // Ряд вне окна прокрутки тела (с запасом в экран; ряд с фокусом, новый и ряд с запросом в пути рисуются всегда) —
+      // пустая заглушка с тем же тест-id, data-row-id и data-row-state плюс data-placeholder="true", без ячеек и кнопок
       row: 'translation-editor-row',
-      // textarea ячейки (+ data-side; data-dirty="true" у несохранённой); ряд — по data-row-id родителя
+      // textarea ячейки (+ data-side; data-dirty="true" у несохранённой); ряд — по data-row-id родителя; только у отрисованных рядов
       cell: 'translation-editor-cell',
-      saveRow: 'translation-editor-save-row', // 💾 в полосе действий (+ data-row-id): операции одного ряда одним запросом
-      addRowAfter: 'translation-editor-add-row-after', // «+» в полосе действий ряда (+ data-row-id): новый ряд под ним
-      // 🗑 в полосе действий (+ data-row-id); у ряда с текстом — окно; data-last-row="true" и disabled —
+      // кнопка сохранения ряда в полосе действий (+ data-row-id; иконка SaveOutlined, LoadingOutlined в пути): операции
+      // одного ряда одним запросом
+      saveRow: 'translation-editor-save-row',
+      addRowAfter: 'translation-editor-add-row-after', // «+» (PlusOutlined) в полосе действий ряда (+ data-row-id): новый ряд под ним
+      // удаление (DeleteOutlined) в полосе действий (+ data-row-id); у ряда с текстом — окно; data-last-row="true" и disabled —
       // единственный сохранённый ряд с текстом (подсказка — title)
       deleteRow: 'translation-editor-delete-row',
       addRow: 'translation-editor-add-row', // «+ Row» под списком

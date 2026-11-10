@@ -73,13 +73,17 @@ const ParagraphQuotes = memo(({ turnId, widgetId }) => {
     return getActiveQuotesDictionary(paragraphQuotes, lines);
   }, [paragraphQuotes, lines]);
 
+  // ключ — ключ цитаты: при вставке или снятии цитаты соседние рамки не перерисовываются;
+  // у цитаты абзаца в несколько строк записей несколько — повторы получают номер
+  const seen = {};
   return (
     <>
-      {paragraphQuotes.map((quote, i) => {
+      {paragraphQuotes.map((quote) => {
+        const n = (seen[quote.quoteKey] = (seen[quote.quoteKey] || 0) + 1);
         return (
           <Quote
             can={can}
-            key={i}
+            key={n > 1 ? `${quote.quoteKey}_${n}` : quote.quoteKey}
             isActive={
               !!activeQuotesDictionary[quote.quoteId] ||
               quote.quoteKey === activeQuoteKey

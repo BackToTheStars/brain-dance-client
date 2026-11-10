@@ -12,6 +12,7 @@ import { snapRound } from '../helpers/grid';
 import { GRID_CELL_X } from '@/config/ui';
 import { ensureQuoteIds, toPlainText } from '../widgets/md/markdown';
 import {
+  PREVIEW_TEXT_LIMIT,
   dropEmptyRows,
   hasRowsContent,
   normalizeLanguages,
@@ -236,7 +237,8 @@ export const buildTurnSave = ({
   const prevQuotes = turnToEdit?.quotes || [];
 
   // Статья md: выделения исходника получают id и становятся текстовыми цитатами хода,
-  // абзац — производный плоский текст; редактор Quill не читается.
+  // абзац — начало плоского текста с тем же пределом, что у превью перевода (цитаты статьи
+  // живут в выделениях исходника, абзац читают только превью); редактор Quill не читается.
   const isMd = template === TEMPLATE_MD;
   const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
 
@@ -245,7 +247,7 @@ export const buildTurnSave = ({
   const rows = isTranslation ? dropEmptyRows(form[FIELD_ROWS]) : null;
 
   const paragraphOps = isMd
-    ? [{ insert: `${toPlainText(md.source)}\n` }]
+    ? [{ insert: `${toPlainText(md.source).slice(0, PREVIEW_TEXT_LIMIT)}\n` }]
     : isTranslation
       ? rowsToPreviewParagraph(rows)
       : collapseSplitQuotes(resTextArr);

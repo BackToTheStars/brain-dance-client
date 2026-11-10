@@ -135,6 +135,7 @@
       resize: none;
       border: 0;
       border-radius: 0;
+      margin-right: var(--editor-scrollbar-gutter);
       font-family: monospace;
       font-size: var(--editor-font-size, 22px);
       @include turn-scrollbar(var(--editor-scrollbar-thumb-color));
@@ -153,10 +154,13 @@
       color: #888;
     }
 
+    // полосы прокрутки предпросмотра, исходника и рядов перевода отодвинуты от края панели
+    // той же переменной, что у .ql-editor
     &__preview {
       flex: 1;
       overflow-y: auto;
       padding: 12px 15px;
+      margin-right: var(--editor-scrollbar-gutter);
       font-size: var(--editor-font-size, 22px);
       line-height: 1.4;
       @include turn-scrollbar(var(--editor-scrollbar-thumb-color));
@@ -164,16 +168,20 @@
   }
 
   // Редактор перевода на месте Quill: языки над колонками, ряд — две textarea и полоса
-  // действий; высота textarea — по содержимому (antd autoSize)
+  // действий; высота textarea — по содержимому, инлайном от замера редактора (не autoSize antd:
+  // он мерил каждую ячейку отдельно). Ряды вне окна прокрутки подряд — один пустой разделитель
+  // с инлайн-высотой (сумма высот рядов): промежутки между рядами — отступы самого ряда, а не gap
+  // тела, чтобы высота ряда в документе равнялась его offsetHeight
   .translation-editor {
     &__body {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+      overflow-anchor: none;
       padding: 8px;
+      margin-right: var(--editor-scrollbar-gutter);
       display: flex;
       flex-direction: column;
-      gap: 8px;
       @include turn-scrollbar(var(--editor-scrollbar-thumb-color));
     }
 
@@ -185,8 +193,12 @@
       align-items: start;
     }
 
+    &__row {
+      padding: 8px 0;
+      flex-shrink: 0; // пустой разделитель с инлайн-высотой иначе сжимается flex-колонкой до отступов
+    }
+
     &__row + .translation-editor__row {
-      padding-top: 8px;
       border-top: 1px solid #ddd;
     }
 
@@ -196,6 +208,7 @@
 
     &__cell {
       resize: none;
+      overflow-y: hidden; // высота ячейки равна тексту; доли пикселя от округления не дают полосы
       font-family: monospace;
       font-size: var(--editor-font-size, 22px);
 
@@ -242,6 +255,9 @@
 
   // Предпросмотр перевода — та же сетка, что у карточки (turn.scss, .stb-widget-translation)
   .translation-preview {
+    // ряды вне окна — разделители оценённой высоты: якорь прокрутки тянул бы позицию за их сменой
+    overflow-anchor: none;
+
     .translation-languages,
     .translation-row {
       display: grid;
