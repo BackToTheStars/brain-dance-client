@@ -1,7 +1,8 @@
 // Карточка хода «Перевод текста»: ряды { id, left, right } в одном прокручиваемом теле, ряд —
 // две равные колонки (высота по большей ячейке), над рядами — языки колонок, если заданы.
-// Ячейка — md без id выделений: цвет есть, цитат и линий нет. Прокрутка с памятью и
-// регистрация ресайза — useQuotedBody с пустой подписью цитат, как у статьи без выделений.
+// Ячейка — md; выделение с id — текстовая цитата хода, в любой колонке. Список цитат выводится
+// из рядов (quotes.js) и нигде не хранится. Рамки, концы линий, прокрутка с памятью и регистрация
+// ресайза — useQuotedBody, как у статьи. Цитата с линией в ряду вне окна — полоска у края тела.
 // Пока рендер md не загружен, в теле вместо сетки пустых рядов — строка загрузки. Ряды вне окна
 // прокрутки сетка рисует разделителями суммарной высоты (TranslationGrid), поэтому высота тела до
 // их отрисовки — оценка: для регистрации ресайза этого достаточно.
@@ -17,7 +18,9 @@ import { useSelector } from 'react-redux';
 import MdEditButton from '../md/MdEditButton';
 import { useMdMarkVars } from '../md/MdHtml';
 import { useMdRenderer } from '../md/mdRenderer';
+import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { useQuotedBody } from '../useQuotedBody';
+import { edgeQuotes, rowsQuoteIndex } from './quotes';
 import TranslationGrid from './TranslationGrid';
 
 const TranslationTable = ({
@@ -53,13 +56,31 @@ const TranslationTable = ({
   const version = useMemo(() => (changes.current += 1), [rows, languages]);
   const contentKey = ready ? `v${version}` : '';
 
+  // Ряды в DOM знает сетка; цитаты остальных рядов идут записями «у края» — только те, к
+  // которым подходят линии: их число не зависит от числа цитат хода.
+  const quotesCount = useMemo(() => rowsQuoteIndex(rows).count, [rows]);
+  const turnLines = useSelector(
+    (state) => state.lines.dByTurnIdAndMarker[turnId],
+  );
+  const visibleRows = useRef(null);
+  const [layoutKey, setLayoutKey] = useState(0);
+  const onLayout = useCallback((visible) => {
+    visibleRows.current = visible;
+    setLayoutKey((n) => n + 1);
+  }, []);
+  const edge = useMemo(
+    () =>
+      edgeQuotes(rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
+    [rows, turnLines, layoutKey],
+  );
+
   useQuotedBody({
     turnId,
     widgetId,
     resizeType: WIDGET_TRANSLATION,
     bodyRef: bodyEl,
     widgetsUpdatedTime,
-    quotesSignature: '',
+    quotesSignature: quotesCount ? String(quotesCount) : '',
     contentKey,
     scrollPosition: widget.scrollPosition,
     registerHandleResize,
@@ -68,36 +89,43 @@ const TranslationTable = ({
     ready,
     minWidth: TRANSLATION_MIN_WIDTH,
     ownScrollRef: ownScroll,
+    edgeQuotes: edge,
+    layoutKey,
   });
 
   return (
-    <div className="turn-widget stb-widget-translation" style={markVars}>
-      <div
-        className="translation-body"
-        ref={bindBody}
-        data-test-id={TID.translation.body}
-        data-turn-id={turnId}
-      >
-        {ready && bodyMounted ? (
-          <TranslationGrid
-            rows={rows}
-            languages={languages}
-            scrollRef={bodyEl}
-            ownScrollRef={ownScroll}
-          />
-        ) : (
-          <div
-            className="translation-loading"
-            data-test-id={TID.translation.loading}
-          >
-            {t('loading')}
-          </div>
+    <>
+      <div className="turn-widget stb-widget-translation" style={markVars}>
+        <div
+          className="translation-body"
+          ref={bindBody}
+          data-test-id={TID.translation.body}
+          data-turn-id={turnId}
+        >
+          {ready && bodyMounted ? (
+            <TranslationGrid
+              rows={rows}
+              languages={languages}
+              scrollRef={bodyEl}
+              ownScrollRef={ownScroll}
+              markIds
+              onLayout={onLayout}
+            />
+          ) : (
+            <div
+              className="translation-loading"
+              data-test-id={TID.translation.loading}
+            >
+              {t('loading')}
+            </div>
+          )}
+        </div>
+        {can(RULE_TURNS_CRUD) && (
+          <MdEditButton turnId={turnId} widgetId={widgetId} />
         )}
       </div>
-      {can(RULE_TURNS_CRUD) && (
-        <MdEditButton turnId={turnId} widgetId={widgetId} />
-      )}
-    </div>
+      <ParagraphQuotes turnId={turnId} widgetId={widgetId} />
+    </>
   );
 };
 

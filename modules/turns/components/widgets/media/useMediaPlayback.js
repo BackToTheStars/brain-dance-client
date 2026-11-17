@@ -108,9 +108,8 @@ export const useMediaPlayback = (widgetId, turnId) => {
   );
 
   // Новый источник (правка хода меняет url без перемонтирования плеера) — своя заявленная длительность.
-  const onLoadStart = useCallback(() => {
-    declared.current.reset();
-    setDuration(0);
+  const onLoadStart = useCallback((e) => {
+    if (declared.current.source(e.currentTarget.src)) setDuration(0);
   }, []);
 
   // Обратная синхронизация: воспроизведение может стартовать/останавливаться

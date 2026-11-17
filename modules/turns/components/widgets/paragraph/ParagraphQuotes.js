@@ -33,7 +33,9 @@ const Quote = memo(({ isActive, quote, can }) => {
           `.turn_${quote.turnId} [data-id='${quote.quoteId}']`,
         );
         if (quouteInsideParagraphEl) {
-          const pEl = quouteInsideParagraphEl.closest('.paragraphText, .md-body');
+          const pEl = quouteInsideParagraphEl.closest(
+            '.paragraphText, .md-body, .translation-body',
+          );
           pEl.scrollTo({
             top: pEl.scrollTop + e.deltaY,
             behavior: 'smooth',

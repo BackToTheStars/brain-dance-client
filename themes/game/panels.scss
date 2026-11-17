@@ -167,16 +167,36 @@
     }
   }
 
-  // Редактор перевода на месте Quill: языки над колонками, ряд — две textarea и полоса
-  // действий; высота textarea — по содержимому, инлайном от замера редактора (не autoSize antd:
+  // Редактор перевода на месте Quill: в верхней полосе — кнопки обёртки и языки над колонками
+  // (вне прокрутки), ряд — две textarea и полоса действий; высота textarea — по содержимому, инлайном от замера редактора (не autoSize antd:
   // он мерил каждую ячейку отдельно). Ряды вне окна прокрутки подряд — один пустой разделитель
   // с инлайн-высотой (сумма высот рядов): промежутки между рядами — отступы самого ряда, а не gap
   // тела, чтобы высота ряда в документе равнялась его offsetHeight
   .translation-editor {
+    &__bar {
+      flex-wrap: wrap;
+    }
+
+    &__tools {
+      display: flex;
+      gap: 4px;
+
+      .md-editor__tool:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+
+    // вторая строка полосы; справа — желоб и полоса прокрутки тела, чтобы поля стояли над колонками
+    &__languages {
+      flex: 0 0 100%;
+      padding: 0 calc(4px + var(--editor-scrollbar-gutter) + var(--turn-widget-paragraph-scrollbar-size)) 0 4px;
+    }
+
     &__body {
       flex: 1;
       min-height: 0;
-      overflow-y: auto;
+      overflow-y: scroll;
       overflow-anchor: none;
       padding: 8px;
       margin-right: var(--editor-scrollbar-gutter);
@@ -270,10 +290,12 @@
 
     .translation-cell {
       min-width: 0;
-      padding: 0.3em 0.5em;
+      padding: 0.3em 0.5em 0.3em 0;
       overflow-wrap: break-word;
 
       & + .translation-cell {
+        padding-right: 0;
+        padding-left: 0.5em;
         border-left: 1px solid #ccc;
       }
     }

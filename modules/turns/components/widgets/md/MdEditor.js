@@ -5,34 +5,11 @@ import { TID } from '@/config/testIds';
 import { Input } from 'antd';
 import { useRef, useState } from 'react';
 import { markColorVars } from './markColors';
-import { MD_COLOR_EMOJI } from './markdown';
 import { useMdHtml } from './mdRenderer';
+import { WRAPS, wrapSelection } from './wrapTools';
 
 const PLACEHOLDER =
   'Markdown: **bold**, *italic*, [link](https://…), # heading, - list, ==🟢 highlight== (🟡 🟢 🟣 🔵 ⚪ 🟠 🔴)';
-
-const COLOR_NAMES = {
-  y: 'yellow',
-  g: 'green',
-  p: 'pink',
-  b: 'blue',
-  s: 'gray',
-  o: 'orange',
-  r: 'red',
-};
-
-const WRAPS = [
-  { name: 'bold', title: 'Bold', label: 'B', before: '**', after: '**' },
-  { name: 'italic', title: 'Italic', label: 'I', before: '*', after: '*' },
-  { name: 'link', title: 'Link', label: '🔗', before: '[', after: '](https://)' },
-  ...Object.entries(MD_COLOR_EMOJI).map(([key, emoji]) => ({
-    name: `mark-${key}`,
-    title: `Highlight ${COLOR_NAMES[key] || key}`,
-    label: emoji,
-    before: `==${emoji} `,
-    after: '==',
-  })),
-];
 
 // Форма показывает фоны палитры, как Quill абзаца; ^id — серым верхним индексом.
 const PREVIEW_MARK_VARS = markColorVars({ palette: true });
@@ -56,16 +33,14 @@ const MdEditor = ({ changeHandler, prefixClass, value, aside = null, notice = nu
   const source = value || '';
 
   // Обёртка выделенного: курсор остаётся на том же тексте внутри обёртки.
-  const wrap = ({ before, after }) => {
+  const wrap = (item) => {
     const el = textAreaRef.current?.resizableTextArea?.textArea;
     if (!el) return;
-    const { selectionStart: start, selectionEnd: end } = el;
-    changeHandler(
-      source.slice(0, start) + before + source.slice(start, end) + after + source.slice(end),
-    );
+    const next = wrapSelection(source, el.selectionStart, el.selectionEnd, item);
+    changeHandler(next.text);
     requestAnimationFrame(() => {
       el.focus();
-      el.setSelectionRange(start + before.length, end + before.length);
+      el.setSelectionRange(next.start, next.end);
     });
   };
 

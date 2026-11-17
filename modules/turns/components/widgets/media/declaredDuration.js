@@ -25,6 +25,7 @@ export const atDeclaredEnd = (time, declared) =>
 export const createDeclaredDuration = () => {
   let declared = 0;
   let noticed = false;
+  let loaded;
   const check = (actual) => {
     if (noticed || !durationMismatch(declared, actual)) return null;
     noticed = true;
@@ -49,6 +50,14 @@ export const createDeclaredDuration = () => {
     reset() {
       declared = 0;
       noticed = false;
+    },
+    // loadstart: true — началась новая загрузка, правило сброшено. Элемент YouTube шлёт loadstart
+    // на каждый запуск и буферизацию, поэтому тот же адрес — та же загрузка; адреса нет — сброс.
+    source(src) {
+      if (src && src === loaded) return false;
+      loaded = src;
+      this.reset();
+      return true;
     },
   };
 };

@@ -173,7 +173,6 @@ export const deleteQuote = () => (dispatch, getState) => {
         },
         {
           success: resolve, // @todo: заменить на Promise
-          error: reject,
         },
       ),
     );

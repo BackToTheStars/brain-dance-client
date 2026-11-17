@@ -47,12 +47,7 @@ export const getParagraphQuotesWithoutScroll = (
 
 const QUOTE_MIN_HEIGHT_DELTA = 40;
 
-export const getScrolledQuotes = (
-  quotes,
-  paragraphEl,
-  passedScrollPosition,
-  zoom = 1,
-) => {
+const bodyRectOf = (paragraphEl, zoom) => {
   const bodyRect = relativeRect(
     paragraphEl.current,
     paragraphEl.current.parentNode.parentNode,
@@ -60,10 +55,49 @@ export const getScrolledQuotes = (
   );
   // Высота тела округляется так же, как координаты цитат выше: иначе цитата в последней
   // строке вплотную к краю (104,86 против 104,859375) считалась ушедшей за нижний край.
-  const paragraphRect = {
+  return {
     ...bodyRect,
     height: Math.round(bodyRect.height * 100) / 100,
   };
+};
+
+// Полоска у верхнего или нижнего края тела — цитата, ушедшая за край.
+const edgeCoords = (paragraphRect, position) => {
+  const outlineWidth = TURN_BORDER_THICKNESS;
+  return {
+    height: 0,
+    width: paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer, // 2 ширины рамки
+    left: outlineWidth + widgetSpacer,
+    top:
+      position === 'top'
+        ? paragraphRect.top - widgetSpacer - 2
+        : paragraphRect.top + paragraphRect.height + outlineWidth + widgetSpacer - 2,
+    position,
+  };
+};
+
+// Записи цитат, узлов которых в теле нет (часть вне окна ленивой отрисовки): сразу полоска у края.
+// edge — [{ quoteId, text, position: 'top' | 'bottom' }].
+export const getEdgeQuotes = (edge, turnId, paragraphEl, zoom = 1) => {
+  if (!edge?.length) return [];
+  const paragraphRect = bodyRectOf(paragraphEl, zoom);
+  return edge.map(({ quoteId, text, position }) => ({
+    quoteId,
+    quoteKey: `${turnId}_${quoteId}`,
+    turnId,
+    text,
+    type: TYPE_QUOTE_TEXT,
+    ...edgeCoords(paragraphRect, position),
+  }));
+};
+
+export const getScrolledQuotes = (
+  quotes,
+  paragraphEl,
+  passedScrollPosition,
+  zoom = 1,
+) => {
+  const paragraphRect = bodyRectOf(paragraphEl, zoom);
   const topGap = paragraphRect.top;
 
   return quotes.map((quote) => {
@@ -84,11 +118,7 @@ export const getScrolledQuotes = (
         height = height + (top + outlineWidth - scrollPosition) - 2;
         top = topGap;
       } else {
-        height = 0;
-        width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer; // 2 ширины рамки
-        left = outlineWidth + widgetSpacer; //left + outlineWidth;
-        top = topGap - widgetSpacer - 2; //top + outlineWidth;
-        position = 'top';
+        ({ height, width, left, top, position } = edgeCoords(paragraphRect, 'top'));
       }
     } else if (
       top + height - outlineWidth >
@@ -102,11 +132,7 @@ export const getScrolledQuotes = (
         const bottom = topGap + paragraphRect.height + outlineWidth - 2;
         height = bottom - top;
       } else {
-        height = 0;
-        width = paragraphRect.width + 2 * outlineWidth - 2 * widgetSpacer;
-        left = outlineWidth + widgetSpacer;
-        top = topGap + paragraphRect.height + outlineWidth + widgetSpacer - 2;
-        position = 'bottom';
+        ({ height, width, left, top, position } = edgeCoords(paragraphRect, 'bottom'));
       }
     } else {
       top = top + topGap - scrollPosition - outlineWidth; // положение красной рамки вокруг цитаты по вертикали

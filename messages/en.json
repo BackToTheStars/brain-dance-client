@@ -203,6 +203,19 @@
         "saveRow": "Save the row",
         "saveRowOff": "Rows are saved one by one once the turn itself is saved as a translation",
         "lastRow": "This is the only saved row with text, and a turn cannot be left without one. Save another row with text first.",
+        "tools": {
+          "noCell": "Put the cursor in a cell first",
+          "bold": "Bold",
+          "italic": "Italic",
+          "link": "Link",
+          "mark-y": "Highlight yellow",
+          "mark-g": "Highlight green",
+          "mark-p": "Highlight pink",
+          "mark-b": "Highlight blue",
+          "mark-s": "Highlight gray",
+          "mark-o": "Highlight orange",
+          "mark-r": "Highlight red"
+        },
         "deleteRow": {
           "Title": "Delete the row",
           "Text": "The row has text in it. Delete it anyway?",

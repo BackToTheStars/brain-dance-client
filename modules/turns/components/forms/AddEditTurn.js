@@ -32,6 +32,7 @@ import {
 import { createTurn, resaveTurn, uploadMedia } from '../../redux/actions';
 import { saveTurnOps } from '../../redux/turnOpsSave';
 import { baseSaved, formDraftOps, formHasDraft } from '../widgets/translation/draft';
+import { ensureRowQuoteIds } from '../widgets/translation/quotes';
 import { dataUrlToFile, frameFileName } from '../helpers/videoFrame';
 import {
   buildTurnSave,
@@ -64,7 +65,9 @@ const {
   FIELD_SOURCE,
   FIELD_DATE,
   FIELD_MARKDOWN,
+  FIELD_ROWS,
   TEMPLATE_MD,
+  TEMPLATE_TRANSLATION,
 } = turnSettings;
 
 const SAVE_HINTS = {
@@ -253,6 +256,23 @@ const AddEditTurnPopup = () => {
     setMarkdown: (value) => formChangeHandler(FIELD_MARKDOWN, value),
   });
 
+  // Снятые цитаты: их линии удаляются, записи о рамках чистятся. Возвращает промис удаления
+  // линий или null.
+  const dropQuoteLinks = ({ lineIds, quoteKeys }) => {
+    const linesDeleted = lineIds.length ? dispatch(linesDelete(lineIds)) : null;
+    if (quoteKeys.length) {
+      dispatch(clearQuotesInfo(quoteKeys));
+      // цитата, снятая этим сохранением, не может остаться активной
+      if (quoteKeys.includes(activeQuoteKey)) {
+        dispatch(setActiveQuoteKey(null));
+      }
+    }
+    return linesDeleted;
+  };
+  // То же после записи одного ряда перевода; спутникам — не раньше удаления линий.
+  const dropRowQuoteLinks = (links) =>
+    Promise.resolve(dropQuoteLinks(links)).then(() => dispatch(castSaved()));
+
   // Сама запись. Между Save и ней могут встать окна, отвечающие позже, поэтому её
   // зовёт последний шаг: finishSave или «Удалить и сохранить».
   const commitSave = async ({
@@ -293,16 +313,10 @@ const AddEditTurnPopup = () => {
       }
     }
 
-    const linesDeleted = lineIdsToDelete.length
-      ? dispatch(linesDelete(lineIdsToDelete))
-      : null;
-    if (quoteKeysDeleted.length) {
-      dispatch(clearQuotesInfo(quoteKeysDeleted));
-      // цитата, снятая этим сохранением, не может остаться активной
-      if (quoteKeysDeleted.includes(activeQuoteKey)) {
-        dispatch(setActiveQuoteKey(null));
-      }
-    }
+    const linesDeleted = dropQuoteLinks({
+      lineIds: lineIdsToDelete,
+      quoteKeys: quoteKeysDeleted,
+    });
 
     const saveCallbacks = {
       // @todo: передавать в виджет через props
@@ -367,16 +381,25 @@ const AddEditTurnPopup = () => {
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     if (checkingLink) return;
+    // выделения рядов перевода получают id до сборки: текст с id — и в запросе, и в форме
+    let formToSave = form;
+    if (activeTemplate === TEMPLATE_TRANSLATION) {
+      const rows = ensureRowQuoteIds(form[FIELD_ROWS], form.rowsBase, { unsaved: true });
+      if (rows !== form[FIELD_ROWS]) {
+        formToSave = { ...form, [FIELD_ROWS]: rows };
+        patchForm({ [FIELD_ROWS]: rows });
+      }
+    }
     const save = buildTurnSave({
       textArr: quillConstants.getQuillTextArr(),
       quoteElementIds: getQuoteElements().map((quoteEl) =>
         quoteEl.getAttribute(QUOTE_ID_ATTRIBUTE),
       ),
-      form,
+      form: formToSave,
       template: activeTemplate,
       // Позиция и цитаты других виджетов — какими они в сторе сейчас.
       turnToEdit: storedTurn(),
-      rowsOps: formDraftOps(form),
+      rowsOps: formDraftOps(formToSave),
       baseFields: baseline?.fields,
       dWidgets: turnData?.dWidgets,
       lines,
@@ -703,6 +726,8 @@ const AddEditTurnPopup = () => {
                 edition,
                 setError,
                 saveTurnOps,
+                lines,
+                dropQuoteLinks: dropRowQuoteLinks,
                 changeHandler: (value) => formChangeHandler(editorSlotField, value),
                 label: fieldSettings[editorSlotField].labelKey
                   ? t(fieldSettings[editorSlotField].labelKey)

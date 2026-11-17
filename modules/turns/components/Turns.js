@@ -3,6 +3,7 @@ import Turn from './Turn';
 import AutoSaveField from './AutoSaveField';
 import { useEffect, useMemo } from 'react';
 import { loadTurnsData } from '../redux/actions';
+import { withPinnedTurn } from '../redux/stacking';
 
 const TurnsLoader = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,16 @@ const TurnsLoader = () => {
 // turnsToRender идёт по z, а узлы карточек — в постоянном порядке, и наложение задаёт z-index:
 // перенос узла в DOM перезагрузил бы iframe плеера и сбросил прокрутку карточки.
 const Turns = () => {
-  const turns = useSelector((store) => store.turns.turnsToRender);
+  const inWindow = useSelector((store) => store.turns.turnsToRender);
+  // Карточка плеера-владельца воспроизведения живёт и вне окна отрисовки, иначе звук обрывается.
+  const playing = useSelector((store) => {
+    const id = store.ui?.activePlayback?.turnId;
+    return id && store.turns.g[id] && store.turns.d[id] ? id : null;
+  });
+  const turns = useMemo(
+    () => withPinnedTurn(inWindow, playing),
+    [inWindow, playing],
+  );
   const domOrder = useMemo(() => [...turns].sort(), [turns]);
   const layers = useMemo(
     () => new Map(turns.map((id, layer) => [id, layer])),

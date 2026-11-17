@@ -10,10 +10,18 @@ import { useMdHtml } from './mdRenderer';
 export const useMdMarkVars = () =>
   useMemo(() => markColorVars({ remap: MARK_COLOR_REMAP }), []);
 
-// markIds: false — выделения без data-id (оформление без цитат и линий); bodyRef — узел тела;
+// markIds: false — выделения без data-id (оформление без цитат и линий); showQuoteIds — ^id
+// выделений верхним индексом (предпросмотр формы); bodyRef — узел тела;
 // остальные пропсы уходят на узел (data-test-id, data-turn-id, data-side).
-const MdHtml = ({ source, markIds = true, bodyRef, className = '', ...attrs }) => {
-  const { html } = useMdHtml(source || '', { markIds });
+const MdHtml = ({
+  source,
+  markIds = true,
+  showQuoteIds = false,
+  bodyRef,
+  className = '',
+  ...attrs
+}) => {
+  const { html } = useMdHtml(source || '', { markIds, showQuoteIds });
   return (
     <div
       ref={bodyRef}

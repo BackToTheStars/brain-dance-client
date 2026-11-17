@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { getQueue } from '../helpers/queueHelper';
 import {
+  getEdgeQuotes,
   getParagraphQuotesWithoutScroll,
   getScrolledQuotes,
 } from '../helpers/quotesHelper';
@@ -27,6 +28,9 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 // minWidth — минимальная ширина карточки от этого виджета; ownScrollRef — ref с последним
 // scrollTop, выставленным самим содержимым (сдвиг заглушек ленивой сетки): такая прокрутка не
 // пользовательская — не отменяет восстановление и не пишется в позицию.
+// Тело с ленивыми частями (перевод) передаёт ещё edgeQuotes — цитаты частей, которых нет в DOM
+// ([{ quoteId, text, position }], см. getEdgeQuotes; [] — таких нет), и layoutKey — значение,
+// меняющееся со сменой набора отрисованных частей: рамки тогда перемеряются по DOM.
 export const useQuotedBody = ({
   turnId,
   widgetId,
@@ -41,6 +45,8 @@ export const useQuotedBody = ({
   ready = true,
   minWidth = TURN_SIZE_MIN_WIDTH,
   ownScrollRef = null,
+  edgeQuotes,
+  layoutKey,
 }) => {
   const quotesDataRef = useRef(null);
   const size = useSelector((state) => state.turns.g[turnId].size);
@@ -53,6 +59,13 @@ export const useQuotedBody = ({
   const dispatch = useDispatch();
   const store = useStore();
   const zoom = () => store.getState().game.zoom;
+  const lazy = edgeQuotes !== undefined;
+  const scrolledOf = (quotes, top) => {
+    const scrolled = getScrolledQuotes(quotes, bodyRef, top, zoom());
+    return edgeQuotes?.length
+      ? [...scrolled, ...getEdgeQuotes(edgeQuotes, turnId, bodyRef, zoom())]
+      : scrolled;
+  };
 
   const [scrollTop, setScrollTop] = useState(0); // дополнительный локальный стейт для быстрого ререндера цитат
 
@@ -75,12 +88,7 @@ export const useQuotedBody = ({
         height,
         scrollTop,
         quotesWithoutScroll,
-        scrolledQuotes: getScrolledQuotes(
-          quotesWithoutScroll,
-          bodyRef,
-          scrollTop,
-          zoom(),
-        ),
+        scrolledQuotes: scrolledOf(quotesWithoutScroll, scrollTop),
       };
     }
     if (!quotesDataRef.current.turnEl) {
@@ -103,30 +111,34 @@ export const useQuotedBody = ({
       needToUpdate = true;
       quotesDataRef.current.height = height;
       quotesDataRef.current.scrollTop = scrollTop;
-      quotesDataRef.current.scrolledQuotes = getScrolledQuotes(
+      quotesDataRef.current.scrolledQuotes = scrolledOf(
         quotesDataRef.current.quotesWithoutScroll,
-        bodyRef,
         scrollTop,
-        zoom(),
       );
     }
 
-    if (!firstRender && quotesDataRef.current.contentKey !== contentKey) {
+    if (
+      !firstRender &&
+      (quotesDataRef.current.contentKey !== contentKey ||
+        quotesDataRef.current.layoutKey !== layoutKey ||
+        quotesDataRef.current.edgeQuotes !== edgeQuotes)
+    ) {
       needToUpdate = true;
       quotesDataRef.current.quotesWithoutScroll =
         getParagraphQuotesWithoutScroll(turnId, bodyRef, zoom());
-      quotesDataRef.current.scrolledQuotes = getScrolledQuotes(
+      quotesDataRef.current.scrolledQuotes = scrolledOf(
         quotesDataRef.current.quotesWithoutScroll,
-        bodyRef,
         scrollTop,
-        zoom(),
       );
     }
     quotesDataRef.current.contentKey = contentKey;
+    quotesDataRef.current.layoutKey = layoutKey;
+    quotesDataRef.current.edgeQuotes = edgeQuotes;
 
     if (needToUpdate) {
       if (!quotesDataRef.current.scrolledQuotes?.length) {
-        if (!quotesSignature) {
+        // у ленивого тела узлов цитат может не быть и при непустой подписи: все они вне окна
+        if (!quotesSignature || lazy) {
           // последнюю цитату сняли — её рамка уходит вместе с ней
           if (store.getState().lines.quotesInfo[turnId]?.[widgetId]?.length) {
             dispatch(quoteCoordsUpdate(turnId, widgetId, []));
@@ -144,12 +156,7 @@ export const useQuotedBody = ({
               bodyRef,
               zoom(),
             );
-            const scrolledQuotes = getScrolledQuotes(
-              quotesWithoutScroll,
-              bodyRef,
-              scrollTop,
-              zoom(),
-            );
+            const scrolledQuotes = scrolledOf(quotesWithoutScroll, scrollTop);
             quotesDataRef.current.quotesWithoutScroll = quotesWithoutScroll;
             quotesDataRef.current.scrolledQuotes = scrolledQuotes;
             if (scrolledQuotes?.length) {
@@ -181,7 +188,16 @@ export const useQuotedBody = ({
         });
       }
     }
-  }, [width, height, scrollTop, bodyRef.current, widgetsUpdatedTime, contentKey]);
+  }, [
+    width,
+    height,
+    scrollTop,
+    bodyRef.current,
+    widgetsUpdatedTime,
+    contentKey,
+    layoutKey,
+    edgeQuotes,
+  ]);
 
   // Коробку тела меняют и мимо зависимостей эффекта выше — разделитель pdf, заголовок:
   // рамки и концы линий перемеряются в том же кадре.
@@ -194,13 +210,8 @@ export const useQuotedBody = ({
       bodyRef,
       zoom(),
     );
-    const scrolledQuotes = getScrolledQuotes(
-      quotesWithoutScroll,
-      bodyRef,
-      el.scrollTop,
-      zoom(),
-    );
-    if (!scrolledQuotes.length) return;
+    const scrolledQuotes = scrolledOf(quotesWithoutScroll, el.scrollTop);
+    if (!scrolledQuotes.length && !lazy) return;
     quotesDataRef.current.quotesWithoutScroll = quotesWithoutScroll;
     quotesDataRef.current.scrolledQuotes = scrolledQuotes;
     dispatch(quoteCoordsUpdate(turnId, widgetId, scrolledQuotes));

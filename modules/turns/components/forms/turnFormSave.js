@@ -18,6 +18,7 @@ import {
   normalizeLanguages,
   rowsToPreviewParagraph,
 } from '../widgets/translation/rows';
+import { lostRowQuotes } from '../widgets/translation/quotes';
 
 const {
   settings,
@@ -242,7 +243,8 @@ export const buildTurnSave = ({
   const isMd = template === TEMPLATE_MD;
   const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
 
-  // Перевод: ряды формы без пустых, абзац — плоский текст первой непустой ячейки, цитат нет.
+  // Перевод: ряды формы без пустых, абзац — плоский текст первой непустой ячейки; цитаты живут
+  // в выделениях рядов и в quotes хода не пишутся.
   const isTranslation = template === TEMPLATE_TRANSLATION;
   const rows = isTranslation ? dropEmptyRows(form[FIELD_ROWS]) : null;
 
@@ -315,8 +317,21 @@ export const buildTurnSave = ({
     }
   }
 
+  // Цитаты перевода, пропавшие из рядов: сохранённые ряды (база черновика) против уходящих;
+  // смена типа снимает все.
+  const rowQuotesDeleted =
+    !!turnToEdit?.contentType && turnToEdit.contentType === TEMPLATE_TRANSLATION
+      ? lostRowQuotes(
+          form.rowsBase || turnToEdit[FIELD_ROWS],
+          isTranslation ? rows : [],
+        ).map((id) => ({ id, type: TYPE_QUOTE_TEXT }))
+      : [];
+
   // Осиротевшие цитаты не попали в quotes, и их линии удаляются общим путём.
-  const quotesDeleted = filterQuotesDeleted(prevQuotes, quotes);
+  const quotesDeleted = [
+    ...filterQuotesDeleted(prevQuotes, quotes),
+    ...rowQuotesDeleted,
+  ];
   // Цитаты ленты живут не в quotes хода — их ключи добавляются отдельно.
   const timelineQuotesDeleted = orphaned
     .filter((item) => item.timelineField)

@@ -1,12 +1,14 @@
-// Сетка перевода без стора: строка языков (если хоть один задан) и ряды по две ячейки md без id
-// выделений. На ней стоят карточка (TranslationTable) и предпросмотр формы (TranslationEditor).
+// Сетка перевода без стора: строка языков (если хоть один задан) и ряды по две ячейки md. На ней
+// стоят карточка (TranslationTable; markIds — выделения с id, это цитаты) и предпросмотр формы
+// (TranslationEditor; showQuoteIds — ^id выделений верхним индексом). onLayout(visible) — после отрисовки, когда сменился
+// набор отрисованных рядов или их раскладка.
 // Ячейки md рисуются только у рядов в окне прокрутки с запасом; ряды вне окна подряд — один пустой
 // разделитель (data-spacer) суммарной высоты их оценок, а после первой отрисовки — замеров, чтобы
 // длинный ход не верстал невидимое и число элементов не зависело от числа рядов. scrollRef —
 // скроллер сетки; ownScrollRef — см. useVisibleParts.
 
 import { TID } from '@/config/testIds';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
 import MdHtml from '../md/MdHtml';
 import { estimateTextHeight, runs, sumHeights } from '../parts/layout';
 import { useVisibleParts } from '../parts/useVisibleParts';
@@ -14,28 +16,40 @@ import { useVisibleParts } from '../parts/useVisibleParts';
 const text = (value) => (typeof value === 'string' ? value : '');
 
 // Оценка высоты ряда до отрисовки: строк по большей ячейке при средней ширине знака в половину
-// кегля и колонке без отступов ячейки (0,5em с боков), плюс отступы ячейки по вертикали (0,3em
-// сверху и снизу) и рамка ряда. Систематическую ошибку снимает калибровка хука.
+// кегля и колонке без отступа ячейки к соседней колонке (0,5em), плюс отступы ячейки по вертикали
+// (0,3em сверху и снизу) и рамка ряда. Систематическую ошибку снимает калибровка хука.
 export const estimateRowHeight = (row, box) =>
   estimateTextHeight({
     chars: Math.max(text(row?.left).length, text(row?.right).length),
-    columnWidth: box.width / 2 - box.fontSize,
+    columnWidth: box.width / 2 - box.fontSize * 0.5,
     charWidth: box.fontSize * 0.5,
     lineHeight: box.lineHeight,
     extra: box.fontSize * 0.6 + 1,
   });
 
-const TranslationGrid = ({ rows, languages, scrollRef, ownScrollRef }) => {
+const TranslationGrid = ({
+  rows,
+  languages,
+  scrollRef,
+  ownScrollRef,
+  markIds = false,
+  showQuoteIds = false,
+  onLayout,
+}) => {
   const showLanguages = !!(languages?.left || languages?.right);
   const ids = useMemo(() => rows.map((row) => row.id), [rows]);
   const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
   const estimate = useCallback((id, box) => estimateRowHeight(byId.get(id), box), [byId]);
-  const { visible, heightOf, measureRef } = useVisibleParts({
+  const parts = useVisibleParts({
     scrollRef,
     ids,
     estimate,
     ownScrollRef,
   });
+  const { visible, heightOf, measureRef } = parts;
+  useLayoutEffect(() => {
+    onLayout?.(visible);
+  }, [parts]);
   return (
     <>
       {showLanguages && (
@@ -77,14 +91,16 @@ const TranslationGrid = ({ rows, languages, scrollRef, ownScrollRef }) => {
               >
                 <MdHtml
                   source={row.left}
-                  markIds={false}
+                  markIds={markIds}
+                  showQuoteIds={showQuoteIds}
                   className="translation-cell"
                   data-test-id={TID.translation.cell}
                   data-side="left"
                 />
                 <MdHtml
                   source={row.right}
-                  markIds={false}
+                  markIds={markIds}
+                  showQuoteIds={showQuoteIds}
                   className="translation-cell"
                   data-test-id={TID.translation.cell}
                   data-side="right"

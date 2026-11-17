@@ -107,7 +107,8 @@ export const TID = {
   },
 
   // Ход «Перевод текста» (contentType=translation): таблица рядов в карточке
-  // (widgets/translation/TranslationTable.js); выделения в ячейках — mark[data-color] без data-id.
+  // (widgets/translation/TranslationTable.js); выделения в ячейках карточки — mark[data-color]
+  // с data-id (цитаты; рамки — quoteRect), в предпросмотре формы — без data-id.
   // Ряды вне окна прокрутки (с запасом в экран сверху и снизу) — пустые заглушки с тем же тест-id
   // и data-row-id плюс data-placeholder="true", без ячеек; то же в предпросмотре формы
   translation: {
@@ -119,6 +120,12 @@ export const TID = {
     // Редактор рядов в форме хода (widgets/translation/TranslationEditor.js), стоит на месте Quill;
     // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
     editor: {
+      // Верхняя полоса редактора (вне прокрутки рядов; в предпросмотре кнопок и полей нет)
+      tools: 'translation-editor-tools', // группа кнопок обёртки выделенного для ячейки, где был курсор
+      // кнопка обёртки: bold, italic, link, mark-<ячейка y g p b s o r>; disabled, пока курсор не побывал в ячейке
+      // или ряд этой ячейки не отрисован
+      tool: (name) => `translation-editor-tool-${name}`,
+      languages: 'translation-editor-languages', // строка полей языков в верхней полосе
       language: 'translation-editor-language', // поле языка колонки (+ data-side = left | right)
       // ряд редактора (+ data-row-id, data-row-state = saved | dirty | new; data-busy="true", пока идёт его запрос).
       // Ряд вне окна прокрутки тела (с запасом в экран; ряд с фокусом, новый и ряд с запросом в пути рисуются всегда) —

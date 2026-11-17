@@ -8,6 +8,10 @@ export const turnZ = (turn) =>
 export const sortIdsByZ = (ids, g) =>
   [...ids].sort((a, b) => turnZ(g[a]) - turnZ(g[b]));
 
+// Список отрисовки с одной карточкой сверх окна; порядок остальных не меняется.
+export const withPinnedTurn = (ids, id) =>
+  !id || ids.includes(id) ? ids : [...ids, id];
+
 const othersZ = (g, id) =>
   Object.keys(g)
     .filter((key) => key !== id)

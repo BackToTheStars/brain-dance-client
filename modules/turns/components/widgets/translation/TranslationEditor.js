@@ -1,8 +1,12 @@
-// Редактор хода «Перевод текста» на месте Quill: языки колонок, ряды из двух textarea
+// Редактор хода «Перевод текста» на месте Quill: в верхней полосе — кнопки обёртки выделенного
+// (для ячейки, где был курсор) и языки колонок; ниже — ряды из двух textarea
 // md-исходника, полоса действий ряда (сохранить ряд, «+» — ряд после него, удаление), Preview той
 // же сеткой, что карточка. Ряды живут в form.rows (changeHandler), языки — в form.languages
 // (patchForm), сохранённое — в черновике рядов (draft.js). Сохранение ряда и удаление
 // сохранённого ряда уходят на сервер сразу; у нового хода и при смене типа — только общим Save.
+// Выделения ячеек — цитаты хода (quotes.js): перед сохранением ряда они получают id; сохранение
+// и удаление ряда, с которыми уходят цитаты с линиями, — через окно потери линий, сами линии
+// снимаются после ответа сервера.
 // Textarea и полоса действий — только у рядов в окне прокрутки тела с запасом, у ряда с фокусом,
 // у только что добавленного и у ряда с запросом в пути; ряды вне окна подряд — один пустой
 // разделитель (data-spacer) суммарной высоты их оценок, а после первой отрисовки — замеров
@@ -27,9 +31,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useMdMarkVars } from '../md/MdHtml';
 import { useMdRenderer } from '../md/mdRenderer';
+import { WRAPS, wrapSelection } from '../md/wrapTools';
 import { useVisibleParts } from '../parts/useVisibleParts';
 import TranslationGrid from './TranslationGrid';
 import {
+  advanceBase,
   baseSaved,
   leavesNoText,
   onlyTextRowId,
@@ -39,6 +45,7 @@ import {
   savedRow,
   seedBase,
 } from './draft';
+import { caretAfterIds, ensureRowQuoteIds, lostRowQuotes, quoteLinks } from './quotes';
 import { dropEmptyRows, emptyRow, formRows, normalizeLanguages } from './rows';
 
 const SIDES = ['left', 'right'];
@@ -152,7 +159,8 @@ const refitAll = (fit, fontChanged) => {
   if (fontChanged) fit.metric = null;
 };
 
-// Предпросмотр показывает то, что уйдёт в ход: без пустых рядов, языки обрезаны. Его корень —
+// Предпросмотр показывает то, что уйдёт в ход: без пустых рядов, языки обрезаны; id выделений —
+// верхним индексом, как в предпросмотре статьи. Его корень —
 // скроллер сетки: ряды вне окна она рисует заглушками. Сетка монтируется после того, как корень
 // попал в ref: иначе её хук увидел бы пустой ref и отрисовал все ряды разом.
 const Preview = ({ rows, languages }) => {
@@ -177,7 +185,13 @@ const Preview = ({ rows, languages }) => {
       {!shown.length ? (
         <div className="md-editor__placeholder">Nothing to preview yet</div>
       ) : ready && mounted ? (
-        <TranslationGrid rows={shown} languages={normalizeLanguages(languages)} scrollRef={pane} />
+        <TranslationGrid
+          rows={shown}
+          languages={normalizeLanguages(languages)}
+          scrollRef={pane}
+          markIds
+          showQuoteIds
+        />
       ) : (
         <div className="md-editor__placeholder" data-test-id={TID.translation.loading}>
           {t('loading')}
@@ -186,6 +200,34 @@ const Preview = ({ rows, languages }) => {
     </div>
   );
 };
+
+// Кнопки обёртки для ячейки, где был курсор. mousedown гасится на всей полосе: ячейка не теряет
+// фокус и выделение.
+const CellTools = memo(({ enabled, onWrap }) => {
+  const t = useTranslations('Game.turnForm.translation.tools');
+  const editor = TID.translation.editor;
+  return (
+    <div
+      className="translation-editor__tools"
+      data-test-id={editor.tools}
+      onMouseDown={(e) => e.preventDefault()}
+    >
+      {WRAPS.map((item) => (
+        <button
+          key={item.name}
+          type="button"
+          className="md-editor__tool"
+          title={t(enabled ? item.name : 'noCell')}
+          disabled={!enabled}
+          data-test-id={editor.tool(item.name)}
+          onClick={() => onWrap(item)}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+});
 
 // Ряд — memo с устойчивыми пропсами: набор текста в ячейке перерисовывает только свой ряд.
 // live — ряды ходят на сервер по одному; last — единственный сохранённый ряд с текстом;
@@ -223,6 +265,7 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
           value={row[side]}
           rows={linesOf(metric[side], perLine)}
           placeholder={CELL_PLACEHOLDER[side]}
+          onFocus={() => actions.caret(row.id, side)}
           onChange={(e) => actions.cell(row.id, side, e.target.value)}
         />
       ))}
@@ -266,7 +309,9 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
 });
 
 // aside — подпись поля из формы; saveTurnOps — действие записи операций (форма передаёт его
-// сама: импорт отсюда замкнул бы settings → редактор → сокет → действия ходов → settings).
+// сама: импорт отсюда замкнул бы settings → редактор → сокет → действия ходов → settings);
+// lines — линии игры, dropQuoteLinks({ lineIds, quoteKeys }) — снять линии и рамки ушедших цитат
+// и сообщить спутникам: зовётся после записи ряда.
 const TranslationEditor = ({
   changeHandler,
   prefixClass,
@@ -276,6 +321,8 @@ const TranslationEditor = ({
   edition,
   setError,
   saveTurnOps,
+  lines,
+  dropQuoteLinks,
   aside = null,
 }) => {
   const t = useTranslations('Game.turnForm');
@@ -287,11 +334,16 @@ const TranslationEditor = ({
   const [preview, setPreview] = useState(false);
   // окно удаления ряда с текстом; saved — ряд удалится на сервере сразу
   const [confirm, setConfirm] = useState(NO_CONFIRM);
+  // окно потери линий: { summary, proceed } — proceed зовётся по «Удалить и сохранить»
+  const [lostLinks, setLostLinks] = useState(null);
   // id рядов, чей запрос в пути
   const [pending, setPending] = useState({});
   // ряд с фокусом и только что добавленный ряд рисуются независимо от окна прокрутки
   const [focused, setFocused] = useState(null);
   const added = useRef(null);
+  // последняя ячейка с фокусом — цель кнопок обёртки; в состоянии только её ряд
+  const caret = useRef(null);
+  const [caretRow, setCaretRow] = useState(null);
   const removing = useRef(new Set());
   const rows = useMemo(() => formRows(value), [value]);
   const seeded = !!form?.rowsBase;
@@ -306,7 +358,20 @@ const TranslationEditor = ({
   }, [seeded]);
 
   const now = useRef(null);
-  now.current = { rows, base, live, turnId, changeHandler, patchForm, edition, setError, saveTurnOps, lastTitle };
+  now.current = {
+    rows,
+    base,
+    live,
+    turnId,
+    changeHandler,
+    patchForm,
+    edition,
+    setError,
+    saveTurnOps,
+    lastTitle,
+    lines,
+    dropQuoteLinks,
+  };
 
   // Скроллер рядов. Ref-колбэк пропускает null (тело снято на время Preview — хук держит прежний
   // элемент, а не считает окно бесконечным) и перерисовывает редактор, когда тело смонтировано
@@ -442,6 +507,15 @@ const TranslationEditor = ({
       setError({ message: lastTitle });
       return true;
     };
+    // Цитаты, которые уйдут из сохранённого хода с операциями ряда: { quoteKeys, lineIds, summary }
+    // или null. Сравнивается сохранённое до и после: цитата, перенесённая в ещё не сохранённый
+    // ряд, считается ушедшей.
+    const goneWith = (ops) => {
+      const { base, turnId, lines } = now.current;
+      if (ops[0].op === 'row.insert') return null;
+      const links = quoteLinks(turnId, lostRowQuotes(base, advanceBase(base, ops)), lines);
+      return links.quoteKeys.length ? links : null;
+    };
     // Операции ряда — одним запросом; после ответа двигается база, форма остаётся открытой.
     // lost — ряд, уже снятый из формы: при отказе он возвращается на место.
     const send = (id, ops, lost) => {
@@ -450,10 +524,14 @@ const TranslationEditor = ({
       const removes = ops[0].op === 'row.remove';
       if (removes && blocked(id)) return false;
       if (removes) removing.current.add(id);
+      const gone = now.current.dropQuoteLinks ? goneWith(ops) : null;
       setPending((prev) => ({ ...prev, [id]: true }));
-      dispatch(saveTurnOps({ turnId, ops })).then((result) => {
+      // с ушедшими цитатами спутникам сообщает dropQuoteLinks — после удаления линий
+      dispatch(saveTurnOps(gone ? { turnId, ops, cast: false } : { turnId, ops })).then((result) => {
         removing.current.delete(id);
         setPending(({ [id]: done, ...rest }) => rest);
+        // ряд записан — линии снимаются и у закрытой формы
+        if (gone && !result.error) now.current.dropQuoteLinks(gone);
         if (!edition.isCurrent(token)) return;
         const { patchForm, setError } = now.current;
         if (!result.error) {
@@ -480,12 +558,68 @@ const TranslationEditor = ({
       added.current = row.id;
       return next;
     };
+    const cell = (id, side, value) => {
+      const { rows, changeHandler } = now.current;
+      f.queue.add(cellKey(id, side));
+      changeHandler(rows.map((row) => (row.id === id ? { ...row, [side]: value } : row)));
+    };
+    // Дописанные id меняют значение ячейки программно: выделение в ней возвращается на тот же текст.
+    const keepCarets = (id, before, after) => {
+      const kept = [];
+      for (const side of SIDES) {
+        const el = f.cells.get(cellKey(id, side));
+        if (!el || before[side] === after[side] || typeof el.selectionStart !== 'number') continue;
+        kept.push([
+          el,
+          caretAfterIds(before, after, side, el.selectionStart),
+          caretAfterIds(before, after, side, el.selectionEnd),
+        ]);
+      }
+      if (!kept.length) return;
+      requestAnimationFrame(() => {
+        for (const [el, start, end] of kept) el.setSelectionRange(start, end);
+      });
+    };
+    // Выделения ряда получают id до отправки; текст с id остаётся и в форме. Уходят цитаты с
+    // линиями (в том числе с рядом, сохранённым пустым) — сначала окно потери линий, форма не тронута.
+    const save = (id, confirmed) => {
+      const { base, live, changeHandler } = now.current;
+      if (!live) return;
+      const before = now.current.rows;
+      const rows = ensureRowQuoteIds(before, base, { only: id });
+      const ops = rowOps(base, rows, id);
+      if (!ops.length) return;
+      const summary = confirmed ? null : goneWith(ops)?.summary;
+      if (summary) {
+        setLostLinks({ summary, proceed: () => save(id, true) });
+        return;
+      }
+      if (rows !== before) {
+        const index = rows.findIndex((row) => row.id === id);
+        for (const side of SIDES) f.queue.add(cellKey(id, side));
+        keepCarets(id, before[index], rows[index]);
+        changeHandler(rows);
+      }
+      send(id, ops);
+    };
     return {
       drop,
-      cell: (id, side, text) => {
-        const { rows, changeHandler } = now.current;
-        f.queue.add(cellKey(id, side));
-        changeHandler(rows.map((row) => (row.id === id ? { ...row, [side]: text } : row)));
+      cell,
+      caret: (id, side) => {
+        caret.current = { id, side };
+        setCaretRow(id);
+      },
+      wrap: (item) => {
+        const at = caret.current;
+        const el = at && f.cells.get(cellKey(at.id, at.side));
+        const row = at && now.current.rows.find((one) => one.id === at.id);
+        if (!el || !row) return;
+        const next = wrapSelection(text(row[at.side]), el.selectionStart, el.selectionEnd, item);
+        cell(at.id, at.side, next.text);
+        requestAnimationFrame(() => {
+          el.focus();
+          el.setSelectionRange(next.start, next.end);
+        });
       },
       addAfter: (id) => {
         const { rows, changeHandler } = now.current;
@@ -496,18 +630,19 @@ const TranslationEditor = ({
         scrollToEnd.current = true;
         changeHandler(insert(rows, rows.length));
       },
-      save: (id) => {
-        const { rows, base, live } = now.current;
-        const ops = live ? rowOps(base, rows, id) : [];
-        if (ops.length) send(id, ops);
-      },
-      // ряд с текстом (в форме или сохранённым) — через окно, пустой — сразу
+      save,
+      // ряд с цитатами, к которым идут линии, — через окно потери линий; иначе ряд с текстом
+      // (в форме или сохранённым) — через окно удаления, пустой — сразу
       remove: (id) => {
         const { rows, base, live } = now.current;
         const saved = live ? savedRow(base, id) : undefined;
         const row = rows.find((item) => item.id === id);
-        if (rowHasText(row) || rowHasText(saved)) setConfirm({ open: true, id, saved: !!saved });
-        else drop(id);
+        const summary = saved ? goneWith([{ op: 'row.remove', id }])?.summary : null;
+        if (summary) {
+          setLostLinks({ summary, proceed: () => drop(id) });
+        } else if (rowHasText(row) || rowHasText(saved)) {
+          setConfirm({ open: true, id, saved: !!saved });
+        } else drop(id);
       },
       focus: (id) => {
         if (added.current !== id) added.current = null;
@@ -530,6 +665,7 @@ const TranslationEditor = ({
       languages: { ...(prev.languages || {}), [side]: text },
     }));
   const onlyText = live ? onlyTextRowId(base) : null;
+  const canWrap = caretRow !== null && indexById.has(caretRow) && visible.has(caretRow);
 
   // Ряды окна — EditorRow, ряды вне окна подряд — один разделитель (как в TranslationGrid); для них
   // ничего не считается, кроме суммы высот. Один плоский список с ключами: ряд, оставшийся в окне,
@@ -579,7 +715,8 @@ const TranslationEditor = ({
 
   return (
     <div className="md-editor translation-editor" data-test-id={TID.addTurn.field(prefixClass)}>
-      <div className="md-editor__bar">
+      <div className="md-editor__bar translation-editor__bar">
+        {!preview && <CellTools enabled={canWrap} onWrap={actions.wrap} />}
         <div className="flex-1" />
         {aside}
         <button
@@ -590,12 +727,8 @@ const TranslationEditor = ({
         >
           {preview ? 'Source' : 'Preview'}
         </button>
-      </div>
-      {preview ? (
-        <Preview rows={rows} languages={languages} />
-      ) : (
-        <div className="translation-editor__body" ref={bindBody}>
-          <div className="translation-editor__languages">
+        {!preview && (
+          <div className="translation-editor__languages" data-test-id={editor.languages}>
             {SIDES.map((side) => (
               <Input
                 key={side}
@@ -607,8 +740,13 @@ const TranslationEditor = ({
                 onChange={(e) => setLanguage(side, e.target.value)}
               />
             ))}
-            <div className="translation-editor__actions" />
           </div>
+        )}
+      </div>
+      {preview ? (
+        <Preview rows={rows} languages={languages} />
+      ) : (
+        <div className="translation-editor__body" ref={bindBody}>
           {parts}
           <button
             type="button"
@@ -643,6 +781,39 @@ const TranslationEditor = ({
         >
           {t(confirm.saved ? 'translation.deleteRow.TextSaved' : 'translation.deleteRow.Text')}
         </p>
+      </Modal>
+
+      {/* то же окно, что у общего Save формы */}
+      <Modal
+        open={!!lostLinks}
+        title={t('lostLinks.Title')}
+        okText={t('lostLinks.Ok')}
+        cancelText={t('lostLinks.Cancel')}
+        okButtonProps={{ danger: true, 'data-test-id': TID.addTurn.lostLinksSave }}
+        cancelButtonProps={{ 'data-test-id': TID.addTurn.lostLinksCancel }}
+        onCancel={() => setLostLinks(null)}
+        onOk={() => {
+          const { proceed } = lostLinks;
+          setLostLinks(null);
+          proceed();
+        }}
+      >
+        {!!lostLinks && (
+          <div
+            data-test-id={TID.addTurn.lostLinks}
+            data-quotes={lostLinks.summary.quotesCount}
+            data-links={lostLinks.summary.linesCount}
+          >
+            <p>{t('lostLinks.Text')}</p>
+            <p className="mb-0">
+              {t.rich('lostLinks.Count', {
+                quotes: lostLinks.summary.quotesCount,
+                links: lostLinks.summary.linesCount,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
+            </p>
+          </div>
+        )}
       </Modal>
     </div>
   );
