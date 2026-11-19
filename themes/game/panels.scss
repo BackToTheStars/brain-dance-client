@@ -173,12 +173,22 @@
   // с инлайн-высотой (сумма высот рядов): промежутки между рядами — отступы самого ряда, а не gap
   // тела, чтобы высота ряда в документе равнялась его offsetHeight
   .translation-editor {
+    &__bar { flex-shrink: 0; }
+
+    &__visual-tools {
+      flex: 1;
+      min-width: 0;
+      .ql-toolbar.ql-snow { border: 0; padding: 0; }
+      &[data-disabled='true'] { opacity: 0.4; }
+    }
+
     &__bar {
       flex-wrap: wrap;
     }
 
     &__tools {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
 
       .md-editor__tool:disabled {
@@ -239,6 +249,29 @@
       }
     }
 
+    &__visual {
+      min-width: 0;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      background: #fff;
+      .ql-container, .ql-editor {
+        height: auto;
+        overflow: visible;
+      }
+      .ql-container { border: 0; }
+      .ql-editor {
+        min-height: 2.8em;
+        padding: 4px 11px;
+        margin: 0;
+      }
+      &[data-dirty='true'] {
+        border-color: var(--fragment-editable-color);
+        background-color: color-mix(in srgb, var(--fragment-editable-color) 10%, white);
+      }
+    }
+
+    &__fallback { min-width: 0; }
+
     // новый ряд, которого ещё нет в ходе, — полоса слева
     &__row[data-row-state='new'] {
       box-shadow: -4px 0 0 var(--fragment-editable-color);
@@ -275,6 +308,8 @@
 
   // Предпросмотр перевода — та же сетка, что у карточки (turn.scss, .stb-widget-translation)
   .translation-preview {
+    min-height: 0;
+    overflow-y: scroll;
     // ряды вне окна — разделители оценённой высоты: якорь прокрутки тянул бы позицию за их сменой
     overflow-anchor: none;
 

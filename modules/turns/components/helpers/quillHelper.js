@@ -98,6 +98,8 @@ const isSameContents = (opsA, opsB) => {
 };
 
 export {
+  Quill,
+  Delta,
   getQuill,
   getQuoteElements,
   checkIfParagraphExists,

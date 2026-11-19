@@ -121,6 +121,9 @@ export const TID = {
     // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
     editor: {
       // Верхняя полоса редактора (вне прокрутки рядов; в предпросмотре кнопок и полей нет)
+      toVisual: 'translation-editor-to-visual',
+      toSource: 'translation-editor-to-source',
+      visualCell: 'translation-editor-visual-cell',
       tools: 'translation-editor-tools', // группа кнопок обёртки выделенного для ячейки, где был курсор
       // кнопка обёртки: bold, italic, link, mark-<ячейка y g p b s o r>; disabled, пока курсор не побывал в ячейке
       // или ряд этой ячейки не отрисован

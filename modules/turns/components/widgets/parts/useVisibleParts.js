@@ -29,7 +29,7 @@ const readBox = (el) => {
 // пишется scrollTop, выставленный хуком (скроллер отличает свой сдвиг от прокрутки пользователя).
 // Ответ: visible — Set id к отрисовке; heightOf(id) — высота части вне окна (замер или оценка);
 // measureRef(id) — ref-колбэк на корень отрисованной части; box — текущая коробка.
-export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef }) => {
+export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef, layoutKey }) => {
   const [, rerender] = useReducer((n) => n + 1, 0);
   const own = useRef(null);
   const ownRef = ownScrollRef || own;
@@ -52,6 +52,17 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
     };
   }
   const s = state.current;
+  // Те же id, но другой способ отображения (Visual / Source): ни замеры, ни
+  // калибровка прежнего редактора не описывают новую высоту рядов.
+  if (s.layoutKey !== layoutKey) {
+    s.layoutKey = layoutKey;
+    s.heights.clear();
+    s.estimates.clear();
+    s.applied.clear();
+    s.scale = 1;
+    s.calibrated = false;
+    s.keepScroll = true;
+  }
   s.ids = ids;
   if (s.estimate !== estimate) s.estimates.clear();
   s.estimate = estimate;
@@ -169,6 +180,8 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
   }, []);
 
   // Список частей сменился: лишние замеры и ref-колбэки долой, окно пересчитать.
+  useLayoutEffect(() => compute(), [layoutKey]);
+
   useLayoutEffect(() => {
     const known = new Set(ids);
     for (const map of [s.heights, s.estimates, s.applied, s.refs, s.attached]) {

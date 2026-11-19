@@ -1,6 +1,7 @@
 // Редактор хода «Перевод текста» на месте Quill: в верхней полосе — кнопки обёртки выделенного
 // (для ячейки, где был курсор) и языки колонок; ниже — ряды из двух textarea
-// md-исходника, полоса действий ряда (сохранить ряд, «+» — ряд после него, удаление), Preview той
+// md-исходника или ячейки Visual (Quill на общем мосту статьи), полоса действий ряда
+// (сохранить ряд, «+» — ряд после него, удаление), Preview той
 // же сеткой, что карточка. Ряды живут в form.rows (changeHandler), языки — в form.languages
 // (patchForm), сохранённое — в черновике рядов (draft.js). Сохранение ряда и удаление
 // сохранённого ряда уходят на сервер сразу; у нового хода и при смене типа — только общим Save.
@@ -34,6 +35,8 @@ import { useMdRenderer } from '../md/mdRenderer';
 import { WRAPS, wrapSelection } from '../md/wrapTools';
 import { useVisibleParts } from '../parts/useVisibleParts';
 import TranslationGrid from './TranslationGrid';
+import TranslationVisualCell from './TranslationVisualCell';
+import { useTranslationWheel } from './useTranslationWheel';
 import {
   advanceBase,
   baseSaved,
@@ -169,6 +172,7 @@ const Preview = ({ rows, languages }) => {
   const ready = !!useMdRenderer();
   const pane = useRef(null);
   const [mounted, setMounted] = useState(false);
+  useTranslationWheel(pane);
   const bindPane = useCallback((el) => {
     if (!el) return;
     pane.current = el;
@@ -232,10 +236,9 @@ const CellTools = memo(({ enabled, onWrap }) => {
 // Ряд — memo с устойчивыми пропсами: набор текста в ячейке перерисовывает только свой ряд.
 // live — ряды ходят на сервер по одному; last — единственный сохранённый ряд с текстом;
 // rows у textarea — оценка до замера, после замера высота стоит инлайном.
-const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine }) => {
+const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide }) => {
   const editor = TID.translation.editor;
   const dirty = rowState(saved, row);
-  const metric = rowMetrics(row);
   const filled = rowHasText(row);
   const keep = live && last;
   const emptied = dirty.state === 'dirty' && !filled;
@@ -254,21 +257,23 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
       onFocus={() => actions.focus(row.id)}
       onBlur={() => actions.blur(row.id)}
     >
-      {SIDES.map((side) => (
-        <Input.TextArea
-          key={side}
-          ref={cellRefs[side]}
-          className="translation-editor__cell"
-          data-test-id={editor.cell}
-          data-side={side}
-          data-dirty={dirty[side] ? 'true' : undefined}
-          value={row[side]}
-          rows={linesOf(metric[side], perLine)}
-          placeholder={CELL_PLACEHOLDER[side]}
-          onFocus={() => actions.caret(row.id, side)}
-          onChange={(e) => actions.cell(row.id, side, e.target.value)}
-        />
-      ))}
+      {SIDES.map((side) => {
+        const props = {
+          'data-side': side,
+          'data-dirty': dirty[side] ? 'true' : undefined,
+          value: row[side],
+          placeholder: CELL_PLACEHOLDER[side],
+          onFocus: () => actions.caret(row.id, side),
+          onChange: (e) => actions.cell(row.id, side, e.target.value),
+        };
+        return visual ? (
+          <TranslationVisualCell {...props} key={side} data-test-id={editor.visualCell}
+            cellRef={cellRefs[side]} toolbarHost={toolbarHost} toolbarActive={toolbarActiveSide === side} />
+        ) : (
+          <Input.TextArea {...props} key={side} data-test-id={editor.cell} ref={cellRefs[side]}
+            className="translation-editor__cell" rows={linesOf(rowMetrics(row)[side], perLine)} />
+        );
+      })}
       <div className="translation-editor__actions">
         <button
           type="button"
@@ -332,6 +337,9 @@ const TranslationEditor = ({
     (state) => state.turns.d[state.panels.editTurnId]?.contentType === 'translation',
   );
   const [preview, setPreview] = useState(false);
+  const [visual, setVisual] = useState(true);
+  const [toolbarHost, setToolbarHost] = useState(null);
+  const [toolbarCell, setToolbarCell] = useState(null);
   // окно удаления ряда с текстом; saved — ряд удалится на сервере сразу
   const [confirm, setConfirm] = useState(NO_CONFIRM);
   // окно потери линий: { summary, proceed } — proceed зовётся по «Удалить и сохранить»
@@ -341,9 +349,9 @@ const TranslationEditor = ({
   // ряд с фокусом и только что добавленный ряд рисуются независимо от окна прокрутки
   const [focused, setFocused] = useState(null);
   const added = useRef(null);
-  // последняя ячейка с фокусом — цель кнопок обёртки; в состоянии только её ряд
-  const caret = useRef(null);
-  const [caretRow, setCaretRow] = useState(null);
+  // Последняя ячейка с фокусом — цель кнопок обёртки в Source.
+  const [caretCell, setCaretCell] = useState(null);
+  const caretRow = caretCell === null ? null : cellRowId(caretCell);
   const removing = useRef(new Set());
   const rows = useMemo(() => formRows(value), [value]);
   const seeded = !!form?.rowsBase;
@@ -360,6 +368,7 @@ const TranslationEditor = ({
   const now = useRef(null);
   now.current = {
     rows,
+    caretCell,
     base,
     live,
     turnId,
@@ -377,6 +386,7 @@ const TranslationEditor = ({
   // элемент, а не считает окно бесконечным) и перерисовывает редактор, когда тело смонтировано
   // заново: хук подключается к новому элементу.
   const body = useRef(null);
+  useTranslationWheel(body);
   const [, bodyMounted] = useReducer((n) => n + 1, 0);
   const bindBody = useCallback((el) => {
     if (!el || el === body.current) return;
@@ -390,7 +400,8 @@ const TranslationEditor = ({
   if (!fit.current) {
     fit.current = {
       cells: new Map(),
-      seen: new Map(),
+      visual: new Map(),
+      seen: new WeakSet(),
       known: new Map(),
       refs: new Map(),
       queue: new Set(),
@@ -405,14 +416,25 @@ const TranslationEditor = ({
     if (!refs) {
       const bind = (side) => (handle) => {
         const key = cellKey(id, side);
+        if (handle?.quill) {
+          f.visual.set(key, handle);
+          setToolbarCell((current) => current || key);
+          return () => {
+            if (f.visual.get(key) !== handle) return;
+            f.visual.delete(key);
+            setToolbarCell((current) => current === key ? f.visual.keys().next().value || null : current);
+          };
+        }
         const el = textareaOf(handle);
         if (!el) {
           f.cells.delete(key);
+          f.visual.delete(key);
           return;
         }
+        f.visual.delete(key);
         f.cells.set(key, el);
-        if (f.seen.get(key) === el) return;
-        f.seen.set(key, el);
+        if (f.seen.has(el)) return;
+        f.seen.add(el);
         f.queue.add(key);
       };
       refs = { left: bind('left'), right: bind('right') };
@@ -447,22 +469,21 @@ const TranslationEditor = ({
   const indexById = useMemo(() => new Map(ids.map((id, i) => [id, i])), [ids]);
   const estimate = useCallback(
     (id, box) => estimateEditorRowHeight(now.current.rows[indexById.get(id)], box, fontSize.current),
-    [indexById, fontChanges],
+    [indexById, fontChanges, visual],
   );
   const always = useMemo(
-    () => [focused, added.current, ...Object.keys(pending)].filter(Boolean),
-    [focused, pending, ids],
+    // Один активный ряд остаётся смонтированным вместе со своим нативным тулбаром.
+    () => [focused, visual && toolbarCell ? cellRowId(toolbarCell) : null, added.current, ...Object.keys(pending)].filter(Boolean),
+    [focused, pending, ids, visual, toolbarCell],
   );
-  const { visible, heightOf, measureRef, box } = useVisibleParts({ scrollRef: body, ids, estimate, always });
+  const { visible, heightOf, measureRef, box } = useVisibleParts({ scrollRef: body, ids, estimate, always, layoutKey: visual });
   const width = box ? box.width : 0;
   const perLine = charsPerLine(width, fontSize.current);
 
   // Ряды сняты — их ячейки забыть.
   useLayoutEffect(() => {
     for (const id of f.refs.keys()) if (!indexById.has(id)) f.refs.delete(id);
-    for (const map of [f.seen, f.known]) {
-      for (const key of map.keys()) if (!indexById.has(cellRowId(key))) map.delete(key);
-    }
+    for (const key of f.known.keys()) if (!indexById.has(cellRowId(key))) f.known.delete(key);
   }, [indexById]);
 
   // После каждого коммита: новые ячейки и ячейки с набранным текстом — одним пакетом; смена
@@ -606,16 +627,16 @@ const TranslationEditor = ({
       drop,
       cell,
       caret: (id, side) => {
-        caret.current = { id, side };
-        setCaretRow(id);
+        const key = cellKey(id, side);
+        setCaretCell(key);
+        if (f.visual.has(key)) setToolbarCell(key);
       },
       wrap: (item) => {
-        const at = caret.current;
-        const el = at && f.cells.get(cellKey(at.id, at.side));
-        const row = at && now.current.rows.find((one) => one.id === at.id);
-        if (!el || !row) return;
-        const next = wrapSelection(text(row[at.side]), el.selectionStart, el.selectionEnd, item);
-        cell(at.id, at.side, next.text);
+        const key = now.current.caretCell;
+        const el = f.cells.get(key);
+        if (!el) return;
+        const next = wrapSelection(el.value, el.selectionStart, el.selectionEnd, item);
+        cell(cellRowId(key), cellSide(key), next.text);
         requestAnimationFrame(() => {
           el.focus();
           el.setSelectionRange(next.start, next.end);
@@ -666,6 +687,7 @@ const TranslationEditor = ({
     }));
   const onlyText = live ? onlyTextRowId(base) : null;
   const canWrap = caretRow !== null && indexById.has(caretRow) && visible.has(caretRow);
+  const toolbarDisabled = caretCell !== null && !f.visual.has(caretCell);
 
   // Ряды окна — EditorRow, ряды вне окна подряд — один разделитель (как в TranslationGrid); для них
   // ничего не считается, кроме суммы высот. Один плоский список с ключами: ряд, оставшийся в окне,
@@ -708,6 +730,9 @@ const TranslationEditor = ({
         measureRef={measureRef(id)}
         cellRefs={cellRefs(id)}
         perLine={perLine}
+        visual={visual}
+        toolbarHost={toolbarHost}
+        toolbarActiveSide={toolbarCell && cellRowId(toolbarCell) === id ? cellSide(toolbarCell) : null}
       />,
     );
   }
@@ -716,16 +741,33 @@ const TranslationEditor = ({
   return (
     <div className="md-editor translation-editor" data-test-id={TID.addTurn.field(prefixClass)}>
       <div className="md-editor__bar translation-editor__bar">
-        {!preview && <CellTools enabled={canWrap} onWrap={actions.wrap} />}
-        <div className="flex-1" />
+        {!preview && (visual ? (
+          <div
+            className="translation-editor__visual-tools"
+            data-test-id={editor.tools}
+            data-disabled={toolbarDisabled || undefined}
+            inert={toolbarDisabled}
+            ref={setToolbarHost}
+            onMouseDown={(e) => e.preventDefault()}
+          />
+        ) : <CellTools enabled={canWrap} onWrap={actions.wrap} />)}
+        {(!visual || preview) && <div className="flex-1" />}
         {aside}
+        {!preview && <button
+          type="button"
+          className="btn btn-primary md-editor__toggle"
+          data-test-id={visual ? editor.toSource : editor.toVisual}
+          onClick={() => { setVisual(!visual); setCaretCell(null); setToolbarCell(null); }}
+        >
+          {visual ? 'Source' : 'Visual'}
+        </button>}
         <button
           type="button"
           className="btn btn-primary md-editor__toggle"
           data-test-id={preview ? editor.source : editor.preview}
-          onClick={() => setPreview(!preview)}
+          onClick={() => { setPreview(!preview); setCaretCell(null); setToolbarCell(null); }}
         >
-          {preview ? 'Source' : 'Preview'}
+          {preview ? (visual ? 'Visual' : 'Source') : 'Preview'}
         </button>
         {!preview && (
           <div className="translation-editor__languages" data-test-id={editor.languages}>

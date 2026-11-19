@@ -131,6 +131,7 @@
         "toSource": "Source",
         "toVisual": "Visual",
         "loading": "Loading the visual editor…",
+        "visualLoadError": "The visual editor could not load. Edit the source or switch to Visual again.",
         "unsupportedTitle": "The visual editor does not support:",
         "unsupported": {
           "table": "tables",

@@ -9,6 +9,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import turnSettings, { WIDGET_HEADER } from '@/modules/turns/settings';
 import FormInput from './FormInput';
+import EditorToolbarControls from './EditorToolbarControls';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   closeTurnForm,
@@ -609,65 +610,7 @@ const AddEditTurnPopup = () => {
           {/* Контролы статьи есть всегда и скрыты CSS вне неё: Quill привязывает
               обработчики к тулбару один раз, при создании. */}
           <div id="toolbar-container-new">
-            <span className="ql-formats">
-              <select className="ql-background">
-                {[
-                  '',
-                  'rgb(255, 255, 0)',
-                  'rgb(138, 255, 36)',
-                  'rgb(253, 201, 255)',
-                  'rgb(156, 245, 255)',
-                  'rgb(210, 211, 212)',
-                  'rgb(255, 213, 150)',
-                  'rgb(255, 99, 99)',
-                ].map((val, i) => (
-                  <option value={val} key={i} />
-                ))}
-              </select>
-              <button
-                className="ql-bold"
-                data-test-id={TID.addTurn.toolbar('bold')}
-              />
-              <button
-                className="ql-italic"
-                data-test-id={TID.addTurn.toolbar('italic')}
-              />
-              <button className="ql-link" />
-            </span>
-            <span className="ql-formats md-only">
-              <select
-                className="ql-header"
-                defaultValue=""
-                data-test-id={TID.addTurn.toolbar('header')}
-              >
-                <option value="1" />
-                <option value="2" />
-                <option value="3" />
-                <option value="" />
-              </select>
-              <button
-                className="ql-list"
-                value="bullet"
-                data-test-id={TID.addTurn.toolbar('list-bullet')}
-              />
-              <button
-                className="ql-list"
-                value="ordered"
-                data-test-id={TID.addTurn.toolbar('list-ordered')}
-              />
-              <button
-                className="ql-blockquote"
-                data-test-id={TID.addTurn.toolbar('blockquote')}
-              />
-              <button
-                className="ql-code-block"
-                data-test-id={TID.addTurn.toolbar('code-block')}
-              />
-              <button
-                className="ql-strike"
-                data-test-id={TID.addTurn.toolbar('strike')}
-              />
-            </span>
+            <EditorToolbarControls />
             {mdBridge.showing ? (
               <span
                 className="editor-field-caption"

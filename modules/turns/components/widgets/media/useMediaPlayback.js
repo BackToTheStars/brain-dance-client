@@ -83,8 +83,18 @@ export const useMediaPlayback = (widgetId, turnId) => {
     [t],
   );
 
+  const readDuration = useCallback((el) => {
+    // Первый loadstart custom element мог пройти до подписки React.
+    if (el.src) declared.current.source(el.src);
+    const reported = el.duration;
+    notify(declared.current.duration(reported));
+    setDuration(declared.current.declared || reported || 0);
+  }, [notify]);
+
   const onTimeUpdate = useCallback((e) => {
     const el = e.currentTarget;
+    // Первый YouTube может вернуть 0 в onReady без второго durationchange.
+    if (!declared.current.declared) readDuration(el);
     const time = el.currentTime || 0;
     const end = declared.current.declared;
     if (end > 0 && time >= end) {
@@ -96,16 +106,9 @@ export const useMediaPlayback = (widgetId, turnId) => {
       return;
     }
     setProgress(time);
-  }, []);
+  }, [readDuration]);
 
-  const onDurationChange = useCallback(
-    (e) => {
-      const reported = e.currentTarget.duration;
-      notify(declared.current.duration(reported));
-      setDuration(declared.current.declared || reported || 0);
-    },
-    [notify],
-  );
+  const onDurationChange = useCallback((e) => readDuration(e.currentTarget), [readDuration]);
 
   // Новый источник (правка хода меняет url без перемонтирования плеера) — своя заявленная длительность.
   const onLoadStart = useCallback((e) => {
@@ -118,12 +121,13 @@ export const useMediaPlayback = (widgetId, turnId) => {
   // принудительно откатывал такой запуск через ~полсекунды, а центральный
   // значок YouTube залипал в противофазе. Обработчики идемпотентны: на наши
   // собственные команды события тоже приходят и не должны ничего менять.
-  const onPlay = useCallback(() => {
+  const onPlay = useCallback((e) => {
+    if (e?.currentTarget && !declared.current.declared) readDuration(e.currentTarget);
     // как и в togglePlay: заявить права до setPlaying, чтобы эффект
     // вытеснения не сработал на самого себя
     dispatch(playbackClaim({ turnId, widgetId }));
     setPlaying(true);
-  }, [dispatch, turnId, widgetId]);
+  }, [dispatch, turnId, widgetId, readDuration]);
 
   const onPause = useCallback(() => {
     setPlaying(false);

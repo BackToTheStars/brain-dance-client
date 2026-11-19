@@ -8,7 +8,7 @@ let bridgePromise = null;
 
 // Мост грузится вместе с markdown-it, при первой статье в форме: странице холста без
 // md-ходов он не нужен.
-const loadBridge = () => {
+export const loadBridge = () => {
   if (!bridgePromise) {
     bridgePromise = Promise.all([loadMdRenderer(), import('../widgets/md/mdDelta')])
       .then(([renderer, { markdownToDelta, deltaToMarkdown }]) => ({
