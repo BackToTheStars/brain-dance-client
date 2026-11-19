@@ -152,7 +152,7 @@ export const applyOpsToStoreTurn = (turn, ops, extra = {}) => {
   }
 
   if (HEADER_FIELDS.some((key) => key in fields)) {
-    const header = 'header' in fields ? fields.header : turn.dWidgets.h_1.text;
+    const header = 'header' in fields ? fields.header.trim() : turn.dWidgets.h_1.text;
     const dontShowHeader =
       'dontShowHeader' in fields ? fields.dontShowHeader : (turn.dontShowHeader ?? !turn.dWidgets.h_1.show);
     const date = 'date' in fields ? fields.date : turn.date;

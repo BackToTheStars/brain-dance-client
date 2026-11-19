@@ -349,12 +349,13 @@ export const deleteTurn = (_id, { onDeleted } = {}) => (dispatch, getState) => {
   });
 };
 
-// Ответ PUT хода рядов не несёт — в сторе остаются прежние. options — как у request(): с
+// PUT опускает ряды и исходник статьи. options — как у request(): с
 // errorCallback отказ сервера и обрыв сети идут в него, без alert.
 export const resaveTurn = (turn, callbacks, options) => (dispatch, getState) => {
   const saved = updateTurnRequest(turn._id, turn, options).then((data) => {
     const stored = getState().turns.d[turn._id];
     const preparedTurn = {
+      markdown: turn.markdown !== undefined ? turn.markdown : stored?.dWidgets?.md_1?.source,
       ...data.item,
       rows: Array.isArray(data.item.rows)
         ? data.item.rows
