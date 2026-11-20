@@ -5,12 +5,14 @@ import { selectFollowing } from '@/modules/presence/redux/selectors';
 import { selectFieldDirty } from '@/modules/turns/redux/selectors';
 import { useUserContext } from '@/modules/user/contexts/UserContext';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPanelMode, togglePanel } from '../../redux/actions';
 import {
   PANEL_ADD_EDIT_TURN,
   PANEL_CLASSES,
   PANEL_INFO,
+  PANEL_NAVIGATOR,
   PANEL_MINIMAP,
   PANEL_TURNS_PASTE,
 } from '@/config/panel';
@@ -22,6 +24,7 @@ import { requestMediaQuotesClose } from '../../redux/mediaQuotesPanel';
 const GameMode = () => {
   //
   const router = useRouter();
+  const t = useTranslations('Game.navigator');
   const { can } = useUserContext();
   const isTurnInBuffer = useSelector(
     (state) => !!state.turns.turnsToPaste.length
@@ -98,7 +101,11 @@ const GameMode = () => {
       },
       show: () => can(RULE_TURNS_CRUD) && isTurnInBuffer && !following,
     },
-    null,
+    {
+      text: t('button'),
+      testId: TID.gameAction('navigator'),
+      callback: () => dispatch(togglePanel({ type: PANEL_NAVIGATOR })),
+    },
     null,
   ];
 

@@ -1,6 +1,16 @@
 import { s } from '@/config/request';
 import { request } from '@/modules/game/requests';
 
+export const getNavigatorPage = (hash, q, after, signal) => {
+  const params = new URLSearchParams({ hash, q });
+  if (after) params.set('after', after);
+  return new Promise((resolve, reject) => {
+    request(`turns/navigator?${params}`, { tokenFlag: true, signal }, {
+      errorCallback: reject,
+    }).then(resolve, reject);
+  });
+};
+
 export const getTurnsGeometryRequest = (hash) => {
   return request(`turns/geometry?hash=${s.hash}`, {
     tokenFlag: true,

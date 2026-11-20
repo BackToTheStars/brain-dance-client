@@ -54,6 +54,8 @@ export const getPersonalizedPanelSettings = (hash, dPanels) => {
 
 const isValidUserField = (field, value) => {
   switch (field) {
+    case "bounds":
+      return value === null || ["left", "top", "width", "height"].every(key => Number.isFinite(value?.[key]));
     case "isDisplayed":
     case "isMinimized":
       return typeof value === "boolean";

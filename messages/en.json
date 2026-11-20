@@ -88,6 +88,13 @@
     "Payment_methods": "Payment methods"
   },
   "Game": {
+    "navigator": {
+      "button": "Navigator", "title": "Turn navigator",
+      "search": "Search titles and text", "empty": "No turns found", "retry": "Retry",
+      "failed": "Could not load turns", "loading": "Loading turns…",
+      "left": "Left column", "right": "Right column",
+      "types": { "turn": "Turn", "picture": "Picture", "picture-only": "Picture", "comment": "Comment", "audio": "Audio", "video": "Video", "pdf": "PDF", "md": "Article", "translation": "Translation" }
+    },
     "turnActions": {
       "confirmCut": "Cut this turn?",
       "confirmDelete": "Delete this turn?",

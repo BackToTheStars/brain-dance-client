@@ -14,6 +14,7 @@ export const PANEL_SETTINGS = 'panel_settings';
 export const PANEL_ADD_EDIT_TURN = 'panel_add_edit_turn';
 export const PANEL_BUTTONS = 'panel_buttons';
 export const PANEL_INFO = 'panel_info';
+export const PANEL_NAVIGATOR = 'panel_navigator';
 export const PANEL_MINIMAP = 'panel_minimap';
 export const PANEL_NOTIFICATIONS = 'panel_notifications';
 export const PANEL_LINES = 'panel_lines';

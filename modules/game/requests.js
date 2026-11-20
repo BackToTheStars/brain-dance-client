@@ -35,11 +35,12 @@ export const dropBrokenAccess = (hash) => {
 
 export const request = async (
   path,
-  { body = null, tokenFlag = false, method = 'GET' } = {},
+  { body = null, tokenFlag = false, method = 'GET', signal } = {},
   { errorMessage, errorCallback, successCallback } = {},
 ) => {
   let defaultMessage = errorMessage || `Request failed, method ${method}`;
   const params = {
+    signal,
     method,
     headers: {
       'content-type': 'application/json',
@@ -89,6 +90,7 @@ export const request = async (
         }
       })
       .catch((err) => {
+        if (signal?.aborted) return reject(err);
         console.log(err);
         reject('Request error');
       });

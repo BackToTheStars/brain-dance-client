@@ -13,6 +13,7 @@ import {
   PANEL_BUTTONS_STYLES,
   PANEL_CLASSES,
   PANEL_INFO,
+  PANEL_NAVIGATOR,
   PANEL_LINES,
   PANEL_MEDIA_QUOTES,
   PANEL_MEDIA_QUOTES_STYLES,
@@ -58,6 +59,14 @@ import PasteTurnPanel from './components/PasteTurnPanel';
 import PresencePanel from '../presence/components/PresencePanel';
 
 export const panels = [
+  {
+    type: PANEL_NAVIGATOR,
+    position: 'turn-navigator',
+    component: dynamic(() => import('./components/TurnNavigator'), { ssr: false }),
+    isDisplayed: false,
+    bounds: null,
+    userFields: ['bounds', 'isDisplayed'],
+  },
   {
     type: PANEL_CLASSES,
     position: POSITION_UPPER_LEFT,

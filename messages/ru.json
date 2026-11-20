@@ -81,6 +81,13 @@
     "Payment_methods": "Платёжные способы"
   },
   "Game": {
+    "navigator": {
+      "button": "Навигатор", "title": "Навигатор ходов",
+      "search": "Поиск по названию и тексту", "empty": "Ходы не найдены", "retry": "Повторить",
+      "failed": "Не удалось загрузить ходы", "loading": "Загрузка ходов…",
+      "left": "Левая колонка", "right": "Правая колонка",
+      "types": { "turn": "Ход", "picture": "Изображение", "picture-only": "Изображение", "comment": "Комментарий", "audio": "Аудио", "video": "Видео", "pdf": "PDF", "md": "Статья", "translation": "Перевод" }
+    },
     "turnActions": {
       "confirmCut": "Точно вырезать?",
       "confirmDelete": "Точно удалить?",
