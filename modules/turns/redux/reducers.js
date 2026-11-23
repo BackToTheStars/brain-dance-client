@@ -7,7 +7,6 @@ import { applyOpsToStoreTurn } from './turnOps';
 // `saved` / `savedScroll` — геометрия и прокрутка, какими они лежат на сервере. Не в `g`
 // и `d`: открытая форма хода перезаполняется при любой смене записи своего хода там.
 const initialTurnsState = {
-  navigatorRevision: 0,
   turnsToRender: [],
   d: {},
   g: {},
@@ -75,7 +74,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         g,
         saved,
         turnsToRender: sortIdsByZ(turnsToRender, g),
-        navigatorRevision: (state.navigatorRevision ?? 0) + 1,
       };
     }
     case types.TURN_UPDATE_GEOMETRY: {
@@ -257,7 +255,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         g,
         saved: { ...state.saved, [payload._id]: toSaved(payload) },
         turnsToRender: sortIdsByZ([...state.turnsToRender, payload._id], g),
-        navigatorRevision: (state.navigatorRevision ?? 0) + 1,
       };
     }
 
@@ -276,7 +273,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
           [payload._id]: { ...payload, z },
         },
         saved: { ...state.saved, [payload._id]: toSaved(payload) },
-        navigatorRevision: (state.navigatorRevision ?? 0) + 1,
         savedScroll: withoutTurnKeys(state.savedScroll, [payload._id]),
       };
     }
@@ -289,7 +285,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
       return {
         ...state,
         d: { ...state.d, [turnId]: applyOpsToStoreTurn(turn, ops, extra) },
-        navigatorRevision: (state.navigatorRevision ?? 0) + 1,
       };
     }
 
@@ -306,7 +301,6 @@ export const turnsReducer = (state = initialTurnsState, { type, payload }) => {
         ...state,
         d: preparedD,
         g: preparedG,
-        navigatorRevision: (state.navigatorRevision ?? 0) + 1,
         saved,
         savedScroll: withoutTurnKeys(state.savedScroll, [payload]),
         scrollPositions: withoutTurnKeys(state.scrollPositions, [payload]),

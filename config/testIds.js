@@ -529,6 +529,14 @@ export const TID = {
     // шрифт редактора, масштаб и Auto Save Field к умолчаниям; позиция холста остаётся
     resetLayout: 'info-reset-layout',
   },
+
+  // Навигатор ходов (modules/panels/components/TurnNavigator.js): корень панели, поле поиска
+  // (на <input> antd Input) и строка результата + data-turn-id
+  navigator: {
+    panel: 'navigator-panel',
+    search: 'navigator-search',
+    item: 'navigator-item',
+  },
 };
 
 export default TID;

@@ -4,6 +4,7 @@ import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useLocale, useTranslations } from 'next-intl';
 import { DragOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
+import { TID } from '@/config/testIds';
 import { gameViewUrl } from '@/modules/lobby/helpers/shareParams';
 import { moveField } from '@/modules/turns/redux/actions';
 import { getNavigatorPage } from '@/modules/turns/requests';
@@ -29,6 +30,21 @@ function Results({ hash, query, navigate }) {
   const [cursor, setCursor] = useState('');
   const [status, setStatus] = useState('loading');
   const [attempt, setAttempt] = useState(0);
+  // Saves do not reload the list. A turn that leaves the store while the list is open drops out;
+  // one this client has not loaded yet stays and opens by its link.
+  const store = useStore();
+  const [gone, setGone] = useState(() => new Set());
+  useEffect(() => {
+    let known = store.getState().turns.g;
+    return store.subscribe(() => {
+      const current = store.getState().turns.g;
+      if (current === known) return;
+      const lost = Object.keys(known).filter(id => !current[id]);
+      known = current;
+      if (lost.length) setGone(previous => new Set([...previous, ...lost]));
+    });
+  }, [store]);
+  const shown = items.filter(item => !gone.has(item._id));
 
   useEffect(() => {
     if (cursor === null) return;
@@ -61,11 +77,11 @@ function Results({ hash, query, navigate }) {
   }, [hash, query, cursor, attempt]);
 
   return <div className="navigator-results" ref={root}>
-    <ul>{items.map(item => {
+    <ul>{shown.map(item => {
       const type = Object.hasOwn(icons, item.contentType) ? item.contentType : 'turn';
       const typeName = t('types.' + type);
       const title = item.title || typeName;
-      return <li key={item._id}>
+      return <li key={item._id} data-test-id={TID.navigator.item} data-turn-id={item._id}>
         <i className={'fa fa-' + (icons[type] || 'file')} title={typeName} aria-label={typeName} />
         <a href={gameViewUrl(hash, { focusTurnId: item._id })} title={title}
           onClick={event => navigate(event, item._id)}><Highlight text={title} query={query} /></a>
@@ -75,7 +91,7 @@ function Results({ hash, query, navigate }) {
     })}</ul>
     <div ref={end} className="navigator-end" />
     <div role="status">{status === 'loading' && t('loading')}
-      {status === 'ready' && cursor === null && !items.length && t('empty')}
+      {status === 'ready' && cursor === null && !shown.length && t('empty')}
       {status === 'error' && <>{t('failed')} <button className="btn btn-primary" onClick={() => {
         setStatus('loading'); setAttempt(n => n + 1);
       }}>{t('retry')}</button></>}
@@ -88,7 +104,6 @@ export default function TurnNavigator() {
   const dispatch = useDispatch();
   const store = useStore();
   const hash = useSelector(state => state.game.game.hash);
-  const revision = useSelector(state => state.turns.navigatorRevision);
   const ref = useRef(null);
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
@@ -111,12 +126,13 @@ export default function TurnNavigator() {
     }));
   }
 
-  return <section ref={ref} aria-label={t('title')}>
+  return <section ref={ref} aria-label={t('title')} data-test-id={TID.navigator.panel}>
     <header className="navigator-header">
       <DragOutlined /><strong>{t('title')}</strong>
     </header>
     <div className="navigator-filter"><Input allowClear prefix={<SearchOutlined />} maxLength={200}
-      value={search} placeholder={t('search')} aria-label={t('search')} onChange={e => setSearch(e.target.value)} /></div>
-    <Results key={JSON.stringify([hash, query, revision])} hash={hash} query={query} navigate={navigate} />
+      value={search} placeholder={t('search')} aria-label={t('search')} data-test-id={TID.navigator.search}
+      onChange={e => setSearch(e.target.value)} /></div>
+    <Results key={JSON.stringify([hash, query])} hash={hash} query={query} navigate={navigate} />
   </section>;
 }
