@@ -138,6 +138,26 @@
   }
 }
 
+// Блок статьи — отдельный узел .md-content (карточка и предпросмотр формы): поля его первого и
+// последнего элемента сняты правилом выше, промежуток между блоками — отступ блока, а не поля
+// (offsetHeight блока — его высота в документе: на нём стоят разделители ленивой отрисовки).
+// Те же промежутки, что у сплошной статьи: 0,6em, перед заголовком 0,8em, после заголовка 0,4em.
+.md-block {
+  display: flow-root;
+
+  & + .md-block {
+    padding-top: 0.6em;
+  }
+
+  & + .md-block > :is(h1, h2, h3, h4, h5, h6):first-child {
+    margin-top: 0.2em;
+  }
+
+  &:has(> :is(h1, h2, h3, h4, h5, h6):last-child) + .md-block {
+    padding-top: 0.4em;
+  }
+}
+
 .translucent-field {
   .stb-react-turn {
     opacity: 0.4;
@@ -395,6 +415,9 @@
         max-height: 100%;
         overflow-y: scroll;
         overflow-wrap: break-word;
+        // блоки вне окна — разделители оценённой высоты: якорь прокрутки Chrome увёл бы
+        // восстановленную позицию вслед за сменой их высоты (как у перевода)
+        overflow-anchor: none;
         @include turn-scrollbar(var(--turn-scrollbar-color));
       }
     }

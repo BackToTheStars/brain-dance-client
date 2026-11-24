@@ -92,7 +92,7 @@
       "button": "Navigator", "title": "Turn navigator",
       "search": "Search titles and text", "empty": "No turns found", "retry": "Retry",
       "failed": "Could not load turns", "loading": "Loading turns…",
-      "left": "Left column", "right": "Right column",
+      "left": "Left column", "right": "Right column", "jump": "Go to the match in the text",
       "types": { "turn": "Turn", "picture": "Picture", "picture-only": "Picture", "comment": "Comment", "audio": "Audio", "video": "Video", "pdf": "PDF", "md": "Article", "translation": "Translation" }
     },
     "turnActions": {
@@ -231,6 +231,20 @@
           "Ok": "Delete",
           "Cancel": "Cancel"
         }
+      },
+      "blocks": {
+        "split": "{count, plural, one {The text was split into # block} other {The text was split into # blocks}}",
+        "addBelow": "Add a block below",
+        "delete": "Delete the block",
+        "merge": "Merge with the next block",
+        "mergeLast": "This is the last block: there is nothing to merge it with",
+        "splitAtCursor": "Split the block at the cursor",
+        "splitNoCursor": "Put the cursor in this block first",
+        "add": "+ Block",
+        "copyAll": "Copy the whole article",
+        "copied": "Copied",
+        "placeholder": "Block (markdown)",
+        "saveOff": "Blocks are saved one by one once the turn itself is saved as an article in blocks"
       }
     },
     "pdf": {

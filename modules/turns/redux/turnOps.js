@@ -128,9 +128,9 @@ export const applyTurnOps = (turn, ops) => {
 const hasRowContent = (row) => row.left.trim() !== '' || row.right.trim() !== '';
 const HEADER_FIELDS = ['header', 'dontShowHeader', 'date', 'sourceUrl'];
 
-// Те же операции над ходом в виде стора (dWidgets): ряды и языки — в tr_1, заголовок, дата и
-// источник — в h_1 / s_1, абзац — в p_1. Виджеты, которых операции не касались, остаются теми же
-// объектами. extra — поля хода поверх (opsVersion из ответа сервера).
+// Те же операции над ходом в виде стора (dWidgets): ряды и языки — в tr_1 (ряды и в md_1 статьи),
+// заголовок, дата и источник — в h_1 / s_1, абзац — в p_1. Виджеты, которых операции не касались,
+// остаются теми же объектами. extra — поля хода поверх (opsVersion из ответа сервера).
 export const applyOpsToStoreTurn = (turn, ops, extra = {}) => {
   const widget = turn.dWidgets.tr_1;
   const { rows, fields } = applyTurnOps({ rows: widget?.rows }, ops);
@@ -148,6 +148,14 @@ export const applyOpsToStoreTurn = (turn, ops, extra = {}) => {
           ? { left: text(fields.languages.left).trim(), right: text(fields.languages.right).trim() }
           : widget.languages,
       show: isTranslation && rows.some(hasRowContent),
+    };
+  }
+  // Статья — те же ряды одной колонкой: после первой записи рядов она уже не «без рядов».
+  if (rowsTouched && turn.dWidgets.md_1) {
+    dWidgets.md_1 = {
+      ...turn.dWidgets.md_1,
+      rows,
+      show: turn.contentType === 'md' && rows.some(hasRowContent),
     };
   }
 

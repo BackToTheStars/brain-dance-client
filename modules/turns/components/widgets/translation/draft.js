@@ -145,5 +145,13 @@ export const baseSaved = (ops) => (form) =>
 
 export const formDraftOps = (form) => (form?.rowsBase ? draftOps(form.rowsBase, form.rows) : []);
 
+// С чем сравнивать ряды формы. Статья без рядов на сервере: база пуста, а исходник разделён на
+// блоки при открытии формы (form.rowsSplit) — пока блоки не тронуты, сохранять нечего.
+export const draftBase = (form) =>
+  form?.rowsSplit && !form.rowsBase?.length ? form.rowsSplit : form?.rowsBase;
+
+// Статья md — те же ряды одной колонкой.
 export const formHasDraft = (form, template) =>
-  template === 'translation' && !!form?.rowsBase && hasDraftChanges(form.rowsBase, form.rows);
+  (template === 'translation' || template === 'md') &&
+  !!form?.rowsBase &&
+  hasDraftChanges(draftBase(form), form.rows);

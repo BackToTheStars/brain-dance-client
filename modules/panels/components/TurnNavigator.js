@@ -2,10 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useLocale, useTranslations } from 'next-intl';
-import { DragOutlined, SearchOutlined } from '@ant-design/icons';
+import { AimOutlined, DragOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
 import { TID } from '@/config/testIds';
 import { gameViewUrl } from '@/modules/lobby/helpers/shareParams';
+import { selectFollowing } from '@/modules/presence/redux/selectors';
+import { cancelJump, jumpToMatch } from '@/modules/turns/components/widgets/parts/jumpToMatch';
 import { moveField } from '@/modules/turns/redux/actions';
 import { getNavigatorPage } from '@/modules/turns/requests';
 import { freeCenter, useNavigatorBounds } from './useNavigatorBounds';
@@ -21,8 +23,10 @@ function Highlight({ text, query }) {
   return <>{text.slice(0, at)}<mark>{text.slice(at, at + query.length)}</mark>{text.slice(at + query.length)}</>;
 }
 
-function Results({ hash, query, navigate }) {
+function Results({ hash, query, navigate, jump }) {
   const t = useTranslations('Game.navigator');
+  // спутник экскурсии только смотрит: холст и карточки ведёт ведущий
+  const following = useSelector(selectFollowing);
   const locale = useLocale();
   const root = useRef(null);
   const end = useRef(null);
@@ -86,6 +90,9 @@ function Results({ hash, query, navigate }) {
         <a href={gameViewUrl(hash, { focusTurnId: item._id })} title={title}
           onClick={event => navigate(event, item._id)}><Highlight text={title} query={query} /></a>
         {item.createdAt && <time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString(locale)}</time>}
+        {item.at && !following && <button type="button" className="navigator-jump" title={t('jump')}
+          aria-label={t('jump')} data-test-id={TID.navigator.jump} data-turn-id={item._id}
+          onClick={() => jump(item)}><AimOutlined /></button>}
         <small>{item.column && t(item.column) + ' · '}<Highlight text={item.snippet || typeName} query={query} /></small>
       </li>;
     })}</ul>
@@ -113,17 +120,33 @@ export default function TurnNavigator() {
   }, [search]);
   useNavigatorBounds(ref);
 
-  function navigate(event, id) {
-    if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-    const { game, turns } = store.getState();
-    const turn = turns.g[id];
-    if (!turn) return;
-    event.preventDefault();
+  function center(turn) {
+    const { game } = store.getState();
     const target = freeCenter(ref.current.parentElement.getBoundingClientRect(), window.innerWidth, window.innerHeight);
     dispatch(moveField({
       left: turn.position.x + turn.size.width / 2 - game.position.x - target.x / game.zoom,
       top: turn.position.y + turn.size.height / 2 - game.position.y - target.y / game.zoom,
     }));
+  }
+
+  function navigate(event, id) {
+    if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const turn = store.getState().turns.g[id];
+    if (!turn) return;
+    event.preventDefault();
+    cancelJump();
+    center(turn);
+  }
+
+  // Ход, ещё не загруженный клиентом, открывается ссылкой, как по названию: до карточки, без перехода в тексте.
+  function jump(item) {
+    const turn = store.getState().turns.g[item._id];
+    if (!turn) {
+      window.location.assign(gameViewUrl(hash, { focusTurnId: item._id }));
+      return;
+    }
+    center(turn);
+    jumpToMatch({ turnId: item._id, contentType: item.contentType, at: item.at, query });
   }
 
   return <section ref={ref} aria-label={t('title')} data-test-id={TID.navigator.panel}>
@@ -133,6 +156,6 @@ export default function TurnNavigator() {
     <div className="navigator-filter"><Input allowClear prefix={<SearchOutlined />} maxLength={200}
       value={search} placeholder={t('search')} aria-label={t('search')} data-test-id={TID.navigator.search}
       onChange={e => setSearch(e.target.value)} /></div>
-    <Results key={JSON.stringify([hash, query])} hash={hash} query={query} navigate={navigate} />
+    <Results key={JSON.stringify([hash, query])} hash={hash} query={query} navigate={navigate} jump={jump} />
   </section>;
 }

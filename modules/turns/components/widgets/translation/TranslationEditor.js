@@ -14,9 +14,23 @@
 // (useVisibleParts): элементов в теле — по окну, не по числу рядов. Высота ячеек —
 // не autoSize antd (он мерил каждую textarea отдельно скрытым textarea в body: принудительная
 // вёрстка документа на каждую), а один пакет замеров на коммит: все чтения, потом все записи.
+// single — статья md: те же ряды одной колонкой (блок — left, right пустой), без языков; у блока
+// ещё «склеить со следующим» и «разделить по курсору» (у сохранённой статьи уходят на сервер сразу,
+// как удаление), в полосе — «скопировать всю статью». Изменённый блок, в котором оказалось
+// несколько блоков (вставка с пустыми строками, больше предела), при сохранении делится на ряды.
+// Статья без рядов (ещё не разделённый markdown) делится на блоки при открытии и пишется
+// целиком первым общим Save.
 
 import { TID } from '@/config/testIds';
-import { DeleteOutlined, LoadingOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  ScissorOutlined,
+  VerticalAlignMiddleOutlined,
+} from '@ant-design/icons';
 import { Input, Modal } from 'antd';
 import { useTranslations } from 'next-intl';
 import {
@@ -40,6 +54,7 @@ import { useTranslationWheel } from './useTranslationWheel';
 import {
   advanceBase,
   baseSaved,
+  draftBase,
   leavesNoText,
   onlyTextRowId,
   rowHasText,
@@ -49,9 +64,19 @@ import {
   seedBase,
 } from './draft';
 import { caretAfterIds, ensureRowQuoteIds, lostRowQuotes, quoteLinks } from './quotes';
-import { dropEmptyRows, emptyRow, formRows, normalizeLanguages } from './rows';
+import {
+  dropEmptyRows,
+  emptyRow,
+  formRows,
+  joinBlocks,
+  newRowId,
+  normalizeLanguages,
+  rowsFromMarkdown,
+  splitDraftRows,
+} from './rows';
 
 const SIDES = ['left', 'right'];
+const SINGLE_SIDES = ['left'];
 const CELL_PLACEHOLDER = { left: 'Original text (markdown)', right: 'Translation (markdown)' };
 const LANGUAGE_PLACEHOLDER = { left: 'Language of the left column', right: 'Language of the right column' };
 const MIN_ROWS = 2;
@@ -69,6 +94,8 @@ const TEXTAREA_EXTRA_Y = 10;
 const ACTIONS_COLUMN = 56 + 6 * 2;
 const ROW_EXTRA = 8 * 2 + 1;
 const ACTIONS_HEIGHT = 26 * 2 + 4 + 2;
+// у блока статьи кнопок пять: «сохранить» во всю ширину и две строки по две
+const SINGLE_ACTIONS_HEIGHT = 26 * 3 + 4 * 2 + 2;
 
 const text = (value) => (typeof value === 'string' ? value : '');
 
@@ -105,21 +132,21 @@ const EMPTY_CELL = cellMetrics('');
 
 // Знаков в строке textarea при ширине тела: ширина колонки за вычетом отступов textarea, знак
 // моноширинного шрифта в долях кегля.
-const charsPerLine = (width, fontSize) => {
-  const textWidth = (width - ACTIONS_COLUMN) / 2 - TEXTAREA_PADDING_X;
+const charsPerLine = (width, fontSize, single = false) => {
+  const textWidth = (width - ACTIONS_COLUMN) / (single ? 1 : 2) - TEXTAREA_PADDING_X;
   return Math.max(1, Math.floor(textWidth / (fontSize * CHAR_WIDTH)));
 };
 // Строк ячейки: по знакам плюс по строке на каждый перенос, не меньше minRows.
 const linesOf = ({ chars, breaks }, perLine) => Math.max(MIN_ROWS, Math.ceil(chars / perLine) + breaks);
 
 // Оценка высоты ряда редактора: строки большей ячейки по кеглю, отступы и рамка textarea, не ниже
-// двух строк кнопок, плюс отступы и линия ряда.
-export const estimateEditorRowHeight = (row, box, fontSize = EDITOR_FONT_DEFAULT) => {
-  const perLine = charsPerLine(box.width, fontSize);
+// строк кнопок, плюс отступы и линия ряда. single — блок статьи: одна колонка во всю ширину.
+export const estimateEditorRowHeight = (row, box, fontSize = EDITOR_FONT_DEFAULT, single = false) => {
+  const perLine = charsPerLine(box.width, fontSize, single);
   const { left, right } = row ? rowMetrics(row) : { left: EMPTY_CELL, right: EMPTY_CELL };
-  const lines = Math.max(linesOf(left, perLine), linesOf(right, perLine));
+  const lines = single ? linesOf(left, perLine) : Math.max(linesOf(left, perLine), linesOf(right, perLine));
   const cell = Math.ceil(lines * fontSize * LINE_HEIGHT) + TEXTAREA_EXTRA_Y;
-  return Math.max(cell, ACTIONS_HEIGHT) + ROW_EXTRA;
+  return Math.max(cell, single ? SINGLE_ACTIONS_HEIGHT : ACTIONS_HEIGHT) + ROW_EXTRA;
 };
 
 // Ячейки редактора: ключ «ряд + сторона», textarea из ref antd (или сам узел), метрика ячейки из
@@ -166,7 +193,7 @@ const refitAll = (fit, fontChanged) => {
 // верхним индексом, как в предпросмотре статьи. Его корень —
 // скроллер сетки: ряды вне окна она рисует заглушками. Сетка монтируется после того, как корень
 // попал в ref: иначе её хук увидел бы пустой ref и отрисовал все ряды разом.
-const Preview = ({ rows, languages }) => {
+const Preview = ({ rows, languages, single }) => {
   const t = useTranslations('Game.translation');
   const markVars = useMdMarkVars();
   const ready = !!useMdRenderer();
@@ -181,7 +208,7 @@ const Preview = ({ rows, languages }) => {
   const shown = dropEmptyRows(rows);
   return (
     <div
-      className="md-editor__preview translation-preview"
+      className={`md-editor__preview translation-preview${single ? ' translation-preview--single' : ''}`}
       ref={bindPane}
       data-test-id={TID.translation.editor.previewPane}
       style={markVars}
@@ -195,6 +222,7 @@ const Preview = ({ rows, languages }) => {
           scrollRef={pane}
           markIds
           showQuoteIds
+          single={single}
         />
       ) : (
         <div className="md-editor__placeholder" data-test-id={TID.translation.loading}>
@@ -236,8 +264,11 @@ const CellTools = memo(({ enabled, onWrap }) => {
 // Ряд — memo с устойчивыми пропсами: набор текста в ячейке перерисовывает только свой ряд.
 // live — ряды ходят на сервер по одному; last — единственный сохранённый ряд с текстом;
 // rows у textarea — оценка до замера, после замера высота стоит инлайном.
-const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide }) => {
+// single — блок статьи: одна ячейка, кнопки «склеить со следующим» (hasNext — есть следующий блок)
+// и «разделить по курсору» (caretHere — курсор был в этом блоке).
+const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide, single, hasNext, caretHere }) => {
   const editor = TID.translation.editor;
+  const sides = single ? SINGLE_SIDES : SIDES;
   const dirty = rowState(saved, row);
   const filled = rowHasText(row);
   const keep = live && last;
@@ -257,12 +288,12 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
       onFocus={() => actions.focus(row.id)}
       onBlur={() => actions.blur(row.id)}
     >
-      {SIDES.map((side) => {
+      {sides.map((side) => {
         const props = {
           'data-side': side,
           'data-dirty': dirty[side] ? 'true' : undefined,
           value: row[side],
-          placeholder: CELL_PLACEHOLDER[side],
+          placeholder: single ? titles.placeholder : CELL_PLACEHOLDER[side],
           onFocus: () => actions.caret(row.id, side),
           onChange: (e) => actions.cell(row.id, side, e.target.value),
         };
@@ -289,7 +320,7 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
         <button
           type="button"
           className="md-editor__tool"
-          title="Add a row below"
+          title={single ? titles.addBelow : 'Add a row below'}
           data-test-id={editor.addRowAfter}
           data-row-id={row.id}
           onClick={() => actions.addAfter(row.id)}
@@ -299,7 +330,7 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
         <button
           type="button"
           className="md-editor__tool"
-          title={keep ? titles.last : 'Delete the row'}
+          title={keep ? titles.last : single ? titles.delete : 'Delete the row'}
           disabled={busy || keep}
           data-test-id={editor.deleteRow}
           data-row-id={row.id}
@@ -308,6 +339,34 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
         >
           <DeleteOutlined />
         </button>
+        {single && (
+          <>
+            <button
+              type="button"
+              className="md-editor__tool"
+              title={hasNext ? titles.merge : titles.mergeLast}
+              disabled={busy || !hasNext}
+              data-test-id={editor.mergeRow}
+              data-row-id={row.id}
+              onClick={() => actions.merge(row.id)}
+            >
+              <VerticalAlignMiddleOutlined />
+            </button>
+            {/* mousedown гасится: курсор и выделение остаются в ячейке блока */}
+            <button
+              type="button"
+              className="md-editor__tool"
+              title={caretHere ? titles.split : titles.splitNoCursor}
+              disabled={busy || !caretHere}
+              data-test-id={editor.splitRow}
+              data-row-id={row.id}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => actions.split(row.id)}
+            >
+              <ScissorOutlined />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -329,13 +388,21 @@ const TranslationEditor = ({
   lines,
   dropQuoteLinks,
   aside = null,
+  single = false,
+  notifySplit,
 }) => {
   const t = useTranslations('Game.turnForm');
   const dispatch = useDispatch();
   const turnId = useSelector((state) => state.panels.editTurnId);
-  const live = useSelector(
-    (state) => state.turns.d[state.panels.editTurnId]?.contentType === 'translation',
-  );
+  // Ряды ходят на сервер по одному, только когда ход сохранён тем же типом; статья — ещё и рядами:
+  // у статьи без рядов на сервере нет блоков, к которым относились бы операции одного блока.
+  const live = useSelector((state) => {
+    const stored = state.turns.d[state.panels.editTurnId];
+    if (!single) return stored?.contentType === 'translation';
+    return stored?.contentType === 'md' && !!stored.dWidgets?.md_1?.rows?.length;
+  });
+  // markdown-it для деления блоков; до загрузки делить нечем (null)
+  const markdownIt = useMdRenderer()?.markdownIt || null;
   const [preview, setPreview] = useState(false);
   const [visual, setVisual] = useState(true);
   const [toolbarHost, setToolbarHost] = useState(null);
@@ -365,6 +432,20 @@ const TranslationEditor = ({
     if (!seeded) patchForm(seedBase);
   }, [seeded]);
 
+  // Статья без рядов: исходник делится на блоки, как только загружен markdown-it. База остаётся
+  // пустой — на сервере рядов нет, после первой правки все блоки уйдут вставками общим Save;
+  // нетронутые блоки сравниваются с делением (rowsSplit) и правкой не считаются.
+  const legacySource = single && !(value || []).length ? form?.markdown : null;
+  useEffect(() => {
+    if (!legacySource?.trim() || !markdownIt) return;
+    const blocks = rowsFromMarkdown(legacySource, markdownIt);
+    patchForm((prev) =>
+      prev.rows?.length
+        ? {}
+        : { rows: blocks, rowsSplit: blocks, ...(prev.rowsBase ? {} : { rowsBase: [] }) },
+    );
+  }, [legacySource, markdownIt]);
+
   const now = useRef(null);
   now.current = {
     rows,
@@ -380,6 +461,9 @@ const TranslationEditor = ({
     lastTitle,
     lines,
     dropQuoteLinks,
+    single,
+    markdownIt,
+    notifySplit,
   };
 
   // Скроллер рядов. Ref-колбэк пропускает null (тело снято на время Preview — хук держит прежний
@@ -468,17 +552,20 @@ const TranslationEditor = ({
   }, [rows]);
   const indexById = useMemo(() => new Map(ids.map((id, i) => [id, i])), [ids]);
   const estimate = useCallback(
-    (id, box) => estimateEditorRowHeight(now.current.rows[indexById.get(id)], box, fontSize.current),
-    [indexById, fontChanges, visual],
+    (id, box) =>
+      estimateEditorRowHeight(now.current.rows[indexById.get(id)], box, fontSize.current, single),
+    [indexById, fontChanges, visual, single],
   );
   const always = useMemo(
     // Один активный ряд остаётся смонтированным вместе со своим нативным тулбаром.
     () => [focused, visual && toolbarCell ? cellRowId(toolbarCell) : null, added.current, ...Object.keys(pending)].filter(Boolean),
     [focused, pending, ids, visual, toolbarCell],
   );
-  const { visible, heightOf, measureRef, box } = useVisibleParts({ scrollRef: body, ids, estimate, always, layoutKey: visual });
+  // смена Visual / Source и смена числа колонок (статья ↔ перевод в той же форме) — другие высоты
+  const layoutKey = single ? `${visual}|single` : visual;
+  const { visible, heightOf, measureRef, box } = useVisibleParts({ scrollRef: body, ids, estimate, always, layoutKey });
   const width = box ? box.width : 0;
-  const perLine = charsPerLine(width, fontSize.current);
+  const perLine = charsPerLine(width, fontSize.current, single);
 
   // Ряды сняты — их ячейки забыть.
   useLayoutEffect(() => {
@@ -603,13 +690,32 @@ const TranslationEditor = ({
     };
     // Выделения ряда получают id до отправки; текст с id остаётся и в форме. Уходят цитаты с
     // линиями (в том числе с рядом, сохранённым пустым) — сначала окно потери линий, форма не тронута.
+    // Блок статьи, в котором оказалось несколько блоков, уходит рядами: первая часть — этот ряд,
+    // остальные вставляются за ним тем же запросом.
+    const splitOnSave = (rows, id) => {
+      const { single, base, markdownIt } = now.current;
+      if (!single) return { rows, extra: [], parts: 0 };
+      const split = splitDraftRows(rows, base, markdownIt, { only: id });
+      if (!split.parts) return { rows, extra: [], parts: 0 };
+      const index = split.rows.findIndex((row) => row.id === id);
+      const added = split.rows.slice(index + 1, index + split.parts);
+      let after = id;
+      const extra = added.map((row) => {
+        const op = { op: 'row.insert', after, row: { id: row.id, left: row.left, right: '' } };
+        after = row.id;
+        return op;
+      });
+      return { rows: split.rows, extra, parts: split.parts };
+    };
     const save = (id, confirmed) => {
-      const { base, live, changeHandler } = now.current;
+      const { base, live, changeHandler, notifySplit } = now.current;
       if (!live) return;
       const before = now.current.rows;
-      const rows = ensureRowQuoteIds(before, base, { only: id });
-      const ops = rowOps(base, rows, id);
-      if (!ops.length) return;
+      const withIds = ensureRowQuoteIds(before, base, { only: id });
+      const { rows, extra, parts } = splitOnSave(withIds, id);
+      const own = rowOps(base, rows, id);
+      const ops = [...own, ...extra];
+      if (!own.length) return;
       const summary = confirmed ? null : goneWith(ops)?.summary;
       if (summary) {
         setLostLinks({ summary, proceed: () => save(id, true) });
@@ -618,14 +724,94 @@ const TranslationEditor = ({
       if (rows !== before) {
         const index = rows.findIndex((row) => row.id === id);
         for (const side of SIDES) f.queue.add(cellKey(id, side));
-        keepCarets(id, before[index], rows[index]);
+        if (!parts) keepCarets(id, before[index], rows[index]);
         changeHandler(rows);
       }
+      if (parts) notifySplit?.(parts);
       send(id, ops);
+    };
+    // Склеить блок со следующим (через пустую строку) и разделить по курсору. Сохранённая статья
+    // получает такую правку сразу, как удаление: иначе общий Save или Cancel после сохранения
+    // одного из двух блоков оставили бы текст на сервере дважды или потеряли бы его часть.
+    const structural = (id, rows, ops) => {
+      const { live, changeHandler } = now.current;
+      if (live && ops.length) {
+        const summary = goneWith(ops)?.summary;
+        if (summary) {
+          setLostLinks({ summary, proceed: () => {
+            if (send(id, ops)) changeHandler(rows);
+          } });
+          return;
+        }
+        if (!send(id, ops)) return;
+      }
+      changeHandler(rows);
+    };
+    const merge = (id) => {
+      const { rows, base } = now.current;
+      const index = rows.findIndex((row) => row.id === id);
+      const next = rows[index + 1];
+      if (index < 0 || !next) return;
+      const left = [text(rows[index].left).replace(/\n+$/, ''), text(next.left).replace(/^\n+/, '')]
+        .filter((part) => part.trim() !== '')
+        .join('\n\n');
+      const merged = rows.filter((row) => row.id !== next.id);
+      merged[index] = { ...rows[index], left };
+      const withIds = ensureRowQuoteIds(merged, base, { only: id });
+      for (const side of SIDES) f.queue.add(cellKey(id, side));
+      const own = rowOps(base, withIds, id);
+      const ops = [...own, ...(savedRow(base, next.id) ? [{ op: 'row.remove', id: next.id }] : [])];
+      // ни один из двух не сохранён — правка только в форме
+      const onServer = savedRow(base, id) || savedRow(base, next.id);
+      structural(own.length ? id : next.id, withIds, onServer ? ops : []);
+    };
+    // Курсор: у textarea — selectionStart, у Visual — индекс выделения Quill; части дельты по обе
+    // стороны курсора переводятся обратно в исходник мостом (строка курсора остаётся с форматом).
+    const caretSplit = (id) => {
+      const key = cellKey(id, 'left');
+      const row = now.current.rows.find((item) => item.id === id);
+      const handle = f.visual.get(key);
+      if (handle?.quill && handle.bridge) {
+        const range = handle.quill.getSelection();
+        if (!range) return null;
+        const contents = handle.quill.getContents();
+        const tail = contents.slice(range.index + range.length);
+        const lineEnd = tail.ops.find((op) => typeof op.insert === 'string' && op.insert.includes('\n'));
+        const head = [...contents.slice(0, range.index).ops, { insert: '\n', ...(lineEnd?.attributes ? { attributes: lineEnd.attributes } : {}) }];
+        return [handle.bridge.toMarkdown(head), handle.bridge.toMarkdown(tail.ops)];
+      }
+      const el = f.cells.get(key);
+      if (!el || typeof el.selectionStart !== 'number') return null;
+      const source = text(row?.left);
+      return [source.slice(0, el.selectionStart), source.slice(el.selectionEnd)];
+    };
+    const split = (id) => {
+      const { rows, base } = now.current;
+      const parts = caretSplit(id);
+      if (!parts) return;
+      // пустые строки на стыке уходят; отступ первой строки второй части остаётся (код с отступом)
+      const head = parts[0].replace(/\s+$/, '');
+      const tail = parts[1].replace(/^([ \t]*\n)+/, '').replace(/\s+$/, '');
+      if (!head.trim() || !tail.trim()) return;
+      const index = rows.findIndex((row) => row.id === id);
+      if (index < 0) return;
+      const fresh = { id: newRowId(), left: tail, right: '' };
+      let next = [...rows];
+      next.splice(index, 1, { ...rows[index], left: head }, fresh);
+      next = ensureRowQuoteIds(next, base, { only: id });
+      next = ensureRowQuoteIds(next, base, { only: fresh.id });
+      for (const side of SIDES) f.queue.add(cellKey(id, side));
+      added.current = fresh.id;
+      const ops = savedRow(base, id)
+        ? [...rowOps(base, next, id), { op: 'row.insert', after: id, row: next[index + 1] }]
+        : [];
+      structural(id, next, ops);
     };
     return {
       drop,
       cell,
+      merge,
+      split,
       caret: (id, side) => {
         const key = cellKey(id, side);
         setCaretCell(key);
@@ -674,11 +860,42 @@ const TranslationEditor = ({
   }, [dispatch]);
 
   const saveTitle = t('translation.saveRow');
-  const detachedTitle = t('translation.saveRowOff');
-  const titles = useMemo(
-    () => ({ save: saveTitle, detached: detachedTitle, last: lastTitle }),
-    [saveTitle, detachedTitle, lastTitle],
-  );
+  const detachedTitle = t(single ? 'blocks.saveOff' : 'translation.saveRowOff');
+  // подписи кнопок блока — строками в зависимостях: titles остаётся тем же объектом между рендерами
+  const blockTitles = [
+    t('blocks.placeholder'),
+    t('blocks.addBelow'),
+    t('blocks.delete'),
+    t('blocks.merge'),
+    t('blocks.mergeLast'),
+    t('blocks.splitAtCursor'),
+    t('blocks.splitNoCursor'),
+  ];
+  const titles = useMemo(() => {
+    const [placeholder, addBelow, remove, merge, mergeLast, split, splitNoCursor] = blockTitles;
+    return {
+      save: saveTitle,
+      detached: detachedTitle,
+      last: lastTitle,
+      placeholder,
+      addBelow,
+      delete: remove,
+      merge,
+      mergeLast,
+      split,
+      splitNoCursor,
+    };
+  }, [saveTitle, detachedTitle, lastTitle, ...blockTitles]);
+
+  // «Скопировать всю статью»: склейка блоков через пустую строку — исходник статьи целиком.
+  const [copied, setCopied] = useState(false);
+  const copyAll = () => {
+    const source = joinBlocks(dropEmptyRows(now.current.rows));
+    Promise.resolve(navigator.clipboard?.writeText(source)).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }, () => {});
+  };
 
   const setLanguage = (side, text) =>
     patchForm((prev) => ({
@@ -686,6 +903,8 @@ const TranslationEditor = ({
       languages: { ...(prev.languages || {}), [side]: text },
     }));
   const onlyText = live ? onlyTextRowId(base) : null;
+  // состояние блока на экране: у статьи без рядов нетронутый блок — как сохранённый
+  const shownBase = draftBase(form) || base;
   const canWrap = caretRow !== null && indexById.has(caretRow) && visible.has(caretRow);
   const toolbarDisabled = caretCell !== null && !f.visual.has(caretCell);
 
@@ -716,12 +935,13 @@ const TranslationEditor = ({
       continue;
     }
     flushHidden();
-    const row = rows[indexById.get(id)];
+    const index = indexById.get(id);
+    const row = rows[index];
     parts.push(
       <EditorRow
         key={id}
         row={row}
-        saved={savedRow(base, id)}
+        saved={savedRow(shownBase, id)}
         live={live}
         busy={!!pending[id]}
         last={onlyText === id}
@@ -733,13 +953,20 @@ const TranslationEditor = ({
         visual={visual}
         toolbarHost={toolbarHost}
         toolbarActiveSide={toolbarCell && cellRowId(toolbarCell) === id ? cellSide(toolbarCell) : null}
+        single={single}
+        hasNext={single && index + 1 < ids.length}
+        caretHere={single && caretRow === id}
       />,
     );
   }
   flushHidden();
 
   return (
-    <div className="md-editor translation-editor" data-test-id={TID.addTurn.field(prefixClass)}>
+    <div
+      className={`md-editor translation-editor${single ? ' translation-editor--single' : ''}`}
+      data-test-id={TID.addTurn.field(prefixClass)}
+      data-single={single ? 'true' : undefined}
+    >
       <div className="md-editor__bar translation-editor__bar">
         {!preview && (visual ? (
           <div
@@ -769,7 +996,19 @@ const TranslationEditor = ({
         >
           {preview ? (visual ? 'Visual' : 'Source') : 'Preview'}
         </button>
-        {!preview && (
+        {single && (
+          <button
+            type="button"
+            className="btn btn-primary md-editor__toggle"
+            title={t('blocks.copyAll')}
+            data-test-id={editor.copyAll}
+            data-copied={copied ? 'true' : undefined}
+            onClick={copyAll}
+          >
+            <CopyOutlined /> {copied ? t('blocks.copied') : t('blocks.copyAll')}
+          </button>
+        )}
+        {!preview && !single && (
           <div className="translation-editor__languages" data-test-id={editor.languages}>
             {SIDES.map((side) => (
               <Input
@@ -786,7 +1025,7 @@ const TranslationEditor = ({
         )}
       </div>
       {preview ? (
-        <Preview rows={rows} languages={languages} />
+        <Preview rows={rows} languages={languages} single={single} />
       ) : (
         <div className="translation-editor__body" ref={bindBody}>
           {parts}
@@ -796,7 +1035,7 @@ const TranslationEditor = ({
             data-test-id={editor.addRow}
             onClick={actions.addAtEnd}
           >
-            + Row
+            {single ? t('blocks.add') : '+ Row'}
           </button>
         </div>
       )}

@@ -1,5 +1,5 @@
 // Кнопки обёртки выделенного в исходнике markdown: одна таблица и одна функция для textarea
-// статьи (MdEditor) и ячеек перевода (TranslationEditor).
+// ячеек статьи и перевода (TranslationEditor).
 
 import { MD_COLOR_EMOJI } from './markdown';
 

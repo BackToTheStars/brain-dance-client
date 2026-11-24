@@ -12,6 +12,10 @@ const MIN_ID = 1e12;
 const randomId = (random) =>
   MIN_ID + Math.floor(random() * (Number.MAX_SAFE_INTEGER - MIN_ID));
 
+// Цифра сразу за дописанным ^id прочиталась бы его частью: перед ней — невидимый разделитель, как в Visual.
+const WORD_JOINER = String.fromCharCode(0x2060);
+const joinedAt = (source, end) => (source[end] === WORD_JOINER ? 1 : 0);
+
 // Выделения ряда, левая ячейка, затем правая: { id, side, text, idStart, end }. Считаются раз на
 // объект ряда — нетронутый ряд после операции остаётся тем же объектом. id — число или null;
 // хвост, который не читается обратно тем же числом (ведущие нули, не безопасное целое), — тоже null.
@@ -142,6 +146,7 @@ export const ensureRowQuoteIds = (rows, base, { random = Math.random, only, unsa
       for (; at < marks.length && marks[at].side === side; at += 1) {
         if (keep[at]) continue;
         out += `${source.slice(cursor, marks[at].idStart)}^${fresh()}`;
+        if (/\d/.test(source[marks[at].end] || '')) out += WORD_JOINER;
         cursor = marks[at].end;
       }
       if (cursor) next[side] = out + source.slice(cursor);
@@ -156,11 +161,13 @@ export const ensureRowQuoteIds = (rows, base, { random = Math.random, only, unsa
 export const caretAfterIds = (before, after, side, position) => {
   const was = rowMarks(before).filter((mark) => mark.side === side);
   const now = rowMarks(after).filter((mark) => mark.side === side);
+  const from = text(before?.[side]);
+  const to = text(after?.[side]);
   let shift = 0;
   for (let i = 0; i < was.length && i < now.length; i += 1) {
     if (position <= was[i].idStart) break;
     if (position < was[i].end) return Math.min(position + shift, now[i].end);
-    shift = now[i].end - was[i].end;
+    shift = now[i].end + joinedAt(to, now[i].end) - was[i].end - joinedAt(from, was[i].end);
   }
   return position + shift;
 };

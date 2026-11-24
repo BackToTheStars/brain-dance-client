@@ -8,7 +8,6 @@ import PictureAddForm from './components/widgets/picture/EditForm';
 import { SourceAddForm } from './components/widgets/source/EditForm';
 import { VideoAddForm } from './components/widgets/video/EditForm';
 import { ParagraphAddForm } from './components/widgets/paragraph/EditForm';
-import MdEditor from './components/widgets/md/MdEditor';
 import TranslationEditor from './components/widgets/translation/TranslationEditor';
 import FileUploading from './components/forms/FileUploading';
 import VideoUrlField from './components/forms/VideoUrlField';
@@ -273,16 +272,17 @@ const settings = {
 
     availableFields: [FIELD_BACKGROUND_COLOR, FIELD_FONT_COLOR],
   },
-  // Статья в Markdown: исходник в поле markdown, абзац — производный плоский текст,
-  // выделения ==…== — текстовые цитаты. Оформление карточки — как у «Text / picture».
+  // Статья в Markdown: блоки — ряды с одной колонкой в поле rows (редактор рядов в режиме
+  // одной колонки), абзац — производный плоский текст, выделения ==…== — текстовые цитаты.
+  // Оформление карточки — как у «Text / picture».
   [TEMPLATE_MD]: {
     value: 'md',
     label: 'Markdown',
-    requiredFields: [FIELD_MARKDOWN],
-    availableFields: [FIELD_MARKDOWN],
+    requiredFields: [FIELD_ROWS],
+    availableFields: [FIELD_ROWS],
   },
   // Перевод текста: ряды md-ячеек в полях rows и languages, абзац — производный плоский текст
-  // левой колонки; выделения в ячейках — только оформление. Цветов, как у md-хода, нет.
+  // левой колонки; выделения в ячейках — текстовые цитаты. Цветов, как у md-хода, нет.
   [TEMPLATE_TRANSLATION]: {
     value: 'translation',
     label: 'Translation',
@@ -484,18 +484,15 @@ const fieldSettings = {
       },
     },
   },
-  // editorSlot — поле стоит на месте редактора Quill (во всю высоту панели), а не в списке.
+  // Исходник статьи, ещё не разделённой на блоки: форма читает его, редактор рядов делит на
+  // блоки, в запись он не идёт.
   [FIELD_MARKDOWN]: {
     label: 'Markdown',
-    labelKey: 'fields.markdown',
     prefixClass: 'markdown',
     special: true,
-    inputType: 'component',
-    editorSlot: true,
-    widgetSettings: {
-      render: (props) => <MdEditor {...props} />,
-    },
+    hidden: true,
   },
+  // editorSlot — поле стоит на месте редактора Quill (во всю высоту панели), а не в списке.
   [FIELD_ROWS]: {
     label: 'Translation',
     labelKey: 'fields.translation',

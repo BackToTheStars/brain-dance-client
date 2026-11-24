@@ -93,17 +93,25 @@ export const TID = {
 
   // Ход md (contentType=md): статья в карточке (widgets/md/MdArticle.js) и редактор исходника
   // в форме хода (widgets/md/MdEditor.js); поле исходника — addTurn.field('markdown')
+  // Статья хранится блоками — рядами одной колонкой. Форма статьи — редактор рядов перевода в режиме
+  // одной колонки (translation.editor.*, корень addTurn.field('translation') с data-single="true",
+  // подпись поля — addTurn.fieldCaption с data-field="markdown").
   md: {
     body: 'md-body', // прокручиваемое тело статьи (+ data-turn-id); выделения — mark[data-id][data-color]
-    preview: 'md-preview', // кнопка «Preview» — показать рендер исходника на месте textarea
-    source: 'md-source', // та же кнопка в режиме предпросмотра — вернуться к исходнику
-    previewPane: 'md-preview-pane', // отрисованный предпросмотр в форме
-    toolbar: (name) => `md-toolbar-${name}`, // обёртка выделенного: bold, italic, link, mark-<ячейка y g p b s o r>
-    // Режимы формы статьи (forms/useMdBridge.js): Visual — статья в Quill формы, Source — textarea
-    toSource: 'md-to-source', // кнопка «Source» в подписи поля над Quill
-    toVisual: 'md-to-visual', // кнопка «Visual» в подписи поля над textarea; disabled, пока есть неподдерживаемое
-    unsupported: 'md-unsupported', // строка под панелью Source: чего мост не знает (+ data-reasons через запятую)
-    loading: 'md-visual-loading', // заглушка на месте редактора, пока статья не залита в Quill (в т. ч. грузится markdown-it)
+    // блок статьи в карточке и в предпросмотре формы (+ data-row-id). Блоки вне окна прокрутки подряд — один
+    // пустой разделитель с тем же тест-id и data-spacer="true", data-from, data-to, data-count, без data-row-id
+    block: 'md-block',
+    // уведомление antd при сохранении: изменённый блок разделён (+ data-count — сколько блоков получилось)
+    splitNotice: 'md-split-notice',
+    // Прежняя форма статьи (один Quill, textarea Source); с хранением блоками в DOM их нет
+    preview: 'md-preview',
+    source: 'md-source',
+    previewPane: 'md-preview-pane',
+    toolbar: (name) => `md-toolbar-${name}`,
+    toSource: 'md-to-source',
+    toVisual: 'md-to-visual',
+    unsupported: 'md-unsupported',
+    loading: 'md-visual-loading',
   },
 
   // Ход «Перевод текста» (contentType=translation): таблица рядов в карточке
@@ -143,7 +151,12 @@ export const TID = {
       // удаление (DeleteOutlined) в полосе действий (+ data-row-id); у ряда с текстом — окно; data-last-row="true" и disabled —
       // единственный сохранённый ряд с текстом (подсказка — title)
       deleteRow: 'translation-editor-delete-row',
-      addRow: 'translation-editor-add-row', // «+ Row» под списком
+      addRow: 'translation-editor-add-row', // «+ Row» под списком («+ Block» у статьи)
+      // Только у статьи (одна колонка), в полосе действий блока (+ data-row-id): склеить со следующим (disabled у
+      // последнего) и разделить по курсору (disabled, пока курсор не в этом блоке)
+      mergeRow: 'translation-editor-merge-row',
+      splitRow: 'translation-editor-split-row',
+      copyAll: 'translation-editor-copy-all', // «скопировать всю статью» в верхней полосе (склейка блоков в буфер)
       preview: 'translation-editor-preview', // кнопка «Preview» — таблица той же сеткой, что карточка
       source: 'translation-editor-source', // та же кнопка в предпросмотре («Source») — назад к рядам
       previewPane: 'translation-editor-preview-pane', // отрисованный предпросмотр (внутри — translation.row / cell)
@@ -536,6 +549,7 @@ export const TID = {
     panel: 'navigator-panel',
     search: 'navigator-search',
     item: 'navigator-item',
+    jump: 'navigator-jump', // кнопка «к найденному» в строке результата (+ data-turn-id)
   },
 };
 

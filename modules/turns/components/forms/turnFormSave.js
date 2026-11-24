@@ -10,9 +10,8 @@ import { collapseSplitQuotes } from '../helpers/quoteSplitHelper';
 import { EMPTY_CROP } from '../widgets/pdf/cropGeometry';
 import { snapRound } from '../helpers/grid';
 import { GRID_CELL_X } from '@/config/ui';
-import { ensureQuoteIds, toPlainText } from '../widgets/md/markdown';
 import {
-  PREVIEW_TEXT_LIMIT,
+  articlePreviewParagraph,
   dropEmptyRows,
   hasRowsContent,
   normalizeLanguages,
@@ -65,14 +64,18 @@ export const prepareFields = (form, template) => {
   return prepared;
 };
 
+// Перевод и статья md хранят текст рядами: статья — одной колонкой (left), right пустой.
+const ROW_TEMPLATES = [TEMPLATE_TRANSLATION, TEMPLATE_MD];
+export const isRowsTemplate = (template) => !!template && ROW_TEMPLATES.includes(template);
+
 // Со снимком сравнивается и превью видео: своя картинка или новый кадр — тоже правка.
 export const comparableFields = (form, template) => {
   const fields = prepareFields(form, template);
   const videoUrl = fields[FIELD_VIDEO];
-  // Языки перевода сравниваются по значению; ряды здесь не сравниваются вовсе — их
-  // несохранённое считает черновик рядов (widgets/translation/draft.js), без прохода по тексту.
+  // Ряды здесь не сравниваются вовсе — их несохранённое считает черновик рядов
+  // (widgets/translation/draft.js), без прохода по тексту; языки перевода — по значению.
+  if (isRowsTemplate(template)) fields[FIELD_ROWS] = null;
   if (template === TEMPLATE_TRANSLATION) {
-    fields[FIELD_ROWS] = null;
     fields[FIELD_LANGUAGES] = JSON.stringify(normalizeLanguages(form[FIELD_LANGUAGES]));
   }
   return {
@@ -90,7 +93,7 @@ export const sameFields = (a, b) =>
 // Turn.js решает, рисовать ли хэдер, картинку и абзац.
 export const hasTurnContent = (template, fields, paragraphHasText) => {
   const { requiredFields = [], requiredParagraph } = settings[template];
-  if (template === TEMPLATE_TRANSLATION) return hasRowsContent(fields[FIELD_ROWS]);
+  if (isRowsTemplate(template)) return hasRowsContent(fields[FIELD_ROWS]);
   if (requiredFields.length) {
     return requiredFields.every((field) => !!fields[field]?.trim());
   }
@@ -237,30 +240,28 @@ export const buildTurnSave = ({
 
   const prevQuotes = turnToEdit?.quotes || [];
 
-  // Статья md: выделения исходника получают id и становятся текстовыми цитатами хода,
-  // абзац — начало плоского текста с тем же пределом, что у превью перевода (цитаты статьи
-  // живут в выделениях исходника, абзац читают только превью); редактор Quill не читается.
+  // Перевод и статья md: ряды формы без пустых; цитаты живут в выделениях рядов (id им дописывает
+  // форма до сборки) и в quotes хода не пишутся. Абзац производный: у перевода — плоский текст
+  // первой непустой ячейки, у статьи — начало плоского текста статьи; редактор Quill не читается.
+  // Правая колонка статьи всегда пустая.
   const isMd = template === TEMPLATE_MD;
-  const md = isMd ? ensureQuoteIds(form[FIELD_MARKDOWN], now) : null;
-
-  // Перевод: ряды формы без пустых, абзац — плоский текст первой непустой ячейки; цитаты живут
-  // в выделениях рядов и в quotes хода не пишутся.
   const isTranslation = template === TEMPLATE_TRANSLATION;
-  const rows = isTranslation ? dropEmptyRows(form[FIELD_ROWS]) : null;
+  const isRows = isMd || isTranslation;
+  const kept = isRows ? dropEmptyRows(form[FIELD_ROWS]) : null;
+  const rows = isMd ? kept.map((row) => (row.right === '' ? row : { ...row, right: '' })) : kept;
 
   const paragraphOps = isMd
-    ? [{ insert: `${toPlainText(md.source).slice(0, PREVIEW_TEXT_LIMIT)}\n` }]
+    ? articlePreviewParagraph(rows)
     : isTranslation
       ? rowsToPreviewParagraph(rows)
       : collapseSplitQuotes(resTextArr);
 
   let formToPrepare = form;
-  if (isMd) formToPrepare = { ...form, [FIELD_MARKDOWN]: md.source };
-  if (isTranslation) {
+  if (isRows) {
     formToPrepare = {
       ...form,
       [FIELD_ROWS]: rows,
-      [FIELD_LANGUAGES]: normalizeLanguages(form[FIELD_LANGUAGES]),
+      [FIELD_LANGUAGES]: isTranslation ? normalizeLanguages(form[FIELD_LANGUAGES]) : null,
     };
   }
   const preparedForm = prepareFields(formToPrepare, template);
@@ -270,7 +271,7 @@ export const buildTurnSave = ({
       return { error: { message: `Need ${requiredField}` } };
     }
   }
-  if (isTranslation && !hasRowsContent(rows)) {
+  if (isRows && !hasRowsContent(rows)) {
     return { error: { message: `Need ${FIELD_ROWS}` } };
   }
 
@@ -278,7 +279,7 @@ export const buildTurnSave = ({
     return { error: { message: 'Need text body' } };
   }
 
-  const quotes = isMd ? [...md.quotes] : [];
+  const quotes = [];
 
   for (let textItem of paragraphOps) {
     if (textItem.attributes && textItem.attributes.id) {
@@ -317,14 +318,22 @@ export const buildTurnSave = ({
     }
   }
 
-  // Цитаты перевода, пропавшие из рядов: сохранённые ряды (база черновика) против уходящих;
-  // смена типа снимает все.
+  // Цитаты перевода и статьи, пропавшие из рядов: сохранённые ряды (база черновика) против
+  // уходящих; смена типа на тип без рядов снимает все.
+  // У статьи, ещё не разделённой на блоки, сохранённые цитаты — в её исходнике.
+  const savedRowsOf = (turn) => {
+    if (form.rowsBase?.length) return form.rowsBase;
+    if (turn[FIELD_ROWS]?.length) return turn[FIELD_ROWS];
+    return turn.contentType === TEMPLATE_MD && turn[FIELD_MARKDOWN]
+      ? [{ id: '', left: turn[FIELD_MARKDOWN], right: '' }]
+      : [];
+  };
   const rowQuotesDeleted =
-    !!turnToEdit?.contentType && turnToEdit.contentType === TEMPLATE_TRANSLATION
-      ? lostRowQuotes(
-          form.rowsBase || turnToEdit[FIELD_ROWS],
-          isTranslation ? rows : [],
-        ).map((id) => ({ id, type: TYPE_QUOTE_TEXT }))
+    !!turnToEdit && isRowsTemplate(turnToEdit.contentType)
+      ? lostRowQuotes(savedRowsOf(turnToEdit), isRows ? rows : []).map((id) => ({
+          id,
+          type: TYPE_QUOTE_TEXT,
+        }))
       : [];
 
   // Осиротевшие цитаты не попали в quotes, и их линии удаляются общим путём.
@@ -398,15 +407,18 @@ export const buildTurnSave = ({
     }
   }
 
-  // Ряды в теле хода — только при создании перевода: правка шлёт их отдельным запросом
+  // Ряды в теле хода — только при создании перевода и статьи: правка шлёт их отдельным запросом
   // операциями (тело PUT с rows сервер отвергает), а ход другого типа ключей rows / languages
-  // не несёт вовсе.
-  if (!isTranslation) {
+  // не несёт вовсе. Исходник статьи целиком не пишется: у статьи в рядах сервер отвечает на
+  // него 400.
+  delete turnObj[FIELD_MARKDOWN];
+  if (!isRows) {
     delete turnObj[FIELD_ROWS];
     delete turnObj[FIELD_LANGUAGES];
   } else if (turnToEdit) {
     delete turnObj[FIELD_ROWS];
   }
+  if (isMd) delete turnObj[FIELD_LANGUAGES];
 
   if (!!turnToEdit) {
     turnObj._id = turnToEdit._id;
@@ -434,9 +446,10 @@ export const buildTurnSave = ({
     previewDraft,
     editionToken,
   };
-  // Правка перевода. Тип прежний — ряды и изменённые поля одним запросом операций, записи хода
-  // нет (put: false). Смена типа на перевод — операции рядов, за ними запись хода без рядов.
-  if (isTranslation && turnToEdit) {
+  // Правка перевода и статьи. Тип прежний — ряды и изменённые поля одним запросом операций,
+  // записи хода нет (put: false). Смена типа на перевод или статью — операции рядов, за ними
+  // запись хода без рядов.
+  if (isRows && turnToEdit) {
     const retyped = turnToEdit.contentType !== template;
     payload.translation = {
       ops: retyped ? rowsOps : [...rowsOps, ...fieldsOps(form, template, baseFields)],

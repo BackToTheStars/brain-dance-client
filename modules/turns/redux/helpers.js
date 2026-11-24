@@ -43,11 +43,12 @@ export class TurnHelper {
     // Пустой после trim заголовок равен явно выключенному хэдеру; одна точка
     // решения на h_1 и s_1 — иначе дата и ссылка пропадают совсем.
     const headerEffectivelyHidden = !!turn.dontShowHeader || !turn.header?.trim();
-    // Текстовые цитаты у md-хода принадлежат статье, у остальных — абзацу.
+    // Текстовые цитаты абзаца; у статьи и перевода они живут в выделениях рядов.
     const isMd = turn.contentType === 'md';
     // У перевода абзац — производный плоский текст левой колонки, вторым виджетом не рисуется.
     const isTranslation = turn.contentType === 'translation';
     const textQuotes = turn.quotes.filter((quote) => quote.type === 'text');
+    const rows = normalizeRows(turn.rows);
     const widgets = {
       [WIDGET_HEADER]: [
         {
@@ -115,18 +116,22 @@ export class TurnHelper {
       [WIDGET_MD]: [
         {
           id: 'md_1',
-          show: isMd && !!turn.markdown?.trim(),
+          // Статья хранится блоками в рядах (left); статья без рядов — ещё не разделённый
+          // markdown: карточка делит его на лету, первая правка формой пишет ряды.
+          show: isMd && (hasRowsContent(rows) || (!rows.length && !!turn.markdown?.trim())),
+          rows,
           source: turn.markdown,
           // у md-хода абзац не рисуется, поле scrollPosition одно на ход — конфликта с p_1 нет
           scrollPosition: turn.scrollPosition || 0,
-          quotes: isMd ? textQuotes : [],
+          // цитаты статьи выводятся из рядов (translation/quotes.js), как у перевода
+          quotes: [],
         },
       ],
       [WIDGET_TRANSLATION]: [
         {
           id: 'tr_1',
           show: isTranslation && hasRowsContent(turn.rows),
-          rows: normalizeRows(turn.rows),
+          rows,
           languages: normalizeLanguages(turn.languages),
           // поле scrollPosition одно на ход — абзац у перевода не рисуется
           scrollPosition: turn.scrollPosition || 0,
@@ -244,9 +249,11 @@ export class TurnHelper {
       date: turn.date,
       paragraph: turn.dWidgets.p_1.inserts,
       markdown: turn.dWidgets.md_1?.source,
-      // ряды и языки — у перевода и у хода, чьи ряды пережили смену типа (форма вернёт их при
-      // обратной смене); у остальных ходов ключей нет
-      ...(turn.contentType === 'translation' || turn.dWidgets.tr_1?.rows?.length
+      // ряды и языки — у перевода, статьи и хода, чьи ряды пережили смену типа (форма вернёт их
+      // при обратной смене); у остальных ходов ключей нет
+      ...(turn.contentType === 'translation' ||
+      turn.contentType === 'md' ||
+      turn.dWidgets.tr_1?.rows?.length
         ? {
             rows: turn.dWidgets.tr_1?.rows || [],
             languages: turn.dWidgets.tr_1?.languages,

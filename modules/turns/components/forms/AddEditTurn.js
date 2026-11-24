@@ -34,24 +34,26 @@ import { createTurn, resaveTurn, uploadMedia } from '../../redux/actions';
 import { saveTurnOps } from '../../redux/turnOpsSave';
 import { baseSaved, formDraftOps, formHasDraft } from '../widgets/translation/draft';
 import { ensureRowQuoteIds } from '../widgets/translation/quotes';
+import { splitDraftRows } from '../widgets/translation/rows';
+import { loadMdRenderer } from '../widgets/md/mdRenderer';
 import { dataUrlToFile, frameFileName } from '../helpers/videoFrame';
 import {
   buildTurnSave,
   comparableFields,
   hasTurnContent,
+  isRowsTemplate,
   prepareFields,
   sameFields,
 } from './turnFormSave';
 import { clearQuotesInfo, linesDelete } from '@/modules/lines/redux/actions';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import DropdownTemplate from '../inputs/DropdownTemplate';
-import { DatePicker, Input, Modal, Switch } from 'antd';
+import { DatePicker, Input, Modal, Switch, message } from 'antd';
 import dayjs from 'dayjs';
 import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
 import { createFormEdition } from '../helpers/formEdition';
 import { useMediaLinkCheck } from './useMediaLinkCheck';
-import { useMdBridge } from './useMdBridge';
 import { TID } from '@/config/testIds';
 import { castSaved } from '@/modules/presence/redux/actions';
 
@@ -65,10 +67,8 @@ const {
   FIELD_HEADER,
   FIELD_SOURCE,
   FIELD_DATE,
-  FIELD_MARKDOWN,
   FIELD_ROWS,
   TEMPLATE_MD,
-  TEMPLATE_TRANSLATION,
 } = turnSettings;
 
 const SAVE_HINTS = {
@@ -168,7 +168,6 @@ const AddEditTurnPopup = () => {
   useEffect(() => {
     if (!quillConstants.quill) return;
     setBaseline(null);
-    mdBridge.reset();
     if (!!turnToEdit) {
       setActiveTemplate(turnToEdit.contentType);
       const newForm = {};
@@ -193,11 +192,9 @@ const AddEditTurnPopup = () => {
         const paragraphQuotes = turnToEdit.quotes
           ? turnToEdit.quotes.filter((quote) => quote.type === 'text')
           : [];
-        // выделения статьи в Quill — не цитаты абзаца, их id из исходника
+        // у статьи в Quill формы лежит только производный абзац — его выделения не цитаты
         const quoteEls =
-          turnToEdit.contentType === TEMPLATE_MD || mdBridge.isShowing()
-            ? []
-            : getQuoteElements();
+          turnToEdit.contentType === TEMPLATE_MD ? [] : getQuoteElements();
         let i = 0;
         let incId = Math.floor(new Date().getTime() / 1000);
         for (let quoteEl of quoteEls) {
@@ -219,7 +216,7 @@ const AddEditTurnPopup = () => {
           token,
           template: turnToEdit.contentType,
           fields: comparableFields(formRef.current, turnToEdit.contentType),
-          paragraph: mdBridge.paragraphOps(contents),
+          paragraph: contents,
         });
       }, 300);
     } else {
@@ -249,13 +246,22 @@ const AddEditTurnPopup = () => {
     return () => quill.off('text-change', sync);
   }, [quillConstants]);
 
+  // Статья md правится редактором рядов в одну колонку; деление блоков при сохранении ждёт
+  // markdown-it, который грузится лениво (рендер карточки и мост Visual грузят тот же).
   const isMd = !!TEMPLATE_MD && activeTemplate === TEMPLATE_MD;
-  const mdBridge = useMdBridge({
-    quill: quillConstants.quill,
-    isMd,
-    markdown: form[FIELD_MARKDOWN],
-    setMarkdown: (value) => formChangeHandler(FIELD_MARKDOWN, value),
-  });
+  const markdownItRef = useRef(null);
+  useEffect(() => {
+    if (!isMd || markdownItRef.current) return;
+    let alive = true;
+    loadMdRenderer()
+      .then((renderer) => {
+        if (alive) markdownItRef.current = renderer.markdownIt;
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [isMd]);
 
   // Снятые цитаты: их линии удаляются, записи о рамках чистятся. Возвращает промис удаления
   // линий или null.
@@ -379,13 +385,28 @@ const AddEditTurnPopup = () => {
     afterNotMediaClose,
   } = useMediaLinkCheck({ edition, onChecked: finishSave });
 
+  const notifySplit = (count) =>
+    message.info({
+      content: (
+        <span data-test-id={TID.md.splitNotice} data-count={count}>
+          {t('blocks.split', { count })}
+        </span>
+      ),
+    });
+
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
     if (checkingLink) return;
-    // выделения рядов перевода получают id до сборки: текст с id — и в запросе, и в форме
+    // выделения рядов перевода и статьи получают id до сборки: текст с id — и в запросе, и в
+    // форме; изменённый блок статьи, в котором оказалось несколько блоков, делится на ряды
     let formToSave = form;
-    if (activeTemplate === TEMPLATE_TRANSLATION) {
-      const rows = ensureRowQuoteIds(form[FIELD_ROWS], form.rowsBase, { unsaved: true });
+    if (isRowsTemplate(activeTemplate)) {
+      let rows = ensureRowQuoteIds(form[FIELD_ROWS], form.rowsBase, { unsaved: true });
+      if (isMd) {
+        const split = splitDraftRows(rows, form.rowsBase, markdownItRef.current);
+        rows = split.rows;
+        if (split.parts) notifySplit(split.parts);
+      }
       if (rows !== form[FIELD_ROWS]) {
         formToSave = { ...form, [FIELD_ROWS]: rows };
         patchForm({ [FIELD_ROWS]: rows });
@@ -443,9 +464,9 @@ const AddEditTurnPopup = () => {
       ...(typeof patch === 'function' ? patch(prevForm) : patch),
     }));
 
-  // Абзац сравнивается и тогда, когда Quill занят статьёй: смена типа туда-обратно без
-  // правок — «нечего сохранять».
-  const paragraphNow = mdBridge.paragraphOps(editorOps);
+  // Абзац сравнивается и тогда, когда Quill скрыт под редактором рядов: смена типа туда-обратно
+  // без правок — «нечего сохранять».
+  const paragraphNow = editorOps;
   const paragraphChanged = useMemo(
     () => !!baseline && !isSameContents(paragraphNow, baseline.paragraph),
     [paragraphNow, baseline],
@@ -602,125 +623,63 @@ const AddEditTurnPopup = () => {
         )}
         <div
           className={`flex-1 quill-wrapper panel-cell mt-0 ${
-            editorSlotField && !mdBridge.showing ? 'editor-hidden' : ''
-          } ${mdBridge.showing ? 'quill-md' : ''}`}
+            editorSlotField ? 'editor-hidden' : ''
+          }`}
           style={{ '--editor-font-size': `${fontSize}px` }}
           data-font-size={fontSize}
         >
-          {/* Контролы статьи есть всегда и скрыты CSS вне неё: Quill привязывает
-              обработчики к тулбару один раз, при создании. */}
+          {/* Quill формы — только абзац; у статьи и перевода он скрыт под редактором рядов.
+              Тулбар Quill привязывает обработчики один раз, при создании. */}
           <div id="toolbar-container-new">
             <EditorToolbarControls />
-            {mdBridge.showing ? (
+            {!editorSlotField && (
               <span
                 className="editor-field-caption"
                 data-test-id={TID.addTurn.fieldCaption}
-                data-field="markdown"
-                data-mode="visual"
+                data-field="paragraph"
               >
-                {t('editor.markdownVisual')}
-                <button
-                  type="button"
-                  className="editor-field-caption__toggle"
-                  data-test-id={TID.md.toSource}
-                  onClick={mdBridge.toSource}
-                >
-                  {t('editor.toSource')}
-                </button>
+                {t('editor.paragraph')}
               </span>
-            ) : (
-              !editorSlotField && (
-                <span
-                  className="editor-field-caption"
-                  data-test-id={TID.addTurn.fieldCaption}
-                  data-field="paragraph"
-                >
-                  {t('editor.paragraph')}
-                </span>
-              )
             )}
           </div>
           <div id="editor-container-new" />
         </div>
-        {!!editorSlotField && !mdBridge.showing && (
+        {!!editorSlotField && (
           <div
             className="flex-1 editor-slot panel-cell mt-0"
             style={{ '--editor-font-size': `${fontSize}px` }}
           >
-            {mdBridge.loading ? (
-              <div className="md-editor md-editor--loading" data-test-id={TID.md.loading}>
-                <div className="md-editor__bar">
-                  <div className="flex-1" />
-                  <span
-                    className="editor-field-caption"
-                    data-test-id={TID.addTurn.fieldCaption}
-                    data-field="markdown"
-                    data-mode="visual"
-                  >
-                    {t('editor.markdownVisual')}
-                  </span>
-                </div>
-                <div className="md-editor__placeholder">{t('editor.loading')}</div>
-              </div>
-            ) : (
-              fieldSettings[editorSlotField].widgetSettings.render({
-                form,
-                patchForm,
-                edition,
-                setError,
-                saveTurnOps,
-                lines,
-                dropQuoteLinks: dropRowQuoteLinks,
-                changeHandler: (value) => formChangeHandler(editorSlotField, value),
-                label: fieldSettings[editorSlotField].labelKey
-                  ? t(fieldSettings[editorSlotField].labelKey)
-                  : fieldSettings[editorSlotField].label,
-                prefixClass: fieldSettings[editorSlotField].prefixClass,
-                value: form[editorSlotField] || '',
-                aside:
-                  editorSlotField === FIELD_MARKDOWN ? (
-                    <span
-                      className="editor-field-caption"
-                      data-test-id={TID.addTurn.fieldCaption}
-                      data-field="markdown"
-                      data-mode="source"
-                    >
-                      {t('editor.markdownSource')}
-                      <button
-                        type="button"
-                        className="editor-field-caption__toggle"
-                        data-test-id={TID.md.toVisual}
-                        disabled={!mdBridge.canVisual}
-                        onClick={mdBridge.toVisual}
-                      >
-                        {t('editor.toVisual')}
-                      </button>
-                    </span>
-                  ) : (
-                    <span
-                      className="editor-field-caption"
-                      data-test-id={TID.addTurn.fieldCaption}
-                      data-field={fieldSettings[editorSlotField].prefixClass}
-                    >
-                      {fieldSettings[editorSlotField].labelKey
-                        ? t(fieldSettings[editorSlotField].labelKey)
-                        : fieldSettings[editorSlotField].label}
-                    </span>
-                  ),
-                notice: mdBridge.unsupported.length ? (
-                  <div
-                    className="md-editor__notice"
-                    data-test-id={TID.md.unsupported}
-                    data-reasons={mdBridge.unsupported.join(',')}
-                  >
-                    {t('editor.unsupportedTitle')}{' '}
-                    {mdBridge.unsupported
-                      .map((reason) => t(`editor.unsupported.${reason}`))
-                      .join(', ')}
-                  </div>
-                ) : null,
-              })
-            )}
+            {fieldSettings[editorSlotField].widgetSettings.render({
+              form,
+              patchForm,
+              edition,
+              setError,
+              saveTurnOps,
+              lines,
+              dropQuoteLinks: dropRowQuoteLinks,
+              // статья md — те же ряды одной колонкой
+              single: isMd,
+              notifySplit,
+              changeHandler: (value) => formChangeHandler(editorSlotField, value),
+              label: fieldSettings[editorSlotField].labelKey
+                ? t(fieldSettings[editorSlotField].labelKey)
+                : fieldSettings[editorSlotField].label,
+              prefixClass: fieldSettings[editorSlotField].prefixClass,
+              value: form[editorSlotField] || '',
+              aside: (
+                <span
+                  className="editor-field-caption"
+                  data-test-id={TID.addTurn.fieldCaption}
+                  data-field={isMd ? 'markdown' : fieldSettings[editorSlotField].prefixClass}
+                >
+                  {isMd
+                    ? t('fields.markdown')
+                    : fieldSettings[editorSlotField].labelKey
+                      ? t(fieldSettings[editorSlotField].labelKey)
+                      : fieldSettings[editorSlotField].label}
+                </span>
+              ),
+            })}
           </div>
         )}
         <div className="panel-cell">

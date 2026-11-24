@@ -56,7 +56,8 @@ const TranslationVisualCell = ({ value, onChange, cellRef, toolbarHost, toolbarA
         now.current.onChange({ target: { value: state.source } });
       };
       quill.on('text-change', change);
-      const unregister = now.current.cellRef({ quill });
+      // мост нужен редактору для «разделить по курсору»: части дельты обратно в исходник
+      const unregister = now.current.cellRef({ quill, bridge });
       setReady(true);
       dispose = () => {
         quill.off('text-change', change);

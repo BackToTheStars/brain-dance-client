@@ -31,7 +31,7 @@
     li {
       display: grid;
       align-items: baseline;
-      grid-template-columns: 18px minmax(0, 1fr) auto;
+      grid-template-columns: 18px minmax(0, 1fr) auto auto;
       gap: 2px 8px;
       padding: 6px 4px;
       border-top: 1px solid var(--panels-border-color);
@@ -48,12 +48,32 @@
     small { grid-column: 2 / -1; }
     time, small { color: var(--turn-widget-notes-color); font-size: 0.85em; }
     mark { background: var(--panel-buttons-bg-color); color: var(--panel-buttons-font-color); }
+
+    // «к найденному» — только у строки под мышью или с фокусом (visibility, а не opacity: скрытая не в фокусе Tab)
+    .navigator-jump {
+      visibility: hidden;
+      align-self: center;
+      padding: 0 2px;
+      border: 0;
+      background: none;
+      color: var(--turn-header-link-color);
+      line-height: 1;
+      cursor: pointer;
+    }
+    .navigator-jump:hover { color: var(--turn-header-link-hover-color); }
+    li:hover .navigator-jump, li:focus-within .navigator-jump { visibility: visible; }
   }
 
   .navigator-end { height: 1px; }
 }
 
 @container (max-width: 360px) {
-  .turn-navigator .navigator-results li { grid-template-columns: 18px minmax(0, 1fr); }
+  .turn-navigator .navigator-results li { grid-template-columns: 18px minmax(0, 1fr) auto; }
   .turn-navigator time { display: none; }
+}
+
+// Найденное в тексте карточки после перехода из навигатора (CSS Custom Highlight API, widgets/parts/textMatch.js)
+::highlight(navigator-match) {
+  background-color: rgba(255, 140, 0, 0.45);
+  text-decoration: underline 2px rgb(230, 81, 0);
 }

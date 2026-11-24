@@ -42,7 +42,10 @@ import { STATIC_MEDIA_URL } from '@/config/server';
 import { GRID_CELL_X, GRID_CELL_Y } from '@/config/ui';
 import { snapRound } from '../components/helpers/grid';
 import { TurnHelper } from './helpers';
-import { rowsToPreviewParagraph } from '../components/widgets/translation/rows';
+import {
+  articlePreviewParagraph,
+  rowsToPreviewParagraph,
+} from '../components/widgets/translation/rows';
 import { backZ, frontZ, newTurnZ, turnZ } from './stacking';
 import { getBoundingAreaRect } from '@/modules/minimap/components/helpers/screen';
 import {
@@ -544,9 +547,13 @@ export const insertTurnFromBuffer =
     dispatch(exitPasteModeIfBufferEmpty());
     // // @todo: get lines, connected with copied turn and display them
     const body = TurnHelper.toOldFields(copiedTurn);
-    // абзац перевода производный: считается от рядов копии тем же правилом, что в форме
+    // абзац перевода и статьи производный: считается от рядов копии тем же правилом, что в форме
     if (body.contentType === 'translation') {
       body.paragraph = rowsToPreviewParagraph(body.rows);
+    } else if (body.contentType === 'md' && body.rows?.length) {
+      // копия хранится рядами; статья без рядов уходит исходником — сервер разделит его сам
+      body.paragraph = articlePreviewParagraph(body.rows);
+      delete body.markdown;
     }
     dispatch(
       createTurn(body, {

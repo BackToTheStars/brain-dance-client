@@ -2,7 +2,7 @@ import * as types from './types';
 import { getTurnsByIdsRequest, turnOpsRequest } from '../requests';
 import { TurnHelper } from './helpers';
 import { TURN_OPS_MAX, applyTurnOps } from './turnOps';
-import { rowsToPreviewParagraph } from '../components/widgets/translation/rows';
+import { articlePreviewParagraph, rowsToPreviewParagraph } from '../components/widgets/translation/rows';
 import { castSaved } from '@/modules/presence/redux/actions';
 
 // Не в actions.js: castSaved тянет socket → refresh → actions.js, импорт оттуда замкнул бы цикл.
@@ -41,13 +41,15 @@ const chunksOf = (ops) => {
   return chunks;
 };
 
-// Превью хода перевода считается от рядов стора после операций (не от формы) и едет тем же
+// Превью хода перевода и статьи считается от рядов стора после операций (не от формы) и едет тем же
 // запросом, если отличается от хранимого абзаца.
+const PREVIEWS = { translation: rowsToPreviewParagraph, md: articlePreviewParagraph };
 const withPreview = (turn, ops) => {
-  if (turn?.contentType !== 'translation') return ops;
+  const preview = PREVIEWS[turn?.contentType];
+  if (!preview) return ops;
   if (ops.some((op) => op.op === 'fields.set' && 'paragraph' in op.fields)) return ops;
   const { rows } = applyTurnOps({ rows: turn.dWidgets?.tr_1?.rows }, ops);
-  const paragraph = rowsToPreviewParagraph(rows);
+  const paragraph = preview(rows);
   return JSON.stringify(paragraph) === JSON.stringify(turn.paragraph)
     ? ops
     : [...ops, { op: 'fields.set', fields: { paragraph } }];

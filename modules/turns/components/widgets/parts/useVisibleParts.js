@@ -5,11 +5,27 @@
 // вёрстки и до рисования). Смена ширины скроллера сбрасывает замеры: их делали при другой ширине.
 
 import { useCallback, useLayoutEffect, useMemo, useReducer, useRef } from 'react';
-import { sameParts, scrollShift, visibleParts } from './layout';
+import { layoutOffsets, sameParts, scrollShift, visibleParts } from './layout';
 
 // Коробка скроллера до первого замера: нужна только первому рендеру, его заменит
 // useLayoutEffect до рисования.
 const DEFAULT_BOX = { width: 600, viewport: 600, fontSize: 18, lineHeight: 24 };
+
+// Скроллер → { scrollToPart }: переход из навигатора находит тело карточки в DOM, а не в сторе.
+const scrollers = new WeakMap();
+export const partsOf = (el) => (el && scrollers.get(el)) || null;
+
+// Сколько кадров ждать отрисовки и замера части и сколько раз доводить её до места.
+const SCROLL_FRAMES = 60;
+const SCROLL_FIXES = 3;
+
+// Верх элемента от верха содержимого скроллера в его пикселях (тело может стоять под CSS zoom).
+const topInScroller = (scroller, el) => {
+  const box = scroller.getBoundingClientRect();
+  const scale = box.height && scroller.offsetHeight ? scroller.offsetHeight / box.height : 1;
+  const padding = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+  return (el.getBoundingClientRect().top - box.top) * scale - scroller.clientTop - padding;
+};
 
 const readBox = (el) => {
   const style = getComputedStyle(el);
@@ -28,7 +44,8 @@ const readBox = (el) => {
 // lineHeight }; always — id, которые рисуются всегда (массив или Set); ownScrollRef — ref, куда
 // пишется scrollTop, выставленный хуком (скроллер отличает свой сдвиг от прокрутки пользователя).
 // Ответ: visible — Set id к отрисовке; heightOf(id) — высота части вне окна (замер или оценка);
-// measureRef(id) — ref-колбэк на корень отрисованной части; box — текущая коробка.
+// measureRef(id) — ref-колбэк на корень отрисованной части; box — текущая коробка;
+// scrollToPart(id) — см. ниже.
 export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef, layoutKey }) => {
   const [, rerender] = useReducer((n) => n + 1, 0);
   const own = useRef(null);
@@ -92,6 +109,10 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
     ownRef.current = Math.round(el.scrollTop);
   };
 
+  // Тело без своей высоты (её задаёт содержимое, а его ещё нет — новая карточка) — окно по коробке
+  // по умолчанию: при нулевом окне рисовался бы один разделитель оценок.
+  const viewportOf = () => s.box.viewport || DEFAULT_BOX.viewport;
+
   // Без скроллера окна нет — рисуется всё.
   const compute = () => {
     const el = scrollRef?.current;
@@ -100,7 +121,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
           ids: s.ids,
           heightOf,
           scrollTop: el.scrollTop,
-          viewportHeight: s.box.viewport,
+          viewportHeight: viewportOf(),
           always: s.always,
         }).visible
       : new Set(s.ids);
@@ -109,6 +130,21 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
       rerender();
     }
   };
+
+  // Первый рендер со скроллером — сразу окно, а не один разделитель оценок: новая карточка зажимает
+  // свою высоту по scrollHeight тела в эффектах этого же коммита, и ход с недооценённым блоком
+  // (список) оставался ниже содержимого.
+  if (!s.primed && scrollRef?.current) {
+    s.primed = true;
+    setBox(readBox(scrollRef.current));
+    s.visible = visibleParts({
+      ids: s.ids,
+      heightOf,
+      scrollTop: scrollRef.current.scrollTop,
+      viewportHeight: viewportOf(),
+      always: s.always,
+    }).visible;
+  }
 
   // Замер отрисованных частей. Калибровка — один раз, по первой пачке замеров: отношение их суммы
   // к сумме сырых оценок, дальше оценки умножаются на него. До калибровки scrollTop не сдвигается:
@@ -179,6 +215,47 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
     return ref;
   }, []);
 
+  // Прокрутка к части id. Части нет в DOM — scrollTop к её оценённому смещению, затем по кадрам:
+  // дождаться отрисовки и замера и довести верх части до верха окна. Часть уже в DOM — без
+  // прокрутки: место внутри неё доводит вызывающий. Ответ — промис с элементом части или null
+  // (части нет или она не отрисовалась). Прокрутка пишется как ручная.
+  const scrollToPart = useCallback(
+    (id) =>
+      new Promise((resolve) => {
+        const el = scrollRef?.current;
+        if (!el || !s.ids.includes(id)) return resolve(null);
+        if (s.attached.has(id)) return resolve(s.attached.get(id));
+        const place = () => {
+          const index = s.ids.indexOf(id);
+          if (index < 0) return false;
+          el.scrollTop = layoutOffsets(s.ids, heightOf).tops[index];
+          compute();
+          return true;
+        };
+        if (!place()) return resolve(null);
+        let frames = 0;
+        let fixes = 0;
+        const step = () => {
+          frames += 1;
+          const part = s.attached.get(id);
+          if (!s.ids.includes(id)) return resolve(null);
+          if (part && s.heights.has(id)) {
+            const off = Math.round(topInScroller(el, part));
+            if (!off || fixes >= SCROLL_FIXES) return resolve(part);
+            fixes += 1;
+            el.scrollTop += off;
+            compute();
+          } else if (!part && frames % 10 === 0) {
+            place();
+          }
+          if (frames >= SCROLL_FRAMES) return resolve(part || null);
+          requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }),
+    [],
+  );
+
   // Список частей сменился: лишние замеры и ref-колбэки долой, окно пересчитать.
   useLayoutEffect(() => compute(), [layoutKey]);
 
@@ -210,6 +287,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
       compute();
       return undefined;
     }
+    scrollers.set(el, { scrollToPart });
     setBox(readBox(el));
     // оценки переходят с коробки по умолчанию на настоящую — это не смена содержимого:
     // scrollTop (0 или восстановленная позиция в пикселях) остаётся без сдвига
@@ -245,6 +323,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
       boxObserver.observe(el);
     }
     return () => {
+      scrollers.delete(el);
       el.removeEventListener('scroll', onScroll);
       if (s.raf) cancelAnimationFrame(s.raf);
       s.raf = 0;
@@ -255,7 +334,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
   }, [scrollRef?.current]);
 
   return useMemo(
-    () => ({ visible: s.visible, heightOf, measureRef, box: s.box }),
+    () => ({ visible: s.visible, heightOf, measureRef, box: s.box, scrollToPart }),
     [s.visible, s.box, s.scale],
   );
 };

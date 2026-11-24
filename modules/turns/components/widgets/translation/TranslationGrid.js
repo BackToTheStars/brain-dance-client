@@ -2,6 +2,9 @@
 // стоят карточка (TranslationTable; markIds — выделения с id, это цитаты) и предпросмотр формы
 // (TranslationEditor; showQuoteIds — ^id выделений верхним индексом). onLayout(visible) — после отрисовки, когда сменился
 // набор отрисованных рядов или их раскладка.
+// single — статья md: ряд — блок статьи (только left), без языков, сетки и линий между рядами;
+// блоки идут сплошным текстом. refs — определения ссылок статьи ([x]: url), общие для всех блоков:
+// у блока, рисуемого отдельно, своих определений нет.
 // Ячейки md рисуются только у рядов в окне прокрутки с запасом; ряды вне окна подряд — один пустой
 // разделитель (data-spacer) суммарной высоты их оценок, а после первой отрисовки — замеров, чтобы
 // длинный ход не верстал невидимое и число элементов не зависело от числа рядов. scrollRef —
@@ -27,6 +30,31 @@ export const estimateRowHeight = (row, box) =>
     extra: box.fontSize * 0.6 + 1,
   });
 
+// Блок статьи: колонка во всю ширину, сверху отступ между блоками (0,6em).
+export const estimateBlockHeight = (row, box) =>
+  estimateTextHeight({
+    chars: text(row?.left).length,
+    columnWidth: box.width,
+    charWidth: box.fontSize * 0.5,
+    lineHeight: box.lineHeight,
+    extra: box.fontSize * 0.6,
+  });
+
+// Определения ссылок статьи: блоки, у которых каждая строка — определение.
+const DEFINITION = /^ {0,3}\[[^\]]+\]:\s*\S/;
+export const linkDefinitions = (rows) => {
+  const found = [];
+  for (const row of rows) {
+    const source = text(row?.left);
+    if (!source.includes(']:')) continue;
+    const lines = source.split('\n');
+    if (lines.every((line) => DEFINITION.test(line))) found.push(source);
+  }
+  return found.join('\n');
+};
+
+const withRefs = (source, refs) => (refs && source.includes('[') ? `${source}\n\n${refs}` : source);
+
 const TranslationGrid = ({
   rows,
   languages,
@@ -35,21 +63,29 @@ const TranslationGrid = ({
   markIds = false,
   showQuoteIds = false,
   onLayout,
+  single = false,
 }) => {
-  const showLanguages = !!(languages?.left || languages?.right);
+  const showLanguages = !single && !!(languages?.left || languages?.right);
   const ids = useMemo(() => rows.map((row) => row.id), [rows]);
   const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
-  const estimate = useCallback((id, box) => estimateRowHeight(byId.get(id), box), [byId]);
+  const refs = useMemo(() => (single ? linkDefinitions(rows) : ''), [single, rows]);
+  const estimate = useCallback(
+    (id, box) => (single ? estimateBlockHeight : estimateRowHeight)(byId.get(id), box),
+    [byId, single],
+  );
   const parts = useVisibleParts({
     scrollRef,
     ids,
     estimate,
     ownScrollRef,
+    layoutKey: single ? 'single' : undefined,
   });
   const { visible, heightOf, measureRef } = parts;
   useLayoutEffect(() => {
     onLayout?.(visible);
   }, [parts]);
+  const rowClass = single ? 'md-block' : 'translation-row';
+  const rowTestId = single ? TID.md.block : TID.translation.row;
   return (
     <>
       {showLanguages && (
@@ -69,9 +105,9 @@ const TranslationGrid = ({
       {runs(ids, visible).flatMap((run) =>
         !run.visible ? (
           <div
-            className="translation-row"
+            className={rowClass}
             key={`spacer\u0000${run.ids[0]}`}
-            data-test-id={TID.translation.row}
+            data-test-id={rowTestId}
             data-spacer="true"
             data-from={run.ids[0]}
             data-to={run.ids[run.ids.length - 1]}
@@ -81,7 +117,18 @@ const TranslationGrid = ({
         ) : (
           run.ids.map((id) => {
             const row = byId.get(id);
-            return (
+            return single ? (
+              <MdHtml
+                key={id}
+                bodyRef={measureRef(id)}
+                source={withRefs(row.left, refs)}
+                markIds={markIds}
+                showQuoteIds={showQuoteIds}
+                className="md-block"
+                data-test-id={TID.md.block}
+                data-row-id={id}
+              />
+            ) : (
               <div
                 className="translation-row"
                 key={id}
