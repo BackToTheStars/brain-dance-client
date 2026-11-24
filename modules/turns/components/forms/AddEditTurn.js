@@ -48,7 +48,7 @@ import {
 import { clearQuotesInfo, linesDelete } from '@/modules/lines/redux/actions';
 import { setActiveQuoteKey } from '@/modules/quotes/redux/actions';
 import DropdownTemplate from '../inputs/DropdownTemplate';
-import { DatePicker, Input, Modal, Switch, message } from 'antd';
+import { DatePicker, Input, Modal, Switch } from 'antd';
 import dayjs from 'dayjs';
 import { cleanText, getFormatLoss } from '../helpers/textHelper';
 import { TurnHelper } from '../../redux/helpers';
@@ -56,6 +56,7 @@ import { createFormEdition } from '../helpers/formEdition';
 import { useMediaLinkCheck } from './useMediaLinkCheck';
 import { TID } from '@/config/testIds';
 import { castSaved } from '@/modules/presence/redux/actions';
+import { addNotification } from '@/modules/ui/redux/actions';
 
 const {
   settings,
@@ -386,13 +387,9 @@ const AddEditTurnPopup = () => {
   } = useMediaLinkCheck({ edition, onChecked: finishSave });
 
   const notifySplit = (count) =>
-    message.info({
-      content: (
-        <span data-test-id={TID.md.splitNotice} data-count={count}>
-          {t('blocks.split', { count })}
-        </span>
-      ),
-    });
+    dispatch(addNotification({ title: 'Info:', text: t('blocks.split', { count }), testId: TID.md.splitNotice, count }));
+  const notifyMergeRefused = () =>
+    dispatch(addNotification({ title: 'Info:', text: t('blocks.mergeTooBig'), testId: TID.md.mergeRefused }));
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
@@ -660,6 +657,7 @@ const AddEditTurnPopup = () => {
               // статья md — те же ряды одной колонкой
               single: isMd,
               notifySplit,
+              notifyMergeRefused,
               changeHandler: (value) => formChangeHandler(editorSlotField, value),
               label: fieldSettings[editorSlotField].labelKey
                 ? t(fieldSettings[editorSlotField].labelKey)

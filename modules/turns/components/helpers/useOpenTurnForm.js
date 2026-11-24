@@ -1,11 +1,13 @@
 // Открыть форму правки хода и подвинуть холст так, чтобы карточка встала в центр
 // свободной области слева от панели редактора. Панель лежит вне #game-box, её ширина —
-// экранные px, в координату холста идёт делением на масштаб.
+// экранные px, в координату холста идёт делением на масштаб. Ряд в середине тела статьи или
+// перевода запоминается до сдвига холста: редактор откроется на нём.
 
 import { PANEL_ADD_EDIT_TURN } from '@/config/panel';
 import { centerViewportAtPosition } from '@/modules/game/game-redux/actions';
 import { getEditorPanelWidth } from '@/modules/panels/helpers/editorPanel';
 import { togglePanel } from '@/modules/panels/redux/actions';
+import { rememberMiddleRow } from '@/modules/turns/components/widgets/parts/middleRow';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,6 +18,7 @@ export const useOpenTurnForm = (turnId) => {
   const zoom = useSelector((state) => state.game.zoom);
 
   return useCallback(() => {
+    rememberMiddleRow(turnId);
     dispatch(
       togglePanel({
         type: PANEL_ADD_EDIT_TURN,

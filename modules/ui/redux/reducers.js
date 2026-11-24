@@ -50,6 +50,8 @@ export const UIReducer = (state = initialUIState, { type, payload }) => {
             id: payload.id,
             title: payload.title,
             text: payload.text,
+            testId: payload.testId,
+            count: payload.count,
             status: 'active',
           },
         ],

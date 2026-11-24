@@ -4,7 +4,8 @@
 // блоках; список выводится из рядов (translation/quotes.js) и нигде не хранится. Рамки, концы линий,
 // прокрутка с памятью и регистрация ресайза — useQuotedBody, как у абзаца и перевода; цитата с линией
 // в блоке вне окна — полоска у края тела. Статья без рядов (ещё не разделённый markdown) делится на
-// блоки здесь же, на лету, тем же делением, что на сервере.
+// блоки здесь же, на лету, тем же делением, что на сервере. Сжатая статья (флаг хода compressed) —
+// окошки вокруг цитат (translation/useQuoteWindows.js) на той же сетке.
 
 import { TID } from '@/config/testIds';
 import { RULE_TURNS_CRUD } from '@/config/user';
@@ -16,6 +17,7 @@ import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { edgeQuotes, rowsQuoteIndex } from '../translation/quotes';
 import { rowsFromMarkdown } from '../translation/rows';
 import TranslationGrid from '../translation/TranslationGrid';
+import { useQuoteWindows } from '../translation/useQuoteWindows';
 import { useQuotedBody } from '../useQuotedBody';
 import MdEditButton from './MdEditButton';
 import { useMdMarkVars } from './MdHtml';
@@ -34,6 +36,7 @@ const MdArticle = ({
   const widget = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId],
   );
+  const width = useSelector((state) => state.turns.g[turnId].size.width);
   const renderer = useMdRenderer();
   const ready = !!renderer;
   // id блоков статьи без рядов — по номеру: нужны только карточке, форма даст свои при записи
@@ -54,6 +57,14 @@ const MdArticle = ({
   }, []);
   const ownScroll = useRef(null);
   const markVars = useMdMarkVars();
+  const view = useQuoteWindows({
+    rows,
+    compressed: widget.compressed,
+    md: renderer?.md,
+    single: true,
+    width,
+    bodyRef: bodyEl,
+  });
 
   const changes = useRef(0);
   const version = useMemo(() => (changes.current += 1), [rows]);
@@ -71,8 +82,8 @@ const MdArticle = ({
   }, []);
   const edge = useMemo(
     () =>
-      edgeQuotes(rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
-    [rows, turnLines, layoutKey],
+      edgeQuotes(view.rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
+    [view.rows, turnLines, layoutKey],
   );
 
   useQuotedBody({
@@ -91,6 +102,7 @@ const MdArticle = ({
     ownScrollRef: ownScroll,
     edgeQuotes: edge,
     layoutKey,
+    sizeKey: view.sizeKey,
   });
 
   return (
@@ -101,15 +113,19 @@ const MdArticle = ({
           ref={bindBody}
           data-test-id={TID.md.body}
           data-turn-id={turnId}
+          data-compressed={view.active ? 'true' : undefined}
         >
           {ready && bodyMounted && (
             <TranslationGrid
-              rows={rows}
+              rows={view.rows}
               scrollRef={bodyEl}
               ownScrollRef={ownScroll}
               markIds
               single
               onLayout={onLayout}
+              windows={view.windows}
+              revealPart={view.revealPart}
+              refRows={view.refRows}
             />
           )}
         </div>

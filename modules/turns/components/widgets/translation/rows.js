@@ -109,7 +109,7 @@ export const articlePreviewParagraph = (rows) => [{ insert: `${articlePreviewTex
 // прочее — по предложениям; выделение ==…==^id не разрезается.
 export const BLOCK_LIMIT = 16 * 1024;
 
-const utf8Bytes = (value) => {
+export const utf8Bytes = (value) => {
   let total = 0;
   for (let i = 0; i < value.length; i += 1) {
     const code = value.charCodeAt(i);

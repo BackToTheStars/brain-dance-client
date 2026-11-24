@@ -20,9 +20,13 @@
 // несколько блоков (вставка с пустыми строками, больше предела), при сохранении делится на ряды.
 // Статья без рядов (ещё не разделённый markdown) делится на блоки при открытии и пишется
 // целиком первым общим Save.
+// Режим — список в полосе: у статьи «Авто» и «Блоки» (Visual / Source) и Preview, у перевода Visual /
+// Source / Preview. «Авто» — статья сплошным текстом без кнопок блока: блок делится и склеивается
+// при наборе (autoBlocks.js), стрелки переходят между блоками; на сервер — тем же общим Save.
 
 import { TID } from '@/config/testIds';
 import {
+  CheckOutlined,
   CopyOutlined,
   DeleteOutlined,
   LoadingOutlined,
@@ -31,7 +35,7 @@ import {
   ScissorOutlined,
   VerticalAlignMiddleOutlined,
 } from '@ant-design/icons';
-import { Input, Modal } from 'antd';
+import { Input, Modal, Select } from 'antd';
 import { useTranslations } from 'next-intl';
 import {
   memo,
@@ -47,6 +51,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useMdMarkVars } from '../md/MdHtml';
 import { useMdRenderer } from '../md/mdRenderer';
 import { WRAPS, wrapSelection } from '../md/wrapTools';
+import { centrePart, takeMiddleRow } from '../parts/middleRow';
 import { useVisibleParts } from '../parts/useVisibleParts';
 import TranslationGrid from './TranslationGrid';
 import TranslationVisualCell from './TranslationVisualCell';
@@ -63,6 +68,7 @@ import {
   savedRow,
   seedBase,
 } from './draft';
+import { autoMerge, autoSplit, listEnter } from './autoBlocks';
 import { caretAfterIds, ensureRowQuoteIds, lostRowQuotes, quoteLinks } from './quotes';
 import {
   dropEmptyRows,
@@ -83,6 +89,34 @@ const MIN_ROWS = 2;
 const NO_CONFIRM = { open: false, id: null, saved: false };
 const NO_IDS = [];
 
+// Режимы редактора; выбор у статьи помнит браузер для всех игр (Preview не запоминается).
+const ARTICLE_MODES = ['auto-visual', 'auto-source', 'blocks-visual', 'blocks-source', 'preview'];
+const TRANSLATION_MODES = ['visual', 'source', 'preview'];
+const ARTICLE_MODE_DEFAULT = 'auto-visual';
+const MODE_KEY = 'md_editor_mode';
+const MODE_LABELS = {
+  'auto-visual': 'autoVisual',
+  'auto-source': 'autoSource',
+  'blocks-visual': 'blocksVisual',
+  'blocks-source': 'blocksSource',
+  preview: 'preview',
+  visual: 'visual',
+  source: 'source',
+};
+const storedArticleMode = () => {
+  try {
+    const value = window.localStorage.getItem(MODE_KEY);
+    return ARTICLE_MODES.includes(value) && value !== 'preview' ? value : ARTICLE_MODE_DEFAULT;
+  } catch {
+    return ARTICLE_MODE_DEFAULT;
+  }
+};
+const storeArticleMode = (value) => {
+  try {
+    window.localStorage.setItem(MODE_KEY, value);
+  } catch {}
+};
+
 // Размеры для оценки высоты ряда до отрисовки: кегль --editor-font-size по умолчанию (panels.scss),
 // ширина знака моноширинного шрифта и высота строки textarea antd в долях кегля; отступы и рамка
 // textarea, колонка кнопок с двумя промежутками сетки, отступы и линия ряда, две строки кнопок — px.
@@ -96,6 +130,11 @@ const ROW_EXTRA = 8 * 2 + 1;
 const ACTIONS_HEIGHT = 26 * 2 + 4 + 2;
 // у блока статьи кнопок пять: «сохранить» во всю ширину и две строки по две
 const SINGLE_ACTIONS_HEIGHT = 26 * 3 + 4 * 2 + 2;
+// «Авто»: без полосы действий и рамок ряда, промежуток абзаца — доля кегля (panels.scss), строк от одной
+const AUTO_GAP = 0.4;
+const AUTO_MIN_ROWS = 1;
+// строка не длиннее — заведомо меньше предела блока в байтах UTF-8 (до 3 байт на знак)
+const SHORT_LINE = 5000;
 
 const text = (value) => (typeof value === 'string' ? value : '');
 
@@ -132,18 +171,22 @@ const EMPTY_CELL = cellMetrics('');
 
 // Знаков в строке textarea при ширине тела: ширина колонки за вычетом отступов textarea, знак
 // моноширинного шрифта в долях кегля.
-const charsPerLine = (width, fontSize, single = false) => {
-  const textWidth = (width - ACTIONS_COLUMN) / (single ? 1 : 2) - TEXTAREA_PADDING_X;
+const charsPerLine = (width, fontSize, single = false, auto = false) => {
+  const textWidth = (width - (auto ? 0 : ACTIONS_COLUMN)) / (single ? 1 : 2) - TEXTAREA_PADDING_X;
   return Math.max(1, Math.floor(textWidth / (fontSize * CHAR_WIDTH)));
 };
 // Строк ячейки: по знакам плюс по строке на каждый перенос, не меньше minRows.
-const linesOf = ({ chars, breaks }, perLine) => Math.max(MIN_ROWS, Math.ceil(chars / perLine) + breaks);
+const linesOf = ({ chars, breaks }, perLine, min = MIN_ROWS) => Math.max(min, Math.ceil(chars / perLine) + breaks);
 
 // Оценка высоты ряда редактора: строки большей ячейки по кеглю, отступы и рамка textarea, не ниже
-// строк кнопок, плюс отступы и линия ряда. single — блок статьи: одна колонка во всю ширину.
-export const estimateEditorRowHeight = (row, box, fontSize = EDITOR_FONT_DEFAULT, single = false) => {
-  const perLine = charsPerLine(box.width, fontSize, single);
+// строк кнопок, плюс отступы и линия ряда. single — блок статьи: одна колонка во всю ширину;
+// auto — статья в «Авто»: только ячейка и промежуток абзаца.
+export const estimateEditorRowHeight = (row, box, fontSize = EDITOR_FONT_DEFAULT, single = false, auto = false) => {
+  const perLine = charsPerLine(box.width, fontSize, single, auto);
   const { left, right } = row ? rowMetrics(row) : { left: EMPTY_CELL, right: EMPTY_CELL };
+  if (auto) {
+    return Math.ceil(linesOf(left, perLine, AUTO_MIN_ROWS) * fontSize * LINE_HEIGHT) + TEXTAREA_EXTRA_Y + Math.round(fontSize * AUTO_GAP);
+  }
   const lines = single ? linesOf(left, perLine) : Math.max(linesOf(left, perLine), linesOf(right, perLine));
   const cell = Math.ceil(lines * fontSize * LINE_HEIGHT) + TEXTAREA_EXTRA_Y;
   return Math.max(cell, single ? SINGLE_ACTIONS_HEIGHT : ACTIONS_HEIGHT) + ROW_EXTRA;
@@ -159,7 +202,7 @@ const textareaOf = (handle) =>
   handle && 'scrollHeight' in handle ? handle : handle?.resizableTextArea?.textArea || null;
 // scrollHeight целый, строки дробные: высота — целое число строк по вычисленной высоте строки,
 // иначе рамка ячейки то на доли пикселя короче текста, то длиннее.
-const cellMetric = (el) => {
+const cellMetric = (el, minRows = MIN_ROWS) => {
   const style = getComputedStyle(el);
   const px = (name) => parseFloat(style[name]) || 0;
   const lineHeight = px('lineHeight') || px('fontSize') * LINE_HEIGHT;
@@ -167,7 +210,7 @@ const cellMetric = (el) => {
   const frame = style.boxSizing === 'content-box' ? 0 : padding + px('borderTopWidth') + px('borderBottomWidth');
   return (scrollHeight) => {
     if (!scrollHeight) return 0;
-    const lines = Math.max(MIN_ROWS, Math.round((scrollHeight - padding) / lineHeight));
+    const lines = Math.max(minRows, Math.round((scrollHeight - padding) / lineHeight));
     return Math.round((lines * lineHeight + frame) * 100) / 100;
   };
 };
@@ -175,7 +218,7 @@ const cellMetric = (el) => {
 // пакет, затем записи. Ячейка с нулевым scrollHeight не отрисована (скрыта) — ей высоту не писать.
 const fitCells = (fit, measure, apply) => {
   for (const item of measure) item.el.style.height = '0px';
-  if (!fit.metric) fit.metric = cellMetric(measure[0].el);
+  if (!fit.metric) fit.metric = cellMetric(measure[0].el, fit.minRows);
   for (const item of measure) item.height = fit.metric(item.el.scrollHeight);
   for (const item of measure) {
     if (item.height) fit.known.set(item.key, { text: item.text, height: item.height });
@@ -187,6 +230,67 @@ const refitAll = (fit, fontChanged) => {
   fit.all = true;
   fit.known.clear();
   if (fontChanged) fit.metric = null;
+};
+
+// Строка курсора textarea — по зеркалу: скрытый div с тем же шрифтом, шириной и переносами, метка на
+// месте курсора. { line, lines, top, lineHeight }: строка курсора, всего строк, верх строки от верха textarea.
+const MIRROR_STYLES = [
+  'boxSizing', 'width', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth',
+  'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle', 'fontFamily', 'fontSize',
+  'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight', 'textTransform', 'wordSpacing', 'tabSize',
+  'textIndent', 'wordBreak',
+];
+const ZERO_WIDTH = '​';
+const textareaCaret = (el, pos) => {
+  const style = getComputedStyle(el);
+  const mirror = document.createElement('div');
+  for (const name of MIRROR_STYLES) mirror.style[name] = style[name];
+  Object.assign(mirror.style, {
+    position: 'absolute',
+    visibility: 'hidden',
+    top: '0',
+    left: '-9999px',
+    height: 'auto',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'break-word',
+  });
+  const marker = document.createElement('span');
+  marker.textContent = ZERO_WIDTH;
+  mirror.append(el.value.slice(0, pos), marker, `${el.value.slice(pos)}${ZERO_WIDTH}`);
+  document.body.append(mirror);
+  const px = (name) => parseFloat(style[name]) || 0;
+  const lineHeight = px('lineHeight') || px('fontSize') * LINE_HEIGHT;
+  const top = marker.offsetTop - px('paddingTop');
+  const content = mirror.clientHeight - px('paddingTop') - px('paddingBottom');
+  mirror.remove();
+  return {
+    line: Math.max(0, Math.round(top / lineHeight)),
+    lines: Math.max(1, Math.round(content / lineHeight)),
+    top: marker.offsetTop + px('borderTopWidth'),
+    lineHeight,
+  };
+};
+
+// Курсор textarea в окне скроллера: фокус без прокрутки браузера, затем сдвиг scrollTop до строки курсора.
+const revealTextareaCaret = (scroller, el, pos) => {
+  if (!scroller) return;
+  const { top, lineHeight } = textareaCaret(el, pos);
+  const box = scroller.getBoundingClientRect();
+  const caretTop = el.getBoundingClientRect().top + top;
+  if (caretTop < box.top) scroller.scrollTop -= box.top - caretTop + lineHeight;
+  else if (caretTop + lineHeight > box.bottom) scroller.scrollTop += caretTop + lineHeight - box.bottom + lineHeight;
+};
+
+// Смещение в исходнике по строке и знаку (у Visual строка Quill — строка исходника).
+const offsetAt = (source, line, column) => {
+  let start = 0;
+  for (let i = 0; i < line; i += 1) {
+    const next = source.indexOf('\n', start);
+    if (next < 0) return source.length;
+    start = next + 1;
+  }
+  const end = source.indexOf('\n', start);
+  return start + Math.min(column, (end < 0 ? source.length : end) - start);
 };
 
 // Предпросмотр показывает то, что уйдёт в ход: без пустых рядов, языки обрезаны; id выделений —
@@ -265,8 +369,9 @@ const CellTools = memo(({ enabled, onWrap }) => {
 // live — ряды ходят на сервер по одному; last — единственный сохранённый ряд с текстом;
 // rows у textarea — оценка до замера, после замера высота стоит инлайном.
 // single — блок статьи: одна ячейка, кнопки «склеить со следующим» (hasNext — есть следующий блок)
-// и «разделить по курсору» (caretHere — курсор был в этом блоке).
-const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide, single, hasNext, caretHere }) => {
+// и «разделить по курсору» (caretHere — курсор был в этом блоке). auto — «Авто»: без кнопок блока,
+// клавиши края блока и Enter — у редактора.
+const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide, single, hasNext, caretHere, auto }) => {
   const editor = TID.translation.editor;
   const sides = single ? SINGLE_SIDES : SIDES;
   const dirty = rowState(saved, row);
@@ -295,17 +400,20 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
           value: row[side],
           placeholder: single ? titles.placeholder : CELL_PLACEHOLDER[side],
           onFocus: () => actions.caret(row.id, side),
-          onChange: (e) => actions.cell(row.id, side, e.target.value),
+          // kind — вид правки от ячейки Visual (у textarea его знает обработчик клавиш)
+          onChange: (e) => actions.cell(row.id, side, e.target.value, e.kind),
         };
         return visual ? (
           <TranslationVisualCell {...props} key={side} data-test-id={editor.visualCell}
-            cellRef={cellRefs[side]} toolbarHost={toolbarHost} toolbarActive={toolbarActiveSide === side} />
+            cellRef={cellRefs[side]} toolbarHost={toolbarHost} toolbarActive={toolbarActiveSide === side}
+            auto={auto} onAutoKey={actions.autoKey} rowId={row.id} />
         ) : (
           <Input.TextArea {...props} key={side} data-test-id={editor.cell} ref={cellRefs[side]}
-            className="translation-editor__cell" rows={linesOf(rowMetrics(row)[side], perLine)} />
+            className="translation-editor__cell" rows={linesOf(rowMetrics(row)[side], perLine, auto ? AUTO_MIN_ROWS : MIN_ROWS)}
+            onKeyDown={auto ? (e) => actions.key(row.id, side, e) : undefined} />
         );
       })}
-      <div className="translation-editor__actions">
+      {!auto && <div className="translation-editor__actions">
         <button
           type="button"
           className="md-editor__tool translation-editor__save"
@@ -367,7 +475,7 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
             </button>
           </>
         )}
-      </div>
+      </div>}
     </div>
   );
 });
@@ -390,6 +498,7 @@ const TranslationEditor = ({
   aside = null,
   single = false,
   notifySplit,
+  notifyMergeRefused,
 }) => {
   const t = useTranslations('Game.turnForm');
   const dispatch = useDispatch();
@@ -403,8 +512,13 @@ const TranslationEditor = ({
   });
   // markdown-it для деления блоков; до загрузки делить нечем (null)
   const markdownIt = useMdRenderer()?.markdownIt || null;
-  const [preview, setPreview] = useState(false);
-  const [visual, setVisual] = useState(true);
+  // режим у статьи и у перевода — свой: тип хода в форме можно сменить, редактор остаётся тем же
+  const [articleMode, setArticleMode] = useState(storedArticleMode);
+  const [translationMode, setTranslationMode] = useState('visual');
+  const mode = single ? articleMode : translationMode;
+  const preview = mode === 'preview';
+  const visual = mode.endsWith('visual');
+  const auto = single && mode.startsWith('auto-');
   const [toolbarHost, setToolbarHost] = useState(null);
   const [toolbarCell, setToolbarCell] = useState(null);
   // окно удаления ряда с текстом; saved — ряд удалится на сервере сразу
@@ -464,6 +578,9 @@ const TranslationEditor = ({
     single,
     markdownIt,
     notifySplit,
+    notifyMergeRefused,
+    auto,
+    visual,
   };
 
   // Скроллер рядов. Ref-колбэк пропускает null (тело снято на время Preview — хук держит прежний
@@ -492,9 +609,52 @@ const TranslationEditor = ({
       all: false,
       metric: null,
       width: 0,
+      auto: false,
+      minRows: MIN_ROWS,
     };
   }
   const f = fit.current;
+  // «Авто» ↔ «Блоки» в Source: те же textarea, другая высота строки минимума — перемерить все
+  if (f.auto !== auto) {
+    f.auto = auto;
+    f.minRows = auto ? AUTO_MIN_ROWS : MIN_ROWS;
+    refitAll(f, true);
+  }
+  // Куда поставить курсор после деления, склейки и стрелок: { id, at: 'start' | 'end' } или
+  // { id, md, quill, line, column } — смещение в исходнике (textarea), в Quill или строка и знак.
+  // Ставится, когда ячейка ряда смонтирована и показывает текст ряда.
+  const want = useRef(null);
+  const applyWant = useCallback(() => {
+    const target = want.current;
+    if (!target) return;
+    const row = now.current.rows.find((item) => item.id === target.id);
+    if (!row) {
+      want.current = null;
+      return;
+    }
+    const key = cellKey(target.id, 'left');
+    const source = text(row.left);
+    const handle = f.visual.get(key);
+    if (handle?.quill) {
+      if (handle.synced() !== source) return;
+      want.current = null;
+      const { quill } = handle;
+      const end = Math.max(0, quill.getLength() - 1);
+      let index = end;
+      if (target.at === 'start') index = 0;
+      else if (target.at !== 'end') index = target.quill ?? handle.lineIndex(target.line, target.column);
+      quill.focus();
+      quill.setSelection(Math.min(index, end), 0, 'api');
+      return;
+    }
+    const el = f.cells.get(key);
+    if (!el || el.value !== source) return;
+    want.current = null;
+    const pos = target.at === 'start' ? 0 : target.at === 'end' ? source.length : Math.min(target.md, source.length);
+    el.focus({ preventScroll: true });
+    el.setSelectionRange(pos, pos);
+    revealTextareaCaret(body.current, el, pos);
+  }, []);
   const cellRefs = useCallback((id) => {
     let refs = f.refs.get(id);
     if (!refs) {
@@ -503,6 +663,7 @@ const TranslationEditor = ({
         if (handle?.quill) {
           f.visual.set(key, handle);
           setToolbarCell((current) => current || key);
+          applyWant();
           return () => {
             if (f.visual.get(key) !== handle) return;
             f.visual.delete(key);
@@ -553,19 +714,38 @@ const TranslationEditor = ({
   const indexById = useMemo(() => new Map(ids.map((id, i) => [id, i])), [ids]);
   const estimate = useCallback(
     (id, box) =>
-      estimateEditorRowHeight(now.current.rows[indexById.get(id)], box, fontSize.current, single),
-    [indexById, fontChanges, visual, single],
+      estimateEditorRowHeight(now.current.rows[indexById.get(id)], box, fontSize.current, single, auto),
+    [indexById, fontChanges, visual, single, auto],
   );
   const always = useMemo(
     // Один активный ряд остаётся смонтированным вместе со своим нативным тулбаром.
     () => [focused, visual && toolbarCell ? cellRowId(toolbarCell) : null, added.current, ...Object.keys(pending)].filter(Boolean),
     [focused, pending, ids, visual, toolbarCell],
   );
-  // смена Visual / Source и смена числа колонок (статья ↔ перевод в той же форме) — другие высоты
-  const layoutKey = single ? `${visual}|single` : visual;
-  const { visible, heightOf, measureRef, box } = useVisibleParts({ scrollRef: body, ids, estimate, always, layoutKey });
+  // смена Visual / Source, «Авто» / «Блоки» и числа колонок (статья ↔ перевод в той же форме) — другие высоты
+  const layoutKey = single ? `${visual}|${auto}|single` : visual;
+  const { visible, heightOf, measureRef, box, scrollToPart } = useVisibleParts({ scrollRef: body, ids, estimate, always, layoutKey });
+  now.current.scrollToPart = scrollToPart;
+
+  // Форма открыта с карточки, прокрученной не в начало: ряд из середины карточки — в середину тела,
+  // как только он есть среди рядов формы (их заливают после монтажа). Курсор не ставится.
+  const middle = useRef(null);
+  useLayoutEffect(() => {
+    middle.current = { id: takeMiddleRow(turnId), until: Date.now() + 3000 };
+  }, [turnId]);
+  useLayoutEffect(() => {
+    const want = middle.current;
+    if (!want?.id || preview || !body.current) return;
+    const { id } = want;
+    if (!indexById.has(id)) {
+      if (Date.now() > want.until) want.id = null;
+      return;
+    }
+    want.id = null;
+    centrePart(body.current, (part) => now.current.scrollToPart(part), id);
+  }, [indexById, preview]);
   const width = box ? box.width : 0;
-  const perLine = charsPerLine(width, fontSize.current, single);
+  const perLine = charsPerLine(width, fontSize.current, single, auto);
 
   // Ряды сняты — их ячейки забыть.
   useLayoutEffect(() => {
@@ -605,6 +785,11 @@ const TranslationEditor = ({
     scrollToEnd.current = false;
     body.current.scrollTop = body.current.scrollHeight;
   });
+
+  // Курсор после деления и склейки: textarea — после замера высот этого коммита, Quill — после того,
+  // как ячейка в своём эффекте приняла новый текст (эффекты детей идут раньше).
+  useLayoutEffect(() => applyWant());
+  useEffect(() => applyWant());
 
   // Обработчики одни на всё время жизни редактора и читают текущее из now.
   const actions = useMemo(() => {
@@ -666,10 +851,181 @@ const TranslationEditor = ({
       added.current = row.id;
       return next;
     };
-    const cell = (id, side, value) => {
-      const { rows, changeHandler } = now.current;
+    // Ряды пишутся и в now сразу: две правки одной ячейки до перерисовки (Quill шлёт вставку и
+    // формат строки по отдельности) и проверка «Авто» после них видят последний текст.
+    const commit = (next) => {
+      now.current.rows = next;
+      now.current.changeHandler(next);
+    };
+    const cell = (id, side, value, kind) => {
+      const { rows } = now.current;
       f.queue.add(cellKey(id, side));
-      changeHandler(rows.map((row) => (row.id === id ? { ...row, [side]: value } : row)));
+      commit(rows.map((row) => (row.id === id ? { ...row, [side]: value } : row)));
+      const typed = kinds.get(id);
+      kinds.delete(id);
+      if (now.current.auto && side === 'left') scheduleCheck(id, kind || typed || 'type');
+    };
+
+    // «Авто». Вид правки textarea — от обработчика клавиш до onChange; проверка деления — после
+    // текущего события, раз на ряд: вид сильнее «type» не теряется.
+    const kinds = new Map();
+    const checks = new Map();
+    const scheduleCheck = (id, kind) => {
+      const had = checks.get(id);
+      checks.set(id, had && kind === 'type' ? had : kind);
+      if (had) return;
+      Promise.resolve().then(() => {
+        const queued = checks.get(id);
+        checks.delete(id);
+        check(id, queued);
+      });
+    };
+    const check = (id, kind) => {
+      const { rows, markdownIt, auto } = now.current;
+      if (!auto || !markdownIt) return;
+      const index = rows.findIndex((row) => row.id === id);
+      if (index < 0) return;
+      const source = text(rows[index].left);
+      // одна короткая строка набором не делится: без чтения курсора
+      if ((kind === 'type' || kind === 'format') && !source.includes('\n') && source.length <= SHORT_LINE) return;
+      const key = cellKey(id, 'left');
+      const handle = f.visual.get(key);
+      let caret = source.length;
+      let column = null;
+      let effective = kind === 'format' ? 'type' : kind;
+      if (handle?.quill) {
+        const info = handle.caretInfo();
+        if (info) {
+          caret = offsetAt(source, info.line, info.column);
+          column = info.column;
+          if ((kind === 'enter' || kind === 'format') && info.leave) effective = 'leave';
+        }
+      } else {
+        const el = f.cells.get(key);
+        if (el && typeof el.selectionEnd === 'number') caret = el.selectionEnd;
+      }
+      const split = autoSplit(source, caret, { markdownIt, kind: effective });
+      if (split) applySplit(index, split, handle?.quill ? column : null);
+    };
+    // Первая часть (keep) остаётся рядом с id блока, остальные — новые ряды; ряд с курсором
+    // смонтирован как только что добавленный.
+    const applySplit = (index, split, quillColumn) => {
+      const { rows } = now.current;
+      const row = rows[index];
+      const pieces = split.parts.map((left, k) =>
+        k === split.keep ? { ...row, left } : { id: newRowId(), left, right: '' },
+      );
+      const next = [...rows];
+      next.splice(index, 1, ...pieces);
+      const target = pieces[split.part].id;
+      if (target !== row.id) added.current = target;
+      f.queue.add(cellKey(row.id, 'left'));
+      const atEnd = split.moved && split.caret > 0 && split.caret === split.parts[split.part].length;
+      want.current = atEnd
+        ? { id: target, at: 'end' }
+        : {
+            id: target,
+            md: split.caret,
+            line: split.line,
+            column: quillColumn !== null && !split.moved ? quillColumn : split.column,
+          };
+      commit(next);
+    };
+    // Длина текста блока в Quill — место стыка при склейке в Visual.
+    const quillLength = (source) => {
+      const bridge = f.visual.values().next().value?.bridge;
+      if (!bridge) return null;
+      let length = 0;
+      for (const op of bridge.toDelta(source).ops) length += typeof op.insert === 'string' ? op.insert.length : 1;
+      return Math.max(0, length - 1);
+    };
+    // Склейка с соседом: dir 'up' — с предыдущим (Backspace в начале), 'down' — со следующим (Delete
+    // в конце). true — клавиша обработана (и при отказе по пределу — тогда уведомление).
+    const join = (id, dir) => {
+      const { rows, visual } = now.current;
+      const index = rows.findIndex((row) => row.id === id);
+      const top = dir === 'up' ? index - 1 : index;
+      if (index < 0 || top < 0 || top + 1 >= rows.length) return false;
+      const upper = rows[top];
+      const lower = rows[top + 1];
+      const merged = autoMerge(upper.left, lower.left);
+      if (!merged) {
+        now.current.notifyMergeRefused?.();
+        return true;
+      }
+      const kept = merged.keep === 'upper' ? upper : lower;
+      const gone = merged.keep === 'upper' ? lower : upper;
+      const next = rows
+        .filter((row) => row.id !== gone.id)
+        .map((row) => (row.id === kept.id && row.left !== merged.text ? { ...row, left: merged.text } : row));
+      if (!merged.caret) want.current = { id: kept.id, at: 'start' };
+      else if (!visual) want.current = { id: kept.id, md: merged.caret };
+      else {
+        const joint = quillLength(upper.left);
+        want.current = joint === null ? { id: kept.id, at: 'end' } : { id: kept.id, quill: joint, md: merged.caret };
+      }
+      if (!f.visual.has(cellKey(kept.id, 'left')) && !f.cells.has(cellKey(kept.id, 'left'))) added.current = kept.id;
+      f.queue.add(cellKey(kept.id, 'left'));
+      commit(next);
+      return true;
+    };
+    // Стрелка с первой / последней строки блока — в конец предыдущего / начало следующего; ряд вне
+    // окна сначала подводится прокруткой, как переход к найденному.
+    const move = (id, dir) => {
+      const { rows } = now.current;
+      const index = rows.findIndex((row) => row.id === id);
+      const target = index < 0 ? null : rows[index + (dir === 'up' ? -1 : 1)];
+      if (!target) return false;
+      want.current = { id: target.id, at: dir === 'up' ? 'end' : 'start' };
+      const key = cellKey(target.id, 'left');
+      if (f.visual.has(key) || f.cells.has(key)) applyWant();
+      else now.current.scrollToPart?.(target.id).then(() => applyWant());
+      return true;
+    };
+    // Клавиши textarea в «Авто»: Enter (пункт списка — новый пункт или выход из списка), склейка на
+    // краю, стрелки на первой / последней видимой строке. Правки — через execCommand: остаётся отмена.
+    const key = (id, side, e) => {
+      if (!now.current.auto || side !== 'left') return;
+      if (e.nativeEvent?.isComposing || e.altKey || e.ctrlKey || e.metaKey) return;
+      const el = e.target;
+      const { selectionStart: start, selectionEnd: end, value } = el;
+      if (e.key === 'Enter') {
+        if (e.shiftKey) return;
+        const item = listEnter(value, start, end);
+        if (!item) {
+          kinds.set(id, 'enter');
+          return;
+        }
+        e.preventDefault();
+        kinds.set(id, item.kind === 'leave' ? 'leave' : 'type');
+        el.setSelectionRange(item.from, item.to);
+        const done = item.insert
+          ? document.execCommand('insertText', false, item.insert)
+          : document.execCommand('delete');
+        if (!done) {
+          want.current = { id, md: item.caret };
+          cell(id, side, item.text);
+        }
+        return;
+      }
+      if (e.shiftKey || start !== end) return;
+      if (e.key === 'Backspace' && start === 0) {
+        if (join(id, 'up')) e.preventDefault();
+      } else if (e.key === 'Delete' && start === value.length) {
+        if (join(id, 'down')) e.preventDefault();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        const up = e.key === 'ArrowUp';
+        const { line, lines } = textareaCaret(el, start);
+        if ((up ? line === 0 : line >= lines - 1) && move(id, up ? 'up' : 'down')) e.preventDefault();
+      }
+    };
+    // Клавиши края блока из Quill (привязки ячейки): true — обработано.
+    const autoKey = (id, name) => {
+      if (!now.current.auto) return false;
+      if (name === 'mergeUp') return join(id, 'up');
+      if (name === 'mergeDown') return join(id, 'down');
+      if (name === 'up' || name === 'down') return move(id, name);
+      return false;
     };
     // Дописанные id меняют значение ячейки программно: выделение в ней возвращается на тот же текст.
     const keepCarets = (id, before, after) => {
@@ -812,6 +1168,8 @@ const TranslationEditor = ({
       cell,
       merge,
       split,
+      key,
+      autoKey,
       caret: (id, side) => {
         const key = cellKey(id, side);
         setCaretCell(key);
@@ -887,13 +1245,29 @@ const TranslationEditor = ({
     };
   }, [saveTitle, detachedTitle, lastTitle, ...blockTitles]);
 
+  const tMode = useTranslations('Game.turnForm.editorMode');
+  const modeOptions = (single ? ARTICLE_MODES : TRANSLATION_MODES).map((value) => ({
+    value,
+    label: tMode(MODE_LABELS[value]),
+  }));
+  // смена Visual / Source и уход в Preview снимают цель кнопок обёртки и нативный тулбар
+  const changeMode = (next) => {
+    if (next === 'preview' || preview || next.endsWith('visual') !== visual) {
+      setCaretCell(null);
+      setToolbarCell(null);
+    }
+    if (!single) return setTranslationMode(next);
+    setArticleMode(next);
+    if (next !== 'preview') storeArticleMode(next);
+  };
+
   // «Скопировать всю статью»: склейка блоков через пустую строку — исходник статьи целиком.
   const [copied, setCopied] = useState(false);
   const copyAll = () => {
     const source = joinBlocks(dropEmptyRows(now.current.rows));
     Promise.resolve(navigator.clipboard?.writeText(source)).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setTimeout(() => setCopied(false), 2000);
     }, () => {});
   };
 
@@ -956,6 +1330,7 @@ const TranslationEditor = ({
         single={single}
         hasNext={single && index + 1 < ids.length}
         caretHere={single && caretRow === id}
+        auto={auto}
       />,
     );
   }
@@ -963,7 +1338,7 @@ const TranslationEditor = ({
 
   return (
     <div
-      className={`md-editor translation-editor${single ? ' translation-editor--single' : ''}`}
+      className={`md-editor translation-editor${single ? ' translation-editor--single' : ''}${auto ? ' translation-editor--auto' : ''}`}
       data-test-id={TID.addTurn.field(prefixClass)}
       data-single={single ? 'true' : undefined}
     >
@@ -980,32 +1355,30 @@ const TranslationEditor = ({
         ) : <CellTools enabled={canWrap} onWrap={actions.wrap} />)}
         {(!visual || preview) && <div className="flex-1" />}
         {aside}
-        {!preview && <button
-          type="button"
-          className="btn btn-primary md-editor__toggle"
-          data-test-id={visual ? editor.toSource : editor.toVisual}
-          onClick={() => { setVisual(!visual); setCaretCell(null); setToolbarCell(null); }}
-        >
-          {visual ? 'Source' : 'Visual'}
-        </button>}
-        <button
-          type="button"
-          className="btn btn-primary md-editor__toggle"
-          data-test-id={preview ? editor.source : editor.preview}
-          onClick={() => { setPreview(!preview); setCaretCell(null); setToolbarCell(null); }}
-        >
-          {preview ? (visual ? 'Visual' : 'Source') : 'Preview'}
-        </button>
+        <Select
+          className="translation-editor__mode"
+          size="small"
+          value={mode}
+          options={modeOptions}
+          onChange={changeMode}
+          popupMatchSelectWidth={false}
+          optionRender={(option) => (
+            <span data-test-id={editor.modeOption(option.value)}>{option.label}</span>
+          )}
+          data-test-id={editor.mode}
+          data-value={mode}
+        />
         {single && (
           <button
             type="button"
             className="btn btn-primary md-editor__toggle"
-            title={t('blocks.copyAll')}
+            title={copied ? t('blocks.copied') : t('blocks.copyAll')}
+            aria-label={t('blocks.copyAll')}
             data-test-id={editor.copyAll}
             data-copied={copied ? 'true' : undefined}
             onClick={copyAll}
           >
-            <CopyOutlined /> {copied ? t('blocks.copied') : t('blocks.copyAll')}
+            {copied ? <CheckOutlined /> : <CopyOutlined />}
           </button>
         )}
         {!preview && !single && (

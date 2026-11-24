@@ -4,12 +4,12 @@ import { serialize as serializeCookie } from 'cookie';
 import { NOTIFICATION_SHOWTIME, NOTIFICATION_TRANSITION } from '@/config/ui';
 
 export const addNotification =
-  ({ title, text }) =>
+  ({ title, text, testId, count }) =>
   (dispatch) => {
     const id = new Date().getTime();
     dispatch({
       type: types.NOTIFICATION_ADD,
-      payload: { id, title, text },
+      payload: { id, title, text, testId, count },
     });
     setTimeout(() => {
       dispatch({

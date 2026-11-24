@@ -45,8 +45,9 @@ const readBox = (el) => {
 // пишется scrollTop, выставленный хуком (скроллер отличает свой сдвиг от прокрутки пользователя).
 // Ответ: visible — Set id к отрисовке; heightOf(id) — высота части вне окна (замер или оценка);
 // measureRef(id) — ref-колбэк на корень отрисованной части; box — текущая коробка;
-// scrollToPart(id) — см. ниже.
-export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef, layoutKey }) => {
+// scrollToPart(id) — см. ниже. reveal(id) — для id не из списка: true, если вызывающий добавит его в
+// список (часть скрыта свёрткой).
+export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef, layoutKey, reveal }) => {
   const [, rerender] = useReducer((n) => n + 1, 0);
   const own = useRef(null);
   const ownRef = ownScrollRef || own;
@@ -84,6 +85,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
   if (s.estimate !== estimate) s.estimates.clear();
   s.estimate = estimate;
   s.always = always;
+  s.reveal = reveal;
 
   // Оценка считается раз на часть, пока не сменились коробка или функция оценки: за шаг прокрутки
   // к heightOf обращаются несколько раз на каждую часть вне окна.
@@ -218,19 +220,41 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
   // Прокрутка к части id. Части нет в DOM — scrollTop к её оценённому смещению, затем по кадрам:
   // дождаться отрисовки и замера и довести верх части до верха окна. Часть уже в DOM — без
   // прокрутки: место внутри неё доводит вызывающий. Ответ — промис с элементом части или null
-  // (части нет или она не отрисовалась). Прокрутка пишется как ручная.
+  // (части нет или она не отрисовалась). Прокрутка пишется как ручная. Части нет в списке, но
+  // reveal её показывает — сначала дождаться её в списке.
   const scrollToPart = useCallback(
     (id) =>
       new Promise((resolve) => {
         const el = scrollRef?.current;
-        if (!el || !s.ids.includes(id)) return resolve(null);
+        if (!el) return resolve(null);
+        if (!s.ids.includes(id)) {
+          if (!s.reveal?.(id)) return resolve(null);
+          let waited = 0;
+          const listed = () => {
+            if (s.ids.includes(id)) return resolve(scrollToPart(id));
+            if ((waited += 1) >= SCROLL_FRAMES) return resolve(null);
+            requestAnimationFrame(listed);
+          };
+          return requestAnimationFrame(listed);
+        }
         if (s.attached.has(id)) return resolve(s.attached.get(id));
-        const place = () => {
+        const topOf = () => {
           const index = s.ids.indexOf(id);
-          if (index < 0) return false;
-          el.scrollTop = layoutOffsets(s.ids, heightOf).tops[index];
+          return index < 0 ? null : layoutOffsets(s.ids, heightOf).tops[index];
+        };
+        const place = () => {
+          const top = topOf();
+          if (top === null) return false;
+          el.scrollTop = top;
           compute();
           return true;
+        };
+        // Оценка верха ушла за экран от scrollTop (калибровка по первым замерам; scrollTop упёрся в
+        // конец, пока разделители в DOM не выросли) — часть не попадёт в окно, ставить снова сразу.
+        const missed = () => {
+          const top = topOf();
+          return top !== null && Math.abs(top - el.scrollTop) > el.clientHeight
+            && el.scrollTop + el.clientHeight + 1 < el.scrollHeight;
         };
         if (!place()) return resolve(null);
         let frames = 0;
@@ -245,7 +269,7 @@ export const useVisibleParts = ({ scrollRef, ids, estimate, always, ownScrollRef
             fixes += 1;
             el.scrollTop += off;
             compute();
-          } else if (!part && frames % 10 === 0) {
+          } else if (!part && (frames % 10 === 0 || missed())) {
             place();
           }
           if (frames >= SCROLL_FRAMES) return resolve(part || null);

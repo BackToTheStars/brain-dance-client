@@ -51,6 +51,8 @@ export const MINIMAP_SIZE_STEP = 10;
 export const MODE_GAME = 'game';
 export const MODE_WIDGET_PICTURE = 'widget-picture';
 export const MODE_WIDGET_PARAGRAPH = 'widget-paragraph';
+// статья md и перевод: Compress / Uncompress, Edit (форма хода), Cancel
+export const MODE_WIDGET_ROWS = 'widget-rows';
 export const MODE_WIDGET_PDF = 'widget-pdf';
 
 export const MODE_WIDGET_PDF_QUOTE_ADD = 'widget-pdf-quote-add';

@@ -556,6 +556,9 @@ const fieldsToClone = [
   'audioQuotes',
   'scrollPosition',
   'splitHeight',
+  // копия сжатого абзаца и свёрнутой статьи или перевода остаётся такой же
+  'compressed',
+  'uncompressedHeight',
   'height',
   'width',
   'size',

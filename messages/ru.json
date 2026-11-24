@@ -236,8 +236,19 @@
         "add": "+ Блок",
         "copyAll": "Скопировать всю статью",
         "copied": "Скопировано",
+        "pasteRefused": "Большой текст ({size} КБ) вставляйте в режиме Source",
         "placeholder": "Блок (markdown)",
-        "saveOff": "Блоки сохраняются по одному, когда ход уже сохранён статьёй в блоках"
+        "saveOff": "Блоки сохраняются по одному, когда ход уже сохранён статьёй в блоках",
+        "mergeTooBig": "Блоки слишком большие для склейки"
+      },
+      "editorMode": {
+        "autoVisual": "Авто · Visual",
+        "autoSource": "Авто · Source",
+        "blocksVisual": "Блоки · Visual",
+        "blocksSource": "Блоки · Source",
+        "preview": "Preview",
+        "visual": "Visual",
+        "source": "Source"
       }
     },
     "pdf": {

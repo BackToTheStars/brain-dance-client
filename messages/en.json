@@ -243,8 +243,19 @@
         "add": "+ Block",
         "copyAll": "Copy the whole article",
         "copied": "Copied",
+        "pasteRefused": "Large text ({size} KB): paste it in Source mode",
         "placeholder": "Block (markdown)",
-        "saveOff": "Blocks are saved one by one once the turn itself is saved as an article in blocks"
+        "saveOff": "Blocks are saved one by one once the turn itself is saved as an article in blocks",
+        "mergeTooBig": "The blocks are too large to merge"
+      },
+      "editorMode": {
+        "autoVisual": "Auto · Visual",
+        "autoSource": "Auto · Source",
+        "blocksVisual": "Blocks · Visual",
+        "blocksSource": "Blocks · Source",
+        "preview": "Preview",
+        "visual": "Visual",
+        "source": "Source"
       }
     },
     "pdf": {

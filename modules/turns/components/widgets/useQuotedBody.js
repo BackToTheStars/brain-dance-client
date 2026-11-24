@@ -31,6 +31,7 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 // Тело с ленивыми частями (перевод) передаёт ещё edgeQuotes — цитаты частей, которых нет в DOM
 // ([{ quoteId, text, position }], см. getEdgeQuotes; [] — таких нет), и layoutKey — значение,
 // меняющееся со сменой набора отрисованных частей: рамки тогда перемеряются по DOM.
+// sizeKey — смена перерегистрирует виджет: карточка пересчитывает высоту по новому содержимому.
 export const useQuotedBody = ({
   turnId,
   widgetId,
@@ -47,6 +48,7 @@ export const useQuotedBody = ({
   ownScrollRef = null,
   edgeQuotes,
   layoutKey,
+  sizeKey,
 }) => {
   const quotesDataRef = useRef(null);
   const size = useSelector((state) => state.turns.g[turnId].size);
@@ -273,7 +275,7 @@ export const useQuotedBody = ({
     };
     registerHandleResize(resizeInfo);
     return () => unregisterHandleResize({ id: widgetId });
-  }, [bodyRef, ready]);
+  }, [bodyRef, ready, sizeKey]);
 
   // ВОССТАНОВЛЕНИЕ ПРОКРУТКИ
   // Позиция приходит с сервера раньше, чем загрузится картинка хода: пока её нет,

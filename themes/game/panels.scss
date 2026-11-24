@@ -271,6 +271,36 @@
       }
     }
 
+    // «Авто»: статья сплошным текстом — без рамок ячеек и линий рядов, без полосы действий; промежуток
+    // абзаца — доля кегля (AUTO_GAP в TranslationEditor.js); изменённый и новый блок — тонкая полоса слева
+    &--auto {
+      .translation-editor__row {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 0 calc(var(--editor-font-size, 22px) * 0.4);
+      }
+      .translation-editor__row + .translation-editor__row { border-top: 0; }
+      .translation-editor__cell,
+      .translation-editor__visual {
+        border-color: transparent;
+        box-shadow: none;
+        &[data-dirty='true'] {
+          border-color: transparent;
+          background-color: transparent;
+        }
+      }
+      .translation-editor__visual .ql-editor { min-height: 0; }
+      .translation-editor__row[data-row-state='dirty'],
+      .translation-editor__row[data-row-state='new'] {
+        box-shadow: -3px 0 0 var(--fragment-editable-color);
+      }
+    }
+
+    &__mode {
+      flex-shrink: 0;
+      min-width: 132px;
+      font-size: 14px;
+    }
+
     &__add {
       align-self: flex-start;
       height: 30px;
@@ -395,9 +425,9 @@
     border: none;
     border-radius: unset;
     background: rgba(0, 0, 0, 0.7);
-    // ниже обычных 4 у .panel — открытая форма хода не должна прятаться под
-    // уведомлением (тот же приём, что у карты ниже, .panel-minimap-styles)
-    z-index: 3;
+    // выше формы хода (4 у .panel): уведомление редактора иначе не видно; клики проходят сквозь него
+    z-index: 5;
+    pointer-events: none;
 
     .notification {
       display: flex;

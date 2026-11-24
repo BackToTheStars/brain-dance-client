@@ -3,6 +3,7 @@ import {
   MODE_GAME,
   MODE_OPERATION_PASTE,
   MODE_WIDGET_PARAGRAPH,
+  MODE_WIDGET_ROWS,
   MODE_WIDGET_PICTURE,
   MODE_WIDGET_PICTURE_QUOTE_ACTIVE,
   MODE_WIDGET_PICTURE_QUOTE_ADD,
@@ -14,6 +15,7 @@ import {
 import GameMode from './buttons/GameMode';
 import TurnPasteMode from './buttons/operations/TurnPasteMode';
 import ParagraphMode from './buttons/paragraph/ParagraphMode';
+import RowsMode from './buttons/rows/RowsMode';
 import PictureMode from './buttons/picture/PictureMode';
 import PictureQuoteActive from './buttons/picture/PictureQuoteActive';
 import PictureQuoteAdd from './buttons/picture/PictureQuoteAdd';
@@ -39,6 +41,7 @@ const getButtonSettings = () => ({
   [MODE_WIDGET_PDF_QUOTE_ACTIVE]: PdfQuoteActive,
   [MODE_WIDGET_PDF_CROP]: PdfCropMode,
   [MODE_WIDGET_PARAGRAPH]: ParagraphMode,
+  [MODE_WIDGET_ROWS]: RowsMode,
   [MODE_OPERATION_PASTE]: TurnPasteMode,
 });
 

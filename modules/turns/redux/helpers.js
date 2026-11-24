@@ -125,6 +125,8 @@ export class TurnHelper {
           scrollPosition: turn.scrollPosition || 0,
           // цитаты статьи выводятся из рядов (translation/quotes.js), как у перевода
           quotes: [],
+          // свёрнут до рядов с выделениями — флаг хода, тот же, что у сжатого абзаца
+          compressed: !!turn.compressed,
         },
       ],
       [WIDGET_TRANSLATION]: [
@@ -135,6 +137,7 @@ export class TurnHelper {
           languages: normalizeLanguages(turn.languages),
           // поле scrollPosition одно на ход — абзац у перевода не рисуется
           scrollPosition: turn.scrollPosition || 0,
+          compressed: !!turn.compressed,
         },
       ],
       [WIDGET_VIDEO_QUOTES]: [TurnHelper.timelineWidget('vq_1', turn.videoQuotes)],
@@ -265,7 +268,12 @@ export class TurnHelper {
           : turn.contentType === 'translation'
             ? turn.dWidgets.tr_1?.scrollPosition
             : turn.dWidgets.p_1.scrollPosition) || 0,
-      compressed: turn.p_1?.compressed || false,
+      // флаг живёт в виджете тела: сжатие абзаца и свёртка меняют только его
+      compressed: !!(turn.contentType === 'md'
+        ? turn.dWidgets.md_1?.compressed
+        : turn.contentType === 'translation'
+          ? turn.dWidgets.tr_1?.compressed
+          : turn.dWidgets.p_1?.compressed),
       updatedAt: turn.updatedAt,
       uncompressedHeight: turn.uncompressedHeight || turn.height,
     };

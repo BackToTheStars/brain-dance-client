@@ -5,7 +5,8 @@
 // ресайза — useQuotedBody, как у статьи. Цитата с линией в ряду вне окна — полоска у края тела.
 // Пока рендер md не загружен, в теле вместо сетки пустых рядов — строка загрузки. Ряды вне окна
 // прокрутки сетка рисует разделителями суммарной высоты (TranslationGrid), поэтому высота тела до
-// их отрисовки — оценка: для регистрации ресайза этого достаточно.
+// их отрисовки — оценка: для регистрации ресайза этого достаточно. Сжатый ход (флаг compressed) —
+// окошки: ряды с цитатами целиком (useQuoteWindows.js) на той же сетке.
 
 import { TID } from '@/config/testIds';
 import { TRANSLATION_MIN_WIDTH } from '@/config/turn';
@@ -22,6 +23,7 @@ import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { useQuotedBody } from '../useQuotedBody';
 import { edgeQuotes, rowsQuoteIndex } from './quotes';
 import TranslationGrid from './TranslationGrid';
+import { useQuoteWindows } from './useQuoteWindows';
 
 const TranslationTable = ({
   turnId,
@@ -49,6 +51,7 @@ const TranslationTable = ({
   // scrollTop, выставленный сеткой при сдвиге заглушек, — не прокрутка пользователя
   const ownScroll = useRef(null);
   const markVars = useMdMarkVars();
+  const view = useQuoteWindows({ rows, compressed: widget.compressed, bodyRef: bodyEl });
 
   // содержимое меняется с рядами и языками и один раз — когда загрузился рендер; счётчик смен
   // вместо строки всех рядов
@@ -70,8 +73,8 @@ const TranslationTable = ({
   }, []);
   const edge = useMemo(
     () =>
-      edgeQuotes(rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
-    [rows, turnLines, layoutKey],
+      edgeQuotes(view.rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
+    [view.rows, turnLines, layoutKey],
   );
 
   useQuotedBody({
@@ -91,6 +94,7 @@ const TranslationTable = ({
     ownScrollRef: ownScroll,
     edgeQuotes: edge,
     layoutKey,
+    sizeKey: view.sizeKey,
   });
 
   return (
@@ -101,15 +105,18 @@ const TranslationTable = ({
           ref={bindBody}
           data-test-id={TID.translation.body}
           data-turn-id={turnId}
+          data-compressed={view.active ? 'true' : undefined}
         >
           {ready && bodyMounted ? (
             <TranslationGrid
-              rows={rows}
+              rows={view.rows}
               languages={languages}
               scrollRef={bodyEl}
               ownScrollRef={ownScroll}
               markIds
               onLayout={onLayout}
+              windows={view.windows}
+              revealPart={view.revealPart}
             />
           ) : (
             <div

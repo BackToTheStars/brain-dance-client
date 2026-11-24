@@ -101,8 +101,12 @@ export const TID = {
     // блок статьи в карточке и в предпросмотре формы (+ data-row-id). Блоки вне окна прокрутки подряд — один
     // пустой разделитель с тем же тест-id и data-spacer="true", data-from, data-to, data-count, без data-row-id
     block: 'md-block',
-    // уведомление antd при сохранении: изменённый блок разделён (+ data-count — сколько блоков получилось)
+    // уведомление в панели справа внизу при сохранении: изменённый блок разделён (+ data-count — сколько блоков получилось)
     splitNotice: 'md-split-notice',
+    // там же: вставка в Visual отклонена как слишком большая (+ data-count — размер текста в КБ)
+    pasteRefused: 'md-paste-refused',
+    // там же: склейка блоков в «Авто» отклонена — итог больше предела блока
+    mergeRefused: 'md-merge-refused',
     // Прежняя форма статьи (один Quill, textarea Source); с хранением блоками в DOM их нет
     preview: 'md-preview',
     source: 'md-source',
@@ -128,9 +132,13 @@ export const TID = {
     // Редактор рядов в форме хода (widgets/translation/TranslationEditor.js), стоит на месте Quill;
     // корень — addTurn.field('translation'); подпись поля — addTurn.fieldCaption с data-field="translation"
     editor: {
-      // Верхняя полоса редактора (вне прокрутки рядов; в предпросмотре кнопок и полей нет)
-      toVisual: 'translation-editor-to-visual',
-      toSource: 'translation-editor-to-source',
+      // Верхняя полоса редактора (вне прокрутки рядов; в предпросмотре кнопок и полей нет).
+      // Список режимов (antd Select, + data-value — текущий режим): у статьи auto-visual | auto-source |
+      // blocks-visual | blocks-source | preview (по умолчанию auto-visual, выбор помнит localStorage
+      // md_editor_mode), у перевода visual | source | preview; пункт в выпадающем списке — modeOption(value).
+      // В «Авто» (корень с классом translation-editor--auto) у блока нет полосы действий
+      mode: 'translation-editor-mode',
+      modeOption: (value) => `translation-editor-mode-${value}`,
       visualCell: 'translation-editor-visual-cell',
       tools: 'translation-editor-tools', // группа кнопок обёртки выделенного для ячейки, где был курсор
       // кнопка обёртки: bold, italic, link, mark-<ячейка y g p b s o r>; disabled, пока курсор не побывал в ячейке
@@ -157,8 +165,6 @@ export const TID = {
       mergeRow: 'translation-editor-merge-row',
       splitRow: 'translation-editor-split-row',
       copyAll: 'translation-editor-copy-all', // «скопировать всю статью» в верхней полосе (склейка блоков в буфер)
-      preview: 'translation-editor-preview', // кнопка «Preview» — таблица той же сеткой, что карточка
-      source: 'translation-editor-source', // та же кнопка в предпросмотре («Source») — назад к рядам
       previewPane: 'translation-editor-preview-pane', // отрисованный предпросмотр (внутри — translation.row / cell)
       // Окно «в ряду есть текст»: тело (+ data-row-id; data-saved="true" — ряд удалится на сервере сразу) и кнопки
       deleteConfirm: 'translation-editor-delete-confirm',
@@ -179,6 +185,10 @@ export const TID = {
   // Кнопка правки виджета — карандаш в тулбаре любого виджета
   // (widgets/buttons/Edit.js), + data-turn-id, data-widget-id
   widgetEdit: 'widget-edit',
+  // Сжатая статья и перевод (Compress в режиме виджета): окошко вокруг цитат в теле карточки
+  // (+ data-row-id — ряд, из которого оно; у статьи из одного блока может быть несколько окошек).
+  // У тела сжатого хода (md.body, translation.body) — data-compressed="true"
+  turnCompressedWindow: 'turn-compressed-window',
 
   // Кнопки режимов панели (modules/panels/components/buttons/<mode>/*.js), вешает
   // buttons/Buttons.js — как gameAction. Имена: add-area, save-area, modify, delete,

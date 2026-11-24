@@ -239,6 +239,40 @@ export const unCompressParagraph = () => (dispatch, getState) => {
   });
 };
 
+// Сжатие статьи и перевода до окошек вокруг цитат: флаг общий на ход, высота до сжатия — в
+// uncompressedHeight, Uncompress возвращает её. Прокрутка тела — в начало. Промис: true — записано.
+export const setTurnCompressed = (turnId, compressed) => (dispatch, getState) =>
+  new Promise((resolve) => {
+    const { d, g } = getState().turns;
+    if (!d[turnId] || !g[turnId]) return resolve(false);
+    const { position, size } = g[turnId];
+    const restore = !compressed && d[turnId].uncompressedHeight;
+    // внутренняя карточка держит высоту прежнего зажатия в стиле: пересчёт размера читает её
+    const inner = document.querySelector(`.turn_${turnId} .stb-react-turn__inner`);
+    const innerHeight = inner?.style.height;
+    if (restore && inner) inner.style.height = `${restore}px`;
+    dispatch(
+      resaveTurn(
+        {
+          _id: turnId,
+          compressed,
+          ...(compressed ? { uncompressedHeight: size.height } : restore ? { height: restore } : {}),
+          scrollPosition: 0,
+          x: position.x,
+          y: position.y,
+        },
+        { success: () => resolve(true) },
+        {
+          errorCallback: (message) => {
+            if (inner && restore) inner.style.height = innerHeight;
+            dispatch(addNotification({ title: 'Error:', text: message }));
+            resolve(false);
+          },
+        },
+      ),
+    );
+  });
+
 export const updateScrollPosition = (data) => (dispatch) =>
   dispatch({
     type: types.TURNS_SCROLL,

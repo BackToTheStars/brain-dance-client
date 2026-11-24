@@ -158,6 +158,52 @@
   }
 }
 
+// Окошки сжатой статьи и перевода разделены тонкой линией, как куски сжатого абзаца. Отступы — внутри
+// окошка: высоту части ленивая сетка берёт по offsetHeight, поля в неё не входят.
+.md-block.turn-compressed-window {
+  padding-bottom: 0.3em;
+
+  & + .md-block.turn-compressed-window {
+    border-top: 1px solid var(--turn-border-color);
+    padding-top: 0.3em;
+  }
+}
+
+// Разделитель ленивых рядов (data-spacer) в карточке, предпросмотре и редакторе: пока ряды окна не
+// отрисованы, вместо пустоты — серые полосы строк. Только фон: высота и раскладка не меняются.
+$lazy-skeleton: linear-gradient(transparent 30%, color-mix(in srgb, currentColor 9%, transparent) 30% 70%, transparent 70%);
+
+[data-spacer='true'] {
+  --skeleton-line: var(--turn-widget-paragraph-line-height, 1.333em);
+  background-image: $lazy-skeleton;
+  background-size: 100% var(--skeleton-line);
+  background-repeat: repeat-y;
+}
+
+.translation-row[data-spacer='true'] {
+  background-image: $lazy-skeleton, $lazy-skeleton;
+  background-size: calc(50% - 0.5em) var(--skeleton-line);
+  background-position: left top, right top;
+}
+
+// ряд редактора: ячейки (текст в 12 px от рамки), промежуток 6 px и полоса действий 56 px; строка — по кеглю
+.translation-editor__row[data-spacer='true'] {
+  --skeleton-line: calc(var(--editor-font-size, 22px) * 1.5);
+  background-image: $lazy-skeleton, $lazy-skeleton;
+  background-size: calc(50% - 58px) var(--skeleton-line);
+  background-position: left 12px top, right 74px top;
+}
+
+.translation-editor--single .translation-editor__row[data-spacer='true'] {
+  background-image: $lazy-skeleton;
+  background-size: calc(100% - 86px) var(--skeleton-line);
+  background-position: left 12px top;
+}
+
+.translation-editor--auto .translation-editor__row[data-spacer='true'] {
+  background-size: calc(100% - 24px) var(--skeleton-line);
+}
+
 .translucent-field {
   .stb-react-turn {
     opacity: 0.4;

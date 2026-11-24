@@ -9,6 +9,9 @@
 // разделитель (data-spacer) суммарной высоты их оценок, а после первой отрисовки — замеров, чтобы
 // длинный ход не верстал невидимое и число элементов не зависело от числа рядов. scrollRef —
 // скроллер сетки; ownScrollRef — см. useVisibleParts.
+// Сжатый ход (windows.js): rows — окошки вокруг цитат, windows — пометить их (тест-id окошка,
+// data-row-id — ряд, из которого окошко); revealPart(id) — для перехода к части не из списка: true, если
+// карточка покажет ход целиком; refRows — все ряды статьи: определение ссылки может стоять вне окошек.
 
 import { TID } from '@/config/testIds';
 import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
@@ -64,11 +67,17 @@ const TranslationGrid = ({
   showQuoteIds = false,
   onLayout,
   single = false,
+  windows = false,
+  revealPart,
+  refRows,
 }) => {
   const showLanguages = !single && !!(languages?.left || languages?.right);
   const ids = useMemo(() => rows.map((row) => row.id), [rows]);
   const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
-  const refs = useMemo(() => (single ? linkDefinitions(rows) : ''), [single, rows]);
+  const refs = useMemo(
+    () => (single ? linkDefinitions(refRows || rows) : ''),
+    [single, rows, refRows],
+  );
   const estimate = useCallback(
     (id, box) => (single ? estimateBlockHeight : estimateRowHeight)(byId.get(id), box),
     [byId, single],
@@ -79,6 +88,7 @@ const TranslationGrid = ({
     estimate,
     ownScrollRef,
     layoutKey: single ? 'single' : undefined,
+    reveal: revealPart,
   });
   const { visible, heightOf, measureRef } = parts;
   useLayoutEffect(() => {
@@ -86,6 +96,8 @@ const TranslationGrid = ({
   }, [parts]);
   const rowClass = single ? 'md-block' : 'translation-row';
   const rowTestId = single ? TID.md.block : TID.translation.row;
+  const partClass = windows ? `${rowClass} turn-compressed-window` : rowClass;
+  const partTestId = windows ? TID.turnCompressedWindow : rowTestId;
   return (
     <>
       {showLanguages && (
@@ -117,6 +129,7 @@ const TranslationGrid = ({
         ) : (
           run.ids.map((id) => {
             const row = byId.get(id);
+            const rowId = windows ? row.rowId : id;
             return single ? (
               <MdHtml
                 key={id}
@@ -124,17 +137,17 @@ const TranslationGrid = ({
                 source={withRefs(row.left, refs)}
                 markIds={markIds}
                 showQuoteIds={showQuoteIds}
-                className="md-block"
-                data-test-id={TID.md.block}
-                data-row-id={id}
+                className={partClass}
+                data-test-id={partTestId}
+                data-row-id={rowId}
               />
             ) : (
               <div
-                className="translation-row"
+                className={partClass}
                 key={id}
                 ref={measureRef(id)}
-                data-test-id={TID.translation.row}
-                data-row-id={id}
+                data-test-id={partTestId}
+                data-row-id={rowId}
               >
                 <MdHtml
                   source={row.left}

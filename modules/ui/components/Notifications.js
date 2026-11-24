@@ -11,6 +11,8 @@ const Notifications = () => {
           key={index}
           className={`notification ${notification.status}`}
           style={{ transition: `${NOTIFICATION_TRANSITION}ms` }}
+          data-test-id={notification.testId}
+          data-count={notification.count}
         >
           <div className="title">{notification.title}</div>
           <div className="text">{notification.text}</div>
