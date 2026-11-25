@@ -475,6 +475,15 @@ export const Turn = memo(({ id }) => {
     // The start comes from the element: under zoom ui.originalSize is off.
     let origin = null;
     let travel = null;
+    // jQuery UI takes the axis from the last handle hovered before the drag starts: a fast move off
+    // the corner across the bottom strip turned "se" into "s" and the width stopped following.
+    let pressed = null;
+    const press = (event) => {
+      const found = String(event.target.className).match(/ui-resizable-(se|sw|ne|nw|n|e|s|w)/);
+      pressed = found ? found[1] : null;
+    };
+    const el = wrapper.current;
+    el.addEventListener('mousedown', press, true);
     // jQuery UI lays ui.size over the size recalculateSize has set: clamp it the same way.
     const follow = (event, ui) => {
       if (!travel) return;
@@ -500,6 +509,8 @@ export const Turn = memo(({ id }) => {
         const el = wrapper.current;
         origin = { width: el.clientWidth, height: el.clientHeight };
         travel = mouseTravel(store.getState().game.zoom, event);
+        const instance = $(el).resizable('instance');
+        if (pressed && instance) instance.axis = pressed;
       },
       resize: (event, ui) => {
         follow(event, ui);
@@ -519,6 +530,7 @@ export const Turn = memo(({ id }) => {
       },
     });
     return () => {
+      el.removeEventListener('mousedown', press, true);
       $(wrapper.current).resizable('destroy');
     };
   }, [resizeDisabled, widgets, restricted]);

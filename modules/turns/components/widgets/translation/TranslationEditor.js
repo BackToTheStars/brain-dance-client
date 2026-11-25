@@ -69,6 +69,7 @@ import {
   seedBase,
 } from './draft';
 import { autoMerge, autoSplit, listEnter } from './autoBlocks';
+import { joinArticleLines } from './lineJoin';
 import { caretAfterIds, ensureRowQuoteIds, lostRowQuotes, quoteLinks } from './quotes';
 import {
   dropEmptyRows,
@@ -300,7 +301,8 @@ const offsetAt = (source, line, column) => {
 const Preview = ({ rows, languages, single }) => {
   const t = useTranslations('Game.translation');
   const markVars = useMdMarkVars();
-  const ready = !!useMdRenderer();
+  const renderer = useMdRenderer();
+  const ready = !!renderer;
   const pane = useRef(null);
   const [mounted, setMounted] = useState(false);
   useTranslationWheel(pane);
@@ -327,6 +329,7 @@ const Preview = ({ rows, languages, single }) => {
           markIds
           showQuoteIds
           single={single}
+          md={renderer.md}
         />
       ) : (
         <div className="md-editor__placeholder" data-test-id={TID.translation.loading}>
@@ -370,8 +373,9 @@ const CellTools = memo(({ enabled, onWrap }) => {
 // rows у textarea — оценка до замера, после замера высота стоит инлайном.
 // single — блок статьи: одна ячейка, кнопки «склеить со следующим» (hasNext — есть следующий блок)
 // и «разделить по курсору» (caretHere — курсор был в этом блоке). auto — «Авто»: без кнопок блока,
-// клавиши края блока и Enter — у редактора.
-const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide, single, hasNext, caretHere, auto }) => {
+// клавиши края блока и Enter — у редактора. reshaped — блоки статьи разделены или склеены только в
+// форме: один блок не сохраняется.
+const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measureRef, cellRefs, perLine, visual, toolbarHost, toolbarActiveSide, single, hasNext, caretHere, auto, reshaped }) => {
   const editor = TID.translation.editor;
   const sides = single ? SINGLE_SIDES : SIDES;
   const dirty = rowState(saved, row);
@@ -379,8 +383,14 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
   const keep = live && last;
   const emptied = dirty.state === 'dirty' && !filled;
   const canSave =
-    live && !busy && (dirty.state === 'dirty' ? !(emptied && keep) : dirty.state === 'new' && filled);
-  const saveTitle = !live ? titles.detached : emptied && keep ? titles.last : titles.save;
+    live && !busy && !reshaped && (dirty.state === 'dirty' ? !(emptied && keep) : dirty.state === 'new' && filled);
+  const saveTitle = !live
+    ? titles.detached
+    : reshaped
+      ? titles.reshaped
+      : emptied && keep
+        ? titles.last
+        : titles.save;
 
   return (
     <div
@@ -421,6 +431,7 @@ const EditorRow = memo(({ row, saved, live, busy, last, actions, titles, measure
           disabled={!canSave}
           data-test-id={editor.saveRow}
           data-row-id={row.id}
+          data-reshaped={reshaped ? 'true' : undefined}
           onClick={() => actions.save(row.id)}
         >
           {busy ? <LoadingOutlined /> : <SaveOutlined />}
@@ -499,6 +510,7 @@ const TranslationEditor = ({
   single = false,
   notifySplit,
   notifyMergeRefused,
+  notifyJoin,
 }) => {
   const t = useTranslations('Game.turnForm');
   const dispatch = useDispatch();
@@ -530,6 +542,9 @@ const TranslationEditor = ({
   // ряд с фокусом и только что добавленный ряд рисуются независимо от окна прокрутки
   const [focused, setFocused] = useState(null);
   const added = useRef(null);
+  // id блоков статьи, появившихся при делении в «Авто» и снятых склейкой в «Авто» или «Склеить строки»:
+  // эти правки живут только в форме
+  const reshapes = useRef({ made: new Set(), gone: new Set() });
   // Последняя ячейка с фокусом — цель кнопок обёртки в Source.
   const [caretCell, setCaretCell] = useState(null);
   const caretRow = caretCell === null ? null : cellRowId(caretCell);
@@ -917,6 +932,7 @@ const TranslationEditor = ({
       );
       const next = [...rows];
       next.splice(index, 1, ...pieces);
+      for (const piece of pieces) if (piece.id !== row.id) reshapes.current.made.add(piece.id);
       const target = pieces[split.part].id;
       if (target !== row.id) added.current = target;
       f.queue.add(cellKey(row.id, 'left'));
@@ -955,6 +971,7 @@ const TranslationEditor = ({
       }
       const kept = merged.keep === 'upper' ? upper : lower;
       const gone = merged.keep === 'upper' ? lower : upper;
+      reshapes.current.gone.add(gone.id);
       const next = rows
         .filter((row) => row.id !== gone.id)
         .map((row) => (row.id === kept.id && row.left !== merged.text ? { ...row, left: merged.text } : row));
@@ -1064,8 +1081,8 @@ const TranslationEditor = ({
       return { rows: split.rows, extra, parts: split.parts };
     };
     const save = (id, confirmed) => {
-      const { base, live, changeHandler, notifySplit } = now.current;
-      if (!live) return;
+      const { base, live, changeHandler, notifySplit, reshaped } = now.current;
+      if (!live || reshaped) return;
       const before = now.current.rows;
       const withIds = ensureRowQuoteIds(before, base, { only: id });
       const { rows, extra, parts } = splitOnSave(withIds, id);
@@ -1089,9 +1106,11 @@ const TranslationEditor = ({
     // Склеить блок со следующим (через пустую строку) и разделить по курсору. Сохранённая статья
     // получает такую правку сразу, как удаление: иначе общий Save или Cancel после сохранения
     // одного из двух блоков оставили бы текст на сервере дважды или потеряли бы его часть.
+    // Пока блоки уже разделены или склеены только в форме, и эта правка остаётся в форме: запрос по
+    // одному блоку разошёлся бы с ними.
     const structural = (id, rows, ops) => {
-      const { live, changeHandler } = now.current;
-      if (live && ops.length) {
+      const { live, changeHandler, reshaped } = now.current;
+      if (live && ops.length && !reshaped) {
         const summary = goneWith(ops)?.summary;
         if (summary) {
           setLostLinks({ summary, proceed: () => {
@@ -1113,6 +1132,7 @@ const TranslationEditor = ({
         .join('\n\n');
       const merged = rows.filter((row) => row.id !== next.id);
       merged[index] = { ...rows[index], left };
+      if (now.current.reshaped) reshapes.current.gone.add(next.id);
       const withIds = ensureRowQuoteIds(merged, base, { only: id });
       for (const side of SIDES) f.queue.add(cellKey(id, side));
       const own = rowOps(base, withIds, id);
@@ -1152,6 +1172,7 @@ const TranslationEditor = ({
       const index = rows.findIndex((row) => row.id === id);
       if (index < 0) return;
       const fresh = { id: newRowId(), left: tail, right: '' };
+      if (now.current.reshaped) reshapes.current.made.add(fresh.id);
       let next = [...rows];
       next.splice(index, 1, { ...rows[index], left: head }, fresh);
       next = ensureRowQuoteIds(next, base, { only: id });
@@ -1219,6 +1240,7 @@ const TranslationEditor = ({
 
   const saveTitle = t('translation.saveRow');
   const detachedTitle = t(single ? 'blocks.saveOff' : 'translation.saveRowOff');
+  const reshapedTitle = t('blocks.saveReshaped');
   // подписи кнопок блока — строками в зависимостях: titles остаётся тем же объектом между рендерами
   const blockTitles = [
     t('blocks.placeholder'),
@@ -1234,6 +1256,7 @@ const TranslationEditor = ({
     return {
       save: saveTitle,
       detached: detachedTitle,
+      reshaped: reshapedTitle,
       last: lastTitle,
       placeholder,
       addBelow,
@@ -1243,7 +1266,7 @@ const TranslationEditor = ({
       split,
       splitNoCursor,
     };
-  }, [saveTitle, detachedTitle, lastTitle, ...blockTitles]);
+  }, [saveTitle, detachedTitle, reshapedTitle, lastTitle, ...blockTitles]);
 
   const tMode = useTranslations('Game.turnForm.editorMode');
   const modeOptions = (single ? ARTICLE_MODES : TRANSLATION_MODES).map((value) => ({
@@ -1259,6 +1282,43 @@ const TranslationEditor = ({
     if (!single) return setTranslationMode(next);
     setArticleMode(next);
     if (next !== 'preview') storeArticleMode(next);
+  };
+
+  // «Склеить строки»: строки, нарезанные по ширине, собираются в абзацы во всех блоках статьи — правкой
+  // в форме, как набор. Отмена одним шагом возвращает тексты блоков, пока ряды формы — те же, что дала
+  // склейка, и база не сдвинулась (любая правка или Save её снимают).
+  const [joined, setJoined] = useState(null);
+  const canRestore = !!joined && joined.value === value && joined.base === form?.rowsBase;
+  const joinLines = () => {
+    const { rows: current, markdownIt: factory } = now.current;
+    if (!factory) return;
+    const result = joinArticleLines(current.map((row) => row.left), { markdownIt: factory });
+    // блок, ушедший первой строкой (абзацный отступ) в следующий, снимается
+    const next = result.blocks
+      ? current.flatMap((row, i) => {
+          const left = result.texts[i];
+          if (left === row.left) return [row];
+          if (left === '') {
+            reshapes.current.gone.add(row.id);
+            return [];
+          }
+          return [{ ...row, left }];
+        })
+      : current;
+    notifyJoin?.(result.lines, result.blocks);
+    if (next === current) return;
+    f.all = true;
+    now.current.rows = next;
+    changeHandler(next);
+    setJoined({ value: next, base: form?.rowsBase, before: current });
+  };
+  // ряды формы — те же, что дала склейка (canRestore): возвращаются ряды до неё целиком
+  const restoreLines = () => {
+    if (!canRestore) return;
+    f.all = true;
+    now.current.rows = joined.before;
+    changeHandler(joined.before);
+    setJoined(null);
   };
 
   // «Скопировать всю статью»: склейка блоков через пустую строку — исходник статьи целиком.
@@ -1277,6 +1337,15 @@ const TranslationEditor = ({
       languages: { ...(prev.languages || {}), [side]: text },
     }));
   const onlyText = live ? onlyTextRowId(base) : null;
+  // Блоки статьи разделены или склеены только в форме: «сохранить блок» записал бы одну часть —
+  // вторая потерялась бы, склеенный текст остался бы на сервере дважды. Такое сохраняет общий Save.
+  const { made, gone } = reshapes.current;
+  const reshaped =
+    single &&
+    live &&
+    ([...gone].some((id) => !indexById.has(id) && !!savedRow(base, id)) ||
+      [...made].some((id) => indexById.has(id) && !savedRow(base, id) && rowHasText(rows[indexById.get(id)])));
+  now.current.reshaped = reshaped;
   // состояние блока на экране: у статьи без рядов нетронутый блок — как сохранённый
   const shownBase = draftBase(form) || base;
   const canWrap = caretRow !== null && indexById.has(caretRow) && visible.has(caretRow);
@@ -1331,6 +1400,7 @@ const TranslationEditor = ({
         hasNext={single && index + 1 < ids.length}
         caretHere={single && caretRow === id}
         auto={auto}
+        reshaped={reshaped}
       />,
     );
   }
@@ -1402,13 +1472,30 @@ const TranslationEditor = ({
       ) : (
         <div className="translation-editor__body" ref={bindBody}>
           {parts}
+          {/* в «Авто» новый блок в конце даёт двойной Enter */}
+          {!auto && (
+            <button
+              type="button"
+              className="btn btn-primary translation-editor__add"
+              data-test-id={editor.addRow}
+              onClick={actions.addAtEnd}
+            >
+              {single ? t('blocks.add') : '+ Row'}
+            </button>
+          )}
+        </div>
+      )}
+      {single && !preview && (
+        <div className="translation-editor__footer">
           <button
             type="button"
             className="btn btn-primary translation-editor__add"
-            data-test-id={editor.addRow}
-            onClick={actions.addAtEnd}
+            data-test-id={editor.joinLines}
+            data-restore={canRestore ? 'true' : undefined}
+            disabled={!markdownIt}
+            onClick={canRestore ? restoreLines : joinLines}
           >
-            {single ? t('blocks.add') : '+ Row'}
+            {canRestore ? t('blocks.restoreLines') : t('blocks.joinLines')}
           </button>
         </div>
       )}

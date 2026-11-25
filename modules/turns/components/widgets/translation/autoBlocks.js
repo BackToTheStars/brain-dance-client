@@ -11,6 +11,8 @@ const BLANK_HEAD = /^(?:[ \t]*\n)+/;
 const BLANK_LINE_END = /\n[ \t]*\n[ \t]*$/;
 // знак, которым пробуется «следующая строка»: начнёт ли она новый блок
 const PROBE = 'x';
+const WORD_JOINER = String.fromCharCode(0x2060);
+const QUOTE_ID_END = /==\^\d+$/;
 
 const lineOf = (source, offset) => {
   let line = 0;
@@ -90,10 +92,11 @@ export const autoSplit = (source, caret, { markdownIt, kind = 'type', limit = BL
   const tail = value.slice(at);
   if (tail.trim() === '' && (head.endsWith('\n') || kind === 'leave')) {
     const first = head.replace(BLANK_TAIL, '');
+    // пустая строка внутри незакрытого ограждённого кода — часть кода: текст за ней блока не начнёт
     const opens =
       kind === 'leave' ||
       first.trim() === '' ||
-      BLANK_LINE_END.test(head) ||
+      (BLANK_LINE_END.test(head) && splitBlocks(`${first}\n\n${PROBE}`, { markdownIt, limit }).length >= 2) ||
       splitBlocks(`${first}\n${PROBE}`, { markdownIt, limit }).length >= 2;
     if (opens) return result([first.trim() === '' ? '' : first, ''], 1, 0);
     return null;
@@ -112,9 +115,11 @@ export const autoMerge = (upper, lower, { limit = BLOCK_LIMIT } = {}) => {
   const bottom = text(lower);
   if (bottom.trim() === '') return { text: top, caret: top.length, keep: 'upper' };
   if (top.trim() === '') return { text: bottom, caret: 0, keep: 'lower' };
-  const joined = top + bottom;
+  // цифры сразу за ==…==^id прочитались бы частью id: на стыке — невидимый разделитель, курсор за ним
+  const gap = QUOTE_ID_END.test(top) && /^\d/.test(bottom) ? WORD_JOINER : '';
+  const joined = top + gap + bottom;
   if (utf8Bytes(joined) > limit) return null;
-  return { text: joined, caret: top.length, keep: 'upper' };
+  return { text: joined, caret: top.length + gap.length, keep: 'upper' };
 };
 
 const LIST_ITEM = /^([ \t]*)(?:([-*+])|(\d{1,9})([.)]))([ \t]+)(.*)$/;

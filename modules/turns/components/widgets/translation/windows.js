@@ -1,165 +1,160 @@
-// Сжатый вид статьи и перевода — окошки вокруг цитат, как у сжатого абзаца, но из исходника md, без
-// замеров. Чистый модуль; из соседей — rowMarks и parseMarks, markdown-it — параметром.
+// Сжатый вид статьи и перевода — столбик окошек вокруг групп цитат, как у сжатого абзаца. Чистый
+// модуль без импортов: ряды — по номерам, высоты и места выделений — числами (замер или оценка).
 //
-// quoteWindows(rows, { md, single, context }) → [{ id, rowId, left, right, whole }]: окошки по порядку,
-// ряд-подобные — их рисует та же сетка, что ряды. У перевода окошко — ряд с выделением целиком (обе
-// колонки). У статьи — кусок абзаца-блока вокруг выделений: ± context знаков, начало и конец — по
-// границе предложения или слова, не внутри кода, ссылки, выделения или выделения-цитаты; соседние
-// выделения ближе 2 × context — одним куском; обрезанный край помечен «…». Таблица, список, код,
-// цитата-блок и заголовок с выделением, а также кусок, после обрезки которого разметка ломается
-// (лишние литеральные *, `, [, ==), — блок целиком. whole — окошко равно ряду (id = id ряда);
-// у куска id — id ряда с номером после WINDOW_PART. Каждое выделение — ровно в одном окошке.
+// Цитаты, между которыми по вертикали меньше 2 × FREE_SPACE, — одна группа; выделения одного ряда —
+// всегда одна группа (ряд не режется). Окошко — ряды от середины промежутка с предыдущей группой до
+// середины промежутка со следующей (граница — между рядами, ближайшая к середине); первое — от
+// начала хода, последнее — до конца: окошки вместе содержат все ряды по одному разу. Высота окошка —
+// FREE_SPACE над группой, группа и FREE_SPACE под ней (не больше, чем в окошке есть рядов), но не
+// больше WINDOW_MAX; начальная прокрутка ставит группу по центру.
 
-import { parseMarks } from '../md/markdown';
-import { rowMarks } from './quotes';
+export const FREE_SPACE = 100;
+export const WINDOW_MAX = 500;
 
-const list = (rows) => (Array.isArray(rows) ? rows : []);
-const text = (value) => (typeof value === 'string' ? value : '');
-
-export const WINDOW_PART = '\u2060';
-export const DEFAULT_CONTEXT = 160;
-const ELLIPSIS = '\u2026';
-
-// Обрезка, оставляющая меньше этой доли блока, не стоит окошка: блок целиком.
-const MIN_CUT_SHARE = 0.15;
-
-// Места, внутри которых резать нельзя: код в строке, ссылки и картинки, автоссылки, URL, теги,
-// жирный, курсив, зачёркивание.
-const PROTECTED = [
-  /(`+)[\s\S]*?\1/g,
-  /!?\[[^\]\n]*\](?:\([^)\n]*\)|\[[^\]\n]*\])?/g,
-  /<[^>\s]+>/g,
-  /https?:\/\/\S+/g,
-  /(\*\*|__)(?=\S)[\s\S]*?\S\1/g,
-  /(\*|_)(?=\S)[\s\S]*?\S\1/g,
-  /~~(?=\S)[\s\S]*?\S~~/g,
-];
-
-const protectedSpans = (source, marks) => {
-  const spans = marks.map((mark) => [mark.start, mark.end]);
-  for (const re of PROTECTED) {
-    re.lastIndex = 0;
-    for (let m = re.exec(source); m; m = re.exec(source)) {
-      if (m[0].length > 1) spans.push([m.index, m.index + m[0].length]);
-      if (!m[0].length) re.lastIndex += 1;
-    }
-  }
-  return spans;
+// Смещения рядов от начала хода: offsets[i] — верх ряда i, offsets[count] — общая высота.
+export const rowOffsets = (count, heightOf) => {
+  const offsets = new Array(count + 1);
+  offsets[0] = 0;
+  for (let i = 0; i < count; i += 1) offsets[i + 1] = offsets[i] + heightOf(i);
+  return offsets;
 };
 
-const insideSpan = (spans, at) => spans.some(([from, to]) => at > from && at < to);
-
-// Литеральные знаки разметки в тексте после разбора: у куска их не должно стать больше, чем у блока.
-const LITERAL = /[*_`[\]]|==|~~/g;
-const literals = (tokens) => {
-  let count = 0;
-  for (const token of tokens) {
-    for (const child of token.children || []) {
-      if (child.type === 'text') count += (child.content.match(LITERAL) || []).length;
-    }
-  }
-  return count;
-};
-
-const isParagraph = (tokens) =>
-  tokens.length === 3 &&
-  tokens[0].type === 'paragraph_open' &&
-  tokens[1].type === 'inline' &&
-  tokens[2].type === 'paragraph_close';
-
-// Начало куска: первая граница предложения, затем слова, в [from, limit]; не нашлось — ближайшая
-// граница слова левее from; нет и её — начало блока.
-const SENTENCE_END = /[.!?\u2026]["'\u00bb\u201d)\]]*\s+/g;
-const startAt = (source, from, limit, spans) => {
-  if (from <= 0) return 0;
-  SENTENCE_END.lastIndex = from;
-  for (let m = SENTENCE_END.exec(source); m && m.index + m[0].length <= limit; m = SENTENCE_END.exec(source)) {
-    const at = m.index + m[0].length;
-    if (at >= from && !insideSpan(spans, at)) return at;
-  }
-  for (let at = from; at <= limit; at += 1) {
-    if (/\s/.test(source[at - 1]) && !/\s/.test(source[at]) && !insideSpan(spans, at)) return at;
-  }
-  for (let at = from - 1; at > 0; at -= 1) {
-    if (/\s/.test(source[at - 1]) && !/\s/.test(source[at]) && !insideSpan(spans, at)) return at;
-  }
-  return 0;
-};
-
-// Конец куска: последняя граница предложения, затем слова, в [limit, to]; не нашлось — ближайшая
-// граница слова правее to; нет и её — конец блока.
-const endAt = (source, limit, to, spans) => {
-  if (to >= source.length) return source.length;
-  let best = -1;
-  SENTENCE_END.lastIndex = limit;
-  for (let m = SENTENCE_END.exec(source); m && m.index < to; m = SENTENCE_END.exec(source)) {
-    const at = m.index + m[0].length - (m[0].length - m[0].trimEnd().length);
-    if (at >= limit && at <= to && !insideSpan(spans, at)) best = at;
-  }
-  if (best >= 0) return best;
-  for (let at = to; at >= limit; at -= 1) {
-    if (!/\s/.test(source[at - 1] || ' ') && /\s/.test(source[at] || ' ') && !insideSpan(spans, at)) return at;
-  }
-  for (let at = to + 1; at < source.length; at += 1) {
-    if (!/\s/.test(source[at - 1]) && /\s/.test(source[at]) && !insideSpan(spans, at)) return at;
-  }
-  return source.length;
-};
-
-// Куски блока статьи: [[start, end], …] по исходнику или null — блок целиком.
-export const blockPieces = (source, md, context = DEFAULT_CONTEXT) => {
-  const marks = parseMarks(source);
-  if (!marks.length) return null;
-  const tokens = md.parse(source, {});
-  if (!isParagraph(tokens)) return null;
-  const spans = protectedSpans(source, marks);
+// quotes — [{ id, row, top, bottom }]: row — номер ряда, top и bottom — от верха своего ряда.
+// Ответ — группы по порядку: { top, bottom — от начала хода; firstRow, lastRow; rows — номера рядов
+// с выделениями; quotes — id }.
+export const quoteGroups = (quotes, offsets, free = FREE_SPACE) => {
+  const placed = quotes
+    .map((quote) => ({
+      id: quote.id,
+      row: quote.row,
+      top: offsets[quote.row] + quote.top,
+      bottom: offsets[quote.row] + Math.max(quote.top, quote.bottom),
+    }))
+    .sort((a, b) => a.row - b.row || a.top - b.top || a.bottom - b.bottom);
   const groups = [];
-  for (const mark of marks) {
+  for (const quote of placed) {
     const last = groups[groups.length - 1];
-    if (last && mark.start - last.to <= 2 * context) last.to = mark.end;
-    else groups.push({ from: mark.start, to: mark.end });
+    if (last && (quote.row === last.lastRow || quote.top - last.bottom < 2 * free)) {
+      last.top = Math.min(last.top, quote.top);
+      last.bottom = Math.max(last.bottom, quote.bottom);
+      if (quote.row !== last.lastRow) last.rows.push(quote.row);
+      last.lastRow = quote.row;
+      last.quotes.push(quote.id);
+    } else {
+      groups.push({
+        top: quote.top,
+        bottom: quote.bottom,
+        firstRow: quote.row,
+        lastRow: quote.row,
+        rows: [quote.row],
+        quotes: [quote.id],
+      });
+    }
   }
-  const pieces = [];
-  for (const group of groups) {
-    const start = startAt(source, group.from - context, group.from, spans);
-    const end = endAt(source, group.to, group.to + context, spans);
-    const prev = pieces[pieces.length - 1];
-    if (prev && start <= prev[1]) prev[1] = Math.max(prev[1], end);
-    else pieces.push([start, end]);
-  }
-  const kept = pieces.reduce((sum, [start, end]) => sum + end - start, 0);
-  if (kept >= source.length * (1 - MIN_CUT_SHARE)) return null;
-  const allowed = literals(tokens);
-  for (const [start, end] of pieces) {
-    const piece = source.slice(start, end);
-    const parsed = md.parse(piece, {});
-    if (!isParagraph(parsed) || literals(parsed) > allowed) return null;
-  }
-  return pieces;
+  return groups;
 };
 
-const pieceSource = (source, [start, end]) =>
-  `${start > 0 ? `${ELLIPSIS} ` : ''}${source.slice(start, end).trim()}${end < source.length ? ` ${ELLIPSIS}` : ''}`;
-
-export const quoteWindows = (rows, { md, single = false, context = DEFAULT_CONTEXT } = {}) => {
-  const windows = [];
-  for (const row of list(rows)) {
-    if (!rowMarks(row).length) continue;
-    const source = text(row.left);
-    const pieces = single && md ? blockPieces(source, md, context) : null;
-    if (!pieces) {
-      windows.push({ ...row, rowId: row.id, whole: true });
-      continue;
-    }
-    pieces.forEach((range, k) =>
-      windows.push({
-        id: `${row.id}${WINDOW_PART}${k + 1}`,
-        rowId: row.id,
-        left: pieceSource(source, range),
-        right: '',
-        whole: false,
-      }),
-    );
+// Граница между рядами, ближайшая к y: номер ряда из [from, to], чей верх ближе всех к y.
+export const nearestBoundary = (offsets, y, from, to) => {
+  let lo = from;
+  let hi = to;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (offsets[mid] < y) lo = mid + 1;
+    else hi = mid;
   }
-  return windows;
+  return lo > from && y - offsets[lo - 1] <= offsets[lo] - y ? lo - 1 : lo;
+};
+
+// count — число рядов; heightOf(i) — высота ряда; quotes — см. quoteGroups.
+// Ответ — окошки по порядку: { from, to — номера первого и последнего ряда; height — высота окошка;
+// content — высота его рядов; top, bottom — группа от верха содержимого окошка; scrollTop — начальная
+// прокрутка (группа по центру); rows — номера рядов с выделениями; quotes — id выделений }.
+export const quoteWindows = ({ count, heightOf, quotes, free = FREE_SPACE, max = WINDOW_MAX }) => {
+  if (!count || !quotes?.length) return [];
+  const offsets = rowOffsets(count, heightOf);
+  const groups = quoteGroups(quotes, offsets, free);
+  const starts = [0];
+  for (let k = 1; k < groups.length; k += 1) {
+    const middle = (groups[k - 1].bottom + groups[k].top) / 2;
+    starts.push(nearestBoundary(offsets, middle, groups[k - 1].lastRow + 1, groups[k].firstRow));
+  }
+  return groups.map((group, k) => {
+    const from = starts[k];
+    const to = (k + 1 < groups.length ? starts[k + 1] : count) - 1;
+    const content = offsets[to + 1] - offsets[from];
+    const top = group.top - offsets[from];
+    const bottom = group.bottom - offsets[from];
+    const height = Math.max(
+      1,
+      Math.round(Math.min(max, Math.min(free, top) + (bottom - top) + Math.min(free, content - bottom))),
+    );
+    const scrollTop = Math.max(
+      0,
+      Math.min(Math.round(content - height), Math.round((top + bottom) / 2 - height / 2)),
+    );
+    return { from, to, height, content, top, bottom, scrollTop, rows: group.rows, quotes: group.quotes };
+  });
+};
+
+// Множитель оценок высоты: медиана отношения «замер / оценка» по замеренным рядам без выделений
+// (ряд с цитатой бывает нетипичным — список, таблица); таких нет — 1.
+export const estimateScale = (measured, estimate) => {
+  const ratios = [];
+  for (const { row, height, marks } of measured) {
+    const raw = estimate(row);
+    if (!marks?.length && raw > 0 && height > 0) ratios.push(height / raw);
+  }
+  if (!ratios.length) return 1;
+  ratios.sort((a, b) => a - b);
+  const middle = ratios.length >> 1;
+  const median = ratios.length % 2 ? ratios[middle] : (ratios[middle - 1] + ratios[middle]) / 2;
+  return Math.min(4, Math.max(0.5, median));
+};
+
+// Окошки по замеру части рядов: measured — [{ row, height, marks: [{ id, top, bottom }] }] (ряды с
+// выделениями — все; места выделений — от верха своего ряда), estimate(i) — оценка высоты остальных.
+// Ответ — { windows, scale, total — сумма высот окошек }.
+export const measuredWindows = ({ count, estimate, measured, free = FREE_SPACE, max = WINDOW_MAX }) => {
+  const heights = new Map(measured.map((item) => [item.row, item.height]));
+  const scale = estimateScale(measured, estimate);
+  const heightOf = (i) =>
+    heights.has(i) ? heights.get(i) : Math.max(1, Math.round(estimate(i) * scale));
+  const quotes = [];
+  for (const { row, marks } of measured) {
+    for (const mark of marks || []) quotes.push({ id: mark.id, row, top: mark.top, bottom: mark.bottom });
+  }
+  const windows = quoteWindows({ count, heightOf, quotes, free, max });
+  return { windows, scale, total: windows.reduce((sum, item) => sum + item.height, 0) };
+};
+
+// Ряды для замера перед раскладкой: quoteRows — номера рядов с выделениями. К ним — соседи сверху и
+// снизу (поля окошка над и под группой) или, когда рядов с выделениями больше neighboursUpTo, samples
+// рядов-образцов равномерно по ходу: по рядам без выделений калибруется оценка остальных.
+export const rowsToMeasure = (count, quoteRows, { neighboursUpTo = 60, samples = 12 } = {}) => {
+  const picked = new Set(quoteRows);
+  if (quoteRows.length <= neighboursUpTo) {
+    for (const row of quoteRows) {
+      if (row > 0) picked.add(row - 1);
+      if (row + 1 < count) picked.add(row + 1);
+    }
+  } else {
+    for (let k = 0; k < samples; k += 1) {
+      picked.add(Math.min(count - 1, Math.floor(((k + 0.5) * count) / samples)));
+    }
+  }
+  return [...picked].sort((a, b) => a - b);
+};
+
+// Номер окошка, в котором лежит ряд row; -1 — такого нет.
+export const windowOfRow = (windows, row) => {
+  let lo = 0;
+  let hi = windows.length - 1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (row < windows[mid].from) hi = mid - 1;
+    else if (row > windows[mid].to) lo = mid + 1;
+    else return mid;
+  }
+  return -1;
 };

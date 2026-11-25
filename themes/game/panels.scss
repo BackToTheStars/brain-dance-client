@@ -307,6 +307,15 @@
       font-size: 14px;
       line-height: 1;
     }
+
+    // нижняя строка статьи под прокруткой — «Склеить строки» видна при любой длине статьи
+    &__footer {
+      flex-shrink: 0;
+      display: flex;
+      gap: 6px;
+      padding: 4px 8px;
+      border-top: 1px solid #ccc;
+    }
   }
 
   // Предпросмотр перевода — та же сетка, что у карточки (turn.scss, .stb-widget-translation)

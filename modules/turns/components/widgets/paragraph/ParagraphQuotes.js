@@ -34,7 +34,7 @@ const Quote = memo(({ isActive, quote, can }) => {
         );
         if (quouteInsideParagraphEl) {
           const pEl = quouteInsideParagraphEl.closest(
-            '.paragraphText, .md-body, .translation-body',
+            '.turn-compressed-window, .paragraphText, .md-body, .translation-body',
           );
           pEl.scrollTo({
             top: pEl.scrollTop + e.deltaY,

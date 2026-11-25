@@ -447,14 +447,31 @@ export const buildTurnSave = ({
     editionToken,
   };
   // Правка перевода и статьи. Тип прежний — ряды и изменённые поля одним запросом операций,
-  // записи хода нет (put: false). Смена типа на перевод или статью — операции рядов, за ними
-  // запись хода без рядов.
+  // записи хода нет (put: false). Смена типа — запись хода без рядов и операции рядов: на перевод
+  // запись идёт первой (putFirst: операции с правой колонкой сервер сверяет с хранимым типом, а у
+  // статьи её нет), на статью — последней (правая колонка перевода стирается, пока ход ещё перевод).
   if (isRows && turnToEdit) {
     const retyped = turnToEdit.contentType !== template;
+    // Картинку статьи и цитаты на ней операции не несут: при её замене или снятии за
+    // операциями идёт запись хода только с этими полями.
+    const pictureChanged =
+      isMd &&
+      !retyped &&
+      (preparedForm[FIELD_PICTURE] || '') !== (turnToEdit[FIELD_PICTURE] || '');
     payload.translation = {
       ops: retyped ? rowsOps : [...rowsOps, ...fieldsOps(form, template, baseFields)],
-      put: retyped,
+      put: retyped || pictureChanged,
+      ...(retyped && isTranslation ? { putFirst: true } : {}),
     };
+    if (pictureChanged) {
+      payload.turnObj = {
+        _id: turnObj._id,
+        x: turnObj.x,
+        y: turnObj.y,
+        [FIELD_PICTURE]: preparedForm[FIELD_PICTURE] || null,
+        quotes: turnObj.quotes,
+      };
+    }
   }
 
   const orphanSummary = orphaned.length

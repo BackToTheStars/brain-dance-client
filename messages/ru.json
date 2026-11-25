@@ -239,7 +239,12 @@
         "pasteRefused": "Большой текст ({size} КБ) вставляйте в режиме Source",
         "placeholder": "Блок (markdown)",
         "saveOff": "Блоки сохраняются по одному, когда ход уже сохранён статьёй в блоках",
-        "mergeTooBig": "Блоки слишком большие для склейки"
+        "saveReshaped": "Блоки разделены или склеены: сохраните их общей кнопкой Save",
+        "mergeTooBig": "Блоки слишком большие для склейки",
+        "joinLines": "Склеить строки",
+        "restoreLines": "Вернуть переносы",
+        "joined": "Склеено {lines, plural, one {# строка} few {# строки} many {# строк} other {# строки}} в {blocks, plural, one {# блоке} other {# блоках}}",
+        "joinNothing": "Нечего склеивать"
       },
       "editorMode": {
         "autoVisual": "Авто · Visual",

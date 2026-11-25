@@ -246,7 +246,12 @@
         "pasteRefused": "Large text ({size} KB): paste it in Source mode",
         "placeholder": "Block (markdown)",
         "saveOff": "Blocks are saved one by one once the turn itself is saved as an article in blocks",
-        "mergeTooBig": "The blocks are too large to merge"
+        "saveReshaped": "Blocks were split or merged: save them with the main Save button",
+        "mergeTooBig": "The blocks are too large to merge",
+        "joinLines": "Join lines",
+        "restoreLines": "Restore line breaks",
+        "joined": "{lines, plural, one {Joined # line} other {Joined # lines}} in {blocks, plural, one {# block} other {# blocks}}",
+        "joinNothing": "Nothing to join"
       },
       "editorMode": {
         "autoVisual": "Auto · Visual",

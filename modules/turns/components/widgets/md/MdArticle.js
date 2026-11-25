@@ -5,7 +5,8 @@
 // прокрутка с памятью и регистрация ресайза — useQuotedBody, как у абзаца и перевода; цитата с линией
 // в блоке вне окна — полоска у края тела. Статья без рядов (ещё не разделённый markdown) делится на
 // блоки здесь же, на лету, тем же делением, что на сервере. Сжатая статья (флаг хода compressed) —
-// окошки вокруг цитат (translation/useQuoteWindows.js) на той же сетке.
+// столбик окошек вокруг групп цитат (translation/useQuoteWindows.js, QuoteWindows.js): тело не
+// прокручивается, у каждого окошка своя прокрутка и своя ленивая сетка.
 
 import { TID } from '@/config/testIds';
 import { RULE_TURNS_CRUD } from '@/config/user';
@@ -15,8 +16,9 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { edgeQuotes, rowsQuoteIndex } from '../translation/quotes';
+import QuoteWindows from '../translation/QuoteWindows';
 import { rowsFromMarkdown } from '../translation/rows';
-import TranslationGrid from '../translation/TranslationGrid';
+import TranslationGrid, { estimateBlockHeight } from '../translation/TranslationGrid';
 import { useQuoteWindows } from '../translation/useQuoteWindows';
 import { useQuotedBody } from '../useQuotedBody';
 import MdEditButton from './MdEditButton';
@@ -36,7 +38,6 @@ const MdArticle = ({
   const widget = useSelector(
     (state) => state.turns.d[turnId].dWidgets[widgetId],
   );
-  const width = useSelector((state) => state.turns.g[turnId].size.width);
   const renderer = useMdRenderer();
   const ready = !!renderer;
   // id блоков статьи без рядов — по номеру: нужны только карточке, форма даст свои при записи
@@ -60,10 +61,10 @@ const MdArticle = ({
   const view = useQuoteWindows({
     rows,
     compressed: widget.compressed,
-    md: renderer?.md,
     single: true,
-    width,
+    estimate: estimateBlockHeight,
     bodyRef: bodyEl,
+    ready,
   });
 
   const changes = useRef(0);
@@ -82,8 +83,8 @@ const MdArticle = ({
   }, []);
   const edge = useMemo(
     () =>
-      edgeQuotes(view.rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
-    [view.rows, turnLines, layoutKey],
+      edgeQuotes(rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
+    [rows, turnLines, layoutKey],
   );
 
   useQuotedBody({
@@ -98,11 +99,13 @@ const MdArticle = ({
     registerHandleResize,
     unregisterHandleResize,
     // до загрузки рендера виджет не зарегистрирован: Turn.js ждёт его и не пересчитывает высоту
-    ready,
+    ready: view.sizeReady,
     ownScrollRef: ownScroll,
     edgeQuotes: edge,
     layoutKey,
     sizeKey: view.sizeKey,
+    paused: view.active,
+    fixedHeight: view.fixedHeight,
   });
 
   return (
@@ -115,17 +118,27 @@ const MdArticle = ({
           data-turn-id={turnId}
           data-compressed={view.active ? 'true' : undefined}
         >
-          {ready && bodyMounted && (
+          {ready && bodyMounted && !view.active && (
             <TranslationGrid
-              rows={view.rows}
+              rows={rows}
               scrollRef={bodyEl}
               ownScrollRef={ownScroll}
               markIds
               single
               onLayout={onLayout}
-              windows={view.windows}
-              revealPart={view.revealPart}
-              refRows={view.refRows}
+              md={renderer.md}
+            />
+          )}
+          {ready && bodyMounted && view.active && (
+            <QuoteWindows
+              view={view}
+              bodyRef={bodyEl}
+              turnId={turnId}
+              widgetId={widgetId}
+              rows={rows}
+              single
+              md={renderer.md}
+              widgetsUpdatedTime={widgetsUpdatedTime}
             />
           )}
         </div>

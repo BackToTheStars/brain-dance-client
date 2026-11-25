@@ -158,14 +158,40 @@
   }
 }
 
-// Окошки сжатой статьи и перевода разделены тонкой линией, как куски сжатого абзаца. Отступы — внутри
-// окошка: высоту части ленивая сетка берёт по offsetHeight, поля в неё не входят.
-.md-block.turn-compressed-window {
-  padding-bottom: 0.3em;
+// Сжатая статья и перевод: тело не прокручивается, в нём столбик окошек постоянной высоты — у
+// каждого своя прокрутка с теми же отступами и полосой, что у тела; между окошками тонкая линия,
+// как у сжатого абзаца (тенью: высоту окошка она не меняет). Строка языков перевода стоит над
+// окошками в такой же коробке — колонки под ней. Замер рядов перед раскладкой не виден.
+@mixin turn-compressed-body {
+  &[data-compressed='true'] {
+    position: relative;
+    max-height: none;
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+  }
 
-  & + .md-block.turn-compressed-window {
-    border-top: 1px solid var(--turn-border-color);
-    padding-top: 0.3em;
+  .turn-compressed-window,
+  .turn-compressed-languages {
+    padding-left: var(--turn-widget-paragraph-scrollbar-padding);
+    padding-right: var(--turn-widget-paragraph-scrollbar-padding);
+    overflow-y: scroll;
+    overflow-anchor: none;
+    @include turn-scrollbar(var(--turn-scrollbar-color));
+  }
+
+  .turn-compressed-window + .turn-compressed-window {
+    box-shadow: 0 -1px 0 var(--turn-border-color);
+  }
+
+  .turn-compressed-window_measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 }
 
@@ -465,6 +491,8 @@ $lazy-skeleton: linear-gradient(transparent 30%, color-mix(in srgb, currentColor
         // восстановленную позицию вслед за сменой их высоты (как у перевода)
         overflow-anchor: none;
         @include turn-scrollbar(var(--turn-scrollbar-color));
+
+        @include turn-compressed-body;
       }
     }
 
@@ -491,6 +519,8 @@ $lazy-skeleton: linear-gradient(transparent 30%, color-mix(in srgb, currentColor
         // восстановленную позицию вслед за выросшим рядом
         overflow-anchor: none;
         @include turn-scrollbar(var(--turn-scrollbar-color));
+
+        @include turn-compressed-body;
       }
 
       .translation-loading {

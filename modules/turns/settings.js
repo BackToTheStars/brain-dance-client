@@ -274,12 +274,12 @@ const settings = {
   },
   // Статья в Markdown: блоки — ряды с одной колонкой в поле rows (редактор рядов в режиме
   // одной колонки), абзац — производный плоский текст, выделения ==…== — текстовые цитаты.
-  // Оформление карточки — как у «Text / picture».
+  // Оформление карточки — как у «Text / picture», картинка над статьёй (без «Picture only»).
   [TEMPLATE_MD]: {
     value: 'md',
     label: 'Markdown',
     requiredFields: [FIELD_ROWS],
-    availableFields: [FIELD_ROWS],
+    availableFields: [FIELD_ROWS, FIELD_PICTURE],
   },
   // Перевод текста: ряды md-ячеек в полях rows и languages, абзац — производный плоский текст
   // левой колонки; выделения в ячейках — текстовые цитаты. Цветов, как у md-хода, нет.

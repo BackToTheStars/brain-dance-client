@@ -2,6 +2,7 @@
 // статьи, ряду перевода), найти вхождение и подсветить. Текст успели изменить после поиска: нет
 // nth-го вхождения — первое в части; нет и его — начало части; нет части — остаётся карточка.
 // Абзац Quill — тот же путь без частей: вхождение ищется во всём теле. Прокрутка — как ручная.
+// У сжатой статьи и перевода ряд лежит в своём окошке: прокручивается оно, ход не разворачивается.
 
 import { TID } from '@/config/testIds';
 import { clearMatch, findMatch, showMatch } from './textMatch';
@@ -69,17 +70,19 @@ export const jumpToMatch = async ({ turnId, contentType, at, query }) => {
   if (!alive() || !body.el.isConnected) return;
 
   let root = body.el;
+  let scroller = body.el;
   if (at?.row != null) {
     if (!body.parts) return;
     const part = await body.parts.scrollToPart(String(at.row));
     if (!part || !alive()) return;
+    if (partsOf(part.parentElement)) scroller = part.parentElement;
     root = (at.column && part.querySelector(`[data-side="${at.column}"]`)) || part;
   }
   const range = findMatch(root, query, at?.nth || 1);
   if (!range) {
-    if (root !== body.el) reveal(body.el, root.getBoundingClientRect(), true);
+    if (root !== body.el) reveal(scroller, root.getBoundingClientRect(), true);
     return;
   }
-  reveal(body.el, range.getBoundingClientRect());
+  reveal(scroller, range.getBoundingClientRect());
   showMatch(range);
 };

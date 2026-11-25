@@ -16,6 +16,8 @@ import {
   getParagraphQuotesWithoutScroll,
   getScrolledQuotes,
 } from '../helpers/quotesHelper';
+import { placePart, topPart } from './parts/middleRow';
+import { partsOf } from './parts/useVisibleParts';
 
 const paragraphScrollQueue = getQueue(PARAGRAPH_SCROLL_TIMEOUT_DELAY);
 const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
@@ -32,6 +34,10 @@ const turnScrollQueue = getQueue(TURN_SCROLL_TIMEOUT_DELAY);
 // ([{ quoteId, text, position }], см. getEdgeQuotes; [] — таких нет), и layoutKey — значение,
 // меняющееся со сменой набора отрисованных частей: рамки тогда перемеряются по DOM.
 // sizeKey — смена перерегистрирует виджет: карточка пересчитывает высоту по новому содержимому.
+// Сжатый ход (окошки со своей прокруткой, QuoteWindows.js): paused — тело рамок не меряет, свою
+// прокрутку не пишет и не восстанавливает (после паузы возвращается на прежнее место: к ряду, что был
+// у верхнего края, — пиксели на оценках высот ленивых рядов привели бы к другому ряду); fixedHeight —
+// ref с высотой тела, пока она задана содержимым (сумма окошек): тогда min = max = она.
 export const useQuotedBody = ({
   turnId,
   widgetId,
@@ -49,8 +55,15 @@ export const useQuotedBody = ({
   edgeQuotes,
   layoutKey,
   sizeKey,
+  paused = false,
+  fixedHeight = null,
 }) => {
   const quotesDataRef = useRef(null);
+  const pausedRef = useRef(paused);
+  // место тела читается до того, как его содержимое сменится окошками
+  const anchorRef = useRef(null);
+  if (paused && !pausedRef.current) anchorRef.current = topPart(bodyRef.current);
+  pausedRef.current = paused;
   const size = useSelector((state) => state.turns.g[turnId].size);
   const { width, height } = size;
 
@@ -73,6 +86,11 @@ export const useQuotedBody = ({
 
   useEffect(() => {
     if (!bodyRef.current) return;
+    if (paused) {
+      // после паузы рамки меряются заново, как при первой отрисовке
+      quotesDataRef.current = null;
+      return;
+    }
     let needToUpdate = false;
     let widthChanged = false;
     let firstRender = false;
@@ -199,6 +217,7 @@ export const useQuotedBody = ({
     contentKey,
     layoutKey,
     edgeQuotes,
+    paused,
   ]);
 
   // Коробку тела меняют и мимо зависимостей эффекта выше — разделитель pdf, заголовок:
@@ -223,6 +242,7 @@ export const useQuotedBody = ({
     if (!bodyRef || !bodyRef.current) return;
 
     const scrollHandler = () => {
+      if (pausedRef.current) return;
       if (!!bodyRef.current) {
         const current = Math.round(bodyRef.current.scrollTop);
         if (ownScrollRef && current === ownScrollRef.current) {
@@ -265,12 +285,12 @@ export const useQuotedBody = ({
       id: widgetId,
       type: resizeType,
       minWidthCallback: () => minWidth,
-      minHeightCallback: () => 40,
+      minHeightCallback: () => fixedHeight?.current ?? 40,
       getDesiredHeight: ({ newHeight }) => {
         return newHeight;
       },
       maxHeightCallback: () => {
-        return bodyRef?.current?.scrollHeight || scrollHeight;
+        return fixedHeight?.current ?? (bodyRef?.current?.scrollHeight || scrollHeight);
       },
     };
     registerHandleResize(resizeInfo);
@@ -293,16 +313,46 @@ export const useQuotedBody = ({
   }, []);
 
   useEffect(() => {
-    if (!bodyRef.current) return;
+    if (!bodyRef.current || paused) return;
     if (scrollTop !== scrollPosition) {
       applyScroll(scrollPosition);
     }
   }, [scrollPosition]);
 
+  // Выход из паузы: тело — туда, где его оставили до неё. Ряд верхнего края не запомнен (ход открыт
+  // уже сжатым) или его больше нет — по позиции в пикселях (несохранённая — в сторе).
+  const wasPaused = useRef(paused);
+  useEffect(() => {
+    if (wasPaused.current === paused) return undefined;
+    wasPaused.current = paused;
+    if (paused) return undefined;
+    const byPixels = () => {
+      const kept =
+        store.getState().turns.scrollPositions?.[`${turnId}_${widgetId}`]?.scrollPosition;
+      applyScroll(kept ?? scrollPosition);
+    };
+    const anchor = anchorRef.current;
+    anchorRef.current = null;
+    const parts = anchor && partsOf(bodyRef.current);
+    if (!parts) {
+      byPixels();
+      return undefined;
+    }
+    let alive = true;
+    pendingScrollRef.current = null;
+    placePart(bodyRef.current, parts.scrollToPart, anchor).then((found) => {
+      if (alive && !found && !pausedRef.current) byPixels();
+    });
+    return () => {
+      alive = false;
+    };
+  }, [paused]);
+
   useEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
+      if (pausedRef.current) return;
       if (pendingScrollRef.current != null) {
         applyScroll(pendingScrollRef.current);
       }
@@ -317,7 +367,7 @@ export const useQuotedBody = ({
   // дальнейшая правка содержимого прокрутку не двигает
   const contentArrivedRef = useRef(false);
   useEffect(() => {
-    if (!contentKey || contentArrivedRef.current) return;
+    if (!contentKey || contentArrivedRef.current || paused) return;
     contentArrivedRef.current = true;
     if (pendingScrollRef.current != null) applyScroll(pendingScrollRef.current);
   }, [contentKey]);

@@ -72,6 +72,10 @@ const {
   TEMPLATE_MD,
 } = turnSettings;
 
+// Нетронутый ряд остаётся тем же объектом: черновик сравнивает ряды с базой по ссылке.
+const withoutRight = (rows) =>
+  Array.isArray(rows) ? rows.map((row) => (!row?.right ? row : { ...row, right: '' })) : rows;
+
 const SAVE_HINTS = {
   empty: 'Nothing to save: the turn is empty',
   unchanged: 'Nothing to save: no changes',
@@ -347,14 +351,27 @@ const AddEditTurnPopup = () => {
     if (isNew) {
       dispatch(createTurn(turnObj, saveCallbacks));
     } else if (translation) {
-      // Ряды и поля перевода — одним запросом операций; запись хода за ним — только при смене типа.
-      const { ops, put } = translation;
+      // Ряды и поля перевода — одним запросом операций; запись хода — только при смене типа (и
+      // картинки статьи): за операциями, а при смене на перевод — до них, иначе операции с правой
+      // колонкой сервер проверил бы по прежнему типу (у статьи её нет).
+      const { ops, put, putFirst } = translation;
+      if (putFirst) {
+        const written = await new Promise((resolve) => {
+          dispatch(resaveTurn(turnObj, { success: () => resolve(true) }, {
+            errorCallback: (message) => {
+              saveCallbacks.error(message);
+              resolve(false);
+            },
+          }));
+        });
+        if (!written) return;
+      }
       const sent = ops.length
         ? await dispatch(saveTurnOps({ turnId: turnObj._id, ops, cast: false }))
         : {};
       if (sent.error) return saveCallbacks.error(sent.error);
       if (ops.length && edition.isCurrent(token)) patchForm(baseSaved(ops));
-      if (!put) return saveCallbacks.success();
+      if (!put || putFirst) return saveCallbacks.success();
       const options = { errorCallback: saveCallbacks.error };
       dispatch(resaveTurn(turnObj, saveCallbacks, options));
     } else {
@@ -390,6 +407,14 @@ const AddEditTurnPopup = () => {
     dispatch(addNotification({ title: 'Info:', text: t('blocks.split', { count }), testId: TID.md.splitNotice, count }));
   const notifyMergeRefused = () =>
     dispatch(addNotification({ title: 'Info:', text: t('blocks.mergeTooBig'), testId: TID.md.mergeRefused }));
+  // «Склеить строки»: lines — сколько переносов снято (0 — склеивать нечего), blocks — в скольких блоках
+  const notifyJoin = (lines, blocks) =>
+    dispatch(addNotification({
+      title: 'Info:',
+      text: lines ? t('blocks.joined', { lines, blocks }) : t('blocks.joinNothing'),
+      testId: TID.md.joinNotice,
+      count: lines,
+    }));
 
   const saveHandler = (e) => {
     e.preventDefault(); // почитать про preventDefault()
@@ -418,7 +443,8 @@ const AddEditTurnPopup = () => {
       template: activeTemplate,
       // Позиция и цитаты других виджетов — какими они в сторе сейчас.
       turnToEdit: storedTurn(),
-      rowsOps: formDraftOps(formToSave),
+      // у статьи правой колонки нет: оставшийся от перевода правый текст стирается операциями
+      rowsOps: formDraftOps(isMd ? { ...formToSave, [FIELD_ROWS]: withoutRight(formToSave[FIELD_ROWS]) } : formToSave),
       baseFields: baseline?.fields,
       dWidgets: turnData?.dWidgets,
       lines,
@@ -561,7 +587,7 @@ const AddEditTurnPopup = () => {
             'w-1/6',
           )}
 
-          {!!error && <div className="alert alert-danger">{error.message}</div>}
+          {!!error && <div className="alert alert-danger" data-test-id={TID.addTurn.saveError}>{error.message}</div>}
         </div>
         <Component />
       </div>
@@ -613,7 +639,7 @@ const AddEditTurnPopup = () => {
                   );
                 })}
               {!!error && (
-                <div className="alert alert-danger">{error.message}</div>
+                <div className="alert alert-danger" data-test-id={TID.addTurn.saveError}>{error.message}</div>
               )}
             </div>
           </>
@@ -658,6 +684,7 @@ const AddEditTurnPopup = () => {
               single: isMd,
               notifySplit,
               notifyMergeRefused,
+              notifyJoin,
               changeHandler: (value) => formChangeHandler(editorSlotField, value),
               label: fieldSettings[editorSlotField].labelKey
                 ? t(fieldSettings[editorSlotField].labelKey)
@@ -678,6 +705,12 @@ const AddEditTurnPopup = () => {
                 </span>
               ),
             })}
+          </div>
+        )}
+        {/* в развёрнутом редакторе поля формы скрыты — ошибка над кнопками */}
+        {isMaximized && !!error && (
+          <div className="panel-cell">
+            <div className="alert alert-danger mb-0" data-test-id={TID.addTurn.saveError}>{error.message}</div>
           </div>
         )}
         <div className="panel-cell">

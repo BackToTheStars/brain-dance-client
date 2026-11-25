@@ -149,3 +149,44 @@ export const getScrolledQuotes = (
     };
   });
 };
+
+// Цитаты окошка сжатой статьи или перевода: windowEl — скроллер окошка, origin — внутренняя карточка
+// (от неё считаются рамки). Цитата режется по краю окошка; ушла за край целиком — рамка нулевой
+// высоты у этого края, как у сжатого абзаца.
+export const getWindowQuotes = (quotes, windowEl, origin, zoom = 1) => {
+  const rect = relativeRect(windowEl, origin, zoom);
+  const edgeTop = Math.round(rect.top * 100) / 100;
+  const edgeBottom = edgeTop + Math.round(rect.height * 100) / 100;
+  const scrollPosition = windowEl.scrollTop;
+
+  return quotes.map((quote) => {
+    const { width, left } = quote.initialCoords;
+    let { height } = quote.initialCoords;
+    let top = quote.initialCoords.top + edgeTop - scrollPosition - TURN_BORDER_THICKNESS;
+    let position = 'default';
+    if (top + height <= edgeTop) {
+      top = edgeTop + 1;
+      height = 0;
+      position = 'top';
+    } else if (top >= edgeBottom) {
+      top = edgeBottom - 1;
+      height = 0;
+      position = 'bottom';
+    } else {
+      if (top < edgeTop) {
+        height -= edgeTop - top;
+        top = edgeTop;
+      }
+      if (top + height > edgeBottom) height = edgeBottom - top;
+    }
+    return {
+      ...quote,
+      type: TYPE_QUOTE_TEXT,
+      width,
+      height,
+      left,
+      top,
+      position,
+    };
+  });
+};

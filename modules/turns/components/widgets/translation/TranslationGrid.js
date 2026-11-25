@@ -4,14 +4,16 @@
 // набор отрисованных рядов или их раскладка.
 // single — статья md: ряд — блок статьи (только left), без языков, сетки и линий между рядами;
 // блоки идут сплошным текстом. refs — определения ссылок статьи ([x]: url), общие для всех блоков:
-// у блока, рисуемого отдельно, своих определений нет.
+// у блока, рисуемого отдельно, своих определений нет; md — экземпляр markdown-it рендера, по нему
+// блоки-определения и находятся.
 // Ячейки md рисуются только у рядов в окне прокрутки с запасом; ряды вне окна подряд — один пустой
 // разделитель (data-spacer) суммарной высоты их оценок, а после первой отрисовки — замеров, чтобы
 // длинный ход не верстал невидимое и число элементов не зависело от числа рядов. scrollRef —
 // скроллер сетки; ownScrollRef — см. useVisibleParts.
-// Сжатый ход (windows.js): rows — окошки вокруг цитат, windows — пометить их (тест-id окошка,
-// data-row-id — ряд, из которого окошко); revealPart(id) — для перехода к части не из списка: true, если
-// карточка покажет ход целиком; refRows — все ряды статьи: определение ссылки может стоять вне окошек.
+// Окошко сжатого хода (QuoteWindows.js) — та же сетка на своём скроллере с частью рядов: always — id
+// рядов, которые рисуются всегда (ряды с цитатами); startAt — id ряда, на который окошко ставится при
+// первой отрисовке; onMeasure — отрисованный ряд сменил высоту; definitions — готовые определения
+// ссылок всей статьи (определение может стоять в ряду другого окошка).
 
 import { TID } from '@/config/testIds';
 import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
@@ -43,20 +45,72 @@ export const estimateBlockHeight = (row, box) =>
     extra: box.fontSize * 0.6,
   });
 
-// Определения ссылок статьи: блоки, у которых каждая строка — определение.
-const DEFINITION = /^ {0,3}\[[^\]]+\]:\s*\S/;
-export const linkDefinitions = (rows) => {
+// Определения ссылок статьи: блоки, которые markdown-it (md — экземпляр рендера) разбирает в ноль
+// токенов, — в них только определения. Без md определений нет.
+export const linkDefinitions = (rows, md) => {
+  if (!md) return '';
   const found = [];
   for (const row of rows) {
     const source = text(row?.left);
-    if (!source.includes(']:')) continue;
-    const lines = source.split('\n');
-    if (lines.every((line) => DEFINITION.test(line))) found.push(source);
+    if (!source.includes(']:') || !source.trim()) continue;
+    if (!md.parse(source, {}).length) found.push(source);
   }
-  return found.join('\n');
+  return found.join('\n\n');
 };
 
 const withRefs = (source, refs) => (refs && source.includes('[') ? `${source}\n\n${refs}` : source);
+
+// Строка языков и узел ряда — одни у сетки и у сжатого хода (QuoteWindows.js: строка языков над
+// окошками, ряды в замере перед раскладкой окошек). ref — на корень ряда.
+export const languagesRow = (languages) => (
+  <div className="translation-languages" data-test-id={TID.translation.languages}>
+    <div className="translation-cell" data-side="left">
+      {languages.left}
+    </div>
+    <div className="translation-cell" data-side="right">
+      {languages.right}
+    </div>
+  </div>
+);
+
+export const gridRow = (row, { single, refs, markIds, showQuoteIds, ref }) =>
+  single ? (
+    <MdHtml
+      key={row.id}
+      bodyRef={ref}
+      source={withRefs(row.left, refs)}
+      markIds={markIds}
+      showQuoteIds={showQuoteIds}
+      className="md-block"
+      data-test-id={TID.md.block}
+      data-row-id={row.id}
+    />
+  ) : (
+    <div
+      className="translation-row"
+      key={row.id}
+      ref={ref}
+      data-test-id={TID.translation.row}
+      data-row-id={row.id}
+    >
+      <MdHtml
+        source={row.left}
+        markIds={markIds}
+        showQuoteIds={showQuoteIds}
+        className="translation-cell"
+        data-test-id={TID.translation.cell}
+        data-side="left"
+      />
+      <MdHtml
+        source={row.right}
+        markIds={markIds}
+        showQuoteIds={showQuoteIds}
+        className="translation-cell"
+        data-test-id={TID.translation.cell}
+        data-side="right"
+      />
+    </div>
+  );
 
 const TranslationGrid = ({
   rows,
@@ -67,16 +121,18 @@ const TranslationGrid = ({
   showQuoteIds = false,
   onLayout,
   single = false,
-  windows = false,
-  revealPart,
-  refRows,
+  md,
+  always,
+  startAt,
+  onMeasure,
+  definitions,
 }) => {
   const showLanguages = !single && !!(languages?.left || languages?.right);
   const ids = useMemo(() => rows.map((row) => row.id), [rows]);
   const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
   const refs = useMemo(
-    () => (single ? linkDefinitions(refRows || rows) : ''),
-    [single, rows, refRows],
+    () => (!single ? '' : definitions !== undefined ? definitions : linkDefinitions(rows, md)),
+    [single, rows, md, definitions],
   );
   const estimate = useCallback(
     (id, box) => (single ? estimateBlockHeight : estimateRowHeight)(byId.get(id), box),
@@ -88,7 +144,9 @@ const TranslationGrid = ({
     estimate,
     ownScrollRef,
     layoutKey: single ? 'single' : undefined,
-    reveal: revealPart,
+    always,
+    startAt,
+    onMeasure,
   });
   const { visible, heightOf, measureRef } = parts;
   useLayoutEffect(() => {
@@ -96,23 +154,9 @@ const TranslationGrid = ({
   }, [parts]);
   const rowClass = single ? 'md-block' : 'translation-row';
   const rowTestId = single ? TID.md.block : TID.translation.row;
-  const partClass = windows ? `${rowClass} turn-compressed-window` : rowClass;
-  const partTestId = windows ? TID.turnCompressedWindow : rowTestId;
   return (
     <>
-      {showLanguages && (
-        <div
-          className="translation-languages"
-          data-test-id={TID.translation.languages}
-        >
-          <div className="translation-cell" data-side="left">
-            {languages.left}
-          </div>
-          <div className="translation-cell" data-side="right">
-            {languages.right}
-          </div>
-        </div>
-      )}
+      {showLanguages && languagesRow(languages)}
       {/* один плоский список с ключами: ряд, оставшийся в окне, не перемонтируется при смене отрезков */}
       {runs(ids, visible).flatMap((run) =>
         !run.visible ? (
@@ -127,47 +171,9 @@ const TranslationGrid = ({
             style={{ height: sumHeights(run.ids, heightOf) }}
           />
         ) : (
-          run.ids.map((id) => {
-            const row = byId.get(id);
-            const rowId = windows ? row.rowId : id;
-            return single ? (
-              <MdHtml
-                key={id}
-                bodyRef={measureRef(id)}
-                source={withRefs(row.left, refs)}
-                markIds={markIds}
-                showQuoteIds={showQuoteIds}
-                className={partClass}
-                data-test-id={partTestId}
-                data-row-id={rowId}
-              />
-            ) : (
-              <div
-                className={partClass}
-                key={id}
-                ref={measureRef(id)}
-                data-test-id={partTestId}
-                data-row-id={rowId}
-              >
-                <MdHtml
-                  source={row.left}
-                  markIds={markIds}
-                  showQuoteIds={showQuoteIds}
-                  className="translation-cell"
-                  data-test-id={TID.translation.cell}
-                  data-side="left"
-                />
-                <MdHtml
-                  source={row.right}
-                  markIds={markIds}
-                  showQuoteIds={showQuoteIds}
-                  className="translation-cell"
-                  data-test-id={TID.translation.cell}
-                  data-side="right"
-                />
-              </div>
-            );
-          })
+          run.ids.map((id) =>
+            gridRow(byId.get(id), { single, refs, markIds, showQuoteIds, ref: measureRef(id) }),
+          )
         ),
       )}
     </>

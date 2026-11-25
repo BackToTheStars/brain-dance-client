@@ -6,7 +6,8 @@
 // Пока рендер md не загружен, в теле вместо сетки пустых рядов — строка загрузки. Ряды вне окна
 // прокрутки сетка рисует разделителями суммарной высоты (TranslationGrid), поэтому высота тела до
 // их отрисовки — оценка: для регистрации ресайза этого достаточно. Сжатый ход (флаг compressed) —
-// окошки: ряды с цитатами целиком (useQuoteWindows.js) на той же сетке.
+// столбик окошек вокруг групп цитат (useQuoteWindows.js, QuoteWindows.js): строка языков над первым
+// окошком, в окошке — ряды с обеими колонками и своя прокрутка.
 
 import { TID } from '@/config/testIds';
 import { TRANSLATION_MIN_WIDTH } from '@/config/turn';
@@ -22,7 +23,8 @@ import { useMdRenderer } from '../md/mdRenderer';
 import ParagraphQuotes from '../paragraph/ParagraphQuotes';
 import { useQuotedBody } from '../useQuotedBody';
 import { edgeQuotes, rowsQuoteIndex } from './quotes';
-import TranslationGrid from './TranslationGrid';
+import QuoteWindows from './QuoteWindows';
+import TranslationGrid, { estimateRowHeight } from './TranslationGrid';
 import { useQuoteWindows } from './useQuoteWindows';
 
 const TranslationTable = ({
@@ -51,7 +53,13 @@ const TranslationTable = ({
   // scrollTop, выставленный сеткой при сдвиге заглушек, — не прокрутка пользователя
   const ownScroll = useRef(null);
   const markVars = useMdMarkVars();
-  const view = useQuoteWindows({ rows, compressed: widget.compressed, bodyRef: bodyEl });
+  const view = useQuoteWindows({
+    rows,
+    compressed: widget.compressed,
+    estimate: estimateRowHeight,
+    bodyRef: bodyEl,
+    ready,
+  });
 
   // содержимое меняется с рядами и языками и один раз — когда загрузился рендер; счётчик смен
   // вместо строки всех рядов
@@ -73,8 +81,8 @@ const TranslationTable = ({
   }, []);
   const edge = useMemo(
     () =>
-      edgeQuotes(view.rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
-    [view.rows, turnLines, layoutKey],
+      edgeQuotes(rows, turnLines ? Object.keys(turnLines) : [], visibleRows.current),
+    [rows, turnLines, layoutKey],
   );
 
   useQuotedBody({
@@ -89,12 +97,14 @@ const TranslationTable = ({
     registerHandleResize,
     unregisterHandleResize,
     // до загрузки рендера виджет не зарегистрирован: Turn.js ждёт его и не пересчитывает высоту
-    ready,
+    ready: view.sizeReady,
     minWidth: TRANSLATION_MIN_WIDTH,
     ownScrollRef: ownScroll,
     edgeQuotes: edge,
     layoutKey,
     sizeKey: view.sizeKey,
+    paused: view.active,
+    fixedHeight: view.fixedHeight,
   });
 
   return (
@@ -108,16 +118,26 @@ const TranslationTable = ({
           data-compressed={view.active ? 'true' : undefined}
         >
           {ready && bodyMounted ? (
-            <TranslationGrid
-              rows={view.rows}
-              languages={languages}
-              scrollRef={bodyEl}
-              ownScrollRef={ownScroll}
-              markIds
-              onLayout={onLayout}
-              windows={view.windows}
-              revealPart={view.revealPart}
-            />
+            view.active ? (
+              <QuoteWindows
+                view={view}
+                bodyRef={bodyEl}
+                turnId={turnId}
+                widgetId={widgetId}
+                rows={rows}
+                languages={languages}
+                widgetsUpdatedTime={widgetsUpdatedTime}
+              />
+            ) : (
+              <TranslationGrid
+                rows={rows}
+                languages={languages}
+                scrollRef={bodyEl}
+                ownScrollRef={ownScroll}
+                markIds
+                onLayout={onLayout}
+              />
+            )
           ) : (
             <div
               className="translation-loading"

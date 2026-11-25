@@ -107,6 +107,8 @@ export const TID = {
     pasteRefused: 'md-paste-refused',
     // там же: склейка блоков в «Авто» отклонена — итог больше предела блока
     mergeRefused: 'md-merge-refused',
+    // там же: итог «Склеить строки» (+ data-count — сколько переносов снято; 0 — «Нечего склеивать»)
+    joinNotice: 'md-join-notice',
     // Прежняя форма статьи (один Quill, textarea Source); с хранением блоками в DOM их нет
     preview: 'md-preview',
     source: 'md-source',
@@ -165,6 +167,9 @@ export const TID = {
       mergeRow: 'translation-editor-merge-row',
       splitRow: 'translation-editor-split-row',
       copyAll: 'translation-editor-copy-all', // «скопировать всю статью» в верхней полосе (склейка блоков в буфер)
+      // Только у статьи, в нижней строке под рядами (кроме Preview): «Склеить строки»; после склейки — «Вернуть
+      // переносы» с data-restore="true" (до следующей правки или Save)
+      joinLines: 'translation-editor-join-lines',
       previewPane: 'translation-editor-preview-pane', // отрисованный предпросмотр (внутри — translation.row / cell)
       // Окно «в ряду есть текст»: тело (+ data-row-id; data-saved="true" — ряд удалится на сервере сразу) и кнопки
       deleteConfirm: 'translation-editor-delete-confirm',
@@ -185,8 +190,9 @@ export const TID = {
   // Кнопка правки виджета — карандаш в тулбаре любого виджета
   // (widgets/buttons/Edit.js), + data-turn-id, data-widget-id
   widgetEdit: 'widget-edit',
-  // Сжатая статья и перевод (Compress в режиме виджета): окошко вокруг цитат в теле карточки
-  // (+ data-row-id — ряд, из которого оно; у статьи из одного блока может быть несколько окошек).
+  // Сжатая статья и перевод (Compress в режиме виджета): окошко вокруг группы цитат в теле карточки —
+  // скроллер постоянной высоты с рядами (md.block / translation.row) внутри; + data-index (номер
+  // окошка), data-rows (число рядов), data-first-row, data-last-row (id рядов).
   // У тела сжатого хода (md.body, translation.body) — data-compressed="true"
   turnCompressedWindow: 'turn-compressed-window',
 
@@ -478,6 +484,8 @@ export const TID = {
     // ready | empty | unchanged | checking (проба ссылки) | preview (кадр видео); кроме ready — disabled
     save: 'add-turn-save',
     cancel: 'add-turn-cancel',
+    // Строка ошибки сохранения (.alert-danger): под полями формы, при Maximize — над кнопками
+    saveError: 'add-turn-save-error',
     // Окно «Похоже, это не картинка / видео / аудио / PDF»: тело с data-field (image | video | audio | pdf)
     // и data-reason (type — видно по адресу, load — проба не удалась), и его кнопки
     notMedia: 'add-turn-not-media',
